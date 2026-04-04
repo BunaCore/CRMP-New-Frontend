@@ -1,0 +1,93 @@
+import { RubricItem, EvalProposalRow, EvalProjectRow } from "../types";
+
+export const DEMO_RUBRIC: RubricItem[] = [
+  { order: 1, name: "Advisor", kind: "continuous", max: 20, score: 19 },
+  { order: 2, name: "Proposal Defence", kind: "continuous", max: 15, score: 13.32 },
+  { order: 3, name: "Documentation", kind: "continuous", max: 20, score: 15 },
+  { order: 4, name: "Defence — Individual", kind: "continuous", max: 15, score: 12.88 },
+  { order: 5, name: "Defence — Group", kind: "final", max: 30, score: 24.8 },
+];
+
+export const EVAL_PROPOSALS: EvalProposalRow[] = [
+  {
+    id: "PRP-EV-001",
+    title: "Adaptive Irrigation Scheduling Using Soil Moisture IoT",
+    pi: "Dr. L. Vance",
+    piAvatar: "LV",
+    piColor: "bg-purple-100 text-purple-700",
+    dept: "Agricultural Engineering",
+    stage: "Committee review",
+    budget: "Br 118,000",
+  },
+  {
+    id: "PRP-EV-002",
+    title: "Low-Cost Prosthetic Socket Materials for Rural Clinics",
+    pi: "Prof. E. Stark",
+    piAvatar: "ES",
+    piColor: "bg-emerald-100 text-emerald-700",
+    dept: "Biomedical Engineering",
+    stage: "External evaluation",
+    budget: "Br 203,500",
+  },
+  {
+    id: "PRP-EV-003",
+    title: "Ethiopian Highlands Carbon Stock Remote Sensing",
+    pi: "Dr. M. Getachew",
+    piAvatar: "MG",
+    piColor: "bg-blue-100 text-blue-700",
+    dept: "Environmental Science",
+    stage: "Scoring complete",
+    budget: "Br 86,400",
+  },
+];
+
+export const EVAL_PROJECTS: EvalProjectRow[] = [
+  {
+    id: "PRJ-EV-101",
+    title: "Community Solar Kiosks — Phase II",
+    lead: "Dr. A. Tadesse",
+    leadAvatar: "AT",
+    leadColor: "bg-amber-100 text-amber-700",
+    dept: "Energy Institute",
+    budget: "Br 450,000",
+    evalStatus: "On evaluation",
+    totalScore: 62.5,
+    maxTotal: 100,
+  },
+  {
+    id: "PRJ-EV-102",
+    title: "National TB Lab Data Harmonization",
+    lead: "Prof. S. Alemu",
+    leadAvatar: "SA",
+    leadColor: "bg-rose-100 text-rose-700",
+    dept: "Public Health",
+    budget: "Br 320,000",
+    evalStatus: "Awaiting approval",
+    totalScore: 84.2,
+    maxTotal: 100,
+  },
+  {
+    id: "PRJ-EV-103",
+    title: "Heritage Documentation VR Pilot",
+    lead: "Dr. H. Demissie",
+    leadAvatar: "HD",
+    leadColor: "bg-cyan-100 text-cyan-700",
+    dept: "Architecture",
+    budget: "Br 95,000",
+    evalStatus: "Scheduled",
+    totalScore: 0,
+    maxTotal: 100,
+  },
+  {
+    id: "PRJ-EV-104",
+    title: "Industrial Enzyme Production Scale-up",
+    lead: "Prof. F. Tadesse",
+    leadAvatar: "FT",
+    leadColor: "bg-violet-100 text-violet-700",
+    dept: "Chemical Engineering",
+    budget: "Br 1,200,000",
+    evalStatus: "Finished",
+    totalScore: 91.0,
+    maxTotal: 100,
+  },
+];

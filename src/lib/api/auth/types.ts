@@ -15,7 +15,9 @@ export type UserRole =
   | "Department"
   | "College/School"
   | "PGMO"
-  | "Examiner/Evaluator";
+  | "Examiner/Evaluator"
+  | "Advisor"
+  | "Evaluator";
 
 // Full user profile returned from backend after login or /auth/me
 export interface UserProfile {

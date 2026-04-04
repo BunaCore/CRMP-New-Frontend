@@ -53,7 +53,7 @@ const ADMIN_MODULE_RULES: SidebarModuleRule[] = [
 
   { url: "/admin/projects", permissions: ["PROJECT_VIEW", "BUDGET_VIEW"] },
   { url: "/admin/proposals", permissions: ["PROJECT_REVIEW", "PROJECT_APPROVE", "PROJECT_REJECT"] },
-  { url: "/admin/evaluations", permissions: ["EVALUATOR_ASSIGN", "PROJECT_REVIEW"] },
+  { url: "/admin/evaluations", permissions: ["EVALUATOR_ASSIGN"] },
   { url: "/admin/progress", permissions: ["FUNDED_VIEW", "FUNDED_SUBMIT"] },
 
   { url: "/admin/budget", permissions: ["BUDGET_VIEW", "BUDGET_APPROVE", "BUDGET_REJECT"] },
