@@ -1,8 +1,11 @@
-import type { Metadata } from "next";
+import { Suspense } from "react";
+
 import Link from "next/link";
+
+import type { Metadata } from "next";
+
 import { SignInForm } from "@/components/auth/SignInForm";
 import { APP_CONFIG } from "@/config/app-config";
-import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Sign In | Collaborative Research Management Platform",
@@ -15,7 +18,7 @@ export default function LoginPage() {
       {/* Left Panel: Graphic / Brand Side */}
       <div className="relative hidden w-0 w-1/2 flex-1 flex-col justify-center border-slate-200 border-r bg-white px-10 pt-10 lg:flex dark:border-slate-800 dark:bg-slate-900">
         <div className="absolute inset-0 z-0 bg-[url('/media/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
-        
+
         <div className="relative z-10 mx-auto flex max-w-xl flex-col items-center justify-center text-center">
           <div className="mb-6 inline-flex h-16 items-center justify-center rounded-2xl border border-blue-600/20 bg-blue-600/10 p-4 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
             {/* Logo placeholder */}
@@ -37,7 +40,8 @@ export default function LoginPage() {
             {APP_CONFIG.meta.title || "CRMP"} Access Portal
           </h1>
           <p className="mt-6 text-lg text-slate-600 dark:text-slate-400">
-            A secure gateway for Principal Investigators, Evaluators, and Administration logic. Use role-based assignments to safely manage and evaluate ongoing projects.
+            A secure gateway for Principal Investigators, Evaluators, and Administration logic. Use role-based
+            assignments to safely manage and evaluate ongoing projects.
           </p>
         </div>
       </div>
@@ -46,7 +50,10 @@ export default function LoginPage() {
       <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:w-1/2 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div className="text-center lg:text-left">
-            <Link href="/" className="mb-10 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white lg:hidden">
+            <Link
+              href="/"
+              className="mb-10 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white lg:hidden"
+            >
               <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <title>Back</title>
                 <path d="M12 2L2 7l10 5 10-5-10-5Z" />
@@ -58,7 +65,10 @@ export default function LoginPage() {
             </h2>
             <p className="mt-2 text-slate-600 text-sm dark:text-slate-400">
               Need access?{" "}
-                <a href="mailto:support@crmp.com" className="font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400">
+              <a
+                href="mailto:support@crmp.com"
+                className="font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400"
+              >
                 Contact your systemic administrator
               </a>
             </p>

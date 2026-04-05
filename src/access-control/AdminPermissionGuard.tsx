@@ -2,11 +2,12 @@
 
 import type { ReactNode } from "react";
 import { useEffect } from "react";
+
 import { useRouter } from "next/navigation";
 
+import { hasPermission } from "@/access-control/permission-gates";
 import NotFoundPage from "@/app/404";
 import { useAuthStore } from "@/stores/authStore";
-import { hasPermission } from "@/access-control/permission-gates";
 
 /**
  * Admin space permission guard (permission-only; no roles).
@@ -52,4 +53,3 @@ export function AdminPermissionGuard({ children }: { children: ReactNode }) {
 
   return <>{children}</>;
 }
-

@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 // ============================================================
 // EDGE MIDDLEWARE — runs server-side before page renders.

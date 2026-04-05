@@ -1,9 +1,13 @@
 "use client";
 
 import Link from "next/link";
+
 import { Command } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 
+// We reuse the existing generic Nav components from your main dash
+import { NavMain } from "@/app/(main)/dashboard/_components/sidebar/nav-main";
+import { NavUser } from "@/app/(main)/dashboard/_components/sidebar/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -14,14 +18,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { APP_CONFIG } from "@/config/app-config";
-
-import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
 import { useSession } from "@/context/SessionContext";
 import { getAuthorizedAdminNavItems } from "@/navigation/sidebar/admin-nav-config";
-
-// We reuse the existing generic Nav components from your main dash
-import { NavMain } from "@/app/(main)/dashboard/_components/sidebar/nav-main";
-import { NavUser } from "@/app/(main)/dashboard/_components/sidebar/nav-user";
+import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
 
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { sidebarVariant, sidebarCollapsible, isSynced } = usePreferencesStore(

@@ -8,7 +8,6 @@ export const APP_CONFIG = {
   copyright: `© ${currentYear}, CRMP.`,
   meta: {
     title: "CRMP - Collaborative Project Management",
-    description:
-      "CRMP is a modern, collaborative project management dashboard.",
+    description: "CRMP is a modern, collaborative project management dashboard.",
   },
 };

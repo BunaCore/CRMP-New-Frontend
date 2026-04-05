@@ -1,11 +1,10 @@
 "use client";
 
-import React from "react";
-import { ProposalsProvider } from "./proposals-context";
-import { ProposalsTable } from "./_components/proposals-table";
-import { ProposalsDrawer } from "./_components/proposals-drawer";
-import { ActionsAndModals } from "./_components/actions-and-modals";
 import { FileText } from "lucide-react";
+
+import { ProposalsDrawer } from "./_components/proposals-drawer";
+import { ProposalsTable } from "./_components/proposals-table";
+import { ProposalsProvider } from "./proposals-context";
 
 export default function AdminProposalsPage() {
   return (
@@ -27,7 +26,6 @@ export default function AdminProposalsPage() {
         {/* ── Main Layout Components ── */}
         <ProposalsTable />
         <ProposalsDrawer />
-        <ActionsAndModals />
       </div>
     </ProposalsProvider>
   );

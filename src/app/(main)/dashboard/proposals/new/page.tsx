@@ -1,36 +1,20 @@
 "use client";
 
 import * as React from "react";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+
+import { ArrowLeft, ArrowRight, Check, CheckCircle2, FileUp, Plus, Search, Trash2 } from "lucide-react";
+
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  CheckCircle2,
-  FileUp,
-  Plus,
-  Search,
-  Trash2,
-} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
 
 /**----------------------
  * MOCK DATA
@@ -43,22 +27,78 @@ const STEPS = [
 ];
 
 const AVAILABLE_TEAM = [
-  { id: "t1", name: "Dr. Elena Rostova", role: "Co-Investigator", dept: "Physics", avatar: "ER", color: "bg-purple-100 text-purple-700" },
-  { id: "t2", name: "Prof. Michael Chen", role: "AI Specialist", dept: "Computer Science", avatar: "MC", color: "bg-blue-100 text-blue-700" },
-  { id: "t3", name: "Sarah Jenkins", role: "Data Analyst", dept: "Bioinformatics", avatar: "SJ", color: "bg-emerald-100 text-emerald-700" },
-  { id: "t4", name: "Dr. Alan Grant", role: "Lead Researcher", dept: "Biology", avatar: "AG", color: "bg-amber-100 text-amber-700" },
-  { id: "t5", name: "Dr. Emily Wong", role: "Biochemist", dept: "Chemistry", avatar: "EW", color: "bg-rose-100 text-rose-700" },
-  { id: "t6", name: "James Carter", role: "Systems Engineer", dept: "Engineering", avatar: "JC", color: "bg-slate-200 text-slate-700" },
+  {
+    id: "t1",
+    name: "Dr. Elena Rostova",
+    role: "Co-Investigator",
+    dept: "Physics",
+    avatar: "ER",
+    color: "bg-purple-100 text-purple-700",
+  },
+  {
+    id: "t2",
+    name: "Prof. Michael Chen",
+    role: "AI Specialist",
+    dept: "Computer Science",
+    avatar: "MC",
+    color: "bg-blue-100 text-blue-700",
+  },
+  {
+    id: "t3",
+    name: "Sarah Jenkins",
+    role: "Data Analyst",
+    dept: "Bioinformatics",
+    avatar: "SJ",
+    color: "bg-emerald-100 text-emerald-700",
+  },
+  {
+    id: "t4",
+    name: "Dr. Alan Grant",
+    role: "Lead Researcher",
+    dept: "Biology",
+    avatar: "AG",
+    color: "bg-amber-100 text-amber-700",
+  },
+  {
+    id: "t5",
+    name: "Dr. Emily Wong",
+    role: "Biochemist",
+    dept: "Chemistry",
+    avatar: "EW",
+    color: "bg-rose-100 text-rose-700",
+  },
+  {
+    id: "t6",
+    name: "James Carter",
+    role: "Systems Engineer",
+    dept: "Engineering",
+    avatar: "JC",
+    color: "bg-slate-200 text-slate-700",
+  },
 ];
 
 const AVAILABLE_ADVISORS = [
-  { id: "a1", name: "Dr. Robert Ford", role: "Senior Faculty", dept: "Engineering", avatar: "RF", color: "bg-slate-200 text-slate-700" },
-  { id: "a2", name: "Prof. Lisa Su", role: "Department Head", dept: "Computer Science", avatar: "LS", color: "bg-indigo-100 text-indigo-700" },
+  {
+    id: "a1",
+    name: "Dr. Robert Ford",
+    role: "Senior Faculty",
+    dept: "Engineering",
+    avatar: "RF",
+    color: "bg-slate-200 text-slate-700",
+  },
+  {
+    id: "a2",
+    name: "Prof. Lisa Su",
+    role: "Department Head",
+    dept: "Computer Science",
+    avatar: "LS",
+    color: "bg-indigo-100 text-indigo-700",
+  },
 ];
 
 export default function NewProposalPage() {
   const router = useRouter();
-  
+
   // Step state
   const [currentStep, setCurrentStep] = React.useState(0);
 
@@ -84,9 +124,7 @@ export default function NewProposalPage() {
   };
 
   const handleToggleTeam = (id: string) => {
-    setSelectedTeam((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
+    setSelectedTeam((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
   };
 
   const handleAddBudgetRow = () => {
@@ -96,22 +134,22 @@ export default function NewProposalPage() {
     setBudgetRows(budgetRows.filter((r) => r.id !== id));
   };
   const handleUpdateBudgetRow = (id: string, field: string, value: string) => {
-    setBudgetRows(
-      budgetRows.map((r) => (r.id === id ? { ...r, [field]: value } : r))
-    );
+    setBudgetRows(budgetRows.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
   };
 
   const calculateTotalBudget = () => {
     return budgetRows.reduce((acc, row) => acc + (parseFloat(row.amount) || 0), 0);
   };
 
-  const filteredTeam = teamSearch.trim().length > 0 
-    ? AVAILABLE_TEAM.filter((t) => (t.name + t.dept + t.role).toLowerCase().includes(teamSearch.toLowerCase()))
-    : [];
+  const filteredTeam =
+    teamSearch.trim().length > 0
+      ? AVAILABLE_TEAM.filter((t) => (t.name + t.dept + t.role).toLowerCase().includes(teamSearch.toLowerCase()))
+      : [];
 
-  const filteredAdvisors = advisorSearch.trim().length > 0 
-    ? AVAILABLE_ADVISORS.filter((a) => (a.name + a.dept + a.role).toLowerCase().includes(advisorSearch.toLowerCase()))
-    : [];
+  const filteredAdvisors =
+    advisorSearch.trim().length > 0
+      ? AVAILABLE_ADVISORS.filter((a) => (a.name + a.dept + a.role).toLowerCase().includes(advisorSearch.toLowerCase()))
+      : [];
 
   /**----------------------
    * RENDER STEPPER
@@ -119,8 +157,8 @@ export default function NewProposalPage() {
   const renderStepper = () => (
     <div className="relative mx-auto mb-6 flex w-full max-w-2xl justify-between">
       <div className="-z-10 absolute top-[16px] right-[5%] left-[5%] h-[2px] bg-slate-100 dark:bg-slate-800" />
-      <div 
-        className="-z-10 absolute top-[16px] left-[5%] h-[2px] bg-blue-600 transition-all duration-500 ease-in-out" 
+      <div
+        className="-z-10 absolute top-[16px] left-[5%] h-[2px] bg-blue-600 transition-all duration-500 ease-in-out"
         style={{ width: `calc(${(currentStep / (STEPS.length - 1)) * 90}%)` }}
       />
       {STEPS.map((step, index) => {
@@ -133,14 +171,16 @@ export default function NewProposalPage() {
                 isActive
                   ? "bg-blue-600 text-white ring-2 ring-blue-100 dark:ring-blue-900/50"
                   : isCompleted
-                  ? "border-2 border-blue-600 bg-white text-blue-600 dark:border-blue-500 dark:bg-slate-950"
-                  : "border border-slate-200 bg-white text-slate-400 dark:border-slate-800 dark:bg-slate-950"
+                    ? "border-2 border-blue-600 bg-white text-blue-600 dark:border-blue-500 dark:bg-slate-950"
+                    : "border border-slate-200 bg-white text-slate-400 dark:border-slate-800 dark:bg-slate-950"
               }`}
             >
               {isCompleted ? <Check className="h-4 w-4" /> : index + 1}
             </div>
             <div className="text-center">
-              <p className={`font-bold text-[11px] uppercase tracking-wider ${isActive ? "text-blue-700 dark:text-blue-400" : isCompleted ? "text-slate-700 dark:text-slate-300" : "text-slate-400"}`}>
+              <p
+                className={`font-bold text-[11px] uppercase tracking-wider ${isActive ? "text-blue-700 dark:text-blue-400" : isCompleted ? "text-slate-700 dark:text-slate-300" : "text-slate-400"}`}
+              >
                 {step.title}
               </p>
             </div>
@@ -155,7 +195,11 @@ export default function NewProposalPage() {
       {/* Header */}
       <div className="mb-2 flex flex-col">
         <Link href="/dashboard/proposals" className="mb-2 w-fit">
-          <Button variant="ghost" size="sm" className="-ml-2 h-7 rounded px-2 text-slate-500 text-xs transition-all hover:bg-slate-100 dark:hover:bg-slate-800">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="-ml-2 h-7 rounded px-2 text-slate-500 text-xs transition-all hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
             <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Back to Proposals
           </Button>
         </Link>
@@ -178,7 +222,9 @@ export default function NewProposalPage() {
           {currentStep === 0 && (
             <div className="fade-in slide-in-from-right-4 mx-auto mt-4 flex max-w-3xl animate-in flex-col gap-5 duration-500">
               <div className="grid gap-1.5">
-                <Label htmlFor="title" className="font-medium text-sm">Proposal Title</Label>
+                <Label htmlFor="title" className="font-medium text-sm">
+                  Proposal Title
+                </Label>
                 <Input
                   id="title"
                   value={title}
@@ -188,7 +234,9 @@ export default function NewProposalPage() {
                 />
               </div>
               <div className="grid gap-1.5">
-                <Label htmlFor="abstract" className="font-medium text-sm">Abstract & Core Objectives</Label>
+                <Label htmlFor="abstract" className="font-medium text-sm">
+                  Abstract & Core Objectives
+                </Label>
                 <Textarea
                   id="abstract"
                   value={abstract}
@@ -205,7 +253,11 @@ export default function NewProposalPage() {
                     Upload full proposal layout (Optional)
                   </p>
                   <p className="mt-0.5 text-[11px] text-slate-500">PDF or DOCX (max 10MB)</p>
-                  {file && <Badge className="mt-3 border border-slate-200 bg-slate-100 px-2 py-0.5 text-slate-700 text-xs shadow-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">{file.name}</Badge>}
+                  {file && (
+                    <Badge className="mt-3 border border-slate-200 bg-slate-100 px-2 py-0.5 text-slate-700 text-xs shadow-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                      {file.name}
+                    </Badge>
+                  )}
                 </div>
               </div>
             </div>
@@ -229,7 +281,7 @@ export default function NewProposalPage() {
                     />
                   </div>
                 </div>
-                
+
                 <div className="flex flex-col gap-2 overflow-y-auto pr-1">
                   {teamSearch.trim().length === 0 ? (
                     <div className="rounded-md border border-slate-200 border-dashed bg-white p-6 text-center text-slate-400 text-sm dark:bg-slate-950/50">
@@ -251,30 +303,50 @@ export default function NewProposalPage() {
                               : "border-slate-200 bg-white hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:hover:bg-slate-900"
                           }`}
                         >
-                          <Avatar className="h-8 w-8"><AvatarFallback className={`${member.color} font-bold text-[10px]`}>{member.avatar}</AvatarFallback></Avatar>
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback className={`${member.color} font-bold text-[10px]`}>
+                              {member.avatar}
+                            </AvatarFallback>
+                          </Avatar>
                           <div className="flex min-w-0 flex-1 flex-col">
-                            <span className="truncate font-semibold text-[13px] text-slate-900 leading-tight dark:text-slate-100">{member.name}</span>
-                            <span className="truncate text-[11px] text-slate-500 leading-tight">{member.role} • {member.dept}</span>
+                            <span className="truncate font-semibold text-[13px] text-slate-900 leading-tight dark:text-slate-100">
+                              {member.name}
+                            </span>
+                            <span className="truncate text-[11px] text-slate-500 leading-tight">
+                              {member.role} • {member.dept}
+                            </span>
                           </div>
                           {isSelected && <CheckCircle2 className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-500" />}
                         </button>
-                      )
+                      );
                     })
                   )}
 
                   {/* Selected count display inside team column */}
                   {selectedTeam.length > 0 && teamSearch.trim() === "" && (
                     <div className="mt-4 border-slate-100 border-t pt-4 dark:border-slate-800">
-                      <p className="mb-2 font-semibold text-slate-500 text-xs uppercase tracking-wider">Currently Selected ({selectedTeam.length})</p>
+                      <p className="mb-2 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+                        Currently Selected ({selectedTeam.length})
+                      </p>
                       <div className="flex flex-col gap-2">
-                        {selectedTeam.map(id => {
-                          const m = AVAILABLE_TEAM.find(t=>t.id === id);
+                        {selectedTeam.map((id) => {
+                          const m = AVAILABLE_TEAM.find((t) => t.id === id);
                           return m ? (
-                            <div key={id} className="flex items-center justify-between rounded-md bg-slate-100 p-2 dark:bg-slate-800/50">
+                            <div
+                              key={id}
+                              className="flex items-center justify-between rounded-md bg-slate-100 p-2 dark:bg-slate-800/50"
+                            >
                               <span className="font-medium text-xs">{m.name}</span>
-                              <Button variant="ghost" size="sm" className="h-5 px-2 text-[10px] text-slate-500 hover:text-red-500" onClick={() => handleToggleTeam(id)}>Remove</Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-5 px-2 text-[10px] text-slate-500 hover:text-red-500"
+                                onClick={() => handleToggleTeam(id)}
+                              >
+                                Remove
+                              </Button>
                             </div>
-                          ) : null
+                          ) : null;
                         })}
                       </div>
                     </div>
@@ -319,29 +391,48 @@ export default function NewProposalPage() {
                               : "border-slate-200 bg-white hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:hover:bg-slate-900"
                           }`}
                         >
-                          <Avatar className="h-8 w-8"><AvatarFallback className={`${adv.color} font-bold text-[10px]`}>{adv.avatar}</AvatarFallback></Avatar>
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback className={`${adv.color} font-bold text-[10px]`}>
+                              {adv.avatar}
+                            </AvatarFallback>
+                          </Avatar>
                           <div className="flex min-w-0 flex-1 flex-col">
-                            <span className="truncate font-semibold text-[13px] text-slate-900 leading-tight dark:text-slate-100">{adv.name}</span>
-                            <span className="truncate text-[11px] text-slate-500 leading-tight">{adv.role} • {adv.dept}</span>
+                            <span className="truncate font-semibold text-[13px] text-slate-900 leading-tight dark:text-slate-100">
+                              {adv.name}
+                            </span>
+                            <span className="truncate text-[11px] text-slate-500 leading-tight">
+                              {adv.role} • {adv.dept}
+                            </span>
                           </div>
-                          {isSelected && <CheckCircle2 className="h-4 w-4 shrink-0 text-indigo-600 dark:text-indigo-500" />}
+                          {isSelected && (
+                            <CheckCircle2 className="h-4 w-4 shrink-0 text-indigo-600 dark:text-indigo-500" />
+                          )}
                         </button>
-                      )
+                      );
                     })
                   )}
 
                   {/* Selected count display inside advisor column */}
                   {selectedAdvisor && advisorSearch.trim() === "" && (
                     <div className="mt-4 border-slate-100 border-t pt-4 dark:border-slate-800">
-                      <p className="mb-2 font-semibold text-slate-500 text-xs uppercase tracking-wider">Currently Selected</p>
+                      <p className="mb-2 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+                        Currently Selected
+                      </p>
                       {(() => {
-                        const a = AVAILABLE_ADVISORS.find(t=>t.id === selectedAdvisor);
+                        const a = AVAILABLE_ADVISORS.find((t) => t.id === selectedAdvisor);
                         return a ? (
                           <div className="flex items-center justify-between rounded-md border border-indigo-100 bg-indigo-50 p-2 dark:border-indigo-800 dark:bg-indigo-900/30">
                             <span className="font-semibold text-indigo-800 text-xs dark:text-indigo-300">{a.name}</span>
-                            <Button variant="ghost" size="sm" className="h-5 px-2 text-[10px] text-slate-500 hover:text-red-500" onClick={() => setSelectedAdvisor(null)}>Remove</Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-5 px-2 text-[10px] text-slate-500 hover:text-red-500"
+                              onClick={() => setSelectedAdvisor(null)}
+                            >
+                              Remove
+                            </Button>
                           </div>
-                        ) : null
+                        ) : null;
                       })()}
                     </div>
                   )}
@@ -362,7 +453,11 @@ export default function NewProposalPage() {
                 <div className="text-right">
                   <p className="font-bold text-[10px] text-slate-500 uppercase">Total Requested</p>
                   <p className="font-bold text-blue-600 text-xl dark:text-blue-400">
-                    ${calculateTotalBudget().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    $
+                    {calculateTotalBudget().toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </p>
                 </div>
               </div>
@@ -381,34 +476,34 @@ export default function NewProposalPage() {
                     {budgetRows.map((row) => (
                       <TableRow key={row.id}>
                         <TableCell className="p-2">
-                          <Input 
+                          <Input
                             placeholder="e.g. Travel"
                             value={row.title}
                             onChange={(e) => handleUpdateBudgetRow(row.id, "title", e.target.value)}
-                            className="h-8 border-slate-200 text-sm focus-visible:ring-1 dark:border-slate-800" 
+                            className="h-8 border-slate-200 text-sm focus-visible:ring-1 dark:border-slate-800"
                           />
                         </TableCell>
                         <TableCell className="p-2">
-                          <Input 
+                          <Input
                             placeholder="Details..."
                             value={row.description}
                             onChange={(e) => handleUpdateBudgetRow(row.id, "description", e.target.value)}
-                            className="h-8 border-slate-200 text-sm focus-visible:ring-1 dark:border-slate-800" 
+                            className="h-8 border-slate-200 text-sm focus-visible:ring-1 dark:border-slate-800"
                           />
                         </TableCell>
                         <TableCell className="p-2">
-                          <Input 
+                          <Input
                             type="number"
                             placeholder="0.00"
                             value={row.amount}
                             onChange={(e) => handleUpdateBudgetRow(row.id, "amount", e.target.value)}
-                            className="h-8 border-slate-200 text-right font-medium text-sm focus-visible:ring-1 dark:border-slate-800" 
+                            className="h-8 border-slate-200 text-right font-medium text-sm focus-visible:ring-1 dark:border-slate-800"
                           />
                         </TableCell>
                         <TableCell className="p-2 text-right">
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => handleRemoveBudgetRow(row.id)}
                             className="h-8 w-8 text-slate-400 hover:text-red-500"
                           >
@@ -420,9 +515,9 @@ export default function NewProposalPage() {
                   </TableBody>
                 </Table>
               </div>
-              
-              <Button 
-                variant="outline" 
+
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={handleAddBudgetRow}
                 className="mt-2 h-8 w-fit border-dashed text-xs"
@@ -479,24 +574,39 @@ export default function NewProposalPage() {
                   </div>
                   <div className="flex flex-1 flex-col gap-4 p-4">
                     <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
-                      <div className="col-span-full mb-1"><p className="font-medium text-slate-500 text-xs">Co-Investigators ({selectedTeam.length})</p></div>
-                      {selectedTeam.length > 0 ? selectedTeam.map(id => {
-                        const m = AVAILABLE_TEAM.find(t=>t.id === id);
-                        return m ? (
-                          <div key={id} className="truncate rounded border border-slate-200 bg-slate-100 px-2 py-1 font-medium text-[13px] text-slate-800 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200">
-                            {m.name}
-                          </div>
-                        ) : null;
-                      }) : <p className="text-slate-400 text-sm italic">None</p>}
+                      <div className="col-span-full mb-1">
+                        <p className="font-medium text-slate-500 text-xs">Co-Investigators ({selectedTeam.length})</p>
+                      </div>
+                      {selectedTeam.length > 0 ? (
+                        selectedTeam.map((id) => {
+                          const m = AVAILABLE_TEAM.find((t) => t.id === id);
+                          return m ? (
+                            <div
+                              key={id}
+                              className="truncate rounded border border-slate-200 bg-slate-100 px-2 py-1 font-medium text-[13px] text-slate-800 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
+                            >
+                              {m.name}
+                            </div>
+                          ) : null;
+                        })
+                      ) : (
+                        <p className="text-slate-400 text-sm italic">None</p>
+                      )}
                     </div>
                     <div className="mt-1">
                       <p className="mb-1 font-medium text-slate-500 text-xs">Primary Advisor</p>
-                      {selectedAdvisor ? (() => {
-                        const a = AVAILABLE_ADVISORS.find(t=>t.id === selectedAdvisor);
-                        return a ? (
-                          <p className="font-semibold text-[13px] text-indigo-700 dark:text-indigo-400">{a.name} <span className="ml-1 font-normal text-slate-500">({a.dept})</span></p>
-                        ) : null;
-                      })() : <p className="text-slate-400 text-sm italic">None</p>}
+                      {selectedAdvisor ? (
+                        (() => {
+                          const a = AVAILABLE_ADVISORS.find((t) => t.id === selectedAdvisor);
+                          return a ? (
+                            <p className="font-semibold text-[13px] text-indigo-700 dark:text-indigo-400">
+                              {a.name} <span className="ml-1 font-normal text-slate-500">({a.dept})</span>
+                            </p>
+                          ) : null;
+                        })()
+                      ) : (
+                        <p className="text-slate-400 text-sm italic">None</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -509,41 +619,42 @@ export default function NewProposalPage() {
                   <div className="flex flex-1 items-center p-4">
                     <div>
                       <p className="mb-1 font-medium text-slate-500 text-xs">Total Funds Requested</p>
-                      <p className="font-bold text-slate-900 text-xl dark:text-slate-100">${calculateTotalBudget().toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                      <p className="font-bold text-slate-900 text-xl dark:text-slate-100">
+                        ${calculateTotalBudget().toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </p>
                       <p className="mt-1 text-slate-400 text-xs">Spanning {budgetRows.length} categorized items.</p>
                     </div>
                   </div>
                 </div>
               </div>
-
             </div>
           )}
         </CardContent>
 
         {/* Navigation Footer placed nicely inside the form Card but at the bottom */}
         <div className="mt-10 flex w-full items-center justify-between border-slate-100 border-t pt-4 dark:border-slate-800">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="sm"
-            onClick={handleBack} 
+            onClick={handleBack}
             disabled={currentStep === 0}
-            className={`h-9 px-4 font-medium transition-opacity ${currentStep === 0 ? 'pointer-events-none opacity-0' : ''}`}
+            className={`h-9 px-4 font-medium transition-opacity ${currentStep === 0 ? "pointer-events-none opacity-0" : ""}`}
           >
             Previous
           </Button>
           <div className="flex gap-2">
             {currentStep === 3 ? (
-              <Button 
+              <Button
                 size="sm"
                 className="h-9 border-0 bg-blue-600 px-6 font-semibold text-white shadow-sm hover:bg-blue-700"
-                onClick={() => router.push('/dashboard/proposals')}
+                onClick={() => router.push("/dashboard/proposals")}
               >
                 Submit Proposal <CheckCircle2 className="ml-1.5 h-4 w-4" />
               </Button>
             ) : (
-              <Button 
+              <Button
                 size="sm"
-                onClick={handleNext} 
+                onClick={handleNext}
                 className="h-9 border-0 bg-slate-900 px-6 font-semibold text-white shadow-sm hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
               >
                 Next <ArrowRight className="ml-1.5 h-4 w-4" />
@@ -551,7 +662,6 @@ export default function NewProposalPage() {
             )}
           </div>
         </div>
-
       </Card>
     </div>
   );

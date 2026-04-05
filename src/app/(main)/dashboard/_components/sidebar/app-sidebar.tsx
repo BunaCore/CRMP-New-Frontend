@@ -5,6 +5,11 @@ import Link from "next/link";
 import { CircleHelp, ClipboardList, Command, Database, File, Search, Settings } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 
+import { hasPermission } from "@/access-control/permission-gates";
+import {
+  DASHBOARD_SIDEBAR_PERMISSION_RULES,
+  SIDEBAR_UNCONFIGURED_ROUTES_VISIBILITY,
+} from "@/access-control/sidebar-permission-config";
 import {
   Sidebar,
   SidebarContent,
@@ -15,12 +20,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { APP_CONFIG } from "@/config/app-config";
+import { useSession } from "@/context/SessionContext";
 import { rootUser } from "@/data/users";
 import { sidebarItems } from "@/navigation/sidebar/sidebar-items";
-import { useSession } from "@/context/SessionContext";
-import { DASHBOARD_SIDEBAR_PERMISSION_RULES } from "@/access-control/sidebar-permission-config";
-import { hasPermission } from "@/access-control/permission-gates";
-import { SIDEBAR_UNCONFIGURED_ROUTES_VISIBILITY } from "@/access-control/sidebar-permission-config";
 import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
 
 import { NavMain } from "./nav-main";

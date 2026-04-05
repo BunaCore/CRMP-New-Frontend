@@ -1,11 +1,7 @@
 export type MainTab = "proposals" | "projects";
-export type DrawerTab = "overview" | "scores" | "defence" | "review";
+export type DrawerTab = "overview" | "team" | "scores" | "defence" | "review";
 
-export type ProjectEvalStatus =
-  | "On evaluation"
-  | "Finished"
-  | "Awaiting approval"
-  | "Scheduled";
+export type ProjectEvalStatus = "On evaluation" | "Finished" | "Awaiting approval" | "Scheduled";
 
 export interface RubricItem {
   order: number;

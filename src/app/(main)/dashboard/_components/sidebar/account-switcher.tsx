@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 
+import { useRouter } from "next/navigation";
+
+import Cookies from "js-cookie";
 import { BadgeCheck, Bell, CreditCard, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,8 +17,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn, getInitials } from "@/lib/utils";
-import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 import { useAuthStore } from "@/stores/authStore";
 
 export function AccountSwitcher({

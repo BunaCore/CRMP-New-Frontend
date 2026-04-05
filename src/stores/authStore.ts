@@ -4,7 +4,8 @@
 // ============================================================
 
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
+
 import type { UserProfile } from "@/lib/api/auth/types";
 
 interface AuthState {
@@ -35,8 +36,7 @@ export const useAuthStore = create<AuthState>()(
         set({ access_token: token, user, isAuthenticated: true, isLoading: false }),
 
       // Clear everything on logout or 401
-      logout: () =>
-        set({ access_token: null, user: null, isAuthenticated: false, isLoading: false }),
+      logout: () => set({ access_token: null, user: null, isAuthenticated: false, isLoading: false }),
 
       setLoading: (loading: boolean) => set({ isLoading: loading }),
 
@@ -55,6 +55,6 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
-    }
-  )
+    },
+  ),
 );

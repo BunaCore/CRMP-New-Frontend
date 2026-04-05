@@ -9,13 +9,15 @@
 // continue to work without modifications.
 // ============================================================
 
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, type ReactNode, useContext } from "react";
+
 import { useAuthStore } from "@/stores/authStore";
 
 // Re-export UserRole from the canonical source so existing
 // imports like `import { UserRole } from "@/context/SessionContext"`
 // keep working without changes.
 export type { UserRole } from "@/lib/api/auth/types";
+
 import type { UserRole } from "@/lib/api/auth/types";
 
 export interface SessionUser {
@@ -42,12 +44,12 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   // that existing components expect
   const sessionUser: SessionUser | null = authUser
     ? {
-      id: authUser.id,
-      name: authUser.fullName,
-      role: authUser.role ?? null,
-      email: authUser.email,
-      permissions: authUser.permissions,
-    }
+        id: authUser.id,
+        name: authUser.fullName,
+        role: authUser.role ?? null,
+        email: authUser.email,
+        permissions: authUser.permissions,
+      }
     : null;
 
   const setSession = (user: SessionUser | null) => {
@@ -59,9 +61,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <SessionContext.Provider value={{ user: sessionUser, isLoading, setSession }}>
-      {children}
-    </SessionContext.Provider>
+    <SessionContext.Provider value={{ user: sessionUser, isLoading, setSession }}>{children}</SessionContext.Provider>
   );
 }
 

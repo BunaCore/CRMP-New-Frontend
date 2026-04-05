@@ -1,10 +1,12 @@
-import { cookies } from "next/headers";
 import type { ReactNode } from "react";
 
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { ThemeSwitcher } from "@/app/(main)/dashboard/_components/sidebar/theme-switcher";
-import { AdminSidebar } from "./_components/admin-sidebar";
+import { cookies } from "next/headers";
+
 import { AdminPermissionGuard } from "@/access-control/AdminPermissionGuard";
+import { ThemeSwitcher } from "@/app/(main)/dashboard/_components/sidebar/theme-switcher";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+
+import { AdminSidebar } from "./_components/admin-sidebar";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const cookieStore = await cookies();

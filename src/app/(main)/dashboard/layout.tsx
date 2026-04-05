@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { Github } from "lucide-react";
 
+import { DashboardPermissionGuard } from "@/access-control/DashboardPermissionGuard";
 import { AppSidebar } from "@/app/(main)/dashboard/_components/sidebar/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -18,7 +19,6 @@ import { AccountSwitcher } from "./_components/sidebar/account-switcher";
 import { LayoutControls } from "./_components/sidebar/layout-controls";
 import { SearchDialog } from "./_components/sidebar/search-dialog";
 import { ThemeSwitcher } from "./_components/sidebar/theme-switcher";
-import { DashboardPermissionGuard } from "@/access-control/DashboardPermissionGuard";
 
 export default async function Layout({ children }: Readonly<{ children: ReactNode }>) {
   const cookieStore = await cookies();

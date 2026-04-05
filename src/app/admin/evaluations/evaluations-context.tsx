@@ -1,8 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useState, useMemo } from "react";
-import { MainTab, DrawerTab, ProjectEvalStatus, RubricItem, EvalProposalRow, EvalProjectRow } from "./types";
-import { DEMO_RUBRIC, EVAL_PROPOSALS, EVAL_PROJECTS } from "./_data/mock-evaluations";
+import type React from "react";
+import { createContext, useContext, useMemo, useState } from "react";
+
+import { ADVISORS, EVALUATORS } from "../proposals/_data/mock-proposals";
+import type { Evaluator } from "../proposals/types";
+import { DEMO_RUBRIC, EVAL_PROJECTS, EVAL_PROPOSALS } from "./_data/mock-evaluations";
+import type { DrawerTab, EvalProjectRow, EvalProposalRow, MainTab, RubricItem } from "./types";
 
 export function rubricTotals(items: RubricItem[]) {
   const earned = items.reduce((s, r) => s + r.score, 0);
@@ -37,13 +41,30 @@ interface EvaluationsContextValue {
   defenceDraftSent: boolean;
 
   evalApproved: Record<string, boolean>;
+  evalRejected: Record<string, boolean>;
   showApproveDialog: boolean;
   setShowApproveDialog: React.Dispatch<React.SetStateAction<boolean>>;
   approveNote: string;
   setApproveNote: React.Dispatch<React.SetStateAction<string>>;
 
+  showAssign: boolean;
+  setShowAssign: React.Dispatch<React.SetStateAction<boolean>>;
+  pickedEvalIds: string[];
+  setPickedEvalIds: React.Dispatch<React.SetStateAction<string[]>>;
+
+  showAssignAdvisor: boolean;
+  setShowAssignAdvisor: React.Dispatch<React.SetStateAction<boolean>>;
+  pickedAdvisorIds: string[];
+  setPickedAdvisorIds: React.Dispatch<React.SetStateAction<string[]>>;
+
+  showTimelineReject: boolean;
+  setShowTimelineReject: React.Dispatch<React.SetStateAction<boolean>>;
+  timelineRejectComment: string;
+  setTimelineRejectComment: React.Dispatch<React.SetStateAction<string>>;
+
   selectionKey: string;
   isEvalApproved: boolean;
+  isEvalRejected: boolean;
 
   filteredProposals: EvalProposalRow[];
   filteredProjects: EvalProjectRow[];
@@ -53,6 +74,19 @@ interface EvaluationsContextValue {
   closeDrawer: () => void;
   handleSendDefenceInvite: () => void;
   handleConfirmApproveEvaluation: () => void;
+
+  toggleEvalPick: (id: string) => void;
+  toggleAdvisorPick: (id: string) => void;
+  handleAssignConfirm: () => void;
+  handleAssignAdvisorConfirm: () => void;
+  handleTimelineRejectSubmit: () => void;
+
+  filteredEvals: Evaluator[];
+  filteredAdvisors: Evaluator[];
+  evalSearch: string;
+  setEvalSearch: React.Dispatch<React.SetStateAction<string>>;
+  advisorSearch: string;
+  setAdvisorSearch: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const EvaluationsContext = createContext<EvaluationsContextValue | undefined>(undefined);
@@ -73,24 +107,50 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
   const [defenceTime, setDefenceTime] = useState("09:00");
   const [defenceVenue, setDefenceVenue] = useState("Main campus — Senate Hall");
   const [defenceMessage, setDefenceMessage] = useState(
-    "Please confirm attendance or propose an alternative slot within five working days."
+    "Please confirm attendance or propose an alternative slot within five working days.",
   );
   const [defenceDraftSent, setDefenceDraftSent] = useState(false);
 
   const [evalApproved, setEvalApproved] = useState<Record<string, boolean>>({});
+  const [evalRejected, setEvalRejected] = useState<Record<string, boolean>>({});
   const [showApproveDialog, setShowApproveDialog] = useState(false);
   const [approveNote, setApproveNote] = useState("");
 
-  const selectionKey = drawerKind === "proposal" && activeProposal ? `p-${activeProposal.id}` : activeProject ? `j-${activeProject.id}` : "";
+  const [showAssign, setShowAssign] = useState(false);
+  const [evalSearch, setEvalSearch] = useState("");
+  const [pickedEvalIds, setPickedEvalIds] = useState<string[]>([]);
+
+  const [showAssignAdvisor, setShowAssignAdvisor] = useState(false);
+  const [advisorSearch, setAdvisorSearch] = useState("");
+  const [pickedAdvisorIds, setPickedAdvisorIds] = useState<string[]>([]);
+
+  const [showTimelineReject, setShowTimelineReject] = useState(false);
+  const [timelineRejectComment, setTimelineRejectComment] = useState("");
+
+  const selectionKey =
+    drawerKind === "proposal" && activeProposal
+      ? `p-${activeProposal.id}`
+      : activeProject
+        ? `j-${activeProject.id}`
+        : "";
   const isEvalApproved = selectionKey ? !!evalApproved[selectionKey] : false;
+  const isEvalRejected = selectionKey ? !!evalRejected[selectionKey] : false;
 
   const totals = useMemo(() => rubricTotals(rubric), [rubric]);
 
   const filteredProposals = EVAL_PROPOSALS.filter((p) =>
-    (p.title + p.pi + p.id + p.dept).toLowerCase().includes(search.toLowerCase())
+    (p.title + p.pi + p.id + p.dept).toLowerCase().includes(search.toLowerCase()),
   );
   const filteredProjects = EVAL_PROJECTS.filter((p) =>
-    (p.title + p.lead + p.id + p.dept).toLowerCase().includes(search.toLowerCase())
+    (p.title + p.lead + p.id + p.dept).toLowerCase().includes(search.toLowerCase()),
+  );
+
+  const filteredEvals = EVALUATORS.filter((e) =>
+    (e.name + e.specialty).toLowerCase().includes(evalSearch.toLowerCase()),
+  );
+
+  const filteredAdvisors = ADVISORS.filter((a) =>
+    (a.name + a.specialty).toLowerCase().includes(advisorSearch.toLowerCase()),
   );
 
   function openDrawerProposal(row: EvalProposalRow) {
@@ -130,21 +190,102 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
     setApproveNote("");
   }
 
+  const toggleEvalPick = (id: string) => {
+    setPickedEvalIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  const toggleAdvisorPick = (id: string) => {
+    setPickedAdvisorIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  const handleAssignConfirm = () => {
+    setShowAssign(false);
+    setEvalSearch("");
+    setPickedEvalIds([]);
+  };
+
+  const handleAssignAdvisorConfirm = () => {
+    setShowAssignAdvisor(false);
+    setAdvisorSearch("");
+    setPickedAdvisorIds([]);
+  };
+
+  const handleTimelineRejectSubmit = () => {
+    if (selectionKey) {
+      setEvalRejected((prev) => ({ ...prev, [selectionKey]: true }));
+      setEvalApproved((prev) => ({ ...prev, [selectionKey]: false }));
+    }
+    setShowTimelineReject(false);
+    setTimelineRejectComment("");
+  };
+
   return (
-    <EvaluationsContext.Provider value={{
-      mainTab, setMainTab,
-      search, setSearch,
-      drawerOpen, drawerKind, drawerTab, setDrawerTab,
-      activeProposal, activeProject,
-      rubric, setRubric, totals,
-      defenceDate, setDefenceDate, defenceTime, setDefenceTime,
-      defenceVenue, setDefenceVenue, defenceMessage, setDefenceMessage, defenceDraftSent,
-      evalApproved, showApproveDialog, setShowApproveDialog, approveNote, setApproveNote,
-      selectionKey, isEvalApproved,
-      filteredProposals, filteredProjects,
-      openDrawerProposal, openDrawerProject, closeDrawer,
-      handleSendDefenceInvite, handleConfirmApproveEvaluation
-    }}>
+    <EvaluationsContext.Provider
+      value={{
+        mainTab,
+        setMainTab,
+        search,
+        setSearch,
+        drawerOpen,
+        drawerKind,
+        drawerTab,
+        setDrawerTab,
+        activeProposal,
+        activeProject,
+        rubric,
+        setRubric,
+        totals,
+        defenceDate,
+        setDefenceDate,
+        defenceTime,
+        setDefenceTime,
+        defenceVenue,
+        setDefenceVenue,
+        defenceMessage,
+        setDefenceMessage,
+        defenceDraftSent,
+        evalApproved,
+        evalRejected,
+        showApproveDialog,
+        setShowApproveDialog,
+        approveNote,
+        setApproveNote,
+        selectionKey,
+        isEvalApproved,
+        isEvalRejected,
+        filteredProposals,
+        filteredProjects,
+        openDrawerProposal,
+        openDrawerProject,
+        closeDrawer,
+        handleSendDefenceInvite,
+        handleConfirmApproveEvaluation,
+
+        showAssign,
+        setShowAssign,
+        pickedEvalIds,
+        setPickedEvalIds,
+        showAssignAdvisor,
+        setShowAssignAdvisor,
+        pickedAdvisorIds,
+        setPickedAdvisorIds,
+        showTimelineReject,
+        setShowTimelineReject,
+        timelineRejectComment,
+        setTimelineRejectComment,
+        toggleEvalPick,
+        toggleAdvisorPick,
+        handleAssignConfirm,
+        handleAssignAdvisorConfirm,
+        handleTimelineRejectSubmit,
+        filteredEvals,
+        filteredAdvisors,
+        evalSearch,
+        setEvalSearch,
+        advisorSearch,
+        setAdvisorSearch,
+      }}
+    >
       {children}
     </EvaluationsContext.Provider>
   );

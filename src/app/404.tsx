@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 
+import { AlertTriangle, Lock } from "lucide-react";
+
+import { hasPermission } from "@/access-control/permission-gates";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 import { useSession } from "@/context/SessionContext";
-import { hasPermission } from "@/access-control/permission-gates";
-import { AlertTriangle, Lock } from "lucide-react";
 
 export default function NotFound404() {
   const { user, isLoading } = useSession();
@@ -66,4 +66,3 @@ export default function NotFound404() {
     </div>
   );
 }
-
