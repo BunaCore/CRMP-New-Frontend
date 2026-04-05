@@ -18,6 +18,12 @@ export const EVAL_PROPOSALS: EvalProposalRow[] = [
     dept: "Agricultural Engineering",
     stage: "Committee review",
     budget: "Br 118,000",
+    budgetItems: [
+      { description: "Soil Moisture IoT Sensors", amount: 60000 },
+      { description: "Data Logging Equipment", amount: 30000 },
+      { description: "Field Deployment Costs", amount: 18000 },
+      { description: "Cloud Data Hosting", amount: 10000 },
+    ],
   },
   {
     id: "PRP-EV-002",
@@ -28,6 +34,12 @@ export const EVAL_PROPOSALS: EvalProposalRow[] = [
     dept: "Biomedical Engineering",
     stage: "External evaluation",
     budget: "Br 203,500",
+    budgetItems: [
+      { description: "Socket Material Resins", amount: 80000 },
+      { description: "3D Printing Filaments", amount: 60000 },
+      { description: "Patient Testing Compensation", amount: 43500 },
+      { description: "Clinic Travel Expenses", amount: 20000 },
+    ],
   },
   {
     id: "PRP-EV-003",
@@ -38,6 +50,12 @@ export const EVAL_PROPOSALS: EvalProposalRow[] = [
     dept: "Environmental Science",
     stage: "Scoring complete",
     budget: "Br 86,400",
+    budgetItems: [
+      { description: "High-Res Satellite Imagery", amount: 45000 },
+      { description: "GIS Software Licenses", amount: 20000 },
+      { description: "Field Verification Travel", amount: 15400 },
+      { description: "Publication Fees", amount: 6000 },
+    ],
   },
 ];
 
@@ -50,6 +68,12 @@ export const EVAL_PROJECTS: EvalProjectRow[] = [
     leadColor: "bg-amber-100 text-amber-700",
     dept: "Energy Institute",
     budget: "Br 450,000",
+    budgetItems: [
+      { description: "Solar Panels & Batteries", amount: 250000 },
+      { description: "Kiosk Construction Materials", amount: 120000 },
+      { description: "Community Training Program", amount: 50000 },
+      { description: "Monitoring Equipment", amount: 30000 },
+    ],
     evalStatus: "On evaluation",
     totalScore: 62.5,
     maxTotal: 100,
@@ -62,6 +86,12 @@ export const EVAL_PROJECTS: EvalProjectRow[] = [
     leadColor: "bg-rose-100 text-rose-700",
     dept: "Public Health",
     budget: "Br 320,000",
+    budgetItems: [
+      { description: "Server Infrastructure", amount: 150000 },
+      { description: "Developer Contracts", amount: 100000 },
+      { description: "Data Security Auditing", amount: 40000 },
+      { description: "Training Workshops", amount: 30000 },
+    ],
     evalStatus: "Awaiting approval",
     totalScore: 84.2,
     maxTotal: 100,
@@ -74,6 +104,12 @@ export const EVAL_PROJECTS: EvalProjectRow[] = [
     leadColor: "bg-cyan-100 text-cyan-700",
     dept: "Architecture",
     budget: "Br 95,000",
+    budgetItems: [
+      { description: "VR Headsets & Gear", amount: 45000 },
+      { description: "3D Scanning Equipment Rent", amount: 30000 },
+      { description: "Site Travel and Access", amount: 15000 },
+      { description: "Software Licenses", amount: 5000 },
+    ],
     evalStatus: "Scheduled",
     totalScore: 0,
     maxTotal: 100,
@@ -86,6 +122,12 @@ export const EVAL_PROJECTS: EvalProjectRow[] = [
     leadColor: "bg-violet-100 text-violet-700",
     dept: "Chemical Engineering",
     budget: "Br 1,200,000",
+    budgetItems: [
+      { description: "Industrial Bioreactors", amount: 700000 },
+      { description: "Raw Chemical Feedstocks", amount: 300000 },
+      { description: "Facility Downstream Processing", amount: 150000 },
+      { description: "Quality Control Analytics", amount: 50000 },
+    ],
     evalStatus: "Finished",
     totalScore: 91.0,
     maxTotal: 100,

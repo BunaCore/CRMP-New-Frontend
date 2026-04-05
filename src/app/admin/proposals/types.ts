@@ -1,5 +1,10 @@
 export type ProposalStatus = "Draft" | "Submitted" | "Under Review" | "Revision";
 
+export interface BudgetItem {
+  description: string;
+  amount: number;
+}
+
 export interface Proposal {
   id: string;
   title: string;
@@ -10,6 +15,7 @@ export interface Proposal {
   submittedDate: string;
   status: ProposalStatus;
   budget: string;
+  budgetItems: BudgetItem[];
   abstract: string;
   evaluators: string[];
   advisors: string[];
