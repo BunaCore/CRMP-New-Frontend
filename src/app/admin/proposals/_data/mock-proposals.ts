@@ -122,6 +122,12 @@ export const PROPOSALS_INITIAL: Proposal[] = [
     submittedDate: "Mar 12, 2025",
     status: "Under Review",
     budget: "Br 92,000",
+    budgetItems: [
+      { description: "Computing hardware (GPU instances)", amount: 45000 },
+      { description: "Data collection & labeling", amount: 25000 },
+      { description: "Travel to clinical sites", amount: 12000 },
+      { description: "Publication & dissemination", amount: 10000 },
+    ],
     evaluators: ["Prof. A. Haile", "Dr. L. Girma"],
     advisors: ["Prof. D. Mekonnen"],
     abstract:
@@ -139,6 +145,12 @@ export const PROPOSALS_INITIAL: Proposal[] = [
     submittedDate: "Mar 18, 2025",
     status: "Submitted",
     budget: "Br 185,000",
+    budgetItems: [
+      { description: "Solar PV panels and inverters", amount: 80000 },
+      { description: "Micro-wind turbines", amount: 65000 },
+      { description: "Site assessment & installation", amount: 25000 },
+      { description: "Maintenance sensors", amount: 15000 },
+    ],
     evaluators: [],
     advisors: [],
     abstract:
@@ -156,6 +168,12 @@ export const PROPOSALS_INITIAL: Proposal[] = [
     submittedDate: "Mar 5, 2025",
     status: "Revision",
     budget: "Br 67,000",
+    budgetItems: [
+      { description: "DNA extraction kits", amount: 30000 },
+      { description: "Sequencing services", amount: 25000 },
+      { description: "Bioinformatics software licenses", amount: 8000 },
+      { description: "Laboratory consumables", amount: 4000 },
+    ],
     evaluators: ["Dr. S. Bekele"],
     advisors: ["Dr. Y. Hailu"],
     abstract:
@@ -173,6 +191,12 @@ export const PROPOSALS_INITIAL: Proposal[] = [
     submittedDate: "Feb 28, 2025",
     status: "Under Review",
     budget: "Br 220,000",
+    budgetItems: [
+      { description: "Cloud quantum computing access", amount: 120000 },
+      { description: "Research stipends", amount: 50000 },
+      { description: "Algorithm development tools", amount: 30000 },
+      { description: "International conference travel", amount: 20000 },
+    ],
     evaluators: ["Prof. M. Tesfaye"],
     advisors: [],
     abstract:
@@ -190,6 +214,12 @@ export const PROPOSALS_INITIAL: Proposal[] = [
     submittedDate: "Mar 21, 2025",
     status: "Submitted",
     budget: "Br 310,000",
+    budgetItems: [
+      { description: "Lipid precursors & chemicals", amount: 110000 },
+      { description: "Cell lines and culture media", amount: 90000 },
+      { description: "Electron microscopy time", amount: 60000 },
+      { description: "In-vitro assay kits", amount: 50000 },
+    ],
     evaluators: [],
     advisors: ["Prof. N. Tsegaye"],
     abstract:
@@ -207,6 +237,12 @@ export const PROPOSALS_INITIAL: Proposal[] = [
     submittedDate: "Mar 10, 2025",
     status: "Draft",
     budget: "Br 44,000",
+    budgetItems: [
+      { description: "Traffic sensor data acquisition", amount: 20000 },
+      { description: "Cloud hosting for model training", amount: 15000 },
+      { description: "Local travel for site surveys", amount: 5000 },
+      { description: "Miscellaneous supplies", amount: 4000 },
+    ],
     evaluators: [],
     advisors: [],
     abstract:

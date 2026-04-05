@@ -2,6 +2,7 @@
 
 import {
   AlertTriangle,
+  Banknote,
   Calendar,
   Check,
   CheckCircle,
@@ -118,6 +119,7 @@ export function ProposalsDrawer() {
                 {[
                   { id: "details" as const, label: "Details" },
                   { id: "team" as const, label: "Team" },
+                  { id: "budget" as const, label: "Budget" },
                   { id: "approve" as const, label: "Approve" },
                 ].map((t) => (
                   <button
@@ -228,6 +230,89 @@ export function ProposalsDrawer() {
                     Full team details will appear here once connected to the backend.
                   </p>
                 </div>
+              )}
+
+              {/* ── TAB: BUDGET ── */}
+              {drawerTab === "budget" && (
+                <Can
+                  permission="BUDGET_VIEW"
+                  fallback={
+                    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-rose-100 bg-rose-50/50 p-8 text-center dark:border-rose-900/40 dark:bg-rose-950/20">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400">
+                        <AlertTriangle className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 text-sm dark:text-slate-100">Access Denied</h4>
+                        <p className="mt-1 max-w-[280px] text-slate-500 text-xs dark:text-slate-400">
+                          You do not have the required permissions to view the financial breakdown of this proposal.
+                        </p>
+                      </div>
+                    </div>
+                  }
+                >
+                  <div className="flex flex-col gap-6">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <div className="flex flex-col justify-center rounded-xl border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm dark:border-slate-800 dark:from-slate-900/50 dark:to-slate-950">
+                        <p className="mb-1 flex items-center gap-1.5 font-bold text-[10px] text-slate-500 uppercase tracking-wider">
+                          <Banknote className="h-3.5 w-3.5" /> Total Requested
+                        </p>
+                        <p className="font-extrabold text-2xl text-blue-600 dark:text-blue-400">{selected.budget}</p>
+                      </div>
+                      <div className="flex flex-col justify-center rounded-xl border border-slate-200/80 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/30">
+                        <p className="mb-1 font-bold text-[10px] text-slate-500 uppercase tracking-wider">Status</p>
+                        <p className="font-semibold text-[15px] text-slate-800 dark:text-slate-200">
+                          Pending Approval
+                        </p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="mb-3 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                        Budget Breakdown
+                      </h4>
+                      <div className="overflow-hidden rounded-xl border border-slate-200 shadow-sm dark:border-slate-800">
+                        <table className="w-full text-left text-sm">
+                          <thead className="bg-slate-50/80 dark:bg-slate-900/50">
+                            <tr>
+                              <th className="px-4 py-3 font-semibold text-slate-600 text-xs dark:text-slate-400">
+                                Description
+                              </th>
+                              <th className="px-4 py-3 text-right font-semibold text-slate-600 text-xs dark:text-slate-400">
+                                Amount
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 text-[13px] dark:divide-slate-800/80">
+                            {selected.budgetItems?.map((item, i) => (
+                              <tr key={`${item.description}-${i}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20">
+                                <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
+                                  {item.description}
+                                </td>
+                                <td className="px-4 py-3 text-right font-medium text-slate-800 dark:text-slate-200">
+                                  {new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(item.amount)}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                          <tfoot className="bg-slate-50 dark:bg-slate-900/50">
+                            <tr>
+                              <td className="px-4 py-3 font-bold text-slate-900 dark:text-slate-100">
+                                Total
+                              </td>
+                              <td className="px-4 py-3 text-right font-bold text-blue-600 dark:text-blue-400">
+                                {selected.budgetItems?.reduce((acc, curr) => acc + curr.amount, 0)
+                                  ? new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+                                      selected.budgetItems.reduce((acc, curr) => acc + curr.amount, 0),
+                                    )
+                                  : selected.budget.replace(/[^0-9.]/g, "")}
+                              </td>
+                            </tr>
+                          </tfoot>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </Can>
               )}
 
               {/* ── TAB: APPROVE (timeline) ── */}

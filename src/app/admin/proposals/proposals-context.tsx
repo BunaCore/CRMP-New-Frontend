@@ -15,8 +15,8 @@ interface ProposalsContextValue {
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   selected: Proposal | null;
   setSelected: React.Dispatch<React.SetStateAction<Proposal | null>>;
-  drawerTab: "details" | "team" | "approve";
-  setDrawerTab: React.Dispatch<React.SetStateAction<"details" | "team" | "approve">>;
+  drawerTab: "details" | "team" | "approve" | "budget";
+  setDrawerTab: React.Dispatch<React.SetStateAction<"details" | "team" | "approve" | "budget">>;
 
   showAssign: boolean;
   setShowAssign: React.Dispatch<React.SetStateAction<boolean>>;
@@ -63,7 +63,7 @@ export function ProposalsProvider({ children }: { children: React.ReactNode }) {
   const [tab, setTab] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Proposal | null>(null);
-  const [drawerTab, setDrawerTab] = useState<"details" | "team" | "approve">("details");
+  const [drawerTab, setDrawerTab] = useState<"details" | "team" | "approve" | "budget">("details");
 
   const [showAssign, setShowAssign] = useState(false);
   const [evalSearch, setEvalSearch] = useState("");
