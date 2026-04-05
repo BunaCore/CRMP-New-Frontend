@@ -1,14 +1,128 @@
+# CRMP New Frontend (Permission-Based Dashboard)
+
+This repository is the **frontend** for the Collaborative Research Management Platform (CRMP).
+It implements **permission-based access control (PBAC)**: the backend supplies a user’s permissions, and the UI + route guards render only what the user is allowed to access.
+
+## Permission Model (PBAC)
+
+- The backend returns `permissions: string[]` for the authenticated user.
+- The frontend normalizes permissions defensively and checks them against the canonical set in:
+  - `src/access-control/permission-gates.tsx`
+- UI elements are gated via:
+  - `<Can permission="PROJECT_CREATE">...</Can>`
+  - `<RequiresPermissions permissions={[...]} mode="any">...</RequiresPermissions>` (OR semantics)
+
+## Auth & Cookie Flow
+
+Client-side auth uses:
+
+- Zustand for persisted session state (`src/stores/authStore.ts`)
+- Cookies for server/edge-friendly presence + permission caching:
+  - `access_token`
+  - `user_permissions` (JSON-encoded permissions array)
+
+Key pieces:
+
+- `src/components/auth/SignInForm.tsx` sets `access_token` + `user_permissions` after login.
+- `src/context/AuthInitializer.tsx` validates the session and re-syncs cookies.
+- Middleware is intentionally minimal and only checks token presence (not authorization).
+- Route guards enforce authorization in the client with loading-safe behavior:
+  - `src/access-control/DashboardPermissionGuard.tsx`
+  - `src/access-control/AdminPermissionGuard.tsx`
+
+## Navigation & Sidebar Filtering
+
+Sidebars are filtered using config-driven permission rules (no role checks).
+
+- Dashboard (PI space): `src/access-control/sidebar-permission-config.ts`
+- Admin sidebar authorization:
+  - `src/navigation/sidebar/admin-nav-config.ts`
+
+
+
+The app treats:
+
+- `PROJECT_CREATE`-capable users as PI space users (`/dashboard`)
+- users without `PROJECT_CREATE` as admin space users (`/admin`)
+
+When a user hits an unauthorized section:
+
+- the app shows the `404`-style access denied UI
+- then redirects to the appropriate area (or `/login` if history is unavailable)
+
+## Local Development
+
+### Requirements
+
+- Node.js 20+
+- npm
+
+### Install & Run
+
+```bash
+npm ci
+npm run dev
+```
+
+Open the app at `http://localhost:3000` (default Next.js behavior).
+
+### Build & Lint
+
+```bash
+npm run lint
+npm run build
+```
+
+### Environment Variables
+
+`src/lib/api/client.ts` uses:
+
+- `NEXT_PUBLIC_API_URL` (defaults to `http://localhost:3001` if not set)
+
+Example:
+
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
+
+## Mock Login (Development Only)
+
+Mock login responses are available in:
+
+- `src/data/mock-auth.ts`
+
+Example emails:
+
+- `pi@crmp.edu`
+- `rad@crmp.edu`
+- `finance@crmp.edu`
+- `coordinator@crmp.edu`
+
+## CI (Pull Requests)
+
+GitHub Actions checks are defined in:
+
+- `.github/workflows/prchecker.yml`
+
+The workflow runs:
+
+- `npm run lint` (Biome)
+- `npm run build` (Next.js)
+
+## Notes on Permission Staleness
+
+Permissions are cached in cookies (`user_permissions`).
+If permissions change on the backend, users may need to clear cookies or re-login for the UI to reflect updated permissions.
+
 # Next.js Admin Template with TypeScript & Shadcn UI
 
 **Studio Admin** - Includes multiple dashboards, authentication layouts, customizable theme presets, and more.
 
 <img src="https://github.com/arhamkhnz/next-shadcn-admin-dashboard/blob/main/media/dashboard.png?version=5" alt="Dashboard Screenshot">
 
-Most admin templates I found, free or paid, felt cluttered, outdated, or too rigid. I built this as a cleaner alternative with features often missing in others, such as theme toggling and layout controls, while keeping the design modern, minimal, and flexible.
+We built this as a cleaner alternative with features often missing in others, such as theme toggling and layout controls, while keeping the design modern, minimal, and flexible.
 
-I’ve taken design inspiration from various sources. If you’d like credit for something specific, feel free to open an issue or reach out.
 
-> **View demo:** [studio admin](https://next-shadcn-admin-dashboard.vercel.app)
 
 > [!TIP]
 > I’m also working on Nuxt.js, Svelte, and React (Vite + TanStack Router) versions of this dashboard. They’ll be live soon.
@@ -23,23 +137,6 @@ I’ve taken design inspiration from various sources. If you’d like credit for
 - Prebuilt dashboards (Default, CRM, Finance) with more coming soon  
 - Role-Based Access Control (RBAC) with config-driven UI and multi-tenant support *(planned)*  
 
-> [!NOTE]
-> The default dashboard uses the **shadcn neutral** theme.  
-> It also includes additional color presets inspired by [Tweakcn](https://tweakcn.com):  
->
-> - Tangerine  
-> - Neo Brutalism  
-> - Soft Pop  
->
-> You can create more presets by following the same structure as the existing ones.
-
-> Looking for the **Next.js 15** version?  
-> Check out the [`archive/next15`](https://github.com/arhamkhnz/next-shadcn-admin-dashboard/tree/archive/next15) branch.  
-> This branch contains the setup prior to upgrading to Next 16 and the React Compiler.
-
-> Looking for the **Next.js 14 + Tailwind CSS v3** version?  
-> Check out the [`archive/next14-tailwindv3`](https://github.com/arhamkhnz/next-shadcn-admin-dashboard/tree/archive/next14-tailwindv3) branch.  
-> It has a different color theme and is not actively maintained, but I try to keep it updated with major changes.  
 
 ## Tech Stack
 
