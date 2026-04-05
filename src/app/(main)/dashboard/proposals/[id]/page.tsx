@@ -26,11 +26,23 @@ import {
   Paperclip,
   Send,
   User,
+  Award,
+  Video,
 } from "lucide-react";
 
 export default function ProposalDetailsPage() {
   const params = useParams();
   const id = params?.id || "PRP-044";
+
+  // ─── MOCK FEATURE TOGGLE ─────────────────────────
+  const SHOW_MOCK_APPOINTMENT = true;
+  const mockAppointment = {
+    title: "Quantum Computing Simulation",
+    date: "14 Mar 2025",
+    time: "10:00 AM (EAT)",
+    venue: "Main Campus — Senate Hall",
+    message: "Please ensure your presentation is strictly 15 minutes. The evaluation committee has already reviewed your abstract.",
+  };
 
   // Mock data for the specific proposal
   const proposal = {
@@ -146,6 +158,15 @@ export default function ProposalDetailsPage() {
           >
             <History className="mr-2 h-4 w-4" /> Version History
           </TabsTrigger>
+          {SHOW_MOCK_APPOINTMENT && (
+            <TabsTrigger 
+              value="evaluation" 
+              className="rounded-none border-transparent border-b-2 px-6 py-3 font-medium text-slate-500 data-[state=active]:border-amber-600 data-[state=active]:bg-transparent data-[state=active]:text-amber-700 data-[state=active]:shadow-none dark:data-[state=active]:text-amber-400"
+            >
+              <Award className="mr-2 h-4 w-4" /> Defence & Evaluation
+              <Badge className="ml-2 h-4 rounded-full border-0 bg-red-100 px-1.5 py-0 text-red-700 dark:bg-red-900/30 dark:text-red-400">Action Required</Badge>
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <div className="py-6">
@@ -311,6 +332,110 @@ export default function ProposalDetailsPage() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Evaluation / Defence Tab */}
+          {SHOW_MOCK_APPOINTMENT && (
+            <TabsContent value="evaluation" className="mt-0 focus-visible:outline-none">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                
+                {/* Left Column: Schedule & Action Block */}
+                <div className="flex flex-col gap-6 lg:col-span-1">
+                  <Card className="rounded-xl border-amber-200/50 bg-gradient-to-b from-amber-50 to-white shadow-md dark:border-amber-900/50 dark:from-amber-950/40 dark:to-slate-950">
+                    <CardHeader className="border-amber-100/50 border-b bg-amber-500/10 pb-4 dark:border-amber-900/20 dark:bg-amber-500/5">
+                      <CardTitle className="flex items-center gap-2 text-lg text-amber-900 dark:text-amber-400">
+                        <Calendar className="h-5 w-5" />
+                        Defence Scheduled
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-6">
+                      <div className="flex flex-col gap-4">
+                        <div>
+                          <p className="font-bold text-[10px] text-slate-400 uppercase tracking-widest">Date & Time (EAT)</p>
+                          <p className="mt-0.5 font-bold text-slate-800 text-lg dark:text-slate-200">{mockAppointment.date}</p>
+                          <p className="font-medium text-slate-500 text-sm">{mockAppointment.time}</p>
+                        </div>
+                        <div>
+                          <p className="font-bold text-[10px] text-slate-400 uppercase tracking-widest">Location</p>
+                          <p className="mt-0.5 font-semibold text-slate-700 text-sm dark:text-slate-300">{mockAppointment.venue}</p>
+                        </div>
+                        <div className="rounded-xl border border-amber-100 bg-amber-50/50 p-4 dark:border-amber-900/30 dark:bg-amber-900/10">
+                          <p className="font-bold text-[10px] text-amber-700 uppercase tracking-widest dark:text-amber-400">Admin/Coordinator Note</p>
+                          <p className="mt-1 text-amber-900 text-sm leading-relaxed dark:text-amber-200">{mockAppointment.message}</p>
+                        </div>
+                        
+                        <div className="mt-2 flex flex-col gap-3">
+                          <Button className="w-full bg-amber-600 hover:bg-amber-700 font-semibold text-white shadow-sm dark:bg-amber-600 dark:hover:bg-amber-500">
+                            Confirm Attendance
+                          </Button>
+                          <Button variant="outline" className="w-full font-semibold">
+                            Propose New Time
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Right Column: Pre-submission & Rubric prep */}
+                <div className="flex flex-col gap-6 lg:col-span-2">
+                  <Card className="rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
+                    <CardHeader className="border-slate-100 border-b bg-slate-50/30 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
+                      <CardTitle className="text-lg text-slate-800 dark:text-slate-200">Pre-Defence Requirements</CardTitle>
+                      <CardDescription>Upload necessary materials before the defence date.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-6">
+                      <div className="flex items-start gap-4 rounded-xl border border-dashed border-slate-300 p-6 dark:border-slate-700">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
+                          <Video className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-slate-800 text-base dark:text-slate-200">Presentation Deck (Required)</h4>
+                          <p className="mt-1 text-slate-500 text-sm leading-relaxed dark:text-slate-400">
+                            The committee requires your slide deck at least 48 hours before the defence. Accepted formats: PPTX, PDF. Max 50MB.
+                          </p>
+                          <Button className="mt-4 border-0 font-medium shadow-none bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
+                            <Paperclip className="mr-2 h-4 w-4" /> Choose File to Upload
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
+                    <CardHeader className="border-slate-100 border-b bg-slate-50/30 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
+                      <CardTitle className="text-lg text-slate-800 dark:text-slate-200">Evaluation Rubric Preview</CardTitle>
+                      <CardDescription>What the evaluators will grade your defence on.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <div className="flex flex-col">
+                        <div className="flex items-center justify-between border-slate-100 border-b px-6 py-4 dark:border-slate-800">
+                          <div>
+                            <p className="font-semibold text-slate-800 text-sm dark:text-slate-200">Clarity and Presentation</p>
+                            <p className="text-slate-500 text-xs">How well the problem and solution are articulated.</p>
+                          </div>
+                          <Badge variant="outline">20 pts</Badge>
+                        </div>
+                        <div className="flex items-center justify-between border-slate-100 border-b px-6 py-4 dark:border-slate-800">
+                          <div>
+                            <p className="font-semibold text-slate-800 text-sm dark:text-slate-200">Methodology Rigor</p>
+                            <p className="text-slate-500 text-xs">Quality of experimental design, feasibility, and technical depth.</p>
+                          </div>
+                          <Badge variant="outline">35 pts</Badge>
+                        </div>
+                        <div className="flex items-center justify-between px-6 py-4">
+                          <div>
+                            <p className="font-semibold text-slate-800 text-sm dark:text-slate-200">Q&A Handling</p>
+                            <p className="text-slate-500 text-xs">Ability to defend the premise against panel critique.</p>
+                          </div>
+                          <Badge variant="outline">25 pts</Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </TabsContent>
+          )}
 
         </div>
       </Tabs>

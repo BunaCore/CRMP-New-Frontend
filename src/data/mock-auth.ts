@@ -31,7 +31,7 @@ const MOCK_USERS: Record<string, LoginResponse> = {
       role: "RAD",
       department: "Research Administration",
       avatarUrl: "",
-      permissions: ["approve_proposal", "assign_evaluator", "manage_users", "approve_budget"],
+      permissions: ["approve_proposal", "assign_evaluator", "manage_users", "approve_budget", "ADVISOR_ASSIGN", "EVALUATION_SCORE_SUBMIT"],
     },
   },
   "finance@crmp.edu": {
@@ -67,8 +67,57 @@ const MOCK_USERS: Record<string, LoginResponse> = {
         "PROJECT_APPROVE",
         "PROJECT_REJECT",
         "EVALUATOR_ASSIGN",
+        "ADVISOR_ASSIGN",
+        "EVALUATION_SCORE_SUBMIT",
 
-        
+
+      ],
+    },
+  },
+  "advisor@crmp.edu": {
+    access_token: "mock_token_adv_555666",
+    user: {
+      id: "usr_005",
+      fullName: "Prof. Dinku Mekonnen",
+      email: "advisor@crmp.edu",
+      role: "Advisor",
+      department: "Research Advisory Board",
+      avatarUrl: "",
+      permissions: [
+        "ADMIN_VIEW",
+        "PROJECT_VIEW",
+        "PROJECT_RECOMMEND",
+
+        "PROJECT_VIEW",
+        "PROJECT_REVIEW",
+
+
+
+
+      ],
+    },
+  },
+  "evaluator@crmp.edu": {
+    access_token: "mock_token_eval_777888",
+    user: {
+      id: "usr_006",
+      fullName: "Dr. Selamawit Bekele",
+      email: "evaluator@crmp.edu",
+      role: "Evaluator",
+      department: "Internal Evaluation Committee",
+      avatarUrl: "",
+      permissions: [
+        "ADMIN_VIEW",
+        "PROJECT_VIEW",
+        "PROJECT_REVIEW",
+        "EVALUATION_SCORE_SUBMIT",
+
+
+        "PROJECT_VIEW",
+        "PROJECT_REVIEW",
+        "PROJECT_APPROVE",
+        "PROJECT_REJECT",
+        "EVALUATION_SCORE_SUBMIT",
       ],
     },
   },

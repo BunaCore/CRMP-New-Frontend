@@ -1,28 +1,32 @@
 "use client";
 
-import { CheckSquare } from "lucide-react";
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React from "react";
+import { EvaluationsProvider } from "./evaluations-context";
+import { EvaluationsTabs } from "./_components/evaluations-tabs";
+import { EvaluationDrawer } from "./_components/evaluation-drawer";
+import { ActionsAndModals } from "./_components/actions-and-modals";
+import { ClipboardList } from "lucide-react";
 
 export default function AdminEvaluationsPage() {
   return (
-    <div className="p-8">
-      <div className="mb-2 flex items-center gap-3">
-        <CheckSquare className="h-6 w-6 text-blue-600" />
-        <h1 className="font-bold text-3xl tracking-tight">Evaluations</h1>
-      </div>
-      <p className="mt-2 text-muted-foreground">
-        Review, score, and decide on evaluator feedback (placeholder UI for now).
-      </p>
+    <EvaluationsProvider>
+      <div className="flex flex-1 flex-col gap-5 p-4 md:p-6 lg:p-8">
+        <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
+          <div>
+            <h1 className="flex items-center gap-2 font-bold text-2xl text-slate-900 tracking-tight dark:text-slate-100">
+              <ClipboardList className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+              Evaluations
+            </h1>
+            <p className="mt-0.5 max-w-2xl text-slate-500 text-sm">
+              Review scoring rubrics, schedule defences, and approve completed evaluations for proposals and funded projects.
+            </p>
+          </div>
+        </div>
 
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle className="text-lg">No evaluation data wired yet</CardTitle>
-        </CardHeader>
-        <CardContent>
-          Connect the backend evaluation endpoints and replace this placeholder with the real table/cards.
-        </CardContent>
-      </Card>
-    </div>
+        <EvaluationsTabs />
+        <EvaluationDrawer />
+        <ActionsAndModals />
+      </div>
+    </EvaluationsProvider>
   );
 }
