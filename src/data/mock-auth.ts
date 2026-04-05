@@ -31,7 +31,14 @@ const MOCK_USERS: Record<string, LoginResponse> = {
       role: "RAD",
       department: "Research Administration",
       avatarUrl: "",
-      permissions: ["approve_proposal", "assign_evaluator", "manage_users", "approve_budget", "ADVISOR_ASSIGN", "EVALUATION_SCORE_SUBMIT"],
+      permissions: [
+        "approve_proposal",
+        "assign_evaluator",
+        "manage_users",
+        "approve_budget",
+        "ADVISOR_ASSIGN",
+        "EVALUATION_SCORE_SUBMIT",
+      ],
     },
   },
   "finance@crmp.edu": {
@@ -69,8 +76,8 @@ const MOCK_USERS: Record<string, LoginResponse> = {
         "EVALUATOR_ASSIGN",
         "ADVISOR_ASSIGN",
         "EVALUATION_SCORE_SUBMIT",
-
-
+        "DEFENCE_SCHEDULE",
+        "BUDGET_VIEW",
       ],
     },
   },
@@ -90,10 +97,6 @@ const MOCK_USERS: Record<string, LoginResponse> = {
 
         "PROJECT_VIEW",
         "PROJECT_REVIEW",
-
-
-
-
       ],
     },
   },
@@ -108,13 +111,7 @@ const MOCK_USERS: Record<string, LoginResponse> = {
       avatarUrl: "",
       permissions: [
         "ADMIN_VIEW",
-        "PROJECT_VIEW",
-        "PROJECT_REVIEW",
         "EVALUATION_SCORE_SUBMIT",
-
-
-        "PROJECT_VIEW",
-        "PROJECT_REVIEW",
         "PROJECT_APPROVE",
         "PROJECT_REJECT",
         "EVALUATION_SCORE_SUBMIT",

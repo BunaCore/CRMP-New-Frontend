@@ -6,9 +6,9 @@ import {
   FileText,
   Folder,
   LayoutDashboard,
+  type LucideIcon,
   Settings,
   Users,
-  type LucideIcon,
 } from "lucide-react";
 
 export interface NavSubItem {

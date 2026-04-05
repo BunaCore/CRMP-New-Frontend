@@ -1,17 +1,19 @@
 "use client";
 
-import React from "react";
-import { useEvaluations } from "../evaluations-context";
-import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
+import { ChevronRight, FileText, Layers, Search } from "lucide-react";
+
+import { Can } from "@/access-control/permission-gates";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, ChevronRight, FileText, Layers } from "lucide-react";
-import { ProjectEvalStatus } from "../types";
-import { EVAL_PROPOSALS, EVAL_PROJECTS } from "../_data/mock-evaluations";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
+
+import { EVAL_PROJECTS, EVAL_PROPOSALS } from "../_data/mock-evaluations";
+import { useEvaluations } from "../evaluations-context";
+import type { ProjectEvalStatus } from "../types";
 
 export const STATUS_STYLES: Record<ProjectEvalStatus, { className: string; description: string }> = {
   "On evaluation": {
@@ -33,21 +35,36 @@ export const STATUS_STYLES: Record<ProjectEvalStatus, { className: string; descr
 };
 
 export function EvaluationsTabs() {
-  const { mainTab, setMainTab, search, setSearch, filteredProposals, filteredProjects, openDrawerProposal, openDrawerProject } = useEvaluations();
+  const {
+    mainTab,
+    setMainTab,
+    search,
+    setSearch,
+    filteredProposals,
+    filteredProjects,
+    openDrawerProposal,
+    openDrawerProject,
+  } = useEvaluations();
 
   return (
     <div className="flex flex-col gap-3">
-      <Tabs value={mainTab} onValueChange={(v: any) => setMainTab(v)}>
+      <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as Parameters<typeof setMainTab>[0])}>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <TabsList className="h-10 w-full justify-start rounded-xl bg-slate-100 p-1 dark:bg-slate-900 sm:w-auto">
-            <TabsTrigger value="proposals" className="rounded-lg px-5 font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-800">
+          <TabsList className="h-10 w-full justify-start rounded-xl bg-slate-100 p-1 sm:w-auto dark:bg-slate-900">
+            <TabsTrigger
+              value="proposals"
+              className="rounded-lg px-5 font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-800"
+            >
               <FileText className="mr-2 h-4 w-4" />
               Proposals
               <Badge className="ml-2 border-0 bg-slate-200 font-bold text-[10px] text-slate-700 dark:bg-slate-700 dark:text-slate-200">
                 {EVAL_PROPOSALS.length}
               </Badge>
             </TabsTrigger>
-            <TabsTrigger value="projects" className="rounded-lg px-5 font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-800">
+            <TabsTrigger
+              value="projects"
+              className="rounded-lg px-5 font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-800"
+            >
               <Layers className="mr-2 h-4 w-4" />
               Projects
               <Badge className="ml-2 border-0 bg-slate-200 font-bold text-[10px] text-slate-700 dark:bg-slate-700 dark:text-slate-200">
@@ -75,7 +92,9 @@ export function EvaluationsTabs() {
                   <TableHead className="pl-5 font-semibold text-xs uppercase">Proposal</TableHead>
                   <TableHead className="font-semibold text-xs uppercase">PI</TableHead>
                   <TableHead className="font-semibold text-xs uppercase">Stage</TableHead>
-                  <TableHead className="font-semibold text-xs uppercase">Budget</TableHead>
+                  <Can permission="BUDGET_VIEW">
+                    <TableHead className="font-semibold text-xs uppercase">Budget</TableHead>
+                  </Can>
                   <TableHead className="w-[120px] pr-5 text-right font-semibold text-xs uppercase" />
                 </TableRow>
               </TableHeader>
@@ -84,26 +103,40 @@ export function EvaluationsTabs() {
                   <TableRow key={p.id} className="border-slate-100 dark:border-slate-800">
                     <TableCell className="py-4 pl-5">
                       <div className="flex flex-col gap-0.5">
-                        <span className="line-clamp-1 font-semibold text-[13px] text-slate-900 dark:text-slate-100">{p.title}</span>
-                        <span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">{p.id} · {p.dept}</span>
+                        <span className="line-clamp-1 font-semibold text-[13px] text-slate-900 dark:text-slate-100">
+                          {p.title}
+                        </span>
+                        <span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                          {p.id} · {p.dept}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className="py-4">
                       <div className="flex items-center gap-2">
                         <Avatar className="h-7 w-7">
-                          <AvatarFallback className={cn("font-bold text-[10px]", p.piColor)}>{p.piAvatar}</AvatarFallback>
+                          <AvatarFallback className={cn("font-bold text-[10px]", p.piColor)}>
+                            {p.piAvatar}
+                          </AvatarFallback>
                         </Avatar>
                         <span className="font-medium text-[13px] text-slate-700 dark:text-slate-300">{p.pi}</span>
                       </div>
                     </TableCell>
                     <TableCell className="py-4">
-                      <Badge variant="secondary" className="font-semibold text-[11px]">{p.stage}</Badge>
+                      <Badge variant="secondary" className="font-semibold text-[11px]">
+                        {p.stage}
+                      </Badge>
                     </TableCell>
-                    <TableCell className="py-4 font-semibold text-[13px] text-slate-700 dark:text-slate-300">
-                      {p.budget}
-                    </TableCell>
+                    <Can permission="BUDGET_VIEW">
+                      <TableCell className="py-4 font-semibold text-[13px] text-slate-700 dark:text-slate-300">
+                        {p.budget}
+                      </TableCell>
+                    </Can>
                     <TableCell className="py-4 pr-5 text-right">
-                      <Button size="sm" className="h-8 rounded-lg bg-indigo-600 font-semibold text-xs hover:bg-indigo-700" onClick={() => openDrawerProposal(p)}>
+                      <Button
+                        size="sm"
+                        className="h-8 rounded-lg bg-indigo-600 font-semibold text-xs hover:bg-indigo-700"
+                        onClick={() => openDrawerProposal(p)}
+                      >
                         Evaluate
                         <ChevronRight className="ml-1 h-3.5 w-3.5" />
                       </Button>
@@ -124,7 +157,9 @@ export function EvaluationsTabs() {
                   <TableHead className="font-semibold text-xs uppercase">Lead</TableHead>
                   <TableHead className="font-semibold text-xs uppercase">Status</TableHead>
                   <TableHead className="font-semibold text-xs uppercase">Score</TableHead>
-                  <TableHead className="font-semibold text-xs uppercase">Budget</TableHead>
+                  <Can permission="BUDGET_VIEW">
+                    <TableHead className="font-semibold text-xs uppercase">Budget</TableHead>
+                  </Can>
                   <TableHead className="w-[120px] pr-5 text-right font-semibold text-xs uppercase" />
                 </TableRow>
               </TableHeader>
@@ -136,30 +171,50 @@ export function EvaluationsTabs() {
                     <TableRow key={p.id} className="border-slate-100 dark:border-slate-800">
                       <TableCell className="py-4 pl-5">
                         <div className="flex flex-col gap-0.5">
-                          <span className="line-clamp-1 font-semibold text-[13px] text-slate-900 dark:text-slate-100">{p.title}</span>
-                          <span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">{p.id} · {p.dept}</span>
+                          <span className="line-clamp-1 font-semibold text-[13px] text-slate-900 dark:text-slate-100">
+                            {p.title}
+                          </span>
+                          <span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                            {p.id} · {p.dept}
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell className="py-4">
                         <div className="flex items-center gap-2">
                           <Avatar className="h-7 w-7">
-                            <AvatarFallback className={cn("font-bold text-[10px]", p.leadColor)}>{p.leadAvatar}</AvatarFallback>
+                            <AvatarFallback className={cn("font-bold text-[10px]", p.leadColor)}>
+                              {p.leadAvatar}
+                            </AvatarFallback>
                           </Avatar>
                           <span className="font-medium text-[13px] text-slate-700 dark:text-slate-300">{p.lead}</span>
                         </div>
                       </TableCell>
                       <TableCell className="py-4">
                         <div className="flex flex-col gap-1">
-                          <Badge className={cn("w-fit border-0 font-bold text-[10px]", st.className)}>{p.evalStatus}</Badge>
-                          <span className="max-w-[200px] text-[10px] text-slate-500 leading-snug dark:text-slate-400">{st.description}</span>
+                          <Badge className={cn("w-fit border-0 font-bold text-[10px]", st.className)}>
+                            {p.evalStatus}
+                          </Badge>
+                          <span className="max-w-[200px] text-[10px] text-slate-500 leading-snug dark:text-slate-400">
+                            {st.description}
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell className="py-4">
-                        <span className="font-bold text-indigo-700 text-sm tabular-nums dark:text-indigo-300">{scoreLabel}</span>
+                        <span className="font-bold text-indigo-700 text-sm tabular-nums dark:text-indigo-300">
+                          {scoreLabel}
+                        </span>
                       </TableCell>
-                      <TableCell className="py-4 font-semibold text-[13px] text-slate-700 dark:text-slate-300">{p.budget}</TableCell>
+                      <Can permission="BUDGET_VIEW">
+                        <TableCell className="py-4 font-semibold text-[13px] text-slate-700 dark:text-slate-300">
+                          {p.budget}
+                        </TableCell>
+                      </Can>
                       <TableCell className="py-4 pr-5 text-right">
-                        <Button size="sm" className="h-8 rounded-lg bg-indigo-600 font-semibold text-xs hover:bg-indigo-700" onClick={() => openDrawerProject(p)}>
+                        <Button
+                          size="sm"
+                          className="h-8 rounded-lg bg-indigo-600 font-semibold text-xs hover:bg-indigo-700"
+                          onClick={() => openDrawerProject(p)}
+                        >
                           Evaluate
                           <ChevronRight className="ml-1 h-3.5 w-3.5" />
                         </Button>

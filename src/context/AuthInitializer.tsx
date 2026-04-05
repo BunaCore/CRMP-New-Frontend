@@ -14,9 +14,11 @@
 // ============================================================
 
 import { useEffect } from "react";
+
 import Cookies from "js-cookie";
-import { useAuthStore } from "@/stores/authStore";
+
 import { getCurrentUser } from "@/lib/api/auth/queries";
+import { useAuthStore } from "@/stores/authStore";
 
 const COOKIE_TOKEN_KEY = "access_token";
 const COOKIE_PERMISSIONS_KEY = "user_permissions";
@@ -27,10 +29,10 @@ export function AuthInitializer() {
 
   useEffect(() => {
     const initSession = async () => {
-      // Use getState() to safely read the latest hydrated token, 
+      // Use getState() to safely read the latest hydrated token,
       // avoiding stale closures where access_token might be null on initial render
       const currentToken = useAuthStore.getState().access_token;
-      
+
       setLoading(true);
 
       if (!currentToken) {

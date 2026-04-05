@@ -5,12 +5,12 @@ import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { APP_CONFIG } from "@/config/app-config";
+import { AuthInitializer } from "@/context/AuthInitializer";
+import { SessionProvider } from "@/context/SessionContext";
 import { fontVars } from "@/lib/fonts/registry";
 import { PREFERENCE_DEFAULTS } from "@/lib/preferences/preferences-config";
 import { ThemeBootScript } from "@/scripts/theme-boot";
 import { PreferencesStoreProvider } from "@/stores/preferences/preferences-provider";
-import { SessionProvider } from "@/context/SessionContext";
-import { AuthInitializer } from "@/context/AuthInitializer";
 
 import "./globals.css";
 

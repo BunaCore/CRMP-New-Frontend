@@ -2,11 +2,12 @@
 
 import type { ReactNode } from "react";
 import { useEffect } from "react";
+
 import { useRouter } from "next/navigation";
 
+import { hasPermission } from "@/access-control/permission-gates";
 import NotFoundPage from "@/app/404";
 import { useAuthStore } from "@/stores/authStore";
-import { hasPermission } from "@/access-control/permission-gates";
 
 export function DashboardPermissionGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -43,4 +44,3 @@ export function DashboardPermissionGuard({ children }: { children: ReactNode }) 
 
   return <>{children}</>;
 }
-

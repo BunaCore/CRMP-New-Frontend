@@ -1,30 +1,66 @@
 "use client";
 
-import React from "react";
-import { useProposals } from "../proposals-context";
-import { STATUS_CFG, formatPeopleList } from "./proposals-table";
+import {
+  AlertTriangle,
+  Calendar,
+  Check,
+  CheckCircle,
+  Circle,
+  Clock,
+  FileText,
+  GraduationCap,
+  Sparkles,
+  UserCheck,
+  Users,
+  XCircle,
+} from "lucide-react";
+
+import { Can } from "@/access-control/permission-gates";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
-import { UserCheck, GraduationCap, AlertTriangle, Calendar, Users, FileText, ChevronRight, Sparkles, Check, Clock, Circle, CheckCircle } from "lucide-react";
-import { Can } from "@/access-control/permission-gates";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Textarea } from "@/components/ui/textarea";
+
 import { getApprovalChain } from "../_data/mock-proposals";
+import { useProposals } from "../proposals-context";
+import { STATUS_CFG } from "./proposals-table";
 
 export function ProposalsDrawer() {
   const {
-    selected, closeDrawer, drawerTab, setDrawerTab,
-    setPickedEvalIds, setShowAssign,
-    setPickedAdvisorIds, setShowAssignAdvisor,
-    setShowTimelineApprove, setShowTimelineReject,
-    filteredEvals, filteredAdvisors
+    selected,
+    closeDrawer,
+    drawerTab,
+    setDrawerTab,
+    showTimelineApprove,
+    setShowTimelineApprove,
+    timelineApproveNote,
+    setTimelineApproveNote,
+    handleTimelineApproveSubmit,
+    showTimelineReject,
+    setShowTimelineReject,
+    timelineRejectComment,
+    setTimelineRejectComment,
+    handleTimelineRejectSubmit,
   } = useProposals();
 
   const approvalChain = selected ? getApprovalChain(selected.id) : [];
 
   return (
     <Sheet open={!!selected} onOpenChange={(o) => !o && closeDrawer()}>
-      <SheetContent className="flex w-full flex-col overflow-hidden border-l border-slate-200/80 bg-white p-0 shadow-2xl dark:border-slate-800 dark:bg-slate-950 sm:max-w-[800px] xl:max-w-[1000px]" side="right">
+      <SheetContent
+        className="flex w-full flex-col overflow-hidden border-slate-200/80 border-l bg-white p-0 shadow-2xl sm:max-w-[800px] xl:max-w-[1000px] dark:border-slate-800 dark:bg-slate-950"
+        side="right"
+      >
         {selected && (
           <>
             {/* Drawer Header */}
@@ -34,8 +70,11 @@ export function ProposalsDrawer() {
                   <Badge className="border-0 bg-slate-200/80 font-bold text-[10px] text-slate-700 uppercase dark:bg-slate-800 dark:text-slate-300">
                     {selected.id}
                   </Badge>
-                  <Badge className={`${STATUS_CFG[selected.status].className} pointer-events-none flex items-center gap-1 border-0 font-bold text-[10px]`}>
-                    {STATUS_CFG[selected.status].icon}{selected.status}
+                  <Badge
+                    className={`${STATUS_CFG[selected.status].className} pointer-events-none flex items-center gap-1 border-0 font-bold text-[10px]`}
+                  >
+                    {STATUS_CFG[selected.status].icon}
+                    {selected.status}
                   </Badge>
                   {selected.evaluators.slice(0, 2).map((name) => (
                     <Badge
@@ -76,19 +115,20 @@ export function ProposalsDrawer() {
 
               {/* Drawer Tab Nav */}
               <div className="mt-4 flex flex-wrap gap-1.5 rounded-xl bg-slate-100/80 p-1 dark:bg-slate-900/60">
-                {([
+                {[
                   { id: "details" as const, label: "Details" },
                   { id: "team" as const, label: "Team" },
                   { id: "approve" as const, label: "Approve" },
-                ]).map((t) => (
+                ].map((t) => (
                   <button
                     type="button"
                     key={t.id}
                     onClick={() => setDrawerTab(t.id)}
-                    className={`rounded-lg px-4 py-2 font-semibold text-xs transition-all ${drawerTab === t.id
+                    className={`rounded-lg px-4 py-2 font-semibold text-xs transition-all ${
+                      drawerTab === t.id
                         ? "bg-white text-blue-700 shadow-sm dark:bg-slate-800 dark:text-blue-400"
                         : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
-                      }`}
+                    }`}
                   >
                     {t.label}
                   </button>
@@ -98,7 +138,6 @@ export function ProposalsDrawer() {
 
             {/* Drawer Body */}
             <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-6 py-6 sm:px-8 sm:py-7">
-
               {/* ── TAB: DETAILS ── */}
               {drawerTab === "details" && (
                 <>
@@ -115,28 +154,40 @@ export function ProposalsDrawer() {
                   {/* Key Stats */}
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                      <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Principal Investigator</p>
+                      <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                        Principal Investigator
+                      </p>
                       <div className="flex items-center gap-2">
                         <Avatar className="h-7 w-7">
-                          <AvatarFallback className={`font-bold text-[10px] ${selected.piColor}`}>{selected.piAvatar}</AvatarFallback>
+                          <AvatarFallback className={`font-bold text-[10px] ${selected.piColor}`}>
+                            {selected.piAvatar}
+                          </AvatarFallback>
                         </Avatar>
-                        <span className="truncate font-semibold text-[13px] text-slate-800 dark:text-slate-200">{selected.pi}</span>
+                        <span className="truncate font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                          {selected.pi}
+                        </span>
                       </div>
                     </div>
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                      <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Budget Requested</p>
+                      <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                        Budget Requested
+                      </p>
                       <p className="font-extrabold text-blue-600 text-xl dark:text-blue-400">{selected.budget}</p>
                     </div>
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                      <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Date Submitted</p>
+                      <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                        Date Submitted
+                      </p>
                       <p className="flex items-center gap-1.5 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
-                        <Calendar className="h-3.5 w-3.5 text-slate-400" />{selected.submittedDate}
+                        <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                        {selected.submittedDate}
                       </p>
                     </div>
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
                       <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Team Size</p>
                       <p className="flex items-center gap-1.5 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
-                        <Users className="h-3.5 w-3.5 text-slate-400" />{selected.teamCount} members
+                        <Users className="h-3.5 w-3.5 text-slate-400" />
+                        {selected.teamCount} members
                       </p>
                     </div>
                   </div>
@@ -150,72 +201,6 @@ export function ProposalsDrawer() {
                       {selected.abstract}
                     </p>
                   </div>
-
-                  {/* Admin Workflow Actions */}
-                  <div>
-                    <h4 className="mb-3 font-bold text-[11px] text-slate-500 uppercase tracking-wider">Workflow Actions</h4>
-                    <div className="grid grid-cols-1 gap-2.5 lg:grid-cols-2">
-                      {/* Assign Evaluators */}
-                      <Can permission="EVALUATOR_ASSIGN">
-                        {(selected.status === "Submitted" || selected.status === "Under Review") && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const pre = filteredEvals.filter((e) =>
-                                selected.evaluators.includes(e.name)
-                              ).map((e) => e.id);
-                              setPickedEvalIds(pre);
-                              setShowAssign(true);
-                            }}
-                            className="group flex w-full items-center gap-3 rounded-xl border border-blue-200/90 bg-gradient-to-br from-blue-50/90 to-white p-4 text-left text-blue-800 shadow-sm transition-all hover:border-blue-300 hover:shadow-md dark:border-blue-900/45 dark:from-blue-950/40 dark:to-slate-950 dark:text-blue-300 dark:hover:border-blue-800"
-                          >
-                            <div className="shrink-0 rounded-xl bg-blue-100 p-2.5 dark:bg-blue-900/50">
-                              <UserCheck className="h-4 w-4" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="font-bold text-[13px] leading-tight">Assign Evaluators</p>
-                              <p className="mt-0.5 line-clamp-2 font-medium text-[11px] text-blue-700/80 dark:text-blue-400/80">
-                                {selected.evaluators.length
-                                  ? `${selected.evaluators.length} assigned: ${formatPeopleList(selected.evaluators, 3)}`
-                                  : "No evaluators assigned"}
-                              </p>
-                            </div>
-                            <ChevronRight className="ml-auto h-4 w-4 shrink-0 opacity-40 transition-opacity group-hover:opacity-100" />
-                          </button>
-                        )}
-                      </Can>
-
-                      {/* Assign Advisor */}
-                      <Can permission="ADVISOR_ASSIGN">
-                        {(selected.status === "Submitted" || selected.status === "Under Review") && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const pre = filteredAdvisors.filter((a) =>
-                                selected.advisors.includes(a.name)
-                              ).map((a) => a.id);
-                              setPickedAdvisorIds(pre);
-                              setShowAssignAdvisor(true);
-                            }}
-                            className="group flex w-full items-center gap-3 rounded-xl border border-violet-200/90 bg-gradient-to-br from-violet-50/90 to-white p-4 text-left text-violet-800 shadow-sm transition-all hover:border-violet-300 hover:shadow-md dark:border-violet-900/45 dark:from-violet-950/35 dark:to-slate-950 dark:text-violet-300 dark:hover:border-violet-800"
-                          >
-                            <div className="shrink-0 rounded-xl bg-violet-100 p-2.5 dark:bg-violet-900/50">
-                              <GraduationCap className="h-4 w-4" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="font-bold text-[13px] leading-tight">Assign Advisor</p>
-                              <p className="mt-0.5 line-clamp-2 font-medium text-[11px] text-violet-700/80 dark:text-violet-400/80">
-                                {selected.advisors.length
-                                  ? `${selected.advisors.length} assigned: ${formatPeopleList(selected.advisors, 3)}`
-                                  : "No advisors assigned"}
-                              </p>
-                            </div>
-                            <ChevronRight className="ml-auto h-4 w-4 shrink-0 opacity-40 transition-opacity group-hover:opacity-100" />
-                          </button>
-                        )}
-                      </Can>
-                    </div>
-                  </div>
                 </>
               )}
 
@@ -227,11 +212,15 @@ export function ProposalsDrawer() {
                   </h4>
                   <div className="flex items-center gap-4 rounded-lg border border-blue-100 bg-blue-50/50 p-3.5 dark:border-blue-900/30 dark:bg-blue-900/10">
                     <Avatar className="h-10 w-10 border-2 border-blue-200 dark:border-blue-800">
-                      <AvatarFallback className={`font-bold text-xs ${selected.piColor}`}>{selected.piAvatar}</AvatarFallback>
+                      <AvatarFallback className={`font-bold text-xs ${selected.piColor}`}>
+                        {selected.piAvatar}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="flex min-w-0 flex-col">
                       <span className="font-bold text-slate-900 text-sm dark:text-slate-100">{selected.pi}</span>
-                      <span className="font-semibold text-blue-600 text-xs dark:text-blue-400">Principal Investigator</span>
+                      <span className="font-semibold text-blue-600 text-xs dark:text-blue-400">
+                        Principal Investigator
+                      </span>
                     </div>
                     <Badge className="ml-auto shrink-0 border-0 bg-blue-600 text-[10px] text-white">PI</Badge>
                   </div>
@@ -252,14 +241,18 @@ export function ProposalsDrawer() {
                       <div>
                         <h4 className="font-bold text-slate-900 text-sm dark:text-slate-100">Approval chain</h4>
                         <p className="font-medium text-[11px] text-slate-500 dark:text-slate-400">
-                          Completed steps show prior approvals. Your step is where you approve or reject. Later steps stay inactive.
+                          Completed steps show prior approvals. Your step is where you approve or reject. Later steps
+                          stay inactive.
                         </p>
                       </div>
                     </div>
                   </div>
 
                   <div className="relative">
-                    <div className="absolute top-3 bottom-3 left-[19px] w-px bg-gradient-to-b from-emerald-200 via-blue-200 to-slate-200 dark:from-emerald-900/40 dark:via-blue-900/40 dark:to-slate-800" aria-hidden />
+                    <div
+                      className="absolute top-3 bottom-3 left-[19px] w-px bg-gradient-to-b from-emerald-200 via-blue-200 to-slate-200 dark:from-emerald-900/40 dark:via-blue-900/40 dark:to-slate-800"
+                      aria-hidden
+                    />
 
                     <ul className="relative flex flex-col gap-4">
                       {approvalChain.map((step, idx) => {
@@ -270,12 +263,13 @@ export function ProposalsDrawer() {
                         return (
                           <li key={step.id} className="relative flex gap-4 pl-1">
                             <div
-                              className={`relative z-[1] mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 shadow-sm transition-colors ${isCompleted
+                              className={`relative z-[1] mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 shadow-sm transition-colors ${
+                                isCompleted
                                   ? "border-emerald-200 bg-emerald-500 text-white dark:border-emerald-800 dark:bg-emerald-600"
                                   : isCurrent
                                     ? "border-blue-300 bg-blue-600 text-white ring-4 ring-blue-500/20 dark:border-blue-500 dark:bg-blue-600 dark:ring-blue-500/25"
                                     : "border-slate-200 bg-slate-100 text-slate-400 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-500"
-                                }`}
+                              }`}
                             >
                               {isCompleted && <Check className="h-4 w-4 stroke-[3]" />}
                               {isCurrent && <Clock className="h-4 w-4" />}
@@ -283,12 +277,13 @@ export function ProposalsDrawer() {
                             </div>
 
                             <div
-                              className={`min-w-0 flex-1 rounded-2xl border p-4 transition-all ${isCompleted
+                              className={`min-w-0 flex-1 rounded-2xl border p-4 transition-all ${
+                                isCompleted
                                   ? "border-emerald-100 bg-emerald-50/40 dark:border-emerald-900/25 dark:bg-emerald-950/20"
                                   : isCurrent
                                     ? "border-blue-200 bg-gradient-to-br from-blue-50/90 to-white shadow-md dark:border-blue-900/40 dark:from-blue-950/30 dark:to-slate-950"
                                     : "border-slate-100 bg-slate-50/40 opacity-60 dark:border-slate-800 dark:bg-slate-900/20"
-                                }`}
+                              }`}
                             >
                               <div className="flex flex-wrap items-start justify-between gap-2">
                                 <div>
@@ -327,8 +322,9 @@ export function ProposalsDrawer() {
                                   permission="PROJECT_APPROVE"
                                   fallback={
                                     <div className="mt-4 flex rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800/80 dark:bg-slate-900/20">
-                                      <p className="font-medium text-xs text-slate-500 italic">
-                                        Awaiting authorized personnel. You do not have permission to approve or reject this proposal step.
+                                      <p className="font-medium text-slate-500 text-xs italic">
+                                        Awaiting authorized personnel. You do not have permission to approve or reject
+                                        this proposal step.
                                       </p>
                                     </div>
                                   }
@@ -337,7 +333,7 @@ export function ProposalsDrawer() {
                                     <Button
                                       type="button"
                                       size="sm"
-                                      className="h-9 flex-1 min-w-[120px] bg-emerald-600 font-semibold text-white shadow-sm hover:bg-emerald-700"
+                                      className="h-9 min-w-[120px] flex-1 bg-emerald-600 font-semibold text-white shadow-sm hover:bg-emerald-700"
                                       onClick={() => setShowTimelineApprove(true)}
                                     >
                                       <Check className="mr-1.5 h-4 w-4" />
@@ -347,7 +343,7 @@ export function ProposalsDrawer() {
                                       type="button"
                                       size="sm"
                                       variant="outline"
-                                      className="h-9 flex-1 min-w-[120px] border-rose-200 font-semibold text-rose-700 hover:bg-rose-50 dark:border-rose-900/50 dark:text-rose-400 dark:hover:bg-rose-950/40"
+                                      className="h-9 min-w-[120px] flex-1 border-rose-200 font-semibold text-rose-700 hover:bg-rose-50 dark:border-rose-900/50 dark:text-rose-400 dark:hover:bg-rose-950/40"
                                       onClick={() => setShowTimelineReject(true)}
                                     >
                                       <AlertTriangle className="mr-1.5 h-4 w-4" />
@@ -368,6 +364,110 @@ export function ProposalsDrawer() {
           </>
         )}
       </SheetContent>
+
+      <Dialog open={showTimelineApprove} onOpenChange={setShowTimelineApprove}>
+        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[460px]">
+          <DialogHeader className="border-slate-100 border-b px-6 pt-6 pb-4 dark:border-slate-800">
+            <div className="mb-1 flex items-center gap-3">
+              <div className="rounded-lg bg-emerald-100 p-2 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400">
+                <Check className="h-5 w-5" />
+              </div>
+              <DialogTitle className="font-bold text-base">Confirm approval</DialogTitle>
+            </div>
+            <DialogDescription className="ml-11 text-slate-500 text-xs">
+              Your approval will advance this proposal to the next step in the chain. Add an optional note for the
+              record.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 px-6 py-5">
+            <div className="rounded-lg border border-slate-100 bg-slate-50 p-3.5 dark:border-slate-800 dark:bg-slate-900/50">
+              <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Proposal</p>
+              <p className="mt-0.5 line-clamp-2 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                {selected?.title}
+              </p>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label
+                htmlFor="timeline-approve-note"
+                className="font-semibold text-[12px] text-slate-700 dark:text-slate-300"
+              >
+                Optional note
+              </Label>
+              <Textarea
+                id="timeline-approve-note"
+                className="min-h-[100px] resize-none rounded-lg bg-white text-sm dark:bg-slate-950"
+                value={timelineApproveNote}
+                onChange={(e) => setTimelineApproveNote(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter className="flex gap-2 border-slate-100 border-t px-6 py-4 dark:border-slate-800">
+            <Button variant="outline" size="sm" className="h-9" onClick={() => setShowTimelineApprove(false)}>
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              className="h-9 flex-1 bg-emerald-600 font-semibold text-white hover:bg-emerald-700"
+              onClick={handleTimelineApproveSubmit}
+            >
+              <Check className="mr-1.5 h-4 w-4" />
+              Confirm approval
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showTimelineReject} onOpenChange={setShowTimelineReject}>
+        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[460px]">
+          <DialogHeader className="border-slate-100 border-b px-6 pt-6 pb-4 dark:border-slate-800">
+            <div className="mb-1 flex items-center gap-3">
+              <div className="rounded-lg bg-rose-100 p-2 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400">
+                <XCircle className="h-5 w-5" />
+              </div>
+              <DialogTitle className="font-bold text-base">Reject at this step</DialogTitle>
+            </div>
+            <DialogDescription className="ml-11 text-slate-500 text-xs">
+              Explain why the proposal cannot proceed.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 px-6 py-5">
+            <div className="rounded-lg border border-slate-100 bg-slate-50 p-3.5 dark:border-slate-800 dark:bg-slate-900/50">
+              <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Proposal</p>
+              <p className="mt-0.5 line-clamp-2 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                {selected?.title}
+              </p>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label
+                htmlFor="timeline-reject-comment"
+                className="font-semibold text-[12px] text-slate-700 dark:text-slate-300"
+              >
+                Reason for rejection <span className="text-rose-500">*</span>
+              </Label>
+              <Textarea
+                id="timeline-reject-comment"
+                className="min-h-[140px] resize-none rounded-lg bg-white text-sm dark:bg-slate-950"
+                value={timelineRejectComment}
+                onChange={(e) => setTimelineRejectComment(e.target.value)}
+              />
+              <p className="font-medium text-[10px] text-slate-400">{timelineRejectComment.length} / 1000 characters</p>
+            </div>
+          </div>
+          <DialogFooter className="flex gap-2 border-slate-100 border-t px-6 py-4 dark:border-slate-800">
+            <Button variant="outline" size="sm" className="h-9" onClick={() => setShowTimelineReject(false)}>
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              className="h-9 flex-1 bg-rose-600 font-semibold text-white hover:bg-rose-700"
+              disabled={timelineRejectComment.trim().length < 10}
+              onClick={handleTimelineRejectSubmit}
+            >
+              <XCircle className="mr-1.5 h-4 w-4" /> Confirm rejection
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Sheet>
   );
 }

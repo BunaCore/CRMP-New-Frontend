@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
-import { EvaluationsProvider } from "./evaluations-context";
-import { EvaluationsTabs } from "./_components/evaluations-tabs";
-import { EvaluationDrawer } from "./_components/evaluation-drawer";
-import { ActionsAndModals } from "./_components/actions-and-modals";
 import { ClipboardList } from "lucide-react";
+
+import { ActionsAndModals } from "./_components/actions-and-modals";
+import { EvaluationDrawer } from "./_components/evaluation-drawer";
+import { EvaluationsTabs } from "./_components/evaluations-tabs";
+import { EvaluationsProvider } from "./evaluations-context";
 
 export default function AdminEvaluationsPage() {
   return (
@@ -18,7 +18,8 @@ export default function AdminEvaluationsPage() {
               Evaluations
             </h1>
             <p className="mt-0.5 max-w-2xl text-slate-500 text-sm">
-              Review scoring rubrics, schedule defences, and approve completed evaluations for proposals and funded projects.
+              Review scoring rubrics, schedule defences, and approve completed evaluations for proposals and funded
+              projects.
             </p>
           </div>
         </div>

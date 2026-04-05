@@ -1,4 +1,4 @@
-import { RubricItem, EvalProposalRow, EvalProjectRow } from "../types";
+import type { EvalProjectRow, EvalProposalRow, RubricItem } from "../types";
 
 export const DEMO_RUBRIC: RubricItem[] = [
   { order: 1, name: "Advisor", kind: "continuous", max: 20, score: 19 },
