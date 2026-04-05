@@ -1,20 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
 
+import { useRouter, useSearchParams } from "next/navigation";
+
+import { zodResolver } from "@hookform/resolvers/zod";
 import Cookies from "js-cookie";
-import { useAuthStore } from "@/stores/authStore";
-import { loginUser } from "@/lib/api/auth/mutations";
+import { Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
+
+import { hasPermission } from "@/access-control/permission-gates";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { hasPermission } from "@/access-control/permission-gates";
+import { loginUser } from "@/lib/api/auth/mutations";
+import { useAuthStore } from "@/stores/authStore";
 
 const signInSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
@@ -27,7 +29,7 @@ export function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
-  
+
   const { login } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -60,7 +62,7 @@ export function SignInForm() {
       });
 
       toast.success("Welcome back!", {
-        description: `Signed in as ${response.user.fullName} (${response.user.role})`
+        description: `Signed in as ${response.user.fullName} (${response.user.role})`,
       });
 
       // Route dynamically based on user role (if no explicit redirect exists)
@@ -72,7 +74,7 @@ export function SignInForm() {
       }
     } catch (_error) {
       toast.error("Sign In Failed", {
-        description: "Please check your credentials and try again."
+        description: "Please check your credentials and try again.",
       });
     } finally {
       setIsLoading(false);
@@ -90,34 +92,18 @@ export function SignInForm() {
           disabled={isLoading}
           {...register("email")}
         />
-        {errors.email && (
-          <p className="font-medium text-red-500 text-sm">
-            {errors.email.message}
-          </p>
-        )}
+        {errors.email && <p className="font-medium text-red-500 text-sm">{errors.email.message}</p>}
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label htmlFor="password">Password</Label>
-          <a
-              href="/login"
-            className="font-medium text-blue-600 text-sm hover:text-blue-500 dark:text-blue-400"
-          >
+          <a href="/login" className="font-medium text-blue-600 text-sm hover:text-blue-500 dark:text-blue-400">
             Forgot password?
           </a>
         </div>
-        <Input
-          id="password"
-          type="password"
-          disabled={isLoading}
-          {...register("password")}
-        />
-        {errors.password && (
-          <p className="font-medium text-red-500 text-sm">
-            {errors.password.message}
-          </p>
-        )}
+        <Input id="password" type="password" disabled={isLoading} {...register("password")} />
+        {errors.password && <p className="font-medium text-red-500 text-sm">{errors.password.message}</p>}
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>

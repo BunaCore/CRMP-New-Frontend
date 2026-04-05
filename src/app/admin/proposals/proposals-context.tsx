@@ -1,8 +1,10 @@
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
-import { Proposal, Evaluator } from "./types";
-import { PROPOSALS_INITIAL, EVALUATORS, ADVISORS } from "./_data/mock-proposals";
+import type React from "react";
+import { createContext, useContext, useState } from "react";
+
+import { ADVISORS, EVALUATORS, PROPOSALS_INITIAL } from "./_data/mock-proposals";
+import type { Evaluator, Proposal } from "./types";
 
 interface ProposalsContextValue {
   proposals: Proposal[];
@@ -73,24 +75,25 @@ export function ProposalsProvider({ children }: { children: React.ReactNode }) {
 
   const [showTimelineApprove, setShowTimelineApprove] = useState(false);
   const [timelineApproveNote, setTimelineApproveNote] = useState("");
-  
+
   const [showTimelineReject, setShowTimelineReject] = useState(false);
   const [timelineRejectComment, setTimelineRejectComment] = useState("");
 
-  const filtered = proposals.filter(p => {
+  const filtered = proposals.filter((p) => {
     const matchTab = tab === "all" || p.status === tab;
-    const matchSearch = p.title.toLowerCase().includes(search.toLowerCase()) ||
-                        p.pi.toLowerCase().includes(search.toLowerCase()) ||
-                        p.id.toLowerCase().includes(search.toLowerCase());
+    const matchSearch =
+      p.title.toLowerCase().includes(search.toLowerCase()) ||
+      p.pi.toLowerCase().includes(search.toLowerCase()) ||
+      p.id.toLowerCase().includes(search.toLowerCase());
     return matchTab && matchSearch;
   });
 
-  const filteredEvals = EVALUATORS.filter(e =>
-    (e.name + e.specialty).toLowerCase().includes(evalSearch.toLowerCase())
+  const filteredEvals = EVALUATORS.filter((e) =>
+    (e.name + e.specialty).toLowerCase().includes(evalSearch.toLowerCase()),
   );
 
-  const filteredAdvisors = ADVISORS.filter(a =>
-    (a.name + a.specialty).toLowerCase().includes(advisorSearch.toLowerCase())
+  const filteredAdvisors = ADVISORS.filter((a) =>
+    (a.name + a.specialty).toLowerCase().includes(advisorSearch.toLowerCase()),
   );
 
   const openDrawer = (p: Proposal) => {
@@ -111,18 +114,18 @@ export function ProposalsProvider({ children }: { children: React.ReactNode }) {
   };
 
   const toggleEvalPick = (id: string) => {
-    setPickedEvalIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+    setPickedEvalIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
   const toggleAdvisorPick = (id: string) => {
-    setPickedAdvisorIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+    setPickedAdvisorIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
   const handleAssignConfirm = () => {
     if (!selected) return;
-    const names = pickedEvalIds.map(id => EVALUATORS.find(e => e.id === id)?.name).filter(Boolean) as string[];
-    setProposals(prev => prev.map(p => p.id === selected.id ? { ...p, evaluators: names } : p));
-    setSelected(s => s && s.id === selected.id ? { ...s, evaluators: names } : s);
+    const names = pickedEvalIds.map((id) => EVALUATORS.find((e) => e.id === id)?.name).filter(Boolean) as string[];
+    setProposals((prev) => prev.map((p) => (p.id === selected.id ? { ...p, evaluators: names } : p)));
+    setSelected((s) => (s && s.id === selected.id ? { ...s, evaluators: names } : s));
     setShowAssign(false);
     setEvalSearch("");
     setPickedEvalIds([]);
@@ -130,9 +133,9 @@ export function ProposalsProvider({ children }: { children: React.ReactNode }) {
 
   const handleAssignAdvisorConfirm = () => {
     if (!selected) return;
-    const names = pickedAdvisorIds.map(id => ADVISORS.find(a => a.id === id)?.name).filter(Boolean) as string[];
-    setProposals(prev => prev.map(p => p.id === selected.id ? { ...p, advisors: names } : p));
-    setSelected(s => s && s.id === selected.id ? { ...s, advisors: names } : s);
+    const names = pickedAdvisorIds.map((id) => ADVISORS.find((a) => a.id === id)?.name).filter(Boolean) as string[];
+    setProposals((prev) => prev.map((p) => (p.id === selected.id ? { ...p, advisors: names } : p)));
+    setSelected((s) => (s && s.id === selected.id ? { ...s, advisors: names } : s));
     setShowAssignAdvisor(false);
     setAdvisorSearch("");
     setPickedAdvisorIds([]);
@@ -149,28 +152,51 @@ export function ProposalsProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <ProposalsContext.Provider value={{
-      proposals, setProposals,
-      tab, setTab,
-      search, setSearch,
-      selected, setSelected,
-      drawerTab, setDrawerTab,
-      showAssign, setShowAssign,
-      pickedEvalIds, setPickedEvalIds,
-      showAssignAdvisor, setShowAssignAdvisor,
-      pickedAdvisorIds, setPickedAdvisorIds,
-      showTimelineApprove, setShowTimelineApprove,
-      timelineApproveNote, setTimelineApproveNote,
-      showTimelineReject, setShowTimelineReject,
-      timelineRejectComment, setTimelineRejectComment,
-      openDrawer, closeDrawer,
-      toggleEvalPick, toggleAdvisorPick,
-      handleAssignConfirm, handleAssignAdvisorConfirm,
-      handleTimelineApproveSubmit, handleTimelineRejectSubmit,
-      filtered, filteredEvals, filteredAdvisors,
-      evalSearch, setEvalSearch,
-      advisorSearch, setAdvisorSearch
-    }}>
+    <ProposalsContext.Provider
+      value={{
+        proposals,
+        setProposals,
+        tab,
+        setTab,
+        search,
+        setSearch,
+        selected,
+        setSelected,
+        drawerTab,
+        setDrawerTab,
+        showAssign,
+        setShowAssign,
+        pickedEvalIds,
+        setPickedEvalIds,
+        showAssignAdvisor,
+        setShowAssignAdvisor,
+        pickedAdvisorIds,
+        setPickedAdvisorIds,
+        showTimelineApprove,
+        setShowTimelineApprove,
+        timelineApproveNote,
+        setTimelineApproveNote,
+        showTimelineReject,
+        setShowTimelineReject,
+        timelineRejectComment,
+        setTimelineRejectComment,
+        openDrawer,
+        closeDrawer,
+        toggleEvalPick,
+        toggleAdvisorPick,
+        handleAssignConfirm,
+        handleAssignAdvisorConfirm,
+        handleTimelineApproveSubmit,
+        handleTimelineRejectSubmit,
+        filtered,
+        filteredEvals,
+        filteredAdvisors,
+        evalSearch,
+        setEvalSearch,
+        advisorSearch,
+        setAdvisorSearch,
+      }}
+    >
       {children}
     </ProposalsContext.Provider>
   );

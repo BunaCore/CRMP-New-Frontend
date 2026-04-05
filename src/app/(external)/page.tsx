@@ -1,14 +1,21 @@
 import Link from "next/link";
-import { ArrowRight, Beaker, ShieldCheck, PieChart, Users, ChevronRight } from "lucide-react";
+
+import { ArrowRight, Beaker, ChevronRight, PieChart, ShieldCheck, Users } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 
 export default function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-white font-sans selection:bg-blue-200 dark:bg-slate-950 dark:selection:bg-blue-900/40">
-      
       {/* Dynamic Background Pattern */}
       <div className="-top-40 -z-10 sm:-top-80 absolute inset-x-0 transform-gpu overflow-hidden blur-3xl">
-        <div className="-translate-x-1/2 relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] rotate-[30deg] bg-gradient-to-tr from-[#3b82f6] to-[#93c5fd] opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem] dark:from-[#1d4ed8] dark:to-[#1e3a8a] dark:opacity-40" style={{ clipPath: 'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)' }} />
+        <div
+          className="-translate-x-1/2 relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] rotate-[30deg] bg-gradient-to-tr from-[#3b82f6] to-[#93c5fd] opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem] dark:from-[#1d4ed8] dark:to-[#1e3a8a] dark:opacity-40"
+          style={{
+            clipPath:
+              "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
+          }}
+        />
       </div>
 
       {/* Navigation */}
@@ -20,13 +27,19 @@ export default function LandingPage() {
             </div>
             <span className="font-bold text-slate-900 text-xl tracking-tight dark:text-white">CRMP</span>
           </div>
-          
+
           <nav className="hidden items-center gap-8 font-medium text-slate-600 text-sm md:flex dark:text-slate-300">
-            <a href="#features" className="transition-colors hover:text-blue-600">Features</a>
-            <a href="#architecture" className="transition-colors hover:text-blue-600">Architecture</a>
-            <a href="#docs" className="transition-colors hover:text-blue-600">Documentation</a>
+            <a href="#features" className="transition-colors hover:text-blue-600">
+              Features
+            </a>
+            <a href="#architecture" className="transition-colors hover:text-blue-600">
+              Architecture
+            </a>
+            <a href="#docs" className="transition-colors hover:text-blue-600">
+              Documentation
+            </a>
           </nav>
-          
+
           <div className="flex items-center gap-4">
             <Link href="/login">
               <Button variant="ghost" className="hidden font-medium hover:bg-slate-100 sm:flex dark:hover:bg-slate-800">
@@ -46,28 +59,39 @@ export default function LandingPage() {
       <main className="flex-1">
         <div className="container mx-auto max-w-7xl px-4 pt-20 pb-16 sm:px-6 lg:px-8 lg:pt-32">
           <div className="mx-auto max-w-3xl text-center">
-            
             <div className="mb-8 inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 font-medium text-blue-600 text-sm dark:border-blue-800/50 dark:bg-blue-900/20 dark:text-blue-400">
               <span className="mr-2 flex h-2 w-2 animate-pulse rounded-full bg-blue-600" />
               v2.2 Architecture Deployed
             </div>
-            
+
             <h1 className="mb-8 font-extrabold text-5xl text-slate-900 leading-[1.1] tracking-tight sm:text-6xl md:text-7xl dark:text-white">
-              The Centralized <span className="bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">Research Management</span> Platform.
+              The Centralized{" "}
+              <span className="bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">
+                Research Management
+              </span>{" "}
+              Platform.
             </h1>
-            
+
             <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600 leading-relaxed dark:text-slate-400">
-              A comprehensive portal designed strictly for the administration, evaluation, and progression of collaborative academic research proposals. Complete with role-based routing and live budget orchestration.
+              A comprehensive portal designed strictly for the administration, evaluation, and progression of
+              collaborative academic research proposals. Complete with role-based routing and live budget orchestration.
             </p>
-            
+
             <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
               <Link href="/login">
-                <Button size="lg" className="h-14 w-full rounded-full bg-slate-900 px-8 font-semibold text-white shadow-slate-900/20 shadow-xl hover:bg-slate-800 sm:w-auto dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200">
+                <Button
+                  size="lg"
+                  className="h-14 w-full rounded-full bg-slate-900 px-8 font-semibold text-white shadow-slate-900/20 shadow-xl hover:bg-slate-800 sm:w-auto dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
+                >
                   Access Portal <ChevronRight className="ml-1 h-5 w-5 opacity-60" />
                 </Button>
               </Link>
               <Link href="/login">
-                <Button variant="outline" size="lg" className="h-14 w-full rounded-full border-slate-300 bg-white/50 px-8 font-medium backdrop-blur-sm sm:w-auto dark:border-slate-700 dark:bg-slate-900/50">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="h-14 w-full rounded-full border-slate-300 bg-white/50 px-8 font-medium backdrop-blur-sm sm:w-auto dark:border-slate-700 dark:bg-slate-900/50"
+                >
                   Run Auth Demo
                 </Button>
               </Link>
@@ -78,10 +102,14 @@ export default function LandingPage() {
         {/* Feature Grid */}
         <div id="features" className="container mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
-            <h2 className="font-bold text-3xl text-slate-900 tracking-tight dark:text-white">Role-Centric Infrastructure</h2>
-            <p className="mt-4 text-slate-600 dark:text-slate-400">Dynamically adapting interfaces depending on your exact administrative role.</p>
+            <h2 className="font-bold text-3xl text-slate-900 tracking-tight dark:text-white">
+              Role-Centric Infrastructure
+            </h2>
+            <p className="mt-4 text-slate-600 dark:text-slate-400">
+              Dynamically adapting interfaces depending on your exact administrative role.
+            </p>
           </div>
-          
+
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             <div className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:border-blue-500/50 hover:shadow-blue-500/5 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900/50">
               <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
@@ -89,7 +117,8 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-3 font-semibold text-slate-900 text-xl dark:text-white">Strict Auth Guards</h3>
               <p className="text-slate-600 text-sm leading-relaxed dark:text-slate-400">
-                Powered by Edge Middleware and Zustand, routes are instantly protected ensuring PIs cannot see Admin finance modules and vice-versa.
+                Powered by Edge Middleware and Zustand, routes are instantly protected ensuring PIs cannot see Admin
+                finance modules and vice-versa.
               </p>
             </div>
 
@@ -99,7 +128,8 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-3 font-semibold text-slate-900 text-xl dark:text-white">Dynamic Routing</h3>
               <p className="text-slate-600 text-sm leading-relaxed dark:text-slate-400">
-                Sign in once. The platform automatically determines whether you belong in the PI workspace or the Administration dashboards.
+                Sign in once. The platform automatically determines whether you belong in the PI workspace or the
+                Administration dashboards.
               </p>
             </div>
 
@@ -109,7 +139,8 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-3 font-semibold text-slate-900 text-xl dark:text-white">Simulated Mock Engine</h3>
               <p className="text-slate-600 text-sm leading-relaxed dark:text-slate-400">
-                Develop securely without a backend. The API layer currently intercepts all requests and mimics realistic database behaviors.
+                Develop securely without a backend. The API layer currently intercepts all requests and mimics realistic
+                database behaviors.
               </p>
             </div>
           </div>
@@ -121,7 +152,9 @@ export default function LandingPage() {
         <div className="container mx-auto flex flex-col items-center justify-between text-slate-500 text-sm md:flex-row dark:text-slate-400">
           <p>© 2026 Collaborative Research Platform. Architecture Mock Build.</p>
           <div className="mt-4 flex gap-4 md:mt-0">
-            <span className="flex items-center gap-1"><div className="h-2 w-2 rounded-full bg-green-500" /> System Online</span>
+            <span className="flex items-center gap-1">
+              <div className="h-2 w-2 rounded-full bg-green-500" /> System Online
+            </span>
           </div>
         </div>
       </footer>

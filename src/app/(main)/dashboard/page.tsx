@@ -1,38 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Avatar, AvatarFallback, } from "@/components/ui/avatar";
-import {
+  ArrowRight,
+  CalendarDays,
   CheckCircle2,
   Clock,
   FileText,
   FolderOpen,
-  Plus,
-  Users,
-  ArrowRight,
-  CalendarDays,
   MapPin,
   MessageSquare,
+  Plus,
+  Users,
 } from "lucide-react";
+
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function DashboardPage() {
   const [showRSVPModal, setShowRSVPModal] = useState(false);
@@ -114,7 +110,7 @@ export default function DashboardPage() {
       message: "Please review the updated Phase 1 budget allocations when you have a moment.",
       time: "10m ago",
       unread: true,
-      avatarColor: "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300"
+      avatarColor: "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300",
     },
     {
       sender: "Prof. Michael Chen",
@@ -123,7 +119,7 @@ export default function DashboardPage() {
       message: "I've uploaded the new methodology drafts. Let me know what you think.",
       time: "1h ago",
       unread: false,
-      avatarColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
+      avatarColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300",
     },
     {
       sender: "Sarah Jenkins",
@@ -132,8 +128,8 @@ export default function DashboardPage() {
       message: "The evaluation committee just fully approved our timeline extension!",
       time: "2h ago",
       unread: false,
-      avatarColor: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
-    }
+      avatarColor: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
+    },
   ];
 
   // ─── MOCK FEATURE TOGGLE ─────────────────────────
@@ -145,24 +141,31 @@ export default function DashboardPage() {
     date: "14 Mar 2025",
     time: "10:00 AM (EAT)",
     venue: "Main Campus — Senate Hall",
-    message: "Please ensure your presentation is strictly 15 minutes. The evaluation committee has already reviewed your abstract.",
+    message:
+      "Please ensure your presentation is strictly 15 minutes. The evaluation committee has already reviewed your abstract.",
   };
 
   return (
     <div className="flex flex-1 flex-col gap-8">
       {/* Option 1: Global Banner for Actionable Notifications */}
       {SHOW_MOCK_APPOINTMENT && (
-        <div className="flex flex-col sm:flex-row items-center gap-4 rounded-xl border border-amber-200/80 bg-gradient-to-r from-amber-50 to-amber-100/50 p-4 shadow-sm dark:border-amber-900/50 dark:from-amber-950/40 dark:to-amber-900/20">
+        <div className="flex flex-col items-center gap-4 rounded-xl border border-amber-200/80 bg-gradient-to-r from-amber-50 to-amber-100/50 p-4 shadow-sm sm:flex-row dark:border-amber-900/50 dark:from-amber-950/40 dark:to-amber-900/20">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500 text-white shadow-sm">
             <CalendarDays className="h-5 w-5" />
           </div>
           <div className="flex-1 text-center sm:text-left">
-            <h3 className="font-bold text-amber-900 text-sm dark:text-amber-200">Action Required: Upcoming Proposal Defence</h3>
+            <h3 className="font-bold text-amber-900 text-sm dark:text-amber-200">
+              Action Required: Upcoming Proposal Defence
+            </h3>
             <p className="mt-0.5 text-amber-700 text-sm dark:text-amber-400">
-              Your defence for <strong className="font-bold">{mockAppointment.title}</strong> is scheduled for {mockAppointment.date} at {mockAppointment.time}.
+              Your defence for <strong className="font-bold">{mockAppointment.title}</strong> is scheduled for{" "}
+              {mockAppointment.date} at {mockAppointment.time}.
             </p>
           </div>
-          <Button onClick={() => setShowRSVPModal(true)} className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 font-semibold text-white shadow-sm dark:bg-amber-600 dark:hover:bg-amber-500">
+          <Button
+            onClick={() => setShowRSVPModal(true)}
+            className="w-full bg-amber-600 font-semibold text-white shadow-sm hover:bg-amber-700 sm:w-auto dark:bg-amber-600 dark:hover:bg-amber-500"
+          >
             View Details & RSVP
           </Button>
         </div>
@@ -202,9 +205,7 @@ export default function DashboardPage() {
 
         <Card className="min-w-[280px] flex-1 snap-center rounded-xl border-slate-200/50 bg-white shadow-none dark:border-slate-800/50 dark:bg-slate-950/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="font-medium text-slate-600 text-sm dark:text-slate-400">
-              Pending Proposals
-            </CardTitle>
+            <CardTitle className="font-medium text-slate-600 text-sm dark:text-slate-400">Pending Proposals</CardTitle>
             <div className="rounded-lg bg-amber-50 p-2 dark:bg-amber-900/20">
               <FileText className="h-4 w-4 text-amber-600 dark:text-amber-400" />
             </div>
@@ -217,9 +218,7 @@ export default function DashboardPage() {
 
         <Card className="min-w-[280px] flex-1 snap-center rounded-xl border-slate-200/50 bg-white shadow-none dark:border-slate-800/50 dark:bg-slate-950/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="font-medium text-slate-600 text-sm dark:text-slate-400">
-              Team Members
-            </CardTitle>
+            <CardTitle className="font-medium text-slate-600 text-sm dark:text-slate-400">Team Members</CardTitle>
             <div className="rounded-lg bg-emerald-50 p-2 dark:bg-emerald-900/20">
               <Users className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
@@ -253,8 +252,12 @@ export default function DashboardPage() {
                   <TableRow className="border-slate-100 hover:bg-transparent dark:border-slate-800">
                     <TableHead className="h-11 px-6 font-medium text-slate-500 tracking-tight">Project Name</TableHead>
                     <TableHead className="h-11 px-6 font-medium text-slate-500 tracking-tight">Status</TableHead>
-                    <TableHead className="hidden h-11 px-6 font-medium text-slate-500 tracking-tight sm:table-cell">Progress</TableHead>
-                    <TableHead className="h-11 px-6 text-right font-medium text-slate-500 tracking-tight">Action</TableHead>
+                    <TableHead className="hidden h-11 px-6 font-medium text-slate-500 tracking-tight sm:table-cell">
+                      Progress
+                    </TableHead>
+                    <TableHead className="h-11 px-6 text-right font-medium text-slate-500 tracking-tight">
+                      Action
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -277,17 +280,16 @@ export default function DashboardPage() {
                       </TableCell>
                       <TableCell className="hidden w-[30%] px-6 py-4 sm:table-cell">
                         <div className="flex items-center gap-3">
-                          <Progress
-                            value={project.progress}
-                            className="h-1.5 w-full bg-slate-100 dark:bg-slate-800"
-                          />
-                          <span className="min-w-[3.5ch] font-medium text-slate-500 text-xs">
-                            {project.progress}%
-                          </span>
+                          <Progress value={project.progress} className="h-1.5 w-full bg-slate-100 dark:bg-slate-800" />
+                          <span className="min-w-[3.5ch] font-medium text-slate-500 text-xs">{project.progress}%</span>
                         </div>
                       </TableCell>
                       <TableCell className="px-6 py-4 text-right">
-                        <Button variant="ghost" size="sm" className="h-8 rounded-full px-3 font-medium text-blue-600 group-hover:bg-blue-50 dark:text-blue-400 group-hover:dark:bg-blue-900/20">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 rounded-full px-3 font-medium text-blue-600 group-hover:bg-blue-50 dark:text-blue-400 group-hover:dark:bg-blue-900/20"
+                        >
                           View <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                         </Button>
                       </TableCell>
@@ -299,9 +301,6 @@ export default function DashboardPage() {
           </Card>
         </div>
         <div className="flex flex-col gap-6 lg:col-span-1">
-
-
-
           {/* Notifications / Direct Messages */}
           <Card className="rounded-xl border-slate-200/50 bg-white shadow-none dark:border-slate-800/50 dark:bg-slate-950/50">
             <CardHeader className="border-slate-100 border-b bg-slate-50/30 pb-4 dark:border-slate-800/50 dark:bg-slate-900/10">
@@ -309,7 +308,10 @@ export default function DashboardPage() {
                 <CardTitle className="font-semibold text-lg text-slate-800 tracking-tight dark:text-slate-200">
                   Recent Messages
                 </CardTitle>
-                <Badge variant="secondary" className="border-0 bg-blue-100 px-2 font-semibold text-blue-700 shadow-none hover:bg-blue-100 dark:bg-blue-900/40 dark:text-blue-300">
+                <Badge
+                  variant="secondary"
+                  className="border-0 bg-blue-100 px-2 font-semibold text-blue-700 shadow-none hover:bg-blue-100 dark:bg-blue-900/40 dark:text-blue-300"
+                >
                   3 New
                 </Badge>
               </div>
@@ -317,10 +319,7 @@ export default function DashboardPage() {
             <CardContent className="px-4 pt-6 sm:px-6">
               <div className="flex flex-col gap-5">
                 {directMessages.map((msg) => (
-                  <div
-                    key={`${msg.sender}-${msg.time}`}
-                    className="group flex cursor-pointer items-start gap-4"
-                  >
+                  <div key={`${msg.sender}-${msg.time}`} className="group flex cursor-pointer items-start gap-4">
                     <div className="relative mt-1">
                       <Avatar className="h-10 w-10 border border-slate-100 ring-blue-500/30 transition-all group-hover:ring-2 dark:border-slate-800">
                         <AvatarFallback className={`${msg.avatarColor} font-semibold text-sm`}>
@@ -333,15 +332,17 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex flex-1 flex-col overflow-hidden">
                       <div className="flex items-baseline justify-between gap-2">
-                        <p className={`truncate text-sm ${msg.unread ? 'font-semibold text-slate-900 dark:text-slate-100' : 'font-medium text-slate-800 dark:text-slate-200'}`}>
+                        <p
+                          className={`truncate text-sm ${msg.unread ? "font-semibold text-slate-900 dark:text-slate-100" : "font-medium text-slate-800 dark:text-slate-200"}`}
+                        >
                           {msg.sender}
                         </p>
-                        <p className="shrink-0 whitespace-nowrap font-medium text-[10px] text-slate-400">
-                          {msg.time}
-                        </p>
+                        <p className="shrink-0 whitespace-nowrap font-medium text-[10px] text-slate-400">{msg.time}</p>
                       </div>
                       <p className="mb-1 text-[11px] text-slate-500 leading-none dark:text-slate-400">{msg.role}</p>
-                      <p className={`line-clamp-2 text-[13px] leading-relaxed ${msg.unread ? 'font-medium text-slate-700 dark:text-slate-300' : 'text-slate-500 dark:text-slate-400'}`}>
+                      <p
+                        className={`line-clamp-2 text-[13px] leading-relaxed ${msg.unread ? "font-medium text-slate-700 dark:text-slate-300" : "text-slate-500 dark:text-slate-400"}`}
+                      >
                         {msg.message}
                       </p>
                     </div>
@@ -361,10 +362,7 @@ export default function DashboardPage() {
             <CardContent className="px-6 pt-6">
               <div className="space-y-6">
                 {activities.map((act, i) => (
-                  <div
-                    key={`${act.title}-${act.time}`}
-                    className="group relative flex items-start gap-4"
-                  >
+                  <div key={`${act.title}-${act.time}`} className="group relative flex items-start gap-4">
                     {/* Timeline Line */}
                     {i !== activities.length - 1 && (
                       <div className="absolute top-10 bottom-[-24px] left-[15px] w-px bg-slate-100 transition-colors dark:bg-slate-800" />
@@ -382,9 +380,7 @@ export default function DashboardPage() {
                       <p className="font-semibold text-slate-800 text-sm leading-none dark:text-slate-200">
                         {act.title}
                       </p>
-                      <p className="mt-1 text-[13px] text-slate-500 leading-relaxed">
-                        {act.desc}
-                      </p>
+                      <p className="mt-1 text-[13px] text-slate-500 leading-relaxed">{act.desc}</p>
                       <p className="mt-1.5 font-semibold text-[10px] text-slate-400 uppercase tracking-wider">
                         {act.time}
                       </p>
@@ -403,7 +399,7 @@ export default function DashboardPage() {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/50">
               <CalendarDays className="h-6 w-6 text-amber-600 dark:text-amber-400" />
             </div>
-            <DialogTitle className="mt-4 text-center text-xl font-semibold">Defence Appointment RSVP</DialogTitle>
+            <DialogTitle className="mt-4 text-center font-semibold text-xl">Defence Appointment RSVP</DialogTitle>
             <DialogDescription className="text-center text-slate-500">
               Please review the details below and confirm your attendance or request a reschedule.
             </DialogDescription>
@@ -411,19 +407,19 @@ export default function DashboardPage() {
 
           <div className="my-4 flex flex-col gap-4">
             <div className="flex flex-col gap-1 rounded-lg border bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-              <p className="font-bold text-[11px] uppercase tracking-wider text-slate-500">Proposal</p>
+              <p className="font-bold text-[11px] text-slate-500 uppercase tracking-wider">Proposal</p>
               <p className="font-semibold text-slate-900 dark:text-slate-100">{mockAppointment.title}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1 rounded-lg border bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/50">
-                <p className="flex items-center gap-1.5 font-bold text-[11px] uppercase tracking-wider text-slate-500">
+                <p className="flex items-center gap-1.5 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
                   <CalendarDays className="h-3.5 w-3.5" /> Date
                 </p>
                 <p className="font-semibold text-slate-900 dark:text-slate-100">{mockAppointment.date}</p>
               </div>
               <div className="flex flex-col gap-1 rounded-lg border bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/50">
-                <p className="flex items-center gap-1.5 font-bold text-[11px] uppercase tracking-wider text-slate-500">
+                <p className="flex items-center gap-1.5 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
                   <Clock className="h-3.5 w-3.5" /> Time
                 </p>
                 <p className="font-semibold text-slate-900 dark:text-slate-100">{mockAppointment.time}</p>
@@ -431,17 +427,17 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex flex-col gap-1 rounded-lg border bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-              <p className="flex items-center gap-1.5 font-bold text-[11px] uppercase tracking-wider text-slate-500">
+              <p className="flex items-center gap-1.5 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
                 <MapPin className="h-3.5 w-3.5" /> Location / Link
               </p>
               <p className="font-semibold text-slate-900 dark:text-slate-100">{mockAppointment.venue}</p>
             </div>
 
             <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-4 dark:border-indigo-900/30 dark:bg-indigo-900/10">
-              <p className="flex items-center gap-1.5 font-bold text-[11px] uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+              <p className="flex items-center gap-1.5 font-bold text-[11px] text-indigo-600 uppercase tracking-wider dark:text-indigo-400">
                 <MessageSquare className="h-3.5 w-3.5" /> Message from Admin
               </p>
-              <p className="mt-2 text-sm text-indigo-900 leading-relaxed dark:text-indigo-200">
+              <p className="mt-2 text-indigo-900 text-sm leading-relaxed dark:text-indigo-200">
                 {mockAppointment.message}
               </p>
             </div>
@@ -451,7 +447,10 @@ export default function DashboardPage() {
             <Button variant="outline" onClick={() => setShowRSVPModal(false)} className="w-full sm:w-auto">
               Request Reschedule
             </Button>
-            <Button onClick={() => setShowRSVPModal(false)} className="w-full bg-amber-600 text-white hover:bg-amber-700 sm:w-auto">
+            <Button
+              onClick={() => setShowRSVPModal(false)}
+              className="w-full bg-amber-600 text-white hover:bg-amber-700 sm:w-auto"
+            >
               <CheckCircle2 className="mr-2 h-4 w-4" />
               Confirm Attendance
             </Button>

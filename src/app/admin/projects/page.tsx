@@ -2,32 +2,7 @@
 
 import type React from "react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import {
   AlertTriangle,
   BookOpen,
@@ -43,7 +18,15 @@ import {
   Users,
   XCircle,
 } from "lucide-react";
+
 import { Can } from "@/access-control/permission-gates";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 // ─── TYPES ──────────────────────────────────────────────────────────
 interface TeamMember {
@@ -175,9 +158,7 @@ const MOCK_PROJECTS: Project[] = [
     endDate: "May 2026",
     abstract:
       "Development of a scalable, open-source genomic pipeline for processing next-generation sequencing data with a focus on rare disease identification in Ethiopian populations. Suspended pending ethics board re-review.",
-    team: [
-      { name: "M. Haile", role: "Data Analyst", avatar: "MH", color: "bg-amber-100 text-amber-700" },
-    ],
+    team: [{ name: "M. Haile", role: "Data Analyst", avatar: "MH", color: "bg-amber-100 text-amber-700" }],
     timeline: [
       { date: "May 2024", label: "IRB Ethics Approval", status: "done" },
       { date: "Aug 2024", label: "Pipeline Architecture Design", status: "done" },
@@ -215,11 +196,31 @@ const MOCK_PROJECTS: Project[] = [
 
 // ─── HELPERS ──────────────────────────────────────────────────────────
 const STATUS_CONFIG: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
-  Active:        { label: "Active",        className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400", icon: <CheckCircle2 className="h-3 w-3" /> },
-  "Under Review":{ label: "Under Review", className: "bg-blue-100    text-blue-700    dark:bg-blue-900/30    dark:text-blue-400",    icon: <Clock className="h-3 w-3" /> },
-  Completed:     { label: "Completed",     className: "bg-slate-200   text-slate-600   dark:bg-slate-700     dark:text-slate-300",   icon: <BookOpen className="h-3 w-3" /> },
-  Suspended:     { label: "Suspended",     className: "bg-red-100     text-red-700     dark:bg-red-900/30    dark:text-red-400",     icon: <XCircle className="h-3 w-3" /> },
-  Pending:       { label: "Pending",       className: "bg-amber-100   text-amber-700   dark:bg-amber-900/30  dark:text-amber-400",   icon: <AlertTriangle className="h-3 w-3" /> },
+  Active: {
+    label: "Active",
+    className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+    icon: <CheckCircle2 className="h-3 w-3" />,
+  },
+  "Under Review": {
+    label: "Under Review",
+    className: "bg-blue-100    text-blue-700    dark:bg-blue-900/30    dark:text-blue-400",
+    icon: <Clock className="h-3 w-3" />,
+  },
+  Completed: {
+    label: "Completed",
+    className: "bg-slate-200   text-slate-600   dark:bg-slate-700     dark:text-slate-300",
+    icon: <BookOpen className="h-3 w-3" />,
+  },
+  Suspended: {
+    label: "Suspended",
+    className: "bg-red-100     text-red-700     dark:bg-red-900/30    dark:text-red-400",
+    icon: <XCircle className="h-3 w-3" />,
+  },
+  Pending: {
+    label: "Pending",
+    className: "bg-amber-100   text-amber-700   dark:bg-amber-900/30  dark:text-amber-400",
+    icon: <AlertTriangle className="h-3 w-3" />,
+  },
 };
 
 const PROGRESS_COLOR = (p: number) =>
@@ -283,7 +284,9 @@ export default function AdminProjectsPage() {
             </SelectTrigger>
             <SelectContent>
               {["All", "Active", "Under Review", "Completed", "Suspended", "Pending"].map((s) => (
-                <SelectItem key={s} value={s}>{s}</SelectItem>
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -295,11 +298,21 @@ export default function AdminProjectsPage() {
         <Table>
           <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
             <TableRow className="border-slate-200 dark:border-slate-800">
-              <TableHead className="h-10 w-[35%] pl-5 font-semibold text-slate-500 text-xs uppercase tracking-wider">Project</TableHead>
-              <TableHead className="h-10 font-semibold text-slate-500 text-xs uppercase tracking-wider">Principal Investigator</TableHead>
-              <TableHead className="h-10 font-semibold text-slate-500 text-xs uppercase tracking-wider">Status</TableHead>
-              <TableHead className="h-10 w-[180px] font-semibold text-slate-500 text-xs uppercase tracking-wider">Progress</TableHead>
-              <TableHead className="h-10 font-semibold text-slate-500 text-xs uppercase tracking-wider">Budget</TableHead>
+              <TableHead className="h-10 w-[35%] pl-5 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+                Project
+              </TableHead>
+              <TableHead className="h-10 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+                Principal Investigator
+              </TableHead>
+              <TableHead className="h-10 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+                Status
+              </TableHead>
+              <TableHead className="h-10 w-[180px] font-semibold text-slate-500 text-xs uppercase tracking-wider">
+                Progress
+              </TableHead>
+              <TableHead className="h-10 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+                Budget
+              </TableHead>
               <TableHead className="h-10 w-[80px]" />
             </TableRow>
           </TableHeader>
@@ -322,8 +335,12 @@ export default function AdminProjectsPage() {
                     {/* Name + Code */}
                     <TableCell className="py-4 pl-5">
                       <div className="flex flex-col gap-0.5">
-                        <span className="line-clamp-1 font-semibold text-[13px] text-slate-900 leading-tight dark:text-slate-100">{project.name}</span>
-                        <span className="font-bold text-[11px] text-slate-400 uppercase tracking-wider">{project.code} · {project.dept}</span>
+                        <span className="line-clamp-1 font-semibold text-[13px] text-slate-900 leading-tight dark:text-slate-100">
+                          {project.name}
+                        </span>
+                        <span className="font-bold text-[11px] text-slate-400 uppercase tracking-wider">
+                          {project.code} · {project.dept}
+                        </span>
                       </div>
                     </TableCell>
 
@@ -331,16 +348,23 @@ export default function AdminProjectsPage() {
                     <TableCell className="py-4">
                       <div className="flex items-center gap-2.5">
                         <Avatar className="h-7 w-7 shrink-0">
-                          <AvatarFallback className={`font-bold text-[10px] ${project.piColor}`}>{project.piAvatar}</AvatarFallback>
+                          <AvatarFallback className={`font-bold text-[10px] ${project.piColor}`}>
+                            {project.piAvatar}
+                          </AvatarFallback>
                         </Avatar>
-                        <span className="truncate font-medium text-[13px] text-slate-700 dark:text-slate-300">{project.pi}</span>
+                        <span className="truncate font-medium text-[13px] text-slate-700 dark:text-slate-300">
+                          {project.pi}
+                        </span>
                       </div>
                     </TableCell>
 
                     {/* Status */}
                     <TableCell className="py-4">
-                      <Badge className={`${cfg.className} pointer-events-none flex w-fit items-center gap-1 border-0 px-2 py-0.5 font-bold text-[11px] shadow-none`}>
-                        {cfg.icon}{cfg.label}
+                      <Badge
+                        className={`${cfg.className} pointer-events-none flex w-fit items-center gap-1 border-0 px-2 py-0.5 font-bold text-[11px] shadow-none`}
+                      >
+                        {cfg.icon}
+                        {cfg.label}
                       </Badge>
                     </TableCell>
 
@@ -353,13 +377,17 @@ export default function AdminProjectsPage() {
                             style={{ width: `${project.progress}%` }}
                           />
                         </div>
-                        <span className="w-9 shrink-0 text-right font-bold text-[12px] text-slate-600 dark:text-slate-400">{project.progress}%</span>
+                        <span className="w-9 shrink-0 text-right font-bold text-[12px] text-slate-600 dark:text-slate-400">
+                          {project.progress}%
+                        </span>
                       </div>
                     </TableCell>
 
                     {/* Budget */}
                     <TableCell className="py-4">
-                      <span className="font-semibold text-[13px] text-slate-700 dark:text-slate-300">{project.budget}</span>
+                      <span className="font-semibold text-[13px] text-slate-700 dark:text-slate-300">
+                        {project.budget}
+                      </span>
                     </TableCell>
 
                     {/* View */}
@@ -368,7 +396,10 @@ export default function AdminProjectsPage() {
                         size="sm"
                         variant="ghost"
                         className="h-8 rounded-lg px-3 font-semibold text-blue-600 text-xs opacity-0 transition-opacity hover:bg-blue-50 group-hover:opacity-100 dark:text-blue-400 dark:hover:bg-blue-900/20"
-                        onClick={(e) => { e.stopPropagation(); openDrawer(project); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openDrawer(project);
+                        }}
                       >
                         View <ChevronRight className="ml-1 h-3.5 w-3.5" />
                       </Button>
@@ -382,9 +413,15 @@ export default function AdminProjectsPage() {
 
         {/* Footer count */}
         <div className="flex items-center justify-between border-slate-100 border-t px-5 py-3 dark:border-slate-800">
-          <p className="font-medium text-slate-400 text-xs">Showing {filtered.length} of {MOCK_PROJECTS.length} projects</p>
+          <p className="font-medium text-slate-400 text-xs">
+            Showing {filtered.length} of {MOCK_PROJECTS.length} projects
+          </p>
           {statusFilter !== "All" && (
-            <button type="button" onClick={() => setStatusFilter("All")} className="font-semibold text-blue-600 text-xs hover:underline dark:text-blue-400">
+            <button
+              type="button"
+              onClick={() => setStatusFilter("All")}
+              className="font-semibold text-blue-600 text-xs hover:underline dark:text-blue-400"
+            >
               Clear filter
             </button>
           )}
@@ -393,7 +430,10 @@ export default function AdminProjectsPage() {
 
       {/* ── Project Details Drawer ── */}
       <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <SheetContent className="flex w-full flex-col overflow-hidden border-l border-slate-200/80 bg-white p-0 shadow-2xl dark:border-slate-800 dark:bg-slate-950 sm:max-w-[800px] xl:max-w-[1000px]" side="right">
+        <SheetContent
+          className="flex w-full flex-col overflow-hidden border-slate-200/80 border-l bg-white p-0 shadow-2xl sm:max-w-[800px] xl:max-w-[1000px] dark:border-slate-800 dark:bg-slate-950"
+          side="right"
+        >
           {selected && (
             <>
               {/* Drawer Header */}
@@ -401,9 +441,14 @@ export default function AdminProjectsPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <Badge className="border-0 bg-slate-200/80 font-bold text-[10px] text-slate-700 uppercase dark:bg-slate-800 dark:text-slate-300">{selected.code}</Badge>
-                      <Badge className={`${STATUS_CONFIG[selected.status].className} pointer-events-none flex items-center gap-1 border-0 font-bold text-[10px]`}>
-                        {STATUS_CONFIG[selected.status].icon}{selected.status}
+                      <Badge className="border-0 bg-slate-200/80 font-bold text-[10px] text-slate-700 uppercase dark:bg-slate-800 dark:text-slate-300">
+                        {selected.code}
+                      </Badge>
+                      <Badge
+                        className={`${STATUS_CONFIG[selected.status].className} pointer-events-none flex items-center gap-1 border-0 font-bold text-[10px]`}
+                      >
+                        {STATUS_CONFIG[selected.status].icon}
+                        {selected.status}
                       </Badge>
                     </div>
                     <SheetTitle className="pr-2 font-bold text-[16px] text-slate-900 leading-snug tracking-tight dark:text-slate-100">
@@ -423,7 +468,9 @@ export default function AdminProjectsPage() {
                       style={{ width: `${selected.progress}%` }}
                     />
                   </div>
-                  <span className="w-10 shrink-0 text-right font-bold text-slate-700 text-sm dark:text-slate-300">{selected.progress}%</span>
+                  <span className="w-10 shrink-0 text-right font-bold text-slate-700 text-sm dark:text-slate-300">
+                    {selected.progress}%
+                  </span>
                 </div>
 
                 {/* Tab Nav */}
@@ -447,35 +494,46 @@ export default function AdminProjectsPage() {
 
               {/* Drawer Scrollable Content */}
               <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-6 py-6 sm:px-8 sm:py-7">
-
                 {/* ── TAB: OVERVIEW ── */}
                 {activeTab === "overview" && (
                   <>
                     {/* Key Stats Row */}
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                        <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Principal Investigator</p>
+                        <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                          Principal Investigator
+                        </p>
                         <div className="flex items-center gap-2">
                           <Avatar className="h-7 w-7">
-                            <AvatarFallback className={`font-bold text-[10px] ${selected.piColor}`}>{selected.piAvatar}</AvatarFallback>
+                            <AvatarFallback className={`font-bold text-[10px] ${selected.piColor}`}>
+                              {selected.piAvatar}
+                            </AvatarFallback>
                           </Avatar>
-                          <p className="truncate font-semibold text-[13px] text-slate-800 dark:text-slate-200">{selected.pi}</p>
+                          <p className="truncate font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                            {selected.pi}
+                          </p>
                         </div>
                       </div>
                       <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                        <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Total Budget</p>
+                        <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                          Total Budget
+                        </p>
                         <p className="font-extrabold text-blue-600 text-xl dark:text-blue-400">{selected.budget}</p>
                       </div>
                       <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                        <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Start Date</p>
+                        <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                          Start Date
+                        </p>
                         <p className="flex items-center gap-1.5 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
-                          <Calendar className="h-3.5 w-3.5 text-slate-400" />{selected.startDate}
+                          <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                          {selected.startDate}
                         </p>
                       </div>
                       <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
                         <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">End Date</p>
                         <p className="flex items-center gap-1.5 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
-                          <Calendar className="h-3.5 w-3.5 text-slate-400" />{selected.endDate}
+                          <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                          {selected.endDate}
                         </p>
                       </div>
                     </div>
@@ -492,7 +550,9 @@ export default function AdminProjectsPage() {
 
                     {/* Admin Actions */}
                     <div>
-                      <h4 className="mb-3 font-bold text-[11px] text-slate-500 uppercase tracking-wider">Admin Actions</h4>
+                      <h4 className="mb-3 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                        Admin Actions
+                      </h4>
                       <div className="flex flex-wrap gap-2">
                         <Can permission="BUDGET_APPROVE">
                           <Button size="sm" variant="outline" className="h-8 font-semibold text-xs">
@@ -501,7 +561,11 @@ export default function AdminProjectsPage() {
                         </Can>
 
                         <Can permission="PROJECT_REJECT">
-                          <Button size="sm" variant="outline" className="h-8 border-red-200 font-semibold text-red-600 text-xs hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-900/20">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 border-red-200 font-semibold text-red-600 text-xs hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-900/20"
+                          >
                             Suspend / Terminate
                           </Button>
                         </Can>
@@ -523,23 +587,34 @@ export default function AdminProjectsPage() {
                     {/* PI Row */}
                     <div className="flex items-center gap-4 rounded-lg border border-blue-100 bg-blue-50/50 p-3.5 dark:border-blue-900/30 dark:bg-blue-900/10">
                       <Avatar className="h-10 w-10 border-2 border-blue-200 dark:border-blue-800">
-                        <AvatarFallback className={`font-bold text-xs ${selected.piColor}`}>{selected.piAvatar}</AvatarFallback>
+                        <AvatarFallback className={`font-bold text-xs ${selected.piColor}`}>
+                          {selected.piAvatar}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="flex min-w-0 flex-col">
-                        <span className="truncate font-bold text-slate-900 text-sm dark:text-slate-100">{selected.pi}</span>
-                        <span className="font-semibold text-blue-600 text-xs dark:text-blue-400">Principal Investigator</span>
+                        <span className="truncate font-bold text-slate-900 text-sm dark:text-slate-100">
+                          {selected.pi}
+                        </span>
+                        <span className="font-semibold text-blue-600 text-xs dark:text-blue-400">
+                          Principal Investigator
+                        </span>
                       </div>
                       <Badge className="ml-auto shrink-0 border-0 bg-blue-600 text-[10px] text-white">PI</Badge>
                     </div>
 
                     {/* Team Members */}
                     {selected.team.map((m) => (
-                      <div key={m.avatar} className="flex items-center gap-4 rounded-lg border border-slate-100 bg-slate-50/30 p-3.5 transition-colors hover:bg-slate-100/60 dark:border-slate-800 dark:bg-slate-900/20 dark:hover:bg-slate-900/40">
+                      <div
+                        key={m.avatar}
+                        className="flex items-center gap-4 rounded-lg border border-slate-100 bg-slate-50/30 p-3.5 transition-colors hover:bg-slate-100/60 dark:border-slate-800 dark:bg-slate-900/20 dark:hover:bg-slate-900/40"
+                      >
                         <Avatar className="h-10 w-10">
                           <AvatarFallback className={`font-bold text-xs ${m.color}`}>{m.avatar}</AvatarFallback>
                         </Avatar>
                         <div className="flex min-w-0 flex-col">
-                          <span className="truncate font-semibold text-slate-900 text-sm dark:text-slate-100">{m.name}</span>
+                          <span className="truncate font-semibold text-slate-900 text-sm dark:text-slate-100">
+                            {m.name}
+                          </span>
                           <span className="font-medium text-slate-500 text-xs">{m.role}</span>
                         </div>
                       </div>
@@ -557,27 +632,33 @@ export default function AdminProjectsPage() {
                       {selected.timeline.map((event) => (
                         <div key={`${event.date}-${event.label}`} className="relative pb-7 pl-6 last:pb-0">
                           {/* Dot */}
-                          <div className={`-left-[9px] absolute top-0.5 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white dark:border-slate-950 ${
-                            event.status === "done"
-                              ? "bg-emerald-500"
-                              : event.status === "active"
-                              ? "bg-blue-600 ring-4 ring-blue-100 dark:ring-blue-900/30"
-                              : "bg-slate-300 dark:bg-slate-700"
-                          }`}>
+                          <div
+                            className={`-left-[9px] absolute top-0.5 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white dark:border-slate-950 ${
+                              event.status === "done"
+                                ? "bg-emerald-500"
+                                : event.status === "active"
+                                  ? "bg-blue-600 ring-4 ring-blue-100 dark:ring-blue-900/30"
+                                  : "bg-slate-300 dark:bg-slate-700"
+                            }`}
+                          >
                             {event.status === "done" && <CheckCircle2 className="h-2.5 w-2.5 text-white" />}
                           </div>
                           <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">{event.date}</p>
-                          <p className={`mt-0.5 font-semibold text-sm ${
-                            event.status === "done"
-                              ? "text-slate-600 dark:text-slate-400"
-                              : event.status === "active"
-                              ? "text-blue-700 dark:text-blue-400"
-                              : "text-slate-400 dark:text-slate-600"
-                          }`}>
+                          <p
+                            className={`mt-0.5 font-semibold text-sm ${
+                              event.status === "done"
+                                ? "text-slate-600 dark:text-slate-400"
+                                : event.status === "active"
+                                  ? "text-blue-700 dark:text-blue-400"
+                                  : "text-slate-400 dark:text-slate-600"
+                            }`}
+                          >
                             {event.label}
                           </p>
                           {event.status === "active" && (
-                            <span className="mt-1 inline-block rounded-full bg-blue-50 px-2 py-0.5 font-bold text-[10px] text-blue-600 dark:bg-blue-900/20 dark:text-blue-500">IN PROGRESS</span>
+                            <span className="mt-1 inline-block rounded-full bg-blue-50 px-2 py-0.5 font-bold text-[10px] text-blue-600 dark:bg-blue-900/20 dark:text-blue-500">
+                              IN PROGRESS
+                            </span>
                           )}
                         </div>
                       ))}

@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useMemo } from "react";
+
 import { useRouter } from "next/navigation";
 
 import NotFoundPage from "@/app/404";
@@ -14,12 +15,12 @@ import { useAuthStore } from "@/stores/authStore";
  * - Your UI should always use these canonical strings.
  * - `normalizePermission()` is defensive and may accept aliases while you
  *   migrate between backend permission naming styles.
- * 
- * 
+ *
+ *
  * d permission-gating utilities in src/access-control/ as
- *  real React components (client-side) that read permissions 
+ *  real React components (client-side) that read permissions
  * from the existing Zustand auth store, wait for session readiness
- *  to avoid UI flashes, and on denial show the existing src/app/not-found.tsx 
+ *  to avoid UI flashes, and on denial show the existing src/app/not-found.tsx
  * UI while redirecting back (or to /login).
  */
 export type Permission =
@@ -51,7 +52,8 @@ export type Permission =
   | "FUNDED_EVALUATOR_ACCESS"
   | "FUNDED_RAD_ACCESS"
   | "FUNDED_APPROVER_ACCESS"
-  | "EVALUATION_SCORE_SUBMIT";
+  | "EVALUATION_SCORE_SUBMIT"
+  | "DEFENCE_SCHEDULE";
 
 const CANONICAL_PERMISSIONS: Permission[] = [
   "PROJECT_CREATE",
@@ -83,6 +85,7 @@ const CANONICAL_PERMISSIONS: Permission[] = [
   "FUNDED_RAD_ACCESS",
   "FUNDED_APPROVER_ACCESS",
   "EVALUATION_SCORE_SUBMIT",
+  "DEFENCE_SCHEDULE",
 ];
 
 /**
@@ -146,10 +149,7 @@ export function hasPermission(permissions: string[], permission: Permission): bo
 
 export type PermissionCheckMode = "any" | "all";
 
-export type PermissionGateFallback =
-  | null
-  | ReactNode
-  | "notFoundOrRedirect"; // must render 404-style page and redirect
+export type PermissionGateFallback = null | ReactNode | "notFoundOrRedirect"; // must render 404-style page and redirect
 
 function getRedirectTarget(): string {
   // Prefer a "real previous page" referrer; otherwise login.
@@ -213,8 +213,7 @@ export function RequiresPermissions({
     return permissions.some((p) => normalized.includes(p));
   }, [user, permissions, mode]);
 
-  const shouldRedirect =
-    typeof redirectOnDenied === "boolean" ? redirectOnDenied : fallback === "notFoundOrRedirect";
+  const shouldRedirect = typeof redirectOnDenied === "boolean" ? redirectOnDenied : fallback === "notFoundOrRedirect";
 
   useEffect(() => {
     if (isLoading) return;
@@ -244,4 +243,3 @@ export function RequiresPermissions({
   // If `fallback` is a ReactNode/null, render it as-is.
   return <>{fallback}</>;
 }
-

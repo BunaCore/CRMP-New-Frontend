@@ -1,23 +1,14 @@
 "use client";
 
 import * as React from "react";
+
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
+import { Clock, Edit, Eye, FileText, Filter, History, MoreHorizontal, Plus, Search, Send } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,18 +17,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Search,
-  Plus,
-  MoreHorizontal,
-  Eye,
-  Edit,
-  Send,
-  History,
-  Clock,
-  FileText,
-  Filter,
-} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Mock Data
 const proposals = [
@@ -123,7 +105,7 @@ export default function ProposalsPage() {
             Create, track, and manage the lifecycle of your research proposals.
           </p>
         </div>
-        
+
         <Link href="/dashboard/proposals/new" className="w-full sm:w-auto">
           <Button className="w-full rounded-full border-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 font-medium text-white shadow transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-md">
             <Plus className="mr-2 h-4 w-4" /> New Proposal
@@ -136,15 +118,27 @@ export default function ProposalsPage() {
           <div className="mb-6 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
             <div className="-mb-1 scrollbar-hide w-full overflow-x-auto pb-1 md:w-auto">
               <TabsList className="rounded-lg border border-slate-200/50 bg-slate-100/50 p-1 dark:border-slate-800/50 dark:bg-slate-900/50">
-                <TabsTrigger value="all" className="rounded-md px-4 data-[state=active]:shadow-sm">All</TabsTrigger>
-                <TabsTrigger value="drafts" className="rounded-md px-4 data-[state=active]:shadow-sm">Drafts</TabsTrigger>
-                <TabsTrigger value="submitted" className="rounded-md px-4 data-[state=active]:shadow-sm">Submitted</TabsTrigger>
-                <TabsTrigger value="under-review" className="rounded-md px-4 data-[state=active]:shadow-sm">Under Review</TabsTrigger>
-                <TabsTrigger value="revisions" className="rounded-md px-4 data-[state=active]:shadow-sm">Revisions</TabsTrigger>
-                <TabsTrigger value="approved" className="rounded-md px-4 data-[state=active]:shadow-sm">Approved</TabsTrigger>
+                <TabsTrigger value="all" className="rounded-md px-4 data-[state=active]:shadow-sm">
+                  All
+                </TabsTrigger>
+                <TabsTrigger value="drafts" className="rounded-md px-4 data-[state=active]:shadow-sm">
+                  Drafts
+                </TabsTrigger>
+                <TabsTrigger value="submitted" className="rounded-md px-4 data-[state=active]:shadow-sm">
+                  Submitted
+                </TabsTrigger>
+                <TabsTrigger value="under-review" className="rounded-md px-4 data-[state=active]:shadow-sm">
+                  Under Review
+                </TabsTrigger>
+                <TabsTrigger value="revisions" className="rounded-md px-4 data-[state=active]:shadow-sm">
+                  Revisions
+                </TabsTrigger>
+                <TabsTrigger value="approved" className="rounded-md px-4 data-[state=active]:shadow-sm">
+                  Approved
+                </TabsTrigger>
               </TabsList>
             </div>
-            
+
             <div className="flex w-full items-center gap-2 md:w-auto">
               <div className="relative w-full md:w-[240px]">
                 <Search className="absolute top-2.5 left-2.5 h-4 w-4 text-slate-500" />
@@ -154,7 +148,11 @@ export default function ProposalsPage() {
                   className="w-full rounded-full border-slate-200 bg-white pl-9 shadow-sm dark:border-slate-800 dark:bg-slate-950"
                 />
               </div>
-              <Button variant="outline" size="icon" className="shrink-0 rounded-full border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
+              <Button
+                variant="outline"
+                size="icon"
+                className="shrink-0 rounded-full border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950"
+              >
                 <Filter className="h-4 w-4 text-slate-600" />
               </Button>
             </div>
@@ -164,112 +162,113 @@ export default function ProposalsPage() {
             <Card className="overflow-hidden rounded-xl border-slate-200/60 bg-white shadow-none dark:border-slate-800/60 dark:bg-slate-950/50">
               <CardContent className="p-0">
                 <Table>
-                <TableHeader className="bg-slate-50/50 dark:bg-slate-900/20">
-                  <TableRow className="border-slate-100 hover:bg-transparent dark:border-slate-800">
-                    <TableHead className="h-11 w-[100px] px-6 font-medium text-slate-500">ID</TableHead>
-                    <TableHead className="h-11 px-6 font-medium text-slate-500">Proposal Details</TableHead>
-                    <TableHead className="h-11 px-6 font-medium text-slate-500">Status</TableHead>
-                    <TableHead className="hidden h-11 px-6 font-medium text-slate-500 md:table-cell">Last Updated</TableHead>
-                    <TableHead className="h-11 px-6 text-right font-medium text-slate-500">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredProposals.length > 0 ? (
-                    filteredProposals.map((proposal) => (
-                      <TableRow
-                        key={proposal.id}
-                        className="border-slate-100 transition-colors hover:bg-slate-50/50 dark:border-slate-800/50 dark:hover:bg-slate-800/20"
-                      >
-                        <TableCell className="px-6 py-4 font-medium text-slate-600 text-xs dark:text-slate-400">
-                          {proposal.id}
-                        </TableCell>
-                        <TableCell className="max-w-[300px] px-6 py-4 lg:max-w-[400px]">
-                          <div className="flex flex-col gap-1.5">
-                            <span className="line-clamp-1 font-semibold text-slate-800 dark:text-slate-200">
-                              {proposal.title}
-                            </span>
-                            <span className="line-clamp-1 text-slate-500 text-xs">
-                              {proposal.abstract}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-6 py-4">
-                          <Badge
-                            variant="outline"
-                            className={`${proposal.color} inline-flex items-center whitespace-nowrap rounded px-2.5 py-0.5 shadow-none`}
-                          >
-                            {proposal.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="hidden px-6 py-4 md:table-cell">
-                          <div className="flex flex-col gap-1">
-                            <span className="text-slate-700 text-sm dark:text-slate-300">
-                              {proposal.date}
-                            </span>
-                            <span className="flex items-center gap-1 text-slate-500 text-xs">
-                              <Clock className="h-3 w-3" /> {proposal.lastModified}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-6 py-4 text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 rounded-full p-0 hover:bg-slate-100 dark:hover:bg-slate-800">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4 text-slate-500" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-lg">
-                              <DropdownMenuLabel className="font-normal text-slate-500 text-xs">
-                                Proposal Actions
-                              </DropdownMenuLabel>
-                              <DropdownMenuSeparator />
-                              <Link href={`/dashboard/proposals/${proposal.id}`}>
-                                <DropdownMenuItem className="cursor-pointer">
-                                  <Eye className="mr-2 h-4 w-4" />
-                                  View Details
-                                </DropdownMenuItem>
-                              </Link>
-                              
-                              {proposal.status === "Draft" || proposal.status === "Revisions Required" ? (
-                                <DropdownMenuItem className="cursor-pointer text-blue-600 dark:text-blue-400">
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  Continue Editing
-                                </DropdownMenuItem>
-                              ) : null}
-                              
-                              {proposal.status === "Draft" && (
-                                <DropdownMenuItem className="cursor-pointer text-emerald-600 dark:text-emerald-400">
-                                  <Send className="mr-2 h-4 w-4" />
-                                  Submit Proposal
-                                </DropdownMenuItem>
-                              )}
+                  <TableHeader className="bg-slate-50/50 dark:bg-slate-900/20">
+                    <TableRow className="border-slate-100 hover:bg-transparent dark:border-slate-800">
+                      <TableHead className="h-11 w-[100px] px-6 font-medium text-slate-500">ID</TableHead>
+                      <TableHead className="h-11 px-6 font-medium text-slate-500">Proposal Details</TableHead>
+                      <TableHead className="h-11 px-6 font-medium text-slate-500">Status</TableHead>
+                      <TableHead className="hidden h-11 px-6 font-medium text-slate-500 md:table-cell">
+                        Last Updated
+                      </TableHead>
+                      <TableHead className="h-11 px-6 text-right font-medium text-slate-500">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredProposals.length > 0 ? (
+                      filteredProposals.map((proposal) => (
+                        <TableRow
+                          key={proposal.id}
+                          className="border-slate-100 transition-colors hover:bg-slate-50/50 dark:border-slate-800/50 dark:hover:bg-slate-800/20"
+                        >
+                          <TableCell className="px-6 py-4 font-medium text-slate-600 text-xs dark:text-slate-400">
+                            {proposal.id}
+                          </TableCell>
+                          <TableCell className="max-w-[300px] px-6 py-4 lg:max-w-[400px]">
+                            <div className="flex flex-col gap-1.5">
+                              <span className="line-clamp-1 font-semibold text-slate-800 dark:text-slate-200">
+                                {proposal.title}
+                              </span>
+                              <span className="line-clamp-1 text-slate-500 text-xs">{proposal.abstract}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-6 py-4">
+                            <Badge
+                              variant="outline"
+                              className={`${proposal.color} inline-flex items-center whitespace-nowrap rounded px-2.5 py-0.5 shadow-none`}
+                            >
+                              {proposal.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="hidden px-6 py-4 md:table-cell">
+                            <div className="flex flex-col gap-1">
+                              <span className="text-slate-700 text-sm dark:text-slate-300">{proposal.date}</span>
+                              <span className="flex items-center gap-1 text-slate-500 text-xs">
+                                <Clock className="h-3 w-3" /> {proposal.lastModified}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-6 py-4 text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  className="h-8 w-8 rounded-full p-0 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                >
+                                  <span className="sr-only">Open menu</span>
+                                  <MoreHorizontal className="h-4 w-4 text-slate-500" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-lg">
+                                <DropdownMenuLabel className="font-normal text-slate-500 text-xs">
+                                  Proposal Actions
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <Link href={`/dashboard/proposals/${proposal.id}`}>
+                                  <DropdownMenuItem className="cursor-pointer">
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    View Details
+                                  </DropdownMenuItem>
+                                </Link>
 
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem className="cursor-pointer">
-                                <History className="mr-2 h-4 w-4" />
-                                View History
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                                {proposal.status === "Draft" || proposal.status === "Revisions Required" ? (
+                                  <DropdownMenuItem className="cursor-pointer text-blue-600 dark:text-blue-400">
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Continue Editing
+                                  </DropdownMenuItem>
+                                ) : null}
+
+                                {proposal.status === "Draft" && (
+                                  <DropdownMenuItem className="cursor-pointer text-emerald-600 dark:text-emerald-400">
+                                    <Send className="mr-2 h-4 w-4" />
+                                    Submit Proposal
+                                  </DropdownMenuItem>
+                                )}
+
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="cursor-pointer">
+                                  <History className="mr-2 h-4 w-4" />
+                                  View History
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={5} className="h-32 text-center text-slate-500">
+                          <div className="flex flex-col items-center justify-center gap-2">
+                            <FileText className="h-8 w-8 text-slate-300 dark:text-slate-600" />
+                            <p>No proposals found in this category.</p>
+                          </div>
                         </TableCell>
                       </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={5} className="h-32 text-center text-slate-500">
-                        <div className="flex flex-col items-center justify-center gap-2">
-                          <FileText className="h-8 w-8 text-slate-300 dark:text-slate-600" />
-                          <p>No proposals found in this category.</p>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
