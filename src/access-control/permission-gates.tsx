@@ -106,7 +106,7 @@ const PERMISSION_ALIASES: Partial<Record<Permission, string[]>> = {
   EVALUATOR_ASSIGN: ["assign_evaluator"],
 
   BUDGET_VIEW: ["view_budget"],
-  BUDGET_APPROVE: ["approve_budget"],
+  BUDGET_APPROVE: ["approve_budget", "release_funds"],
   BUDGET_REJECT: ["reject_budget"],
 
   ADMIN_VIEW: ["admin_view"],

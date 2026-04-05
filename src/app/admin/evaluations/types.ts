@@ -1,7 +1,12 @@
 export type MainTab = "proposals" | "projects";
-export type DrawerTab = "overview" | "team" | "scores" | "defence" | "review";
+export type DrawerTab = "overview" | "team" | "budget" | "scores" | "defence" | "review";
 
 export type ProjectEvalStatus = "On evaluation" | "Finished" | "Awaiting approval" | "Scheduled";
+
+export interface BudgetItem {
+  description: string;
+  amount: number;
+}
 
 export interface RubricItem {
   order: number;
@@ -20,6 +25,7 @@ export interface EvalProposalRow {
   dept: string;
   stage: string;
   budget: string;
+  budgetItems?: BudgetItem[];
 }
 
 export interface EvalProjectRow {
@@ -30,6 +36,7 @@ export interface EvalProjectRow {
   leadColor: string;
   dept: string;
   budget: string;
+  budgetItems?: BudgetItem[];
   evalStatus: ProjectEvalStatus;
   totalScore: number;
   maxTotal: number;
