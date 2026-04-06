@@ -1,10 +1,10 @@
 import {
   Activity,
   BarChart,
+  Coins,
   Bell,
   BookOpen,
   CheckSquare,
-  DollarSign,
   FileText,
   FolderOpen,
   History,
@@ -71,9 +71,9 @@ export const adminSidebarItems: NavGroup[] = [
     label: "Management & Finance",
     items: [
       {
-        title: "Budget",
-        url: "/admin/budget",
-        icon: DollarSign,
+        title: "Budget Requests",
+        url: "/admin/budget-requests",
+        icon: Coins,
       },
       {
         title: "Requests",

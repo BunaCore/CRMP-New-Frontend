@@ -17,7 +17,9 @@ export type UserRole =
   | "PGMO"
   | "Examiner/Evaluator"
   | "Advisor"
-  | "Evaluator";
+  | "Evaluator"
+  | "DGC_MEMBER"
+  | "PG_OFFICE";
 
 // Full user profile returned from backend after login or /auth/me
 export interface UserProfile {

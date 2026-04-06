@@ -77,7 +77,7 @@ const MOCK_USERS: Record<string, LoginResponse> = {
         "ADVISOR_ASSIGN",
         "EVALUATION_SCORE_SUBMIT",
         "DEFENCE_SCHEDULE",
-        "BUDGET_VIEW",
+
       ],
     },
   },
@@ -115,6 +115,54 @@ const MOCK_USERS: Record<string, LoginResponse> = {
         "PROJECT_APPROVE",
         "PROJECT_REJECT",
         "EVALUATION_SCORE_SUBMIT",
+      ],
+    },
+  },
+  "dgc@crmp.edu": {
+    access_token: "mock_token_dgc_aabbcc",
+    user: {
+      id: "usr_007",
+      fullName: "Prof. Mulugeta Assefa",
+      email: "dgc@crmp.edu",
+      role: "DGC_MEMBER",
+      department: "Directorate of Graduate Studies",
+      avatarUrl: "",
+      // DGC Member: reviews, approves/rejects proposals, assigns evaluators/advisors,
+      // submits evaluation scores, schedules defence, and has budget visibility.
+      permissions: [
+        "PROJECT_VIEW",
+        "PROJECT_REVIEW",
+        "PROJECT_APPROVE",
+        "PROJECT_REJECT",
+        "EVALUATOR_ASSIGN",
+        "ADVISOR_ASSIGN",
+        "BUDGET_VIEW",
+        "BUDGET_APPROVE",
+        "BUDGET_REJECT",
+        "EVALUATION_SCORE_SUBMIT",
+        "DEFENCE_SCHEDULE",
+      ],
+    },
+  },
+  "pgoffice@crmp.edu": {
+    access_token: "mock_token_pgoffice_ddeeff",
+    user: {
+      id: "usr_008",
+      fullName: "Ato Girma Tadele",
+      email: "pgoffice@crmp.edu",
+      role: "PG_OFFICE",
+      department: "Postgraduate Office",
+      avatarUrl: "",
+      // PG Office: approves/rejects proposals and budgets, has full admin view.
+      // Does NOT have PROJECT_CREATE — stays in /admin space.
+      permissions: [
+        "PROJECT_VIEW",
+        "PROJECT_APPROVE",
+        "PROJECT_REJECT",
+        "BUDGET_VIEW",
+        "BUDGET_APPROVE",
+        "BUDGET_REJECT",
+        "ADMIN_VIEW",
       ],
     },
   },
