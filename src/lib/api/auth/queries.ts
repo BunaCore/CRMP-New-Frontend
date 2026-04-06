@@ -6,9 +6,10 @@
 // ============================================================
 
 import type { UserProfile } from "@/lib/api/auth/types";
+import { mapBackendPermissionsToFrontend } from "@/lib/permissions/permission-mapper";
 
 // ─── 🟢 MOCK SWITCH ──────────────────────────────────────────
-const USE_MOCK = true;
+const USE_MOCK = false;
 // ─────────────────────────────────────────────────────────────
 
 /**
@@ -27,12 +28,10 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
     return useAuthStore.getState().user;
   }
 
-  // 🔴 REAL BACKEND — uncomment when backend is ready
-  /*
   const { apiClient } = await import("@/lib/api/client");
-  const response = await apiClient.get<{ user: UserProfile }>("/auth/me");
-  return response.data.user;
-  */
-
-  return null;
+  const response = await apiClient.get<UserProfile>("/auth/me");
+  return {
+    ...response.data,
+    permissions: mapBackendPermissionsToFrontend(response.data.permissions),
+  };
 }

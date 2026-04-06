@@ -27,13 +27,18 @@ export interface UserProfile {
   fullName: string;
   email: string;
   /**
-   * Backend may omit `role` and provide only `permissions`.
-   * UI should treat this as optional (display-only).
+   * User's assigned roles (e.g., "FACULTY", "COORDINATOR").
+   * Deprecated in favor of permissions, but kept for reference.
    */
-  role?: UserRole;
-  department?: string;
+  roles?: string[];
+  role?: string;
+  department?: string | null;
   avatarUrl?: string;
   permissions?: string[];
+  /**
+   * Account status (e.g., "active", "inactive", "suspended").
+   */
+  accountStatus?: string;
 }
 
 // ─── Request Shapes ─────────────────────────────────────────
@@ -44,6 +49,6 @@ export interface LoginCredentials {
 
 // ─── Response Shapes ────────────────────────────────────────
 export interface LoginResponse {
-  access_token: string;
+  access_token: string; // Normalized from backend's accessToken
   user: UserProfile;
 }

@@ -54,7 +54,11 @@ export function SignInForm() {
       login(response.access_token, response.user);
 
       // Sync cookies immediately so middleware recognizes this user on redirect
-      Cookies.set("access_token", response.access_token, { expires: 7, path: "/", sameSite: "lax" });
+      Cookies.set("access_token", response.access_token, {
+        expires: 7,
+        path: "/",
+        sameSite: "lax",
+      });
       Cookies.set("user_permissions", JSON.stringify(response.user.permissions ?? []), {
         expires: 7,
         path: "/",
@@ -62,7 +66,7 @@ export function SignInForm() {
       });
 
       toast.success("Welcome back!", {
-        description: `Signed in as ${response.user.fullName} (${response.user.role})`,
+        description: `Signed in as ${response.user.fullName} (${response.user.roles})`,
       });
 
       // Route dynamically based on user role (if no explicit redirect exists)

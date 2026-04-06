@@ -1,10 +1,10 @@
 import {
   Activity,
   BarChart,
-  Coins,
   Bell,
   BookOpen,
   CheckSquare,
+  Coins,
   FileText,
   FolderOpen,
   History,
@@ -125,7 +125,7 @@ export function getAuthorizedAdminNavItems(permissions: string[] | null | undefi
 
   // PI space permission is `PROJECT_CREATE`. Admin sidebar should be hidden for PI users.
   // (The `/admin` routes themselves are protected by `AdminPermissionGuard`.)
-  if (hasPermission(safePermissions, "PROJECT_CREATE")) return [];
+  // if (hasPermission(safePermissions, "PROJECT_CREATE")) return [];
 
   // Determine if the user can see /admin/evaluations.
   // If yes, hide /admin/proposals — Evaluations already covers proposal management
@@ -139,7 +139,7 @@ export function getAuthorizedAdminNavItems(permissions: string[] | null | undefi
     .map((group) => {
       const filteredItems = group.items.filter((item) => {
         // If the user has Evaluations access, suppress Proposals — it's redundant.
-        if (canSeeEvaluations && item.url === "/admin/proposals") return false;
+        // if (canSeeEvaluations && item.url === "/admin/proposals") return false;
 
         const required = ADMIN_SIDEBAR_PERMISSION_RULES[item.url];
         // Unknown routes visibility is configurable.

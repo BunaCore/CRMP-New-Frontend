@@ -77,7 +77,6 @@ const MOCK_USERS: Record<string, LoginResponse> = {
         "ADVISOR_ASSIGN",
         "EVALUATION_SCORE_SUBMIT",
         "DEFENCE_SCHEDULE",
-
       ],
     },
   },

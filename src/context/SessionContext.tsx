@@ -23,7 +23,7 @@ import type { UserRole } from "@/lib/api/auth/types";
 export interface SessionUser {
   id: string;
   name: string;
-  role: UserRole | null;
+  roles: UserRole[];
   email: string;
   permissions?: string[];
 }
@@ -46,7 +46,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     ? {
         id: authUser.id,
         name: authUser.fullName,
-        role: authUser.role ?? null,
+        roles: (authUser.roles as any) ?? null,
         email: authUser.email,
         permissions: authUser.permissions,
       }
