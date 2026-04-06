@@ -6,15 +6,24 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { ArrowLeft, ArrowRight, Check, CheckCircle2, FileUp, Plus, Search, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
+import { getDepartmentsSelector } from "@/lib/api/departments/queries";
+import { createProposal } from "@/lib/api/proposals/mutations";
+import type { DepartmentOption, UserOption } from "@/lib/api/proposals/types";
+import { type ProposalMemberRole, ProposalProgram } from "@/lib/api/proposals/types";
+import { getAdvisors, getUsers } from "@/lib/api/users/queries";
+import { useAuthStore } from "@/stores/authStore";
 
 /**----------------------
  * MOCK DATA
@@ -26,101 +35,85 @@ const STEPS = [
   { title: "Review", desc: "Final submit" },
 ];
 
-const AVAILABLE_TEAM = [
-  {
-    id: "t1",
-    name: "Dr. Elena Rostova",
-    role: "Co-Investigator",
-    dept: "Physics",
-    avatar: "ER",
-    color: "bg-purple-100 text-purple-700",
-  },
-  {
-    id: "t2",
-    name: "Prof. Michael Chen",
-    role: "AI Specialist",
-    dept: "Computer Science",
-    avatar: "MC",
-    color: "bg-blue-100 text-blue-700",
-  },
-  {
-    id: "t3",
-    name: "Sarah Jenkins",
-    role: "Data Analyst",
-    dept: "Bioinformatics",
-    avatar: "SJ",
-    color: "bg-emerald-100 text-emerald-700",
-  },
-  {
-    id: "t4",
-    name: "Dr. Alan Grant",
-    role: "Lead Researcher",
-    dept: "Biology",
-    avatar: "AG",
-    color: "bg-amber-100 text-amber-700",
-  },
-  {
-    id: "t5",
-    name: "Dr. Emily Wong",
-    role: "Biochemist",
-    dept: "Chemistry",
-    avatar: "EW",
-    color: "bg-rose-100 text-rose-700",
-  },
-  {
-    id: "t6",
-    name: "James Carter",
-    role: "Systems Engineer",
-    dept: "Engineering",
-    avatar: "JC",
-    color: "bg-slate-200 text-slate-700",
-  },
-];
-
-const AVAILABLE_ADVISORS = [
-  {
-    id: "a1",
-    name: "Dr. Robert Ford",
-    role: "Senior Faculty",
-    dept: "Engineering",
-    avatar: "RF",
-    color: "bg-slate-200 text-slate-700",
-  },
-  {
-    id: "a2",
-    name: "Prof. Lisa Su",
-    role: "Department Head",
-    dept: "Computer Science",
-    avatar: "LS",
-    color: "bg-indigo-100 text-indigo-700",
-  },
-];
-
 export default function NewProposalPage() {
   const router = useRouter();
 
   // Step state
   const [currentStep, setCurrentStep] = React.useState(0);
 
-  // Form states
+  // Form states - Basic Info
   const [title, setTitle] = React.useState("");
   const [abstract, setAbstract] = React.useState("");
-  const [file, _setFile] = React.useState<File | null>(null);
+  const [proposalProgram, setProposalProgram] = React.useState<ProposalProgram | "">("");
+  const [researchArea, setResearchArea] = React.useState("");
+  const [durationMonths, setDurationMonths] = React.useState("");
+  const [isFunded, setIsFunded] = React.useState(false);
+  const [departmentId, setDepartmentId] = React.useState("");
+  const [file, setFile] = React.useState<File | null>(null);
 
+  // Selectors data
+  const [departments, setDepartments] = React.useState<DepartmentOption[]>([]);
+  const [advisors, setAdvisors] = React.useState<UserOption[]>([]);
+  const [members, setMembers] = React.useState<UserOption[]>([]);
+  const [loadingSelectors, setLoadingSelectors] = React.useState(true);
+
+  // Team state
   const [teamSearch, setTeamSearch] = React.useState("");
   const [advisorSearch, setAdvisorSearch] = React.useState("");
   const [selectedTeam, setSelectedTeam] = React.useState<string[]>([]);
   const [selectedAdvisor, setSelectedAdvisor] = React.useState<string | null>(null);
 
+  // Budget state
   const [budgetRows, setBudgetRows] = React.useState([
-    { id: "1", title: "Equipment", description: "Lab sensors and compute servers", amount: "5000" },
+    {
+      id: "1",
+      title: "Equipment",
+      description: "Lab sensors and compute servers",
+      amount: "5000",
+    },
   ]);
 
+  // Submission state
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  // Load selectors on mount
+  React.useEffect(() => {
+    const loadSelectors = async () => {
+      try {
+        setLoadingSelectors(true);
+        const [depts, advs, membs] = await Promise.all([getDepartmentsSelector(), getAdvisors(), getUsers()]);
+        setDepartments(depts);
+        setAdvisors(advs);
+        setMembers(membs);
+      } catch (error) {
+        console.error("Failed to load selectors:", error);
+        toast.error("Could not load departments, advisors, and members");
+      } finally {
+        setLoadingSelectors(false);
+      }
+    };
+    loadSelectors();
+  }, []);
+
   const handleNext = () => {
-    if (currentStep < STEPS.length - 1) setCurrentStep((c) => c + 1);
+    if (currentStep < STEPS.length - 1) {
+      // Skip budget step if not funded
+      if (currentStep === 1 && !isFunded) {
+        setCurrentStep(3);
+      } else {
+        setCurrentStep((c) => c + 1);
+      }
+    }
   };
   const handleBack = () => {
-    if (currentStep > 0) setCurrentStep((c) => c - 1);
+    if (currentStep > 0) {
+      // Skip budget step when going back if not funded
+      if (currentStep === 3 && !isFunded) {
+        setCurrentStep(1);
+      } else {
+        setCurrentStep((c) => c - 1);
+      }
+    }
   };
 
   const handleToggleTeam = (id: string) => {
@@ -141,14 +134,118 @@ export default function NewProposalPage() {
     return budgetRows.reduce((acc, row) => acc + (parseFloat(row.amount) || 0), 0);
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      // Validate file size (10MB max)
+      if (selectedFile.size > 10 * 1024 * 1024) {
+        toast.error("File size must not exceed 10MB");
+        return;
+      }
+      // Validate file type
+      const allowedTypes = [
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ];
+      if (!allowedTypes.includes(selectedFile.type)) {
+        toast.error("Only PDF and DOCX files are allowed");
+        return;
+      }
+      setFile(selectedFile);
+    }
+  };
+
+  // Handle proposal submission
+  const handleSubmitProposal = async (submit = false) => {
+    const { user } = useAuthStore.getState();
+
+    // Validation
+    if (!title.trim()) {
+      toast.error("Please enter a proposal title");
+      return;
+    }
+    if (!proposalProgram) {
+      toast.error("Please select a proposal program");
+      return;
+    }
+    if (!departmentId) {
+      toast.error("Please select a department");
+      return;
+    }
+    if (!researchArea.trim()) {
+      toast.error("Please enter a research area");
+      return;
+    }
+    if (!durationMonths || parseInt(durationMonths, 10) < 1) {
+      toast.error("Please enter a valid duration in months (minimum 1)");
+      return;
+    }
+    if (isFunded && budgetRows.length === 0) {
+      toast.error("Please add at least one budget item");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      // Build payload
+      const payload = {
+        title: title.trim(),
+        abstract: abstract.trim(),
+        proposalProgram,
+        researchArea: researchArea.trim(),
+        durationMonths: parseInt(durationMonths, 10),
+        isFunded,
+        departmentId,
+        budget: isFunded
+          ? budgetRows.map((row) => ({
+              description: row.title || row.description,
+              amount: parseFloat(row.amount) || 0,
+            }))
+          : [],
+        members: [
+          {
+            userId: user?.id || "",
+            role: "PI" as ProposalMemberRole.PI,
+          },
+          ...selectedTeam.map((memberId) => ({
+            userId: memberId,
+            role: "MEMBER" as unknown as ProposalMemberRole,
+          })),
+          ...(selectedAdvisor
+            ? [
+                {
+                  userId: selectedAdvisor,
+                  role: "ADVISOR" as unknown as ProposalMemberRole,
+                },
+              ]
+            : []),
+        ],
+      };
+
+      const response = await createProposal(payload, file, { submit });
+
+      if (response.submissionError) {
+        toast.error(`Submission error: ${response.submissionError}`);
+      } else {
+        toast.success(submit ? "Proposal submitted successfully!" : "Proposal saved as draft!");
+        // Redirect to proposals list
+        router.push("/dashboard/proposals");
+      }
+    } catch (error) {
+      console.error("Failed to submit proposal:", error);
+      toast.error("Failed to submit proposal. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const filteredTeam =
-    teamSearch.trim().length > 0
-      ? AVAILABLE_TEAM.filter((t) => (t.name + t.dept + t.role).toLowerCase().includes(teamSearch.toLowerCase()))
-      : [];
+    teamSearch.trim().length > 0 ? members.filter((m) => m.label.toLowerCase().includes(teamSearch.toLowerCase())) : [];
 
   const filteredAdvisors =
     advisorSearch.trim().length > 0
-      ? AVAILABLE_ADVISORS.filter((a) => (a.name + a.dept + a.role).toLowerCase().includes(advisorSearch.toLowerCase()))
+      ? advisors.filter((a) => a.label.toLowerCase().includes(advisorSearch.toLowerCase()))
       : [];
 
   /**----------------------
@@ -208,7 +305,7 @@ export default function NewProposalPage() {
             New Research Proposal
           </h1>
           <p className="mt-0.5 text-[13px] text-slate-500 dark:text-slate-400">
-            Draft your research framework, complete your team, and organize the budget.
+            Draft your research framework, complete your whole team, and organize the budget.
           </p>
         </div>
       </div>
@@ -246,8 +343,90 @@ export default function NewProposalPage() {
                 />
               </div>
               <div className="grid gap-1.5">
+                <Label htmlFor="researchArea" className="font-medium text-sm">
+                  Research Area
+                </Label>
+                <Input
+                  id="researchArea"
+                  value={researchArea}
+                  onChange={(e) => setResearchArea(e.target.value)}
+                  placeholder="e.g. Renewable Energy, Machine Learning..."
+                  className="h-10 rounded-md bg-white text-sm dark:bg-slate-950"
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label htmlFor="proposalProgram" className="font-medium text-sm">
+                  Proposal Program
+                </Label>
+                <Select value={proposalProgram} onValueChange={(val) => setProposalProgram(val as ProposalProgram)}>
+                  <SelectTrigger className="h-10 rounded-md bg-white text-sm dark:bg-slate-950">
+                    <SelectValue placeholder="Select a program..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={ProposalProgram.UG}>Undergraduate (UG)</SelectItem>
+                    <SelectItem value={ProposalProgram.PG}>Postgraduate (PG)</SelectItem>
+                    <SelectItem value={ProposalProgram.GENERAL}>General</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-1.5">
+                <Label htmlFor="departmentId" className="font-medium text-sm">
+                  Department
+                </Label>
+                <Select value={departmentId} onValueChange={setDepartmentId} disabled={loadingSelectors}>
+                  <SelectTrigger className="h-10 rounded-md bg-white text-sm dark:bg-slate-950">
+                    <SelectValue placeholder={loadingSelectors ? "Loading..." : "Select a department..."} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {departments.map((dept) => (
+                      <SelectItem key={dept.value} value={dept.value}>
+                        {dept.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-1.5">
+                  <Label htmlFor="durationMonths" className="font-medium text-sm">
+                    Duration (Months)
+                  </Label>
+                  <Input
+                    id="durationMonths"
+                    type="number"
+                    min="1"
+                    value={durationMonths}
+                    onChange={(e) => setDurationMonths(e.target.value)}
+                    placeholder="e.g. 12"
+                    className="h-10 rounded-md bg-white text-sm dark:bg-slate-950"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <div className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-950">
+                    <Checkbox
+                      id="isFunded"
+                      checked={isFunded}
+                      onCheckedChange={(checked) => setIsFunded(Boolean(checked))}
+                    />
+                    <Label htmlFor="isFunded" className="font-medium text-sm cursor-pointer">
+                      Is Funded
+                    </Label>
+                  </div>
+                </div>
+              </div>
+              <div className="grid gap-1.5">
                 <Label className="font-medium text-sm">Supporting Document</Label>
-                <div className="flex cursor-pointer flex-col items-center justify-center rounded-lg border border-slate-300 border-dashed bg-slate-50/50 p-6 text-center transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900/30 dark:hover:bg-slate-800/50">
+                <input
+                  type="file"
+                  id="file-upload"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                />
+                <label
+                  htmlFor="file-upload"
+                  className="flex cursor-pointer flex-col items-center justify-center rounded-lg border border-slate-300 border-dashed bg-slate-50/50 p-6 text-center transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900/30 dark:hover:bg-slate-800/50"
+                >
                   <FileUp className="mb-2 h-5 w-5 text-slate-400" />
                   <p className="font-medium text-[13px] text-slate-700 dark:text-slate-300">
                     Upload full proposal layout (Optional)
@@ -258,7 +437,7 @@ export default function NewProposalPage() {
                       {file.name}
                     </Badge>
                   )}
-                </div>
+                </label>
               </div>
             </div>
           )}
@@ -266,15 +445,17 @@ export default function NewProposalPage() {
           {/* STEP 2: TEAM */}
           {currentStep === 1 && (
             <div className="fade-in slide-in-from-right-4 mt-4 grid min-h-[400px] animate-in grid-cols-1 gap-8 divide-slate-100 rounded-lg border border-slate-100 bg-slate-50/30 duration-500 lg:grid-cols-2 lg:divide-x dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900/10">
-              {/* Co-Investigators (Left) */}
+              {/* Members (Left) */}
               <div className="flex flex-col gap-4 p-4 lg:p-6 lg:pr-8">
                 <div>
-                  <h3 className="font-semibold text-slate-900 text-sm dark:text-slate-100">Co-Investigators</h3>
-                  <p className="mb-3 text-slate-500 text-xs">Search and add team members.</p>
+                  <h3 className="font-semibold text-slate-900 text-sm dark:text-slate-100">Members</h3>
+                  <p className="mb-3 text-slate-500 text-xs">
+                    You are automatically included as PI. Add team members below.
+                  </p>
                   <div className="relative w-full">
                     <Search className="-translate-y-1/2 absolute top-1/2 left-2.5 h-3.5 w-3.5 text-slate-400" />
                     <Input
-                      placeholder="Search teammates by name or department..."
+                      placeholder="Search members by name..."
                       className="h-9 rounded-md bg-white pl-8 text-sm dark:bg-slate-950"
                       value={teamSearch}
                       onChange={(e) => setTeamSearch(e.target.value)}
@@ -291,12 +472,12 @@ export default function NewProposalPage() {
                     <div className="p-4 text-center text-slate-500 text-xs italic">No exact matches found.</div>
                   ) : (
                     filteredTeam.map((member) => {
-                      const isSelected = selectedTeam.includes(member.id);
+                      const isSelected = selectedTeam.includes(member.value);
                       return (
                         <button
                           type="button"
-                          key={member.id}
-                          onClick={() => handleToggleTeam(member.id)}
+                          key={member.value}
+                          onClick={() => handleToggleTeam(member.value)}
                           className={`flex cursor-pointer items-center gap-3 rounded-lg border p-2.5 transition-colors ${
                             isSelected
                               ? "border-blue-400 bg-blue-50/50 shadow-sm dark:bg-blue-900/20"
@@ -304,16 +485,13 @@ export default function NewProposalPage() {
                           }`}
                         >
                           <Avatar className="h-8 w-8">
-                            <AvatarFallback className={`${member.color} font-bold text-[10px]`}>
-                              {member.avatar}
+                            <AvatarFallback className="font-bold text-[10px]">
+                              {member.label?.substring(0, 2).toUpperCase() || "?"}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex min-w-0 flex-1 flex-col">
                             <span className="truncate font-semibold text-[13px] text-slate-900 leading-tight dark:text-slate-100">
-                              {member.name}
-                            </span>
-                            <span className="truncate text-[11px] text-slate-500 leading-tight">
-                              {member.role} • {member.dept}
+                              {member.label}
                             </span>
                           </div>
                           {isSelected && <CheckCircle2 className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-500" />}
@@ -326,17 +504,36 @@ export default function NewProposalPage() {
                   {selectedTeam.length > 0 && teamSearch.trim() === "" && (
                     <div className="mt-4 border-slate-100 border-t pt-4 dark:border-slate-800">
                       <p className="mb-2 font-semibold text-slate-500 text-xs uppercase tracking-wider">
-                        Currently Selected ({selectedTeam.length})
+                        Team ({selectedTeam.length + 1})
                       </p>
                       <div className="flex flex-col gap-2">
+                        {/* Current user as PI */}
+                        {(() => {
+                          const { user } = useAuthStore.getState();
+                          return user ? (
+                            <div
+                              key="current-user-pi"
+                              className="flex items-center justify-between rounded-md bg-blue-50 border border-blue-200 p-2 dark:bg-blue-900/20 dark:border-blue-800/50"
+                            >
+                              <div className="flex items-center gap-2 flex-1">
+                                <span className="font-medium text-xs text-blue-700 dark:text-blue-300">
+                                  {user.fullName}
+                                </span>
+                                <Badge className="h-5 bg-blue-600 text-white text-[10px] px-1.5">PI</Badge>
+                              </div>
+                              <span className="text-[10px] text-slate-500">Added automatically</span>
+                            </div>
+                          ) : null;
+                        })()}
+                        {/* Other selected members */}
                         {selectedTeam.map((id) => {
-                          const m = AVAILABLE_TEAM.find((t) => t.id === id);
+                          const m = members.find((mem) => mem.value === id);
                           return m ? (
                             <div
                               key={id}
                               className="flex items-center justify-between rounded-md bg-slate-100 p-2 dark:bg-slate-800/50"
                             >
-                              <span className="font-medium text-xs">{m.name}</span>
+                              <span className="font-medium text-xs">{m.label}</span>
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -379,12 +576,12 @@ export default function NewProposalPage() {
                     <div className="p-4 text-center text-slate-500 text-xs italic">No exact matches found.</div>
                   ) : (
                     filteredAdvisors.map((adv) => {
-                      const isSelected = selectedAdvisor === adv.id;
+                      const isSelected = selectedAdvisor === adv.value;
                       return (
                         <button
                           type="button"
-                          key={adv.id}
-                          onClick={() => setSelectedAdvisor(adv.id)}
+                          key={adv.value}
+                          onClick={() => setSelectedAdvisor(adv.value)}
                           className={`flex cursor-pointer items-center gap-3 rounded-lg border p-2.5 transition-colors ${
                             isSelected
                               ? "border-indigo-400 bg-indigo-50/50 shadow-sm dark:bg-indigo-900/20"
@@ -392,16 +589,13 @@ export default function NewProposalPage() {
                           }`}
                         >
                           <Avatar className="h-8 w-8">
-                            <AvatarFallback className={`${adv.color} font-bold text-[10px]`}>
-                              {adv.avatar}
+                            <AvatarFallback className="font-bold text-[10px]">
+                              {adv.label?.substring(0, 2).toUpperCase() || "?"}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex min-w-0 flex-1 flex-col">
                             <span className="truncate font-semibold text-[13px] text-slate-900 leading-tight dark:text-slate-100">
-                              {adv.name}
-                            </span>
-                            <span className="truncate text-[11px] text-slate-500 leading-tight">
-                              {adv.role} • {adv.dept}
+                              {adv.label}
                             </span>
                           </div>
                           {isSelected && (
@@ -419,10 +613,12 @@ export default function NewProposalPage() {
                         Currently Selected
                       </p>
                       {(() => {
-                        const a = AVAILABLE_ADVISORS.find((t) => t.id === selectedAdvisor);
+                        const a = advisors.find((adv) => adv.value === selectedAdvisor);
                         return a ? (
                           <div className="flex items-center justify-between rounded-md border border-indigo-100 bg-indigo-50 p-2 dark:border-indigo-800 dark:bg-indigo-900/30">
-                            <span className="font-semibold text-indigo-800 text-xs dark:text-indigo-300">{a.name}</span>
+                            <span className="font-semibold text-indigo-800 text-xs dark:text-indigo-300">
+                              {a.label}
+                            </span>
                             <Button
                               variant="ghost"
                               size="sm"
@@ -575,33 +771,43 @@ export default function NewProposalPage() {
                   <div className="flex flex-1 flex-col gap-4 p-4">
                     <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
                       <div className="col-span-full mb-1">
-                        <p className="font-medium text-slate-500 text-xs">Co-Investigators ({selectedTeam.length})</p>
+                        <p className="font-medium text-slate-500 text-xs">Members ({selectedTeam.length + 1})</p>
                       </div>
-                      {selectedTeam.length > 0 ? (
-                        selectedTeam.map((id) => {
-                          const m = AVAILABLE_TEAM.find((t) => t.id === id);
-                          return m ? (
-                            <div
-                              key={id}
-                              className="truncate rounded border border-slate-200 bg-slate-100 px-2 py-1 font-medium text-[13px] text-slate-800 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
-                            >
-                              {m.name}
-                            </div>
-                          ) : null;
-                        })
-                      ) : (
-                        <p className="text-slate-400 text-sm italic">None</p>
-                      )}
+                      {/* Current user as PI */}
+                      {(() => {
+                        const { user } = useAuthStore.getState();
+                        return user ? (
+                          <div
+                            key="pi-badge"
+                            className="flex items-center gap-1 truncate rounded border border-blue-200 bg-blue-50 px-2 py-1 font-medium text-[13px] text-blue-800 dark:border-blue-800/50 dark:bg-blue-900/20 dark:text-blue-300"
+                          >
+                            <span className="truncate">{user.fullName}</span>
+                            <Badge className="h-4 bg-blue-600 text-white text-[10px] px-1 whitespace-nowrap">PI</Badge>
+                          </div>
+                        ) : null;
+                      })()}
+                      {/* Other members */}
+                      {selectedTeam.length > 0
+                        ? selectedTeam.map((id) => {
+                            const m = members.find((mem) => mem.value === id);
+                            return m ? (
+                              <div
+                                key={id}
+                                className="truncate rounded border border-slate-200 bg-slate-100 px-2 py-1 font-medium text-[13px] text-slate-800 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
+                              >
+                                {m.label}
+                              </div>
+                            ) : null;
+                          })
+                        : null}
                     </div>
                     <div className="mt-1">
                       <p className="mb-1 font-medium text-slate-500 text-xs">Primary Advisor</p>
                       {selectedAdvisor ? (
                         (() => {
-                          const a = AVAILABLE_ADVISORS.find((t) => t.id === selectedAdvisor);
+                          const a = advisors.find((adv) => adv.value === selectedAdvisor);
                           return a ? (
-                            <p className="font-semibold text-[13px] text-indigo-700 dark:text-indigo-400">
-                              {a.name} <span className="ml-1 font-normal text-slate-500">({a.dept})</span>
-                            </p>
+                            <p className="font-semibold text-[13px] text-indigo-700 dark:text-indigo-400">{a.label}</p>
                           ) : null;
                         })()
                       ) : (
@@ -620,7 +826,10 @@ export default function NewProposalPage() {
                     <div>
                       <p className="mb-1 font-medium text-slate-500 text-xs">Total Funds Requested</p>
                       <p className="font-bold text-slate-900 text-xl dark:text-slate-100">
-                        ${calculateTotalBudget().toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        $
+                        {calculateTotalBudget().toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                        })}
                       </p>
                       <p className="mt-1 text-slate-400 text-xs">Spanning {budgetRows.length} categorized items.</p>
                     </div>
@@ -644,13 +853,26 @@ export default function NewProposalPage() {
           </Button>
           <div className="flex gap-2">
             {currentStep === 3 ? (
-              <Button
-                size="sm"
-                className="h-9 border-0 bg-blue-600 px-6 font-semibold text-white shadow-sm hover:bg-blue-700"
-                onClick={() => router.push("/dashboard/proposals")}
-              >
-                Submit Proposal <CheckCircle2 className="ml-1.5 h-4 w-4" />
-              </Button>
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleSubmitProposal(false)}
+                  disabled={isSubmitting}
+                  className="h-9 px-6 font-semibold"
+                >
+                  {isSubmitting ? "Saving..." : "Save as Draft"}
+                </Button>
+                <Button
+                  size="sm"
+                  className="h-9 border-0 bg-blue-600 px-6 font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-50"
+                  onClick={() => handleSubmitProposal(true)}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit Proposal"}
+                  <CheckCircle2 className="ml-1.5 h-4 w-4" />
+                </Button>
+              </>
             ) : (
               <Button
                 size="sm"
