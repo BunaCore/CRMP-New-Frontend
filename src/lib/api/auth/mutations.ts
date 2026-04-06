@@ -7,10 +7,11 @@
 // ============================================================
 
 import { getMockLoginResponse } from "@/data/mock-auth";
-import type { LoginCredentials, LoginResponse } from "@/lib/api/auth/types";
+import type { LoginCredentials, LoginResponse, UserProfile } from "@/lib/api/auth/types";
+import { mapBackendPermissionsToFrontend } from "@/lib/permissions/permission-mapper";
 
 // ─── 🟢 MOCK SWITCH ──────────────────────────────────────────
-const USE_MOCK = true;
+const USE_MOCK = false;
 // ─────────────────────────────────────────────────────────────
 
 /**
@@ -24,17 +25,25 @@ export async function loginUser(credentials: LoginCredentials): Promise<LoginRes
     return getMockLoginResponse(credentials.email);
   }
 
-  // 🔴 REAL BACKEND — uncomment when backend is ready
-  /*
   const { apiClient } = await import("@/lib/api/client");
-  const response = await apiClient.post<LoginResponse>("/auth/login", {
+  // Backend response type: has accessToken (camelCase) and user with backend permission format
+  const response = await apiClient.post<{
+    accessToken: string;
+    user: Omit<UserProfile, "permissions"> & { permissions?: string[] };
+  }>("/auth/login", {
     email: credentials.email,
     password: credentials.password,
   });
-  return response.data;
-  */
-
-  throw new Error("Set USE_MOCK = false and uncomment the real block above.");
+  // Transform backend response:
+  // 1. Convert accessToken → access_token
+  // 2. Map backend permissions to frontend canonical names
+  return {
+    access_token: response.data.accessToken,
+    user: {
+      ...response.data.user,
+      permissions: mapBackendPermissionsToFrontend(response.data.user.permissions),
+    },
+  };
 }
 
 /**
