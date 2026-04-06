@@ -65,10 +65,14 @@ export function AuthInitializer() {
           Cookies.remove(COOKIE_TOKEN_KEY);
           Cookies.remove(COOKIE_PERMISSIONS_KEY);
         }
-      } catch {
-        logout();
-        Cookies.remove(COOKIE_TOKEN_KEY);
-        Cookies.remove(COOKIE_PERMISSIONS_KEY);
+      } catch (error: unknown) {
+        //logout only if 401 response
+        const axiosLikeError = error as { response?: { status?: number } };
+        if (axiosLikeError.response?.status === 401) {
+          logout();
+          Cookies.remove(COOKIE_TOKEN_KEY);
+          Cookies.remove(COOKIE_PERMISSIONS_KEY);
+        }
       } finally {
         setLoading(false);
       }
