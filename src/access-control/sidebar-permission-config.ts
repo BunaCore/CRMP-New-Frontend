@@ -31,14 +31,26 @@ const DASHBOARD_MODULE_RULES: SidebarModuleRule[] = [
   // The dashboard layout is already guarded by `PROJECT_CREATE`.
   { url: "/dashboard", permissions: ["PROJECT_CREATE"] },
 
-  { url: "/dashboard/projects", permissions: ["PROJECT_VIEW", "PROJECT_CREATE"] },
-  { url: "/dashboard/proposals", permissions: ["PROJECT_SUBMIT", "PROJECT_VIEW"] },
+  {
+    url: "/dashboard/projects",
+    permissions: ["PROJECT_VIEW", "PROJECT_CREATE"],
+  },
+  {
+    url: "/dashboard/proposals",
+    permissions: ["PROJECT_SUBMIT", "PROJECT_VIEW"],
+  },
   { url: "/dashboard/team", permissions: ["TEAM_VIEW", "TEAM_MANAGE"] },
   { url: "/dashboard/progress", permissions: ["FUNDED_VIEW", "FUNDED_SUBMIT"] },
-  { url: "/dashboard/evaluations", permissions: ["FUNDED_EVALUATOR_ACCESS", "PROJECT_REVIEW"] },
+  {
+    url: "/dashboard/evaluations",
+    permissions: ["FUNDED_EVALUATOR_ACCESS", "PROJECT_REVIEW"],
+  },
 
   { url: "/dashboard/notifications", permissions: ["PROJECT_VIEW"] },
-  { url: "/dashboard/publications", permissions: ["FUNDED_VIEW", "FUNDED_DECIDE"] },
+  {
+    url: "/dashboard/publications",
+    permissions: ["FUNDED_VIEW", "FUNDED_DECIDE"],
+  },
   { url: "/dashboard/settings", permissions: ["PROJECT_VIEW"] },
 ];
 
@@ -49,15 +61,34 @@ export const DASHBOARD_SIDEBAR_PERMISSION_RULES: SidebarPermissionRules = toRule
 // -------------------------------
 const ADMIN_MODULE_RULES: SidebarModuleRule[] = [
   // Main console overview
-  { url: "/admin", permissions: ["ADMIN_VIEW", "USER_VIEW", "PROJECT_VIEW", "BUDGET_VIEW"] },
+  {
+    url: "/admin",
+    permissions: ["ADMIN_VIEW", "USER_VIEW", "PROJECT_VIEW", "BUDGET_VIEW"],
+  },
 
   { url: "/admin/projects", permissions: ["PROJECT_VIEW", "BUDGET_VIEW"] },
-  { url: "/admin/proposals", permissions: ["PROJECT_REVIEW", "PROJECT_APPROVE", "PROJECT_REJECT"] },
-  { url: "/admin/evaluations", permissions: ["EVALUATION_SCORE_SUBMIT"] },
+  {
+    url: "/admin/proposals",
+    permissions: ["PROJECT_REVIEW", "PROJECT_APPROVE", "PROJECT_REJECT"],
+  },
+  {
+    url: "/admin/evaluations",
+    permissions: ["PROJECT_CREATE", "EVALUATION_SCORE_SUBMIT"],
+  },
   { url: "/admin/progress", permissions: ["FUNDED_VIEW", "FUNDED_SUBMIT"] },
 
-  { url: "/admin/budget-requests", permissions: ["BUDGET_VIEW", "BUDGET_APPROVE", "BUDGET_REJECT"] },  { url: "/admin/requests", permissions: ["BUDGET_VIEW", "PROJECT_APPROVE", "PROJECT_REJECT", "FUNDED_VIEW"] },
-  { url: "/admin/publications", permissions: ["FUNDED_RAD_ACCESS", "FUNDED_DECIDE", "FUNDED_VIEW"] },
+  {
+    url: "/admin/budget-requests",
+    permissions: ["BUDGET_VIEW", "BUDGET_APPROVE", "BUDGET_REJECT"],
+  },
+  {
+    url: "/admin/requests",
+    permissions: ["BUDGET_VIEW", "PROJECT_APPROVE", "PROJECT_REJECT", "FUNDED_VIEW"],
+  },
+  {
+    url: "/admin/publications",
+    permissions: ["FUNDED_RAD_ACCESS", "FUNDED_DECIDE", "FUNDED_VIEW"],
+  },
   { url: "/admin/users", permissions: ["USER_VIEW", "ADMIN_EDIT"] },
 
   { url: "/admin/reports", permissions: ["PROJECT_VIEW", "ADMIN_VIEW"] },

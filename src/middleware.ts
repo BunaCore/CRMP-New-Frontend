@@ -16,12 +16,12 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Block unauthenticated access to protected routes.
-  const isProtected = pathname.startsWith("/admin") || pathname.startsWith("/dashboard");
-  if (isProtected && !tokenCookie) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
+  // const isProtected = pathname.startsWith("/admin") || pathname.startsWith("/dashboard");
+  // if (isProtected && !tokenCookie) {
+  //   const loginUrl = new URL("/login", request.url);
+  //   loginUrl.searchParams.set("redirect", pathname);
+  //   return NextResponse.redirect(loginUrl);
+  // }
 
   return NextResponse.next();
 }
