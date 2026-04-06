@@ -46,7 +46,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     ? {
         id: authUser.id,
         name: authUser.fullName,
-        roles: (authUser.roles as any) ?? null,
+        roles: (authUser.roles as UserRole[]) ?? null,
         email: authUser.email,
         permissions: authUser.permissions,
       }
