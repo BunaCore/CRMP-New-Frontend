@@ -12,8 +12,8 @@ import { NextResponse } from "next/server";
 // ============================================================
 
 export function middleware(request: NextRequest) {
-  const tokenCookie = request.cookies.get("access_token")?.value;
-  const { pathname } = request.nextUrl;
+  const _tokenCookie = request.cookies.get("access_token")?.value;
+  const { pathname: _pathname } = request.nextUrl;
 
   // Block unauthenticated access to protected routes.
   // const isProtected = pathname.startsWith("/admin") || pathname.startsWith("/dashboard");

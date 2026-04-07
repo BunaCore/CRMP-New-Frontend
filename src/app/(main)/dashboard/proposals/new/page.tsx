@@ -408,7 +408,7 @@ export default function NewProposalPage() {
                       checked={isFunded}
                       onCheckedChange={(checked) => setIsFunded(Boolean(checked))}
                     />
-                    <Label htmlFor="isFunded" className="font-medium text-sm cursor-pointer">
+                    <Label htmlFor="isFunded" className="cursor-pointer font-medium text-sm">
                       Is Funded
                     </Label>
                   </div>
@@ -513,7 +513,7 @@ export default function NewProposalPage() {
                           return user ? (
                             <div
                               key="current-user-pi"
-                              className="flex items-center justify-between rounded-md bg-blue-50 border border-blue-200 p-2 dark:bg-blue-900/20 dark:border-blue-800/50"
+                              className="flex items-center justify-between rounded-md border border-blue-200 bg-blue-50 p-2 dark:border-blue-800/50 dark:bg-blue-900/20"
                             >
                               <div className="flex items-center gap-2 flex-1">
                                 <span className="font-medium text-xs text-blue-700 dark:text-blue-300">

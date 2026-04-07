@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { type GroupChatMessage, type TeamMember } from "@/lib/team-data"
+import type { GroupChatMessage, TeamMember } from "@/lib/team-data"
 
 // Legacy ChatMessage type alias for backwards compatibility
 type ChatMessage = Omit<GroupChatMessage, "roomId" | "senderName" | "readBy"> & {
@@ -45,11 +45,11 @@ function formatDateHeader(timestamp: string) {
 
   if (date.toDateString() === today.toDateString()) {
     return "Today"
-  } else if (date.toDateString() === yesterday.toDateString()) {
-    return "Yesterday"
-  } else {
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
   }
+  if (date.toDateString() === yesterday.toDateString()) {
+    return "Yesterday"
+  }
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
 }
 
 export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRemoveMember }: ChatPanelProps) {
@@ -61,11 +61,11 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [messages])
+  }, [])
 
   useEffect(() => {
     inputRef.current?.focus()
-  }, [member.id])
+  }, [])
 
   const handleSend = () => {
     if (inputValue.trim()) {
@@ -106,14 +106,14 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
               </AvatarFallback>
             </Avatar>
             <span
-              className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card ${
+              className={`absolute right-0 bottom-0 h-3 w-3 rounded-full border-2 border-card ${
                 member.status === "Active" ? "bg-emerald-500" : "bg-muted-foreground/50"
               }`}
             />
           </div>
           <div>
             <h3 className="font-semibold text-foreground">{member.name}</h3>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               {member.role} {member.status === "Active" ? "- Online" : "- Offline"}
             </p>
           </div>
@@ -142,10 +142,10 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
       <ScrollArea className="flex-1 p-4" ref={scrollRef}>
         <div className="space-y-6">
           {groupedMessages.map((group, groupIdx) => (
-            <div key={groupIdx}>
+            <div key={group.date}>
               {/* Date Header */}
-              <div className="flex items-center justify-center mb-4">
-                <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
+              <div className="mb-4 flex items-center justify-center">
+                <span className="rounded-full bg-muted px-3 py-1 text-muted-foreground text-xs">
                   {formatDateHeader(group.date)}
                 </span>
               </div>
@@ -161,8 +161,8 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
                       <div
                         className={`group max-w-[75%] rounded-2xl px-4 py-2 ${
                           isSent
-                            ? "bg-primary text-primary-foreground rounded-br-md"
-                            : "bg-muted text-foreground rounded-bl-md"
+                            ? "rounded-br-md bg-primary text-primary-foreground"
+                            : "rounded-bl-md bg-muted text-foreground"
                         }`}
                       >
                         <p className="text-sm leading-relaxed">{message.content}</p>
@@ -209,7 +209,7 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2"
+              className="-translate-y-1/2 absolute top-1/2 right-1 h-7 w-7"
             >
               <Smile className="h-4 w-4 text-muted-foreground" />
               <span className="sr-only">Add emoji</span>
