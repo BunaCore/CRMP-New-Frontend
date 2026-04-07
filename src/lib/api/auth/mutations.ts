@@ -11,7 +11,7 @@ import type { LoginCredentials, LoginResponse, UserProfile } from "@/lib/api/aut
 import { mapBackendPermissionsToFrontend } from "@/lib/permissions/permission-mapper";
 
 // ─── 🟢 MOCK SWITCH ──────────────────────────────────────────
-const USE_MOCK = false;
+const USE_MOCK = true;
 // ─────────────────────────────────────────────────────────────
 
 /**

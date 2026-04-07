@@ -458,6 +458,9 @@ export default function NewProposalPage() {
                       onCheckedChange={setIsFunded}
                       className="data-[state=checked]:bg-blue-600"
                     />
+                    <Label htmlFor="isFunded" className="cursor-pointer font-medium text-sm">
+                      Is Funded
+                    </Label>
                   </div>
                 </div>
               </div>
