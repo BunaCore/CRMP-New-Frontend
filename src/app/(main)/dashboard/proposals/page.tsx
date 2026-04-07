@@ -4,7 +4,20 @@ import * as React from "react";
 
 import Link from "next/link";
 
-import { Clock, Edit, Eye, FileText, Filter, History, MoreHorizontal, Plus, Search, Send } from "lucide-react";
+import {
+  AlertCircle,
+  Clock,
+  Edit,
+  Eye,
+  FileText,
+  Filter,
+  Loader2,
+  MoreHorizontal,
+  Plus,
+  RefreshCw,
+  Search,
+  Send,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,80 +31,119 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getMyProposals } from "@/lib/api/proposals/queries";
+import type { ResearcherProposal } from "@/lib/api/proposals/types";
+import {
+  formatProposalDate,
+  formatRelativeDate,
+  getStatusBadgeClass,
+  getStatusLabel,
+  shortProposalId,
+} from "@/lib/api/proposals/utils";
 
-// Mock Data
-const proposals = [
-  {
-    id: "PRP-042",
-    title: "Quantum Computing Simulation Framework",
-    abstract: "Developing a robust framework for simulating 128-qubit environments...",
-    status: "Under Review",
-    lastModified: "2 days ago",
-    date: "Oct 24, 2026",
-    color: "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200/50",
-  },
-  {
-    id: "PRP-043",
-    title: "AI Health Diagnostics",
-    abstract: "A machine learning pipeline for early stage oncology detection...",
-    status: "Approved",
-    lastModified: "1 week ago",
-    date: "Oct 18, 2026",
-    color: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200/50",
-  },
-  {
-    id: "PRP-044",
-    title: "Neural Interface Robotics Control",
-    abstract: "Brain-computer interface protocols for advanced robotic prosthetics.",
-    status: "Revisions Required",
-    lastModified: "4 hours ago",
-    date: "Oct 26, 2026",
-    color: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200/50",
-  },
-  {
-    id: "PRP-045",
-    title: "Climate Change Predictive Modeling",
-    abstract: "Utilizing distributed sensor networks to predict local weather anomalies.",
-    status: "Draft",
-    lastModified: "Just now",
-    date: "Oct 26, 2026",
-    color: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200/50",
-  },
-  {
-    id: "PRP-046",
-    title: "Advanced Bio-Polymers Synthesis",
-    abstract: "Biodegradable polymer synthesis using modified cyanobacteria.",
-    status: "Rejected",
-    lastModified: "3 weeks ago",
-    date: "Oct 02, 2026",
-    color: "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200/50",
-  },
-  {
-    id: "PRP-047",
-    title: "Next-Gen Photovoltaic Cells",
-    abstract: "Improving solar efficiency using perovskite tandem cells.",
-    status: "Submitted",
-    lastModified: "1 day ago",
-    date: "Oct 25, 2026",
-    color: "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border-indigo-200/50",
-  },
-];
+// ─── Tab definitions ───────────────────────────────────────────────────────────
+
+const TABS = [
+  { value: "all", label: "All" },
+  { value: "Draft", label: "Drafts" },
+  { value: "Under_Review", label: "Under Review" },
+  { value: "Revision", label: "Revisions" },
+  { value: "Accepted", label: "Approved" },
+  { value: "Rejected", label: "Rejected" },
+  { value: "Pending", label: "Submitted" },
+] as const;
+
+// ─── Loading skeleton rows ─────────────────────────────────────────────────────
+
+function SkeletonRow() {
+  return (
+    <TableRow className="border-slate-100 dark:border-slate-800/50">
+      <TableCell className="px-6 py-4">
+        <Skeleton className="h-4 w-20" />
+      </TableCell>
+      <TableCell className="px-6 py-4">
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-4 w-48" />
+          <Skeleton className="h-3 w-32" />
+        </div>
+      </TableCell>
+      <TableCell className="px-6 py-4">
+        <Skeleton className="h-5 w-24 rounded-sm" />
+      </TableCell>
+      <TableCell className="hidden px-6 py-4 md:table-cell">
+        <div className="flex flex-col gap-1.5">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-3 w-16" />
+        </div>
+      </TableCell>
+      <TableCell className="px-6 py-4 text-right">
+        <Skeleton className="ml-auto h-8 w-8 rounded-full" />
+      </TableCell>
+    </TableRow>
+  );
+}
+
+// ─── Page Component ────────────────────────────────────────────────────────────
 
 export default function ProposalsPage() {
+  const [proposals, setProposals] = React.useState<ResearcherProposal[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState("all");
+  const [search, setSearch] = React.useState("");
 
-  const filteredProposals = proposals.filter((p) => {
-    if (activeTab === "all") return true;
-    if (activeTab === "drafts") return p.status === "Draft";
-    if (activeTab === "submitted") return p.status === "Submitted";
-    if (activeTab === "under-review") return p.status === "Under Review";
-    if (activeTab === "revisions") return p.status === "Revisions Required";
-    if (activeTab === "approved") return p.status === "Approved";
-    if (activeTab === "rejected") return p.status === "Rejected";
-    return true;
-  });
+  // ─── Fetch proposals ─────────────────────────────────────────────────────────
+
+  const fetchProposals = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getMyProposals();
+      setProposals(data);
+    } catch {
+      setError("Failed to load proposals. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    fetchProposals();
+  }, [fetchProposals]);
+
+  // ─── Filtering ───────────────────────────────────────────────────────────────
+
+  const filteredProposals = React.useMemo(() => {
+    let result = proposals;
+
+    // Status tab filter
+    if (activeTab !== "all") {
+      result = result.filter((p) => p.status === activeTab);
+    }
+
+    // Client-side search by title
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      result = result.filter((p) => p.title.toLowerCase().includes(q));
+    }
+
+    return result;
+  }, [proposals, activeTab, search]);
+
+  // ─── Tab counts ──────────────────────────────────────────────────────────────
+
+  const tabCounts = React.useMemo(() => {
+    const counts: Record<string, number> = { all: proposals.length };
+    for (const p of proposals) {
+      counts[p.status] = (counts[p.status] ?? 0) + 1;
+    }
+    return counts;
+  }, [proposals]);
+
+  // ─── Render ──────────────────────────────────────────────────────────────────
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 lg:p-10">
@@ -99,10 +151,10 @@ export default function ProposalsPage() {
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="font-semibold text-3xl text-slate-900 tracking-tight dark:text-slate-100">
-            Proposals Management
+            My Proposals
           </h1>
           <p className="mt-1 text-slate-500 text-sm dark:text-slate-400">
-            Create, track, and manage the lifecycle of your research proposals.
+            Track and manage all your research proposals in one place.
           </p>
         </div>
 
@@ -113,38 +165,62 @@ export default function ProposalsPage() {
         </Link>
       </div>
 
+      {/* Error Banner */}
+      {error && !loading && (
+        <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-900/50 dark:bg-red-950/30">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
+          <div className="flex flex-1 items-start justify-between gap-4">
+            <p className="text-red-700 text-sm dark:text-red-300">{error}</p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={fetchProposals}
+              className="h-7 shrink-0 rounded-full px-3 text-red-700 text-xs hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-900/30"
+            >
+              <RefreshCw className="mr-1.5 h-3 w-3" />
+              Retry
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Tabs + Table */}
       <div className="flex flex-col gap-4">
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="mb-6 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+            {/* Tab List */}
             <div className="-mb-1 scrollbar-hide w-full overflow-x-auto pb-1 md:w-auto">
-              <TabsList className="rounded-lg border border-slate-200/50 bg-slate-100/50 p-1 dark:border-slate-800/50 dark:bg-slate-900/50">
-                <TabsTrigger value="all" className="rounded-md px-4 data-[state=active]:shadow-sm">
-                  All
-                </TabsTrigger>
-                <TabsTrigger value="drafts" className="rounded-md px-4 data-[state=active]:shadow-sm">
-                  Drafts
-                </TabsTrigger>
-                <TabsTrigger value="submitted" className="rounded-md px-4 data-[state=active]:shadow-sm">
-                  Submitted
-                </TabsTrigger>
-                <TabsTrigger value="under-review" className="rounded-md px-4 data-[state=active]:shadow-sm">
-                  Under Review
-                </TabsTrigger>
-                <TabsTrigger value="revisions" className="rounded-md px-4 data-[state=active]:shadow-sm">
-                  Revisions
-                </TabsTrigger>
-                <TabsTrigger value="approved" className="rounded-md px-4 data-[state=active]:shadow-sm">
-                  Approved
-                </TabsTrigger>
+              <TabsList className="h-auto rounded-lg border border-slate-200/50 bg-slate-100/50 p-1 dark:border-slate-800/50 dark:bg-slate-900/50">
+                {TABS.map((tab) => (
+                  <TabsTrigger
+                    key={tab.value}
+                    value={tab.value}
+                    className="rounded-md px-4 data-[state=active]:shadow-sm"
+                  >
+                    {tab.label}
+                    {!loading && tabCounts[tab.value] > 0 && (
+                      <span className="ml-1.5 rounded-full bg-slate-200 px-1.5 py-0.5 font-semibold text-[10px] text-slate-600 leading-none data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700 dark:bg-slate-700 dark:text-slate-400">
+                        {tabCounts[tab.value]}
+                      </span>
+                    )}
+                  </TabsTrigger>
+                ))}
               </TabsList>
             </div>
 
+            {/* Search + Filter */}
             <div className="flex w-full items-center gap-2 md:w-auto">
               <div className="relative w-full md:w-[240px]">
-                <Search className="absolute top-2.5 left-2.5 h-4 w-4 text-slate-500" />
+                {loading ? (
+                  <Loader2 className="absolute top-2.5 left-2.5 h-4 w-4 animate-spin text-slate-400" />
+                ) : (
+                  <Search className="absolute top-2.5 left-2.5 h-4 w-4 text-slate-500" />
+                )}
                 <Input
                   type="search"
                   placeholder="Search proposals..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
                   className="w-full rounded-full border-slate-200 bg-white pl-9 shadow-sm dark:border-slate-800 dark:bg-slate-950"
                 />
               </div>
@@ -164,49 +240,81 @@ export default function ProposalsPage() {
                 <Table>
                   <TableHeader className="bg-slate-50/50 dark:bg-slate-900/20">
                     <TableRow className="border-slate-100 hover:bg-transparent dark:border-slate-800">
-                      <TableHead className="h-11 w-[100px] px-6 font-medium text-slate-500">ID</TableHead>
-                      <TableHead className="h-11 px-6 font-medium text-slate-500">Proposal Details</TableHead>
-                      <TableHead className="h-11 px-6 font-medium text-slate-500">Status</TableHead>
-                      <TableHead className="hidden h-11 px-6 font-medium text-slate-500 md:table-cell">
-                        Last Updated
+                      <TableHead className="h-11 w-[110px] px-6 font-medium text-slate-500">
+                        ID
                       </TableHead>
-                      <TableHead className="h-11 px-6 text-right font-medium text-slate-500">Actions</TableHead>
+                      <TableHead className="h-11 px-6 font-medium text-slate-500">
+                        Proposal Details
+                      </TableHead>
+                      <TableHead className="h-11 px-6 font-medium text-slate-500">
+                        Status
+                      </TableHead>
+                      <TableHead className="hidden h-11 px-6 font-medium text-slate-500 md:table-cell">
+                        Submitted
+                      </TableHead>
+                      <TableHead className="h-11 px-6 text-right font-medium text-slate-500">
+                        Actions
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
+
                   <TableBody>
-                    {filteredProposals.length > 0 ? (
+                    {/* ── Loading state ── */}
+                    {loading &&
+                      Array.from({ length: 5 }).map((_, i) => (
+                        // biome-ignore lint/suspicious/noArrayIndexKey: skeletons have no identity
+                        <SkeletonRow key={i} />
+                      ))}
+
+                    {/* ── Populated rows ── */}
+                    {!loading &&
+                      filteredProposals.length > 0 &&
                       filteredProposals.map((proposal) => (
                         <TableRow
                           key={proposal.id}
                           className="border-slate-100 transition-colors hover:bg-slate-50/50 dark:border-slate-800/50 dark:hover:bg-slate-800/20"
                         >
-                          <TableCell className="px-6 py-4 font-medium text-slate-600 text-xs dark:text-slate-400">
-                            {proposal.id}
+                          {/* ID */}
+                          <TableCell className="px-6 py-4 font-medium font-mono text-slate-500 text-xs dark:text-slate-400">
+                            {shortProposalId(proposal.id)}
                           </TableCell>
+
+                          {/* Title + Department */}
                           <TableCell className="max-w-[300px] px-6 py-4 lg:max-w-[400px]">
                             <div className="flex flex-col gap-1.5">
                               <span className="line-clamp-1 font-semibold text-slate-800 dark:text-slate-200">
                                 {proposal.title}
                               </span>
-                              <span className="line-clamp-1 text-slate-500 text-xs">{proposal.abstract}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="px-6 py-4">
-                            <Badge
-                              variant="outline"
-                              className={`${proposal.color} inline-flex items-center whitespace-nowrap rounded px-2.5 py-0.5 shadow-none`}
-                            >
-                              {proposal.status}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="hidden px-6 py-4 md:table-cell">
-                            <div className="flex flex-col gap-1">
-                              <span className="text-slate-700 text-sm dark:text-slate-300">{proposal.date}</span>
-                              <span className="flex items-center gap-1 text-slate-500 text-xs">
-                                <Clock className="h-3 w-3" /> {proposal.lastModified}
+                              <span className="line-clamp-1 text-slate-500 text-xs">
+                                {proposal.department?.name ?? "—"}{proposal.type ? ` · ${proposal.type}` : ""}
                               </span>
                             </div>
                           </TableCell>
+
+                          {/* Status badge */}
+                          <TableCell className="px-6 py-4">
+                            <Badge
+                              variant="outline"
+                              className={`${getStatusBadgeClass(proposal.status)} inline-flex items-center whitespace-nowrap rounded px-2.5 py-0.5 shadow-none`}
+                            >
+                              {getStatusLabel(proposal.status)}
+                            </Badge>
+                          </TableCell>
+
+                          {/* Date */}
+                          <TableCell className="hidden px-6 py-4 md:table-cell">
+                            <div className="flex flex-col gap-1">
+                              <span className="text-slate-700 text-sm dark:text-slate-300">
+                                {formatProposalDate(proposal.createdAt)}
+                              </span>
+                              <span className="flex items-center gap-1 text-slate-500 text-xs">
+                                <Clock className="h-3 w-3" />
+                                {formatRelativeDate(proposal.createdAt)}
+                              </span>
+                            </div>
+                          </TableCell>
+
+                          {/* Actions */}
                           <TableCell className="px-6 py-4 text-right">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -223,6 +331,7 @@ export default function ProposalsPage() {
                                   Proposal Actions
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
+
                                 <Link href={`/dashboard/proposals/${proposal.id}`}>
                                   <DropdownMenuItem className="cursor-pointer">
                                     <Eye className="mr-2 h-4 w-4" />
@@ -230,12 +339,14 @@ export default function ProposalsPage() {
                                   </DropdownMenuItem>
                                 </Link>
 
-                                {proposal.status === "Draft" || proposal.status === "Revisions Required" ? (
-                                  <DropdownMenuItem className="cursor-pointer text-blue-600 dark:text-blue-400">
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    Continue Editing
-                                  </DropdownMenuItem>
-                                ) : null}
+                                {(proposal.status === "Draft" || proposal.status === "Revision") && (
+                                  <Link href={`/dashboard/proposals/${proposal.id}/edit`}>
+                                    <DropdownMenuItem className="cursor-pointer text-blue-600 dark:text-blue-400">
+                                      <Edit className="mr-2 h-4 w-4" />
+                                      Continue Editing
+                                    </DropdownMenuItem>
+                                  </Link>
+                                )}
 
                                 {proposal.status === "Draft" && (
                                   <DropdownMenuItem className="cursor-pointer text-emerald-600 dark:text-emerald-400">
@@ -243,23 +354,57 @@ export default function ProposalsPage() {
                                     Submit Proposal
                                   </DropdownMenuItem>
                                 )}
-
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem className="cursor-pointer">
-                                  <History className="mr-2 h-4 w-4" />
-                                  View History
-                                </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
                         </TableRow>
-                      ))
-                    ) : (
+                      ))}
+
+                    {/* ── Empty state (no data after fetch) ── */}
+                    {!loading && !error && filteredProposals.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={5} className="h-32 text-center text-slate-500">
-                          <div className="flex flex-col items-center justify-center gap-2">
-                            <FileText className="h-8 w-8 text-slate-300 dark:text-slate-600" />
-                            <p>No proposals found in this category.</p>
+                        <TableCell colSpan={5} className="h-48 text-center text-slate-500">
+                          <div className="flex flex-col items-center justify-center gap-3">
+                            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                              <FileText className="h-7 w-7 text-slate-400 dark:text-slate-500" />
+                            </div>
+                            {search ? (
+                              <>
+                                <p className="font-medium text-slate-700 text-sm dark:text-slate-300">
+                                  No proposals match &ldquo;{search}&rdquo;
+                                </p>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setSearch("")}
+                                  className="h-7 rounded-full text-slate-500 text-xs"
+                                >
+                                  Clear search
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <p className="font-medium text-slate-700 text-sm dark:text-slate-300">
+                                  No proposals in this category
+                                </p>
+                                <p className="max-w-xs text-center text-slate-400 text-xs">
+                                  {activeTab === "all"
+                                    ? "You haven't submitted any proposals yet. Start by creating a new one."
+                                    : `No proposals with status "${getStatusLabel(activeTab)}" found.`}
+                                </p>
+                                {activeTab === "all" && (
+                                  <Link href="/dashboard/proposals/new">
+                                    <Button
+                                      size="sm"
+                                      className="mt-1 rounded-full border-0 bg-blue-600 px-4 text-white hover:bg-blue-700"
+                                    >
+                                      <Plus className="mr-1.5 h-3.5 w-3.5" />
+                                      New Proposal
+                                    </Button>
+                                  </Link>
+                                )}
+                              </>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>

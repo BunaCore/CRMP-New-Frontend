@@ -131,7 +131,7 @@ export function getAuthorizedAdminNavItems(permissions: string[] | null | undefi
   // If yes, hide /admin/proposals — Evaluations already covers proposal management
   // and most of its features. The reverse is NOT enforced.
   const evalRequired = ADMIN_SIDEBAR_PERMISSION_RULES["/admin/evaluations"];
-  const canSeeEvaluations = evalRequired
+  const _canSeeEvaluations = evalRequired
     ? evalRequired.some((p) => hasPermission(safePermissions, p))
     : SIDEBAR_UNCONFIGURED_ROUTES_VISIBILITY === "visible";
 
