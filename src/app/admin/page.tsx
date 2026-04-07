@@ -89,7 +89,6 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Pending Approvals */}
         <Card className="border-slate-200/60 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-slate-800/60 dark:bg-slate-950">
           <CardContent className="p-6">
             <div className="mb-4 flex items-center justify-between">
