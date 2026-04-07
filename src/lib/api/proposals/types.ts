@@ -180,3 +180,43 @@ export interface UserOption {
   name?: string;
   email?: string;
 }
+
+// ─── Admin Specific Types ──────────────────────────────────────────────────────
+
+export interface PendingApproval {
+  id: string;
+  title: string;
+  abstract?: string;
+  proposalProgram: string;
+  isFunded: boolean;
+  currentStatus: ProposalStatus | string;
+  submittedAt: string;
+  createdAt: string;
+  createdBy: string;
+  createdByName: string;
+  currentStepOrder: number;
+  currentApproverRole: string;
+  stepLabel: string;
+  evaluatorAssigned: boolean;
+  advisorAssigned: boolean;
+}
+
+export interface AdminProposalDetail {
+  id: string;
+  title: string;
+  type: string;
+  status: ProposalStatus | string;
+  budget: {
+    total: number;
+    items: BudgetItem[];
+  };
+  department: ProposalDepartment;
+  pi: PiMember;
+  advisors: Advisor[];
+  evaluators: Evaluator[];
+  team: TeamMember[];
+  workflow: Workflow;
+  comments: ProposalComment[];
+  defenceSchedules: DefenceSchedule[];
+  createdAt: string;
+}

@@ -18,6 +18,8 @@ import type {
   ResearcherProposal,
   TeamMember,
   Workflow,
+  PendingApproval,
+  AdminProposalDetail,
 } from "@/lib/api/proposals/types";
 
 // ─── Null-safety normalization ─────────────────────────────────────────────────
@@ -69,5 +71,27 @@ export async function getMyProposals(): Promise<ResearcherProposal[]> {
   const response = await apiClient.get<any[]>("/proposals/detail");
   const raw = Array.isArray(response.data) ? response.data : [];
   return raw.map(normalizeProposal);
+}
+
+// ─── Admin Queries ─────────────────────────────────────────────────────────────
+
+/**
+ * Fetch all pending proposals awaiting the authenticated admin's approval
+ * GET /proposals/pending-approvals
+ */
+export async function getPendingApprovals(): Promise<PendingApproval[]> {
+  const { apiClient } = await import("@/lib/api/client");
+  const response = await apiClient.get<PendingApproval[]>("/proposals/pending-approvals");
+  return Array.isArray(response.data) ? response.data : [];
+}
+
+/**
+ * Fetch the exact details for a specific proposal (admin view)
+ * GET /proposals/:id
+ */
+export async function getAdminProposalDetails(id: string): Promise<AdminProposalDetail> {
+  const { apiClient } = await import("@/lib/api/client");
+  const response = await apiClient.get<AdminProposalDetail>(`/proposals/${id}`);
+  return response.data;
 }
 

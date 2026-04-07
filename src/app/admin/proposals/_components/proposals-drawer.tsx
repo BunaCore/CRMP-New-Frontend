@@ -32,7 +32,10 @@ import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 
-import { getApprovalChain } from "../_data/mock-proposals";
+import { useEffect, useState } from "react";
+import { getAdminProposalDetails } from "@/lib/api/proposals/queries";
+import type { AdminProposalDetail } from "@/lib/api/proposals/types";
+
 import { useProposals } from "../proposals-context";
 import { STATUS_CFG } from "./proposals-table";
 
@@ -54,7 +57,20 @@ export function ProposalsDrawer() {
     handleTimelineRejectSubmit,
   } = useProposals();
 
-  const approvalChain = selected ? getApprovalChain(selected.id) : [];
+  const [details, setDetails] = useState<AdminProposalDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (selected) {
+      setIsLoading(true);
+      getAdminProposalDetails(selected.id)
+        .then(setDetails)
+        .catch(console.error)
+        .finally(() => setIsLoading(false));
+    } else {
+      setDetails(null);
+    }
+  }, [selected]);
 
   return (
     <Sheet open={!!selected} onOpenChange={(o) => !o && closeDrawer()}>
@@ -62,7 +78,12 @@ export function ProposalsDrawer() {
         className="flex w-full flex-col overflow-hidden border-slate-200/80 border-l bg-white p-0 shadow-2xl sm:max-w-[800px] xl:max-w-[1000px] dark:border-slate-800 dark:bg-slate-950"
         side="right"
       >
-        {selected && (
+        {selected && isLoading && (
+          <div className="flex flex-1 items-center justify-center p-12 text-slate-400">
+            Fetching full proposal details...
+          </div>
+        )}
+        {selected && !isLoading && details && (
           <>
             {/* Drawer Header */}
             <SheetHeader className="shrink-0 space-y-0 border-slate-100 border-b bg-gradient-to-b from-slate-50/90 to-white px-6 pt-6 pb-4 dark:border-slate-800 dark:from-slate-900/80 dark:to-slate-950">
@@ -72,45 +93,45 @@ export function ProposalsDrawer() {
                     {selected.id}
                   </Badge>
                   <Badge
-                    className={`${STATUS_CFG[selected.status].className} pointer-events-none flex items-center gap-1 border-0 font-bold text-[10px]`}
+                    className={`${STATUS_CFG[details.status.toString()]?.className || "bg-blue-100 text-blue-700"} pointer-events-none flex items-center gap-1 border-0 font-bold text-[10px]`}
                   >
-                    {STATUS_CFG[selected.status].icon}
-                    {selected.status}
+                    {STATUS_CFG[details.status.toString()]?.icon}
+                    {details.status.toString().replace("_", " ")}
                   </Badge>
-                  {selected.evaluators.slice(0, 2).map((name) => (
+                  {details.evaluators?.slice(0, 2).map((evaluator) => (
                     <Badge
-                      key={name}
+                      key={evaluator.id}
                       className="max-w-[140px] truncate border-0 bg-emerald-100 font-bold text-[10px] text-emerald-800 dark:bg-emerald-900/35 dark:text-emerald-300"
-                      title={name}
+                      title={evaluator.name}
                     >
-                      <UserCheck className="h-3 w-3 shrink-0" /> {name}
+                      <UserCheck className="h-3 w-3 shrink-0" /> {evaluator.name}
                     </Badge>
                   ))}
-                  {selected.evaluators.length > 2 && (
+                  {(details.evaluators?.length ?? 0) > 2 && (
                     <Badge className="border-0 bg-emerald-50 font-bold text-[10px] text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400">
-                      +{selected.evaluators.length - 2} evaluators
+                      +{details.evaluators.length - 2} evaluators
                     </Badge>
                   )}
-                  {selected.advisors.slice(0, 2).map((name) => (
+                  {details.advisors?.slice(0, 2).map((advisor) => (
                     <Badge
-                      key={name}
+                      key={advisor.id}
                       className="max-w-[140px] truncate border-0 bg-violet-100 font-bold text-[10px] text-violet-800 dark:bg-violet-900/35 dark:text-violet-300"
-                      title={name}
+                      title={advisor.name}
                     >
-                      <GraduationCap className="h-3 w-3 shrink-0" /> {name}
+                      <GraduationCap className="h-3 w-3 shrink-0" /> {advisor.name}
                     </Badge>
                   ))}
-                  {selected.advisors.length > 2 && (
+                  {(details.advisors?.length ?? 0) > 2 && (
                     <Badge className="border-0 bg-violet-50 font-bold text-[10px] text-violet-700 dark:bg-violet-900/20 dark:text-violet-400">
-                      +{selected.advisors.length - 2} advisors
+                      +{details.advisors.length - 2} advisors
                     </Badge>
                   )}
                 </div>
                 <SheetTitle className="pr-2 font-bold text-[16px] text-slate-900 leading-snug tracking-tight dark:text-slate-100">
-                  {selected.title}
+                  {details.title}
                 </SheetTitle>
                 <SheetDescription className="font-medium text-slate-500 text-xs leading-relaxed">
-                  {selected.dept} · Submitted {selected.submittedDate} · Budget {selected.budget}
+                  {details.department.name} · Date {details.createdAt.split("T")[0]} · Budget {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(details.budget.total)}
                 </SheetDescription>
               </div>
 
@@ -143,12 +164,12 @@ export function ProposalsDrawer() {
               {/* ── TAB: DETAILS ── */}
               {drawerTab === "details" && (
                 <>
-                  {selected.status === "Revision" && (
+                  {selected.currentStatus === "Revision" && (
                     <div className="flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-900/30 dark:bg-rose-900/10">
                       <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600 dark:text-rose-400" />
                       <div>
                         <p className="font-bold text-rose-800 text-sm dark:text-rose-300">Returned for Revision</p>
-                        <p className="mt-0.5 text-rose-600 text-xs dark:text-rose-400">{selected.lastAction}</p>
+                        <p className="mt-0.5 text-rose-600 text-xs dark:text-rose-400">Please review the timeline or comments for revision notes.</p>
                       </div>
                     </div>
                   )}
@@ -161,12 +182,12 @@ export function ProposalsDrawer() {
                       </p>
                       <div className="flex items-center gap-2">
                         <Avatar className="h-7 w-7">
-                          <AvatarFallback className={`font-bold text-[10px] ${selected.piColor}`}>
-                            {selected.piAvatar}
+                          <AvatarFallback className="bg-blue-100 font-bold text-[10px] text-blue-700">
+                            {details.pi.name.slice(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <span className="truncate font-semibold text-[13px] text-slate-800 dark:text-slate-200">
-                          {selected.pi}
+                          {details.pi.name}
                         </span>
                       </div>
                     </div>
@@ -174,7 +195,9 @@ export function ProposalsDrawer() {
                       <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
                         Budget Requested
                       </p>
-                      <p className="font-extrabold text-blue-600 text-xl dark:text-blue-400">{selected.budget}</p>
+                      <p className="font-extrabold text-blue-600 text-xl dark:text-blue-400">
+                        {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(details.budget.total)}
+                      </p>
                     </div>
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
                       <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
@@ -182,27 +205,29 @@ export function ProposalsDrawer() {
                       </p>
                       <p className="flex items-center gap-1.5 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
                         <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                        {selected.submittedDate}
+                        {details.createdAt.split("T")[0]}
                       </p>
                     </div>
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
                       <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Team Size</p>
                       <p className="flex items-center gap-1.5 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
                         <Users className="h-3.5 w-3.5 text-slate-400" />
-                        {selected.teamCount} members
+                        {details.team.length + 1} members
                       </p>
                     </div>
                   </div>
 
-                  {/* Abstract */}
-                  <div>
-                    <h4 className="mb-2.5 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
-                      <FileText className="h-3.5 w-3.5" /> Abstract
-                    </h4>
-                    <p className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-[13px] text-slate-600 leading-relaxed dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
-                      {selected.abstract}
-                    </p>
-                  </div>
+                  {/* Only show abstract if exists in backend details, else fallback to pending Approval abstract */}
+                  {(selected.abstract) && (
+                    <div>
+                      <h4 className="mb-2.5 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                        <FileText className="h-3.5 w-3.5" /> Abstract
+                      </h4>
+                      <p className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-[13px] text-slate-600 leading-relaxed dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
+                        {selected.abstract}
+                      </p>
+                    </div>
+                  )}
                 </>
               )}
 
@@ -214,21 +239,31 @@ export function ProposalsDrawer() {
                   </h4>
                   <div className="flex items-center gap-4 rounded-lg border border-blue-100 bg-blue-50/50 p-3.5 dark:border-blue-900/30 dark:bg-blue-900/10">
                     <Avatar className="h-10 w-10 border-2 border-blue-200 dark:border-blue-800">
-                      <AvatarFallback className={`font-bold text-xs ${selected.piColor}`}>
-                        {selected.piAvatar}
+                      <AvatarFallback className="bg-blue-100 font-bold text-blue-700 text-xs">
+                        {details.pi.name.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex min-w-0 flex-col">
-                      <span className="font-bold text-slate-900 text-sm dark:text-slate-100">{selected.pi}</span>
+                      <span className="font-bold text-slate-900 text-sm dark:text-slate-100">{details.pi.name}</span>
                       <span className="font-semibold text-blue-600 text-xs dark:text-blue-400">
                         Principal Investigator
                       </span>
                     </div>
                     <Badge className="ml-auto shrink-0 border-0 bg-blue-600 text-[10px] text-white">PI</Badge>
                   </div>
-                  <p className="rounded-lg border border-slate-200 border-dashed py-6 text-center text-slate-400 text-xs italic dark:border-slate-700">
-                    Full team details will appear here once connected to the backend.
-                  </p>
+                  {details.team.map((member) => (
+                    <div key={member.id} className="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-3.5 dark:border-slate-800 dark:bg-slate-950">
+                      <Avatar className="h-10 w-10">
+                        <AvatarFallback className="bg-slate-100 font-bold text-slate-600 text-xs">
+                          {member.name.slice(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex min-w-0 flex-col">
+                        <span className="font-bold text-slate-900 text-sm dark:text-slate-100">{member.name}</span>
+                        <span className="font-medium text-slate-500 text-xs">Member</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
 
@@ -256,12 +291,14 @@ export function ProposalsDrawer() {
                         <p className="mb-1 flex items-center gap-1.5 font-bold text-[10px] text-slate-500 uppercase tracking-wider">
                           <Banknote className="h-3.5 w-3.5" /> Total Requested
                         </p>
-                        <p className="font-extrabold text-2xl text-blue-600 dark:text-blue-400">{selected.budget}</p>
+                        <p className="font-extrabold text-2xl text-blue-600 dark:text-blue-400">
+                          {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(details.budget.total)}
+                        </p>
                       </div>
                       <div className="flex flex-col justify-center rounded-xl border border-slate-200/80 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/30">
                         <p className="mb-1 font-bold text-[10px] text-slate-500 uppercase tracking-wider">Status</p>
                         <p className="font-semibold text-[15px] text-slate-800 dark:text-slate-200">
-                          Pending Approval
+                          {details.status.toString().replace("_", " ")}
                         </p>
                       </div>
                     </div>
@@ -283,7 +320,7 @@ export function ProposalsDrawer() {
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100 text-[13px] dark:divide-slate-800/80">
-                            {selected.budgetItems?.map((item, i) => (
+                            {details.budget.items?.map((item, i) => (
                               <tr key={`${item.description}-${i}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20">
                                 <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
                                   {item.description}
@@ -300,11 +337,7 @@ export function ProposalsDrawer() {
                                 Total
                               </td>
                               <td className="px-4 py-3 text-right font-bold text-blue-600 dark:text-blue-400">
-                                {selected.budgetItems?.reduce((acc, curr) => acc + curr.amount, 0)
-                                  ? new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
-                                      selected.budgetItems.reduce((acc, curr) => acc + curr.amount, 0),
-                                    )
-                                  : selected.budget.replace(/[^0-9.]/g, "")}
+                                {new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(details.budget.total)}
                               </td>
                             </tr>
                           </tfoot>
@@ -340,13 +373,13 @@ export function ProposalsDrawer() {
                     />
 
                     <ul className="relative flex flex-col gap-4">
-                      {approvalChain.map((step, idx) => {
-                        const isCompleted = step.state === "completed";
-                        const isCurrent = step.state === "current";
-                        const isUpcoming = step.state === "upcoming";
+                      {details.workflow.steps.map((step, _idx) => {
+                        const isCompleted = step.status === "Accepted";
+                        const isCurrent = step.isActive;
+                        const isUpcoming = step.status === "Pending" && !step.isActive;
 
                         return (
-                          <li key={step.id} className="relative flex gap-4 pl-1">
+                          <li key={`${step.stepOrder}-${step.role}`} className="relative flex gap-4 pl-1">
                             <div
                               className={`relative z-[1] mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 shadow-sm transition-colors ${
                                 isCompleted
@@ -373,15 +406,15 @@ export function ProposalsDrawer() {
                               <div className="flex flex-wrap items-start justify-between gap-2">
                                 <div>
                                   <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider dark:text-slate-500">
-                                    Step {idx + 1} · {step.role}
+                                    Step {step.stepOrder} · {step.role}
                                   </p>
                                   <p className="mt-0.5 font-semibold text-slate-900 text-sm dark:text-slate-100">
-                                    {isCurrent ? "You" : step.approverName}
+                                    {isCurrent ? "You" : step.approverUserId || "Assigned Approver"}
                                   </p>
-                                  {isCompleted && step.approvedAt && (
+                                  {isCompleted && (
                                     <p className="mt-1 flex items-center gap-1 font-medium text-[11px] text-emerald-700 dark:text-emerald-400">
                                       <CheckCircle className="h-3 w-3 shrink-0" />
-                                      Approved · {step.approvedAt}
+                                      Approved
                                     </p>
                                   )}
                                   {isUpcoming && (

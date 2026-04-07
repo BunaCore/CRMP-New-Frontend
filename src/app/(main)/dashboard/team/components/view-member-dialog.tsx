@@ -1,5 +1,5 @@
-/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
-/** biome-ignore-all assist/source/organizeImports: <explanation> */
+/** biome-ignore-all lint/nursery/useSortedClasses: legacy code */
+/** biome-ignore-all assist/source/organizeImports: legacy code */
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
