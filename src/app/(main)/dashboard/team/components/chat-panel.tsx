@@ -101,7 +101,7 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
         <div className="flex items-center gap-3">
           <div className="relative">
             <Avatar className="h-10 w-10">
-              <AvatarFallback className="bg-primary/10 text-primary font-medium">
+              <AvatarFallback className="bg-primary/10 font-medium text-primary">
                 {getInitials(member.name)}
               </AvatarFallback>
             </Avatar>
@@ -141,7 +141,7 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
       {/* Messages Area */}
       <ScrollArea className="flex-1 p-4" ref={scrollRef}>
         <div className="space-y-6">
-          {groupedMessages.map((group, groupIdx) => (
+          {groupedMessages.map((group, _groupIdx) => (
             <div key={group.date}>
               {/* Date Header */}
               <div className="mb-4 flex items-center justify-center">

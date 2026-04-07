@@ -18,7 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { type ChatRoom, type GroupChatMessage, type TeamMember } from "@/lib/team-data"
+import type { ChatRoom, GroupChatMessage, TeamMember } from "@/lib/team-data"
 import {
   Check,
   CheckCheck,
@@ -66,15 +66,14 @@ function formatDateHeader(timestamp: string) {
 
   if (date.toDateString() === today.toDateString()) {
     return "Today"
-  } else if (date.toDateString() === yesterday.toDateString()) {
+  }if (date.toDateString() === yesterday.toDateString()) {
     return "Yesterday"
-  } else {
+  }
     return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
     })
-  }
 }
 
 function getRelativeTime(timestamp: string) {

@@ -169,7 +169,7 @@ export function AddMemberDialog({ open, onOpenChange, onSubmit }: AddMemberDialo
                 value={formData.expertise}
                 onChange={(e) => setFormData({ ...formData, expertise: e.target.value })}
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Enter expertise areas separated by commas
               </p>
             </div>
