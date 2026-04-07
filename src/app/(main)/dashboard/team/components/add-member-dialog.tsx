@@ -1,4 +1,4 @@
-/** biome-ignore-all assist/source/organizeImports: <explanation> */
+/** biome-ignore-all assist/source/organizeImports: legacy code */
 "use client";
 
 import { Button } from "@/components/ui/button";
