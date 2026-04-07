@@ -1,6 +1,7 @@
-"use client"
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,35 +9,29 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Spinner } from "@/components/ui/spinner"
-import { departmentOptions, roleOptions, statusOptions } from "@/lib/team-data"
-import { useState } from "react"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
+import { departmentOptions, roleOptions, statusOptions } from "@/lib/team-data";
+import { useState } from "react";
 
 interface AddMemberDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onSubmit: (data: {
-    name: string
-    email: string
-    role: string
-    department: string
-    status: string
-    expertise: string
-  }) => void
+    name: string;
+    email: string;
+    role: string;
+    department: string;
+    status: string;
+    expertise: string;
+  }) => void;
 }
 
 export function AddMemberDialog({ open, onOpenChange, onSubmit }: AddMemberDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -44,17 +39,17 @@ export function AddMemberDialog({ open, onOpenChange, onSubmit }: AddMemberDialo
     department: "",
     status: "Active",
     expertise: "",
-  })
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    setIsSubmitting(true);
 
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    onSubmit(formData)
-    setIsSubmitting(false)
+    onSubmit(formData);
+    setIsSubmitting(false);
     setFormData({
       name: "",
       email: "",
@@ -62,20 +57,18 @@ export function AddMemberDialog({ open, onOpenChange, onSubmit }: AddMemberDialo
       department: "",
       status: "Active",
       expertise: "",
-    })
-    onOpenChange(false)
-  }
+    });
+    onOpenChange(false);
+  };
 
-  const isFormValid = formData.name && formData.email && formData.role && formData.department
+  const isFormValid = formData.name && formData.email && formData.role && formData.department;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-125">
         <DialogHeader>
           <DialogTitle>Add New Team Member</DialogTitle>
-          <DialogDescription>
-            Add a new researcher to your project team. Fill in the details below.
-          </DialogDescription>
+          <DialogDescription>Add a new researcher to your project team. Fill in the details below.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-5 py-4">
@@ -105,10 +98,7 @@ export function AddMemberDialog({ open, onOpenChange, onSubmit }: AddMemberDialo
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="role">Role</Label>
-                <Select
-                  value={formData.role}
-                  onValueChange={(value) => setFormData({ ...formData, role: value })}
-                >
+                <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
                   <SelectTrigger id="role">
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
@@ -124,10 +114,7 @@ export function AddMemberDialog({ open, onOpenChange, onSubmit }: AddMemberDialo
 
               <div className="grid gap-2">
                 <Label htmlFor="status">Status</Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(value) => setFormData({ ...formData, status: value })}
-                >
+                <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
                   <SelectTrigger id="status">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
@@ -169,18 +156,11 @@ export function AddMemberDialog({ open, onOpenChange, onSubmit }: AddMemberDialo
                 value={formData.expertise}
                 onChange={(e) => setFormData({ ...formData, expertise: e.target.value })}
               />
-              <p className="text-muted-foreground text-xs">
-                Enter expertise areas separated by commas
-              </p>
+              <p className="text-muted-foreground text-xs">Enter expertise areas separated by commas</p>
             </div>
           </div>
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
-            >
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
               Cancel
             </Button>
             <Button type="submit" disabled={!isFormValid || isSubmitting}>
@@ -197,5 +177,5 @@ export function AddMemberDialog({ open, onOpenChange, onSubmit }: AddMemberDialo
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

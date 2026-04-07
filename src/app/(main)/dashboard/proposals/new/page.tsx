@@ -515,8 +515,8 @@ export default function NewProposalPage() {
                               key="current-user-pi"
                               className="flex items-center justify-between rounded-md border border-blue-200 bg-blue-50 p-2 dark:border-blue-800/50 dark:bg-blue-900/20"
                             >
-                              <div className="flex items-center gap-2 flex-1">
-                                <span className="font-medium text-xs text-blue-700 dark:text-blue-300">
+                              <div className="flex flex-1 items-center gap-2">
+                                <span className="font-medium text-blue-700 text-xs dark:text-blue-300">
                                   {user.fullName}
                                 </span>
                                 <Badge className="h-5 bg-blue-600 text-white text-[10px] px-1.5">PI</Badge>

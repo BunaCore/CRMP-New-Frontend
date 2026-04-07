@@ -1,26 +1,33 @@
-"use client"
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
+"use client";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import type { GroupChatMessage, TeamMember } from "@/lib/team-data"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import type { GroupChatMessage, TeamMember } from "@/lib/team-data";
 
 // Legacy ChatMessage type alias for backwards compatibility
 type ChatMessage = Omit<GroupChatMessage, "roomId" | "senderName" | "readBy"> & {
-  senderId: string
-  isRead: boolean
-}
-import { Check, CheckCheck, MoreVertical, Paperclip, Send, Smile, User } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
+  senderId: string;
+  isRead: boolean;
+};
+import { Check, CheckCheck, MoreVertical, Paperclip, Send, Smile, User } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 interface ChatPanelProps {
-  member: TeamMember
-  messages: ChatMessage[]
-  onSendMessage: (content: string) => void
-  onViewProfile: () => void
-  onRemoveMember: () => void
+  member: TeamMember;
+  messages: ChatMessage[];
+  onSendMessage: (content: string) => void;
+  onViewProfile: () => void;
+  onRemoveMember: () => void;
 }
 
 function getInitials(name: string) {
@@ -29,70 +36,70 @@ function getInitials(name: string) {
     .map((n) => n[0])
     .join("")
     .toUpperCase()
-    .slice(0, 2)
+    .slice(0, 2);
 }
 
 function formatTime(timestamp: string) {
-  const date = new Date(timestamp)
-  return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
+  const date = new Date(timestamp);
+  return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 }
 
 function formatDateHeader(timestamp: string) {
-  const date = new Date(timestamp)
-  const today = new Date()
-  const yesterday = new Date(today)
-  yesterday.setDate(yesterday.getDate() - 1)
+  const date = new Date(timestamp);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
 
   if (date.toDateString() === today.toDateString()) {
-    return "Today"
+    return "Today";
   }
   if (date.toDateString() === yesterday.toDateString()) {
-    return "Yesterday"
+    return "Yesterday";
   }
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
 export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRemoveMember }: ChatPanelProps) {
-  const [inputValue, setInputValue] = useState("")
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [inputValue, setInputValue] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    inputRef.current?.focus()
-  }, [])
+    inputRef.current?.focus();
+  }, []);
 
   const handleSend = () => {
     if (inputValue.trim()) {
-      onSendMessage(inputValue.trim())
-      setInputValue("")
+      onSendMessage(inputValue.trim());
+      setInputValue("");
     }
-  }
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
+      e.preventDefault();
+      handleSend();
     }
-  }
+  };
 
   // Group messages by date
-  const groupedMessages: { date: string; messages: ChatMessage[] }[] = []
-  let currentDate = ""
+  const groupedMessages: { date: string; messages: ChatMessage[] }[] = [];
+  let currentDate = "";
   messages.forEach((msg) => {
-    const msgDate = new Date(msg.timestamp).toDateString()
+    const msgDate = new Date(msg.timestamp).toDateString();
     if (msgDate !== currentDate) {
-      currentDate = msgDate
-      groupedMessages.push({ date: msg.timestamp, messages: [msg] })
+      currentDate = msgDate;
+      groupedMessages.push({ date: msg.timestamp, messages: [msg] });
     } else {
-      groupedMessages[groupedMessages.length - 1].messages.push(msg)
+      groupedMessages[groupedMessages.length - 1].messages.push(msg);
     }
-  })
+  });
 
   return (
     <div className="flex h-full flex-col bg-card">
@@ -152,12 +159,9 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
               {/* Messages */}
               <div className="space-y-3">
                 {group.messages.map((message) => {
-                  const isSent = message.senderId === "current"
+                  const isSent = message.senderId === "current";
                   return (
-                    <div
-                      key={message.id}
-                      className={`flex ${isSent ? "justify-end" : "justify-start"}`}
-                    >
+                    <div key={message.id} className={`flex ${isSent ? "justify-end" : "justify-start"}`}>
                       <div
                         className={`group max-w-[75%] rounded-2xl px-4 py-2 ${
                           isSent
@@ -172,17 +176,12 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
                           }`}
                         >
                           <span>{formatTime(message.timestamp)}</span>
-                          {isSent && (
-                            message.isRead ? (
-                              <CheckCheck className="h-3 w-3" />
-                            ) : (
-                              <Check className="h-3 w-3" />
-                            )
-                          )}
+                          {isSent &&
+                            (message.isRead ? <CheckCheck className="h-3 w-3" /> : <Check className="h-3 w-3" />)}
                         </div>
                       </div>
                     </div>
-                  )
+                  );
                 })}
               </div>
             </div>
@@ -206,11 +205,7 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
               placeholder="Type a message..."
               className="pr-10"
             />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="-translate-y-1/2 absolute top-1/2 right-1 h-7 w-7"
-            >
+            <Button variant="ghost" size="icon" className="-translate-y-1/2 absolute top-1/2 right-1 h-7 w-7">
               <Smile className="h-4 w-4 text-muted-foreground" />
               <span className="sr-only">Add emoji</span>
             </Button>
@@ -222,5 +217,5 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
         </div>
       </div>
     </div>
-  )
+  );
 }

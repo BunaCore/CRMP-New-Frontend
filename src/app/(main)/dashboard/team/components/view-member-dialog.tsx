@@ -1,8 +1,10 @@
-"use client"
+/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
+"use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,44 +12,44 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Separator } from "@/components/ui/separator"
-import type { TeamMember } from "@/lib/team-data"
-import { Building2, Calendar, Mail, Sparkles } from "lucide-react"
+} from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+import type { TeamMember } from "@/lib/team-data";
+import { Building2, Calendar, Mail, Sparkles } from "lucide-react";
 
 interface ViewMemberDialogProps {
-  member: TeamMember | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  member: TeamMember | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 function getStatusColor(status: TeamMember["status"]) {
   switch (status) {
     case "Active":
-      return "bg-emerald-500/15 text-emerald-700 border-emerald-500/20"
+      return "bg-emerald-500/15 text-emerald-700 border-emerald-500/20";
     case "Inactive":
-      return "bg-gray-500/15 text-gray-700 border-gray-500/20"
+      return "bg-gray-500/15 text-gray-700 border-gray-500/20";
     case "Pending":
-      return "bg-amber-500/15 text-amber-700 border-amber-500/20"
+      return "bg-amber-500/15 text-amber-700 border-amber-500/20";
     default:
-      return "bg-gray-500/15 text-gray-700"
+      return "bg-gray-500/15 text-gray-700";
   }
 }
 
 function getRoleBadgeVariant(role: TeamMember["role"]) {
   switch (role) {
     case "Principal Investigator":
-      return "bg-blue-500/15 text-blue-700 border-blue-500/20"
+      return "bg-blue-500/15 text-blue-700 border-blue-500/20";
     case "Co-Investigator":
-      return "bg-indigo-500/15 text-indigo-700 border-indigo-500/20"
+      return "bg-indigo-500/15 text-indigo-700 border-indigo-500/20";
     case "Research Assistant":
-      return "bg-teal-500/15 text-teal-700 border-teal-500/20"
+      return "bg-teal-500/15 text-teal-700 border-teal-500/20";
     case "Graduate Student":
-      return "bg-cyan-500/15 text-cyan-700 border-cyan-500/20"
+      return "bg-cyan-500/15 text-cyan-700 border-cyan-500/20";
     case "Postdoctoral Fellow":
-      return "bg-rose-500/15 text-rose-700 border-rose-500/20"
+      return "bg-rose-500/15 text-rose-700 border-rose-500/20";
     default:
-      return "bg-gray-500/15 text-gray-700"
+      return "bg-gray-500/15 text-gray-700";
   }
 }
 
@@ -57,15 +59,15 @@ function getInitials(name: string) {
     .map((n) => n[0])
     .join("")
     .toUpperCase()
-    .slice(0, 2)
+    .slice(0, 2);
 }
 
 export function ViewMemberDialog({ member, open, onOpenChange }: ViewMemberDialogProps) {
-  if (!member) return null
+  if (!member) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="sm:max-w-120">
         <DialogHeader className="pb-4">
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16 border-2 border-background shadow-md">
@@ -118,7 +120,7 @@ export function ViewMemberDialog({ member, open, onOpenChange }: ViewMemberDialo
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Joined Date</p>
+              <p className="text-muted-foreground text-xs">Joined Date</p>
               <p className="text-foreground">
                 {new Date(member.joinedAt).toLocaleDateString("en-US", {
                   year: "numeric",
@@ -161,5 +163,5 @@ export function ViewMemberDialog({ member, open, onOpenChange }: ViewMemberDialo
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
