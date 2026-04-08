@@ -14,12 +14,15 @@ import {
   Clock,
   FileText,
   GraduationCap,
+  Loader2,
   Send,
   ShieldCheck,
   Sparkles,
   UserCheck,
   Users,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { Can, hasPermission } from "@/access-control/permission-gates";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -32,6 +35,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Progress } from "@/components/ui/progress";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { submitEvaluationScores } from "@/lib/api/proposals/mutations";
+import { fetchProposalEvaluations, getProposalMembers } from "@/lib/api/proposals/queries";
+import type { EvaluationRubric } from "@/lib/api/proposals/types";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -39,6 +45,12 @@ import { formatPeopleList } from "../../proposals/_components/proposals-table";
 import { getApprovalChain } from "../../proposals/_data/mock-proposals";
 import { useEvaluations } from "../evaluations-context";
 import { STATUS_STYLES } from "./evaluations-tabs";
+
+// Draft score state keyed by rubricId
+interface DraftScore {
+  score: number;
+  feedback: string;
+}
 
 export function EvaluationDrawer() {
   const {
@@ -78,6 +90,84 @@ export function EvaluationDrawer() {
   const userPerms = user?.permissions ?? [];
   const canScheduleDefence = hasPermission(userPerms, "DEFENCE_SCHEDULE");
   const canViewBudget = hasPermission(userPerms, "BUDGET_VIEW");
+
+  // ── Evaluations API state ────────────────────────────────────────────────────
+  const [apiRubrics, setApiRubrics] = useState<EvaluationRubric[]>([]);
+  const [draftScores, setDraftScores] = useState<Record<string, DraftScore>>({});
+  const [scoresLoading, setScoresLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const activeId = drawerKind === "proposal" ? activeProposal?.id : activeProject?.id;
+
+  // Fetch rubrics when the scores tab opens
+  useEffect(() => {
+    if (drawerTab !== "scores" || !activeId) return;
+
+    setScoresLoading(true);
+    fetchProposalEvaluations(activeId)
+      .then((data) => {
+        setApiRubrics(data.rubrics);
+        // Pre-fill draft scores from first awardedScore per rubric
+        const prefilled: Record<string, DraftScore> = {};
+        for (const rubric of data.rubrics) {
+          const existing = rubric.awardedScores[0];
+          prefilled[rubric.id] = {
+            score: existing?.score ?? 0,
+            feedback: existing?.feedback ?? "",
+          };
+        }
+        setDraftScores(prefilled);
+      })
+      .catch(() => {
+        toast.error("Failed to load evaluation rubrics.");
+      })
+      .finally(() => setScoresLoading(false));
+  }, [drawerTab, activeId]);
+
+  // Filter rubrics by the current drawer phase
+  const phaseFilter = drawerKind === "proposal" ? "PROPOSAL" : "PROJECT";
+  const filteredApiRubrics = apiRubrics.filter((r) => r.phase === phaseFilter);
+
+  // Compute aggregate from filtered api rubrics using draft scores
+  const apiAggregate = filteredApiRubrics.reduce(
+    (acc, r) => {
+      acc.earned += draftScores[r.id]?.score ?? 0;
+      acc.max += r.maxPoints;
+      return acc;
+    },
+    { earned: 0, max: 0 },
+  );
+
+  async function handleSubmitScores() {
+    if (!activeId) return;
+    setIsSubmitting(true);
+    try {
+      // Step 1: fetch the real member user IDs for this proposal
+      const members = await getProposalMembers(activeId);
+      if (members.length === 0) {
+        toast.error("No members found for this proposal. Cannot submit scores.");
+        return;
+      }
+
+      // Step 2: for each rubric, replicate the same score for every member (group scoring)
+      const scores = filteredApiRubrics.flatMap((rubric) =>
+        members.map((member) => ({
+          rubricId: rubric.id,
+          studentId: member.userId,
+          score: draftScores[rubric.id]?.score ?? 0,
+          feedback: draftScores[rubric.id]?.feedback ?? "",
+          projectId: drawerKind === "project" ? activeId : null,
+        })),
+      );
+
+      await submitEvaluationScores(activeId, { scores });
+      toast.success("Evaluation scores submitted successfully!");
+    } catch {
+      toast.error("Failed to submit scores. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   const drawerTitle = drawerKind === "proposal" ? activeProposal?.title : activeProject?.title;
   const drawerSubtitle =
@@ -383,85 +473,197 @@ export function EvaluationDrawer() {
               {/* ── TAB: SCORES ── */}
               {drawerTab === "scores" && (
                 <div className="flex flex-col gap-4">
+                  {/* Header row */}
                   <div className="flex flex-wrap items-end justify-between gap-3">
                     <div>
                       <h3 className="font-bold text-slate-900 text-sm dark:text-slate-100">Evaluation rubric</h3>
                       <p className="mt-0.5 text-slate-500 text-xs">
-                        Each row shows component type, cap, and awarded points. Adjust demo scores to preview totals.
+                        {drawerKind === "proposal" ? "Proposal phase" : "Project phase"} rubrics · adjust scores and submit.
                       </p>
                     </div>
-                    <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 dark:border-indigo-900/50 dark:bg-indigo-950/40">
-                      <p className="font-bold text-[10px] text-indigo-800 uppercase tracking-wider dark:text-indigo-300">
-                        Aggregate
-                      </p>
-                      <p className="font-black text-indigo-900 text-lg tabular-nums dark:text-indigo-100">
-                        {totals.earned.toFixed(2)}{" "}
-                        <span className="font-semibold text-slate-500 text-sm">/ {totals.max}</span>
-                      </p>
-                    </div>
+                    {!scoresLoading && filteredApiRubrics.length > 0 && (
+                      <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 dark:border-indigo-900/50 dark:bg-indigo-950/40">
+                        <p className="font-bold text-[10px] text-indigo-800 uppercase tracking-wider dark:text-indigo-300">
+                          Aggregate
+                        </p>
+                        <p className="font-black text-indigo-900 text-lg tabular-nums dark:text-indigo-100">
+                          {apiAggregate.earned.toFixed(2)}{" "}
+                          <span className="font-semibold text-slate-500 text-sm">/ {apiAggregate.max}</span>
+                        </p>
+                      </div>
+                    )}
+                    {/* Fallback: no API data yet — show local mock totals */}
+                    {!scoresLoading && filteredApiRubrics.length === 0 && (
+                      <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 dark:border-indigo-900/50 dark:bg-indigo-950/40">
+                        <p className="font-bold text-[10px] text-indigo-800 uppercase tracking-wider dark:text-indigo-300">
+                          Aggregate
+                        </p>
+                        <p className="font-black text-indigo-900 text-lg tabular-nums dark:text-indigo-100">
+                          {totals.earned.toFixed(2)}{" "}
+                          <span className="font-semibold text-slate-500 text-sm">/ {totals.max}</span>
+                        </p>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex flex-col gap-3">
-                    {rubric.map((row, i) => {
-                      const pct = row.max > 0 ? (row.score / row.max) * 100 : 0;
-                      return (
-                        <div
-                          key={row.order}
-                          className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-slate-800 dark:bg-slate-950"
-                        >
-                          <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-indigo-500 to-violet-500 opacity-80" />
-                          <div className="flex flex-col gap-3 pl-2 sm:flex-row sm:items-center sm:justify-between">
-                            <div className="flex min-w-0 items-start gap-3">
-                              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 font-black text-indigo-600 text-sm dark:bg-slate-800 dark:text-indigo-400">
-                                {row.order}
-                              </span>
-                              <div className="min-w-0">
-                                <p className="font-bold text-slate-900 text-sm dark:text-slate-100">{row.name}</p>
-                                <div className="mt-1 flex flex-wrap items-center gap-2">
-                                  <Badge
-                                    variant="outline"
-                                    className="border-slate-200 font-semibold text-[10px] uppercase dark:border-slate-700"
-                                  >
-                                    {row.kind}
-                                  </Badge>
-                                  <span className="font-medium text-[11px] text-slate-500">Max {row.max} pts</span>
+
+                  {/* Loading skeleton */}
+                  {scoresLoading && (
+                    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 py-12 dark:border-slate-800 dark:bg-slate-900/30">
+                      <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+                      <p className="text-slate-500 text-xs">Loading rubrics from server…</p>
+                    </div>
+                  )}
+
+                  {/* API rubrics (real data) */}
+                  {!scoresLoading && filteredApiRubrics.length > 0 && (
+                    <div className="flex flex-col gap-3">
+                      {filteredApiRubrics.map((row, i) => {
+                        const draft = draftScores[row.id] ?? { score: 0, feedback: "" };
+                        const pct = row.maxPoints > 0 ? (draft.score / row.maxPoints) * 100 : 0;
+                        return (
+                          <div
+                            key={row.id}
+                            className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-slate-800 dark:bg-slate-950"
+                          >
+                            <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-indigo-500 to-violet-500 opacity-80" />
+                            <div className="flex flex-col gap-3 pl-2 sm:flex-row sm:items-center sm:justify-between">
+                              <div className="flex min-w-0 items-start gap-3">
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 font-black text-indigo-600 text-sm dark:bg-slate-800 dark:text-indigo-400">
+                                  {i + 1}
+                                </span>
+                                <div className="min-w-0">
+                                  <p className="font-bold text-slate-900 text-sm dark:text-slate-100">{row.name}</p>
+                                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                                    <Badge
+                                      variant="outline"
+                                      className="border-slate-200 font-semibold text-[10px] uppercase dark:border-slate-700"
+                                    >
+                                      {row.type}
+                                    </Badge>
+                                    <span className="font-medium text-[11px] text-slate-500">Max {row.maxPoints} pts</span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                            <div className="flex w-full flex-col gap-2 sm:w-52">
-                              <div className="flex items-baseline justify-between gap-2">
-                                <span className="font-bold text-slate-500 text-xs">Result</span>
-                                <span className="font-black text-indigo-700 text-lg tabular-nums dark:text-indigo-300">
-                                  {row.score}
-                                  <span className="font-semibold text-slate-400 text-sm"> / {row.max}</span>
-                                </span>
+                              <div className="flex w-full flex-col gap-2 sm:w-52">
+                                <div className="flex items-baseline justify-between gap-2">
+                                  <span className="font-bold text-slate-500 text-xs">Result</span>
+                                  <span className="font-black text-indigo-700 text-lg tabular-nums dark:text-indigo-300">
+                                    {draft.score.toFixed(2)}
+                                    <span className="font-semibold text-slate-400 text-sm"> / {row.maxPoints}</span>
+                                  </span>
+                                </div>
+                                <Progress value={pct} className="h-2 bg-slate-100 dark:bg-slate-800" />
                               </div>
-                              <Progress value={pct} className="h-2 bg-slate-100 dark:bg-slate-800" />
+                            </div>
+                            {/* Score + Feedback inputs */}
+                            <div className="mt-3 flex flex-col gap-2 pl-2 sm:pl-12">
+                              <div className="flex items-center gap-2">
+                                <Label className="w-14 shrink-0 font-semibold text-[11px] text-slate-500">Score</Label>
+                                <Input
+                                  type="number"
+                                  step="0.01"
+                                  min={0}
+                                  max={row.maxPoints}
+                                  className="h-8 max-w-[120px] font-mono text-sm"
+                                  value={draft.score}
+                                  onChange={(e) => {
+                                    const v = Number.parseFloat(e.target.value);
+                                    if (Number.isNaN(v)) return;
+                                    setDraftScores((prev) => ({
+                                      ...prev,
+                                      [row.id]: { ...prev[row.id], score: Math.min(row.maxPoints, Math.max(0, v)) },
+                                    }));
+                                  }}
+                                />
+                              </div>
+                              <div className="flex items-start gap-2">
+                                <Label className="mt-1.5 w-14 shrink-0 font-semibold text-[11px] text-slate-500">Note</Label>
+                                <Textarea
+                                  className="min-h-[60px] resize-none rounded-lg text-[12px] dark:bg-slate-900"
+                                  placeholder="Optional feedback…"
+                                  value={draft.feedback}
+                                  onChange={(e) =>
+                                    setDraftScores((prev) => ({
+                                      ...prev,
+                                      [row.id]: { ...prev[row.id], feedback: e.target.value },
+                                    }))
+                                  }
+                                />
+                              </div>
                             </div>
                           </div>
-                          <div className="mt-3 flex items-center gap-2 pl-2 sm:pl-12">
-                            <Label className="w-14 shrink-0 font-semibold text-[11px] text-slate-500">Edit</Label>
-                            <Input
-                              type="number"
-                              step="0.01"
-                              min={0}
-                              max={row.max}
-                              className="h-8 max-w-[120px] font-mono text-sm"
-                              value={row.score}
-                              onChange={(e) => {
-                                const v = Number.parseFloat(e.target.value);
-                                if (Number.isNaN(v)) return;
-                                setRubric((prev) =>
-                                  prev.map((r, idx) =>
-                                    idx === i ? { ...r, score: Math.min(r.max, Math.max(0, v)) } : r,
-                                  ),
-                                );
-                              }}
-                            />
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Fallback: no API data — show local mock rubric (read-only preview) */}
+                  {!scoresLoading && filteredApiRubrics.length === 0 && (
+                    <div className="flex flex-col gap-3">
+                      {rubric.map((row, i) => {
+                        const pct = row.max > 0 ? (row.score / row.max) * 100 : 0;
+                        return (
+                          <div
+                            key={row.order}
+                            className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-slate-800 dark:bg-slate-950"
+                          >
+                            <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-indigo-500 to-violet-500 opacity-80" />
+                            <div className="flex flex-col gap-3 pl-2 sm:flex-row sm:items-center sm:justify-between">
+                              <div className="flex min-w-0 items-start gap-3">
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 font-black text-indigo-600 text-sm dark:bg-slate-800 dark:text-indigo-400">
+                                  {row.order}
+                                </span>
+                                <div className="min-w-0">
+                                  <p className="font-bold text-slate-900 text-sm dark:text-slate-100">{row.name}</p>
+                                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                                    <Badge
+                                      variant="outline"
+                                      className="border-slate-200 font-semibold text-[10px] uppercase dark:border-slate-700"
+                                    >
+                                      {row.kind}
+                                    </Badge>
+                                    <span className="font-medium text-[11px] text-slate-500">Max {row.max} pts</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex w-full flex-col gap-2 sm:w-52">
+                                <div className="flex items-baseline justify-between gap-2">
+                                  <span className="font-bold text-slate-500 text-xs">Result</span>
+                                  <span className="font-black text-indigo-700 text-lg tabular-nums dark:text-indigo-300">
+                                    {row.score}
+                                    <span className="font-semibold text-slate-400 text-sm"> / {row.max}</span>
+                                  </span>
+                                </div>
+                                <Progress value={pct} className="h-2 bg-slate-100 dark:bg-slate-800" />
+                              </div>
+                            </div>
+                            <div className="mt-3 flex items-center gap-2 pl-2 sm:pl-12">
+                              <Label className="w-14 shrink-0 font-semibold text-[11px] text-slate-500">Edit</Label>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                min={0}
+                                max={row.max}
+                                className="h-8 max-w-[120px] font-mono text-sm"
+                                value={row.score}
+                                onChange={(e) => {
+                                  const v = Number.parseFloat(e.target.value);
+                                  if (Number.isNaN(v)) return;
+                                  setRubric((prev) =>
+                                    prev.map((r, idx) =>
+                                      idx === i ? { ...r, score: Math.min(r.max, Math.max(0, v)) } : r,
+                                    ),
+                                  );
+                                }}
+                              />
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Submit button */}
                   <div className="mt-4 flex items-center justify-end">
                     <Can
                       permission="EVALUATION_SCORE_SUBMIT"
@@ -474,9 +676,15 @@ export function EvaluationDrawer() {
                       <Button
                         type="button"
                         className="h-10 bg-indigo-600 font-semibold text-white shadow hover:bg-indigo-700"
+                        disabled={isSubmitting || scoresLoading || filteredApiRubrics.length === 0}
+                        onClick={handleSubmitScores}
                       >
-                        <Send className="mr-1.5 h-4 w-4" />
-                        Submit Evaluation Scores
+                        {isSubmitting ? (
+                          <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Send className="mr-1.5 h-4 w-4" />
+                        )}
+                        {isSubmitting ? "Submitting…" : "Submit Evaluation Scores"}
                       </Button>
                     </Can>
                   </div>

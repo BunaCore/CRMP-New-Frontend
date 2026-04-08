@@ -20,6 +20,8 @@ import type {
   Workflow,
   PendingApproval,
   AdminProposalDetail,
+  GetEvaluationsResponse,
+  ProposalMemberEntry,
 } from "@/lib/api/proposals/types";
 
 // ─── Null-safety normalization ─────────────────────────────────────────────────
@@ -93,5 +95,25 @@ export async function getAdminProposalDetails(id: string): Promise<AdminProposal
   const { apiClient } = await import("@/lib/api/client");
   const response = await apiClient.get<AdminProposalDetail>(`/proposals/${id}`);
   return response.data;
+}
+
+/**
+ * Fetch evaluations and rubrics for a specific proposal
+ * GET /proposals/:id/evaluations
+ */
+export async function fetchProposalEvaluations(proposalId: string): Promise<GetEvaluationsResponse> {
+  const { apiClient } = await import("@/lib/api/client");
+  const response = await apiClient.get<GetEvaluationsResponse>(`/proposals/${proposalId}/evaluations`);
+  return response.data;
+}
+
+/**
+ * Fetch all members (PI + team) for a proposal
+ * GET /proposals/:id/all-members
+ */
+export async function getProposalMembers(proposalId: string): Promise<ProposalMemberEntry[]> {
+  const { apiClient } = await import("@/lib/api/client");
+  const response = await apiClient.get<ProposalMemberEntry[]>(`/proposals/${proposalId}/all-members`);
+  return Array.isArray(response.data) ? response.data : [];
 }
 
