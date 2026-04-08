@@ -260,9 +260,7 @@ export function ProposalsDrawer() {
                       </div>
                       <div className="flex flex-col justify-center rounded-xl border border-slate-200/80 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/30">
                         <p className="mb-1 font-bold text-[10px] text-slate-500 uppercase tracking-wider">Status</p>
-                        <p className="font-semibold text-[15px] text-slate-800 dark:text-slate-200">
-                          Pending Approval
-                        </p>
+                        <p className="font-semibold text-[15px] text-slate-800 dark:text-slate-200">Pending Approval</p>
                       </div>
                     </div>
 
@@ -284,26 +282,29 @@ export function ProposalsDrawer() {
                           </thead>
                           <tbody className="divide-y divide-slate-100 text-[13px] dark:divide-slate-800/80">
                             {selected.budgetItems?.map((item, i) => (
-                              <tr key={`${item.description}-${i}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20">
-                                <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
-                                  {item.description}
-                                </td>
+                              <tr
+                                key={`${item.description}-${i}`}
+                                className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20"
+                              >
+                                <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{item.description}</td>
                                 <td className="px-4 py-3 text-right font-medium text-slate-800 dark:text-slate-200">
-                                  {new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(item.amount)}
+                                  {new Intl.NumberFormat("en-US", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }).format(item.amount)}
                                 </td>
                               </tr>
                             ))}
                           </tbody>
                           <tfoot className="bg-slate-50 dark:bg-slate-900/50">
                             <tr>
-                              <td className="px-4 py-3 font-bold text-slate-900 dark:text-slate-100">
-                                Total
-                              </td>
+                              <td className="px-4 py-3 font-bold text-slate-900 dark:text-slate-100">Total</td>
                               <td className="px-4 py-3 text-right font-bold text-blue-600 dark:text-blue-400">
                                 {selected.budgetItems?.reduce((acc, curr) => acc + curr.amount, 0)
-                                  ? new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
-                                      selected.budgetItems.reduce((acc, curr) => acc + curr.amount, 0),
-                                    )
+                                  ? new Intl.NumberFormat("en-US", {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2,
+                                    }).format(selected.budgetItems.reduce((acc, curr) => acc + curr.amount, 0))
                                   : selected.budget.replace(/[^0-9.]/g, "")}
                               </td>
                             </tr>

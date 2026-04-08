@@ -82,20 +82,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const filteredNavGroups = isLoading
     ? []
     : sidebarItems
-      .map((group) => ({
-        ...group,
-        items: group.items.filter((item) => {
-          const required = DASHBOARD_SIDEBAR_PERMISSION_RULES[item.url];
-          // Unknown routes are treated as hidden (principle of least privilege).
-          if (!required || required.length === 0) {
-            return SIDEBAR_UNCONFIGURED_ROUTES_VISIBILITY === "visible";
-          }
+        .map((group) => ({
+          ...group,
+          items: group.items.filter((item) => {
+            const required = DASHBOARD_SIDEBAR_PERMISSION_RULES[item.url];
+            // Unknown routes are treated as hidden (principle of least privilege).
+            if (!required || required.length === 0) {
+              return SIDEBAR_UNCONFIGURED_ROUTES_VISIBILITY === "visible";
+            }
 
-          // Sidebar visibility uses OR semantics: show if the user has any required permission.
-          return required.some((p) => hasPermission(user?.permissions ?? [], p));
-        }),
-      }))
-      .filter((group) => group.items.length > 0);
+            // Sidebar visibility uses OR semantics: show if the user has any required permission.
+            return required.some((p) => hasPermission(user?.permissions ?? [], p));
+          }),
+        }))
+        .filter((group) => group.items.length > 0);
 
   return (
     <Sidebar {...props} variant={variant} collapsible={collapsible}>

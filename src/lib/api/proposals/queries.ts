@@ -41,9 +41,7 @@ function normalizeProposal(raw: any): ResearcherProposal {
     team: Array.isArray(raw?.team) ? (raw.team as TeamMember[]) : [],
     workflow: (raw?.workflow ?? { currentStepOrder: 0, steps: [] }) as Workflow,
     comments: Array.isArray(raw?.comments) ? (raw.comments as ProposalComment[]) : [],
-    defenceSchedules: Array.isArray(raw?.defenceSchedules)
-      ? (raw.defenceSchedules as DefenceSchedule[])
-      : [],
+    defenceSchedules: Array.isArray(raw?.defenceSchedules) ? (raw.defenceSchedules as DefenceSchedule[]) : [],
     createdAt: raw?.createdAt ?? "",
   };
 }
@@ -70,4 +68,3 @@ export async function getMyProposals(): Promise<ResearcherProposal[]> {
   const raw = Array.isArray(response.data) ? response.data : [];
   return raw.map(normalizeProposal);
 }
-

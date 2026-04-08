@@ -241,7 +241,7 @@ export function EvaluationDrawer() {
                             <p className="font-bold text-[13px] leading-tight">Assign Evaluators</p>
                             <p className="mt-0.5 line-clamp-2 font-medium text-[11px] text-blue-700/80 dark:text-blue-400/80">
                               {(activeProposal as { evaluators?: string[] })?.evaluators?.length
-                                ? `${(activeProposal as { evaluators?: string[] })?.evaluators?.length} assigned: ${formatPeopleList(((activeProposal as { evaluators?: string[] })?.evaluators) || [], 3)}`
+                                ? `${(activeProposal as { evaluators?: string[] })?.evaluators?.length} assigned: ${formatPeopleList((activeProposal as { evaluators?: string[] })?.evaluators || [], 3)}`
                                 : "No evaluators assigned"}
                             </p>
                           </div>
@@ -270,7 +270,7 @@ export function EvaluationDrawer() {
                             <p className="font-bold text-[13px] leading-tight">Assign Advisor</p>
                             <p className="mt-0.5 line-clamp-2 font-medium text-[11px] text-violet-700/80 dark:text-violet-400/80">
                               {(activeProposal as { advisors?: string[] })?.advisors?.length
-                                ? `${(activeProposal as { advisors?: string[] })?.advisors?.length} assigned: ${formatPeopleList(((activeProposal as { advisors?: string[] })?.advisors) || [], 3)}`
+                                ? `${(activeProposal as { advisors?: string[] })?.advisors?.length} assigned: ${formatPeopleList((activeProposal as { advisors?: string[] })?.advisors || [], 3)}`
                                 : "No advisors assigned"}
                             </p>
                           </div>
@@ -349,28 +349,44 @@ export function EvaluationDrawer() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 text-[13px] dark:divide-slate-800/80">
-                          {(drawerKind === "proposal" ? activeProposal?.budgetItems : activeProject?.budgetItems)?.map((item, i) => (
-                            <tr key={`${item.description}-${i}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20">
-                              <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
-                                {item.description}
-                              </td>
-                              <td className="px-4 py-3 text-right font-medium text-slate-800 dark:text-slate-200">
-                                {new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(item.amount)}
-                              </td>
-                            </tr>
-                          ))}
+                          {(drawerKind === "proposal" ? activeProposal?.budgetItems : activeProject?.budgetItems)?.map(
+                            (item, i) => (
+                              <tr
+                                key={`${item.description}-${i}`}
+                                className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20"
+                              >
+                                <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{item.description}</td>
+                                <td className="px-4 py-3 text-right font-medium text-slate-800 dark:text-slate-200">
+                                  {new Intl.NumberFormat("en-US", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }).format(item.amount)}
+                                </td>
+                              </tr>
+                            ),
+                          )}
                         </tbody>
                         <tfoot className="bg-slate-50 dark:bg-slate-900/50">
                           <tr>
-                            <td className="px-4 py-3 font-bold text-slate-900 dark:text-slate-100">
-                              Total
-                            </td>
+                            <td className="px-4 py-3 font-bold text-slate-900 dark:text-slate-100">Total</td>
                             <td className="px-4 py-3 text-right font-bold text-indigo-600 dark:text-indigo-400">
-                              {(drawerKind === "proposal" ? activeProposal : activeProject)?.budgetItems?.reduce((acc, curr) => acc + curr.amount, 0)
-                                ? new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
-                                  (drawerKind === "proposal" ? activeProposal : activeProject)?.budgetItems?.reduce((acc, curr) => acc + curr.amount, 0) ?? 0,
-                                )
-                                : (drawerKind === "proposal" ? activeProposal?.budget : activeProject?.budget)?.replace(/[^0-9.]/g, "")}
+                              {(drawerKind === "proposal" ? activeProposal : activeProject)?.budgetItems?.reduce(
+                                (acc, curr) => acc + curr.amount,
+                                0,
+                              )
+                                ? new Intl.NumberFormat("en-US", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }).format(
+                                    (drawerKind === "proposal" ? activeProposal : activeProject)?.budgetItems?.reduce(
+                                      (acc, curr) => acc + curr.amount,
+                                      0,
+                                    ) ?? 0,
+                                  )
+                                : (drawerKind === "proposal" ? activeProposal?.budget : activeProject?.budget)?.replace(
+                                    /[^0-9.]/g,
+                                    "",
+                                  )}
                             </td>
                           </tr>
                         </tfoot>
@@ -636,14 +652,15 @@ export function EvaluationDrawer() {
                         return (
                           <li key={step.id} className="relative flex gap-4 pl-1">
                             <div
-                              className={`relative z-[1] mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 shadow-sm transition-colors ${isCompleted
-                                ? "border-emerald-200 bg-emerald-500 text-white dark:border-emerald-800 dark:bg-emerald-600"
-                                : isRejectedHere
-                                  ? "border-rose-200 bg-rose-500 text-white dark:border-rose-800 dark:bg-rose-600"
-                                  : isCurrent
-                                    ? "border-indigo-300 bg-indigo-600 text-white ring-4 ring-indigo-500/20 dark:border-indigo-500 dark:bg-indigo-600 dark:ring-indigo-500/25"
-                                    : "border-slate-200 bg-slate-100 text-slate-400 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-500"
-                                }`}
+                              className={`relative z-[1] mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 shadow-sm transition-colors ${
+                                isCompleted
+                                  ? "border-emerald-200 bg-emerald-500 text-white dark:border-emerald-800 dark:bg-emerald-600"
+                                  : isRejectedHere
+                                    ? "border-rose-200 bg-rose-500 text-white dark:border-rose-800 dark:bg-rose-600"
+                                    : isCurrent
+                                      ? "border-indigo-300 bg-indigo-600 text-white ring-4 ring-indigo-500/20 dark:border-indigo-500 dark:bg-indigo-600 dark:ring-indigo-500/25"
+                                      : "border-slate-200 bg-slate-100 text-slate-400 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-500"
+                              }`}
                             >
                               {isCompleted && <Check className="h-4 w-4 stroke-[3]" />}
                               {isRejectedHere && <AlertTriangle className="h-4 w-4 stroke-[3]" />}
@@ -652,14 +669,15 @@ export function EvaluationDrawer() {
                             </div>
 
                             <div
-                              className={`min-w-0 flex-1 rounded-2xl border p-4 transition-all ${isCompleted
-                                ? "border-emerald-100 bg-emerald-50/40 dark:border-emerald-900/25 dark:bg-emerald-950/20"
-                                : isRejectedHere
-                                  ? "border-rose-100 bg-rose-50/40 dark:border-rose-900/25 dark:bg-rose-950/20"
-                                  : isCurrent
-                                    ? "border-indigo-200 bg-gradient-to-br from-indigo-50/90 to-white shadow-md dark:border-indigo-900/40 dark:from-indigo-950/30 dark:to-slate-950"
-                                    : "border-slate-100 bg-slate-50/40 opacity-60 dark:border-slate-800 dark:bg-slate-900/20"
-                                }`}
+                              className={`min-w-0 flex-1 rounded-2xl border p-4 transition-all ${
+                                isCompleted
+                                  ? "border-emerald-100 bg-emerald-50/40 dark:border-emerald-900/25 dark:bg-emerald-950/20"
+                                  : isRejectedHere
+                                    ? "border-rose-100 bg-rose-50/40 dark:border-rose-900/25 dark:bg-rose-950/20"
+                                    : isCurrent
+                                      ? "border-indigo-200 bg-gradient-to-br from-indigo-50/90 to-white shadow-md dark:border-indigo-900/40 dark:from-indigo-950/30 dark:to-slate-950"
+                                      : "border-slate-100 bg-slate-50/40 opacity-60 dark:border-slate-800 dark:bg-slate-900/20"
+                              }`}
                             >
                               <div className="flex flex-wrap items-start justify-between gap-2">
                                 <div>

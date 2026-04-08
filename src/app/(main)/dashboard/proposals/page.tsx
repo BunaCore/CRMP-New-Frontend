@@ -150,9 +150,7 @@ export default function ProposalsPage() {
       {/* Header Section */}
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-semibold text-3xl text-slate-900 tracking-tight dark:text-slate-100">
-            My Proposals
-          </h1>
+          <h1 className="font-semibold text-3xl text-slate-900 tracking-tight dark:text-slate-100">My Proposals</h1>
           <p className="mt-1 text-slate-500 text-sm dark:text-slate-400">
             Track and manage all your research proposals in one place.
           </p>
@@ -240,21 +238,13 @@ export default function ProposalsPage() {
                 <Table>
                   <TableHeader className="bg-slate-50/50 dark:bg-slate-900/20">
                     <TableRow className="border-slate-100 hover:bg-transparent dark:border-slate-800">
-                      <TableHead className="h-11 w-[110px] px-6 font-medium text-slate-500">
-                        ID
-                      </TableHead>
-                      <TableHead className="h-11 px-6 font-medium text-slate-500">
-                        Proposal Details
-                      </TableHead>
-                      <TableHead className="h-11 px-6 font-medium text-slate-500">
-                        Status
-                      </TableHead>
+                      <TableHead className="h-11 w-[110px] px-6 font-medium text-slate-500">ID</TableHead>
+                      <TableHead className="h-11 px-6 font-medium text-slate-500">Proposal Details</TableHead>
+                      <TableHead className="h-11 px-6 font-medium text-slate-500">Status</TableHead>
                       <TableHead className="hidden h-11 px-6 font-medium text-slate-500 md:table-cell">
                         Submitted
                       </TableHead>
-                      <TableHead className="h-11 px-6 text-right font-medium text-slate-500">
-                        Actions
-                      </TableHead>
+                      <TableHead className="h-11 px-6 text-right font-medium text-slate-500">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
 
@@ -286,7 +276,8 @@ export default function ProposalsPage() {
                                 {proposal.title}
                               </span>
                               <span className="line-clamp-1 text-slate-500 text-xs">
-                                {proposal.department?.name ?? "—"}{proposal.type ? ` · ${proposal.type}` : ""}
+                                {proposal.department?.name ?? "—"}
+                                {proposal.type ? ` · ${proposal.type}` : ""}
                               </span>
                             </div>
                           </TableCell>

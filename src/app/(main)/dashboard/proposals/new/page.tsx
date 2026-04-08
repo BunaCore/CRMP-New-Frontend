@@ -413,7 +413,9 @@ export default function NewProposalPage() {
                   />
                 </div>
                 <div className="flex flex-col justify-end">
-                  <Label className="mb-2 font-semibold text-slate-700 text-sm dark:text-slate-300">Grant & Funding</Label>
+                  <Label className="mb-2 font-semibold text-slate-700 text-sm dark:text-slate-300">
+                    Grant & Funding
+                  </Label>
                   {/* biome-ignore lint/a11y/useSemanticElements: Nested interactive elements (Switch) prevent using button */}
                   <div
                     role="button"
@@ -718,7 +720,9 @@ export default function NewProposalPage() {
                 <div className="flex items-center gap-6">
                   <div className="hidden h-10 w-px bg-slate-200 sm:block dark:bg-slate-800" />
                   <div className="text-right">
-                    <p className="font-bold text-[10px] text-slate-400 uppercase tracking-widest">Initial Grant Estimate</p>
+                    <p className="font-bold text-[10px] text-slate-400 uppercase tracking-widest">
+                      Initial Grant Estimate
+                    </p>
                     <p className="font-bold text-2xl text-blue-600 dark:text-blue-400">
                       $
                       {calculateTotalBudget().toLocaleString(undefined, {

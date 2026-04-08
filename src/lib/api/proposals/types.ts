@@ -116,13 +116,7 @@ export interface DefenceSchedule {
   createdAt: string; // ISO date
 }
 
-export type ProposalStatus =
-  | "Draft"
-  | "Under_Review"
-  | "Revision"
-  | "Accepted"
-  | "Rejected"
-  | "Pending";
+export type ProposalStatus = "Draft" | "Under_Review" | "Revision" | "Accepted" | "Rejected" | "Pending";
 
 /**
  * Full rich proposal returned by GET /proposals/detail.
