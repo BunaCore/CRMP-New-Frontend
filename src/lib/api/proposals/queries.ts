@@ -8,12 +8,16 @@
  */
 
 import type {
+  AdminProposalDetail,
   Advisor,
   DefenceSchedule,
   Evaluator,
+  GetEvaluationsResponse,
+  PendingApproval,
   PiMember,
   ProposalComment,
   ProposalDepartment,
+  ProposalMemberEntry,
   ProposalStatus,
   ResearcherProposal,
   TeamMember,
@@ -34,7 +38,11 @@ function normalizeProposal(raw: any): ResearcherProposal {
     title: raw?.title ?? "Untitled Proposal",
     type: raw?.type ?? "—",
     status: (raw?.status ?? "Draft") as ProposalStatus,
-    department: (raw?.department ?? { id: "", name: "—", code: "—" }) as ProposalDepartment,
+    department: (raw?.department ?? {
+      id: "",
+      name: "—",
+      code: "—",
+    }) as ProposalDepartment,
     pi: (raw?.pi ?? { id: "", name: "Unknown", avatarUrl: null }) as PiMember,
     advisors: Array.isArray(raw?.advisors) ? (raw.advisors as Advisor[]) : [],
     evaluators: Array.isArray(raw?.evaluators) ? (raw.evaluators as Evaluator[]) : [],
@@ -67,4 +75,21 @@ export async function getMyProposals(): Promise<ResearcherProposal[]> {
   const response = await apiClient.get<any[]>("/proposals/detail");
   const raw = Array.isArray(response.data) ? response.data : [];
   return raw.map(normalizeProposal);
+}
+
+/**
+ * Fetch detailed information about a specific proposal for admins.
+ * GET /proposals/admin/:proposalId
+ *
+ * Returns detailed information about the proposal, including workflow,
+ * comments, team members, and evaluation status.
+ *
+ * @param proposalId - The ID of the proposal to fetch details for.
+ * @returns AdminProposalDetail object containing proposal details.
+ * @throws AxiosError on network or server failure.
+ */
+export async function getAdminProposalDetails(proposalId: string): Promise<AdminProposalDetail> {
+  const { apiClient } = await import("@/lib/api/client");
+  const response = await apiClient.get<AdminProposalDetail>(`/proposals/admin/${proposalId}`);
+  return response.data;
 }

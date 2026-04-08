@@ -2,20 +2,19 @@
 
 import type React from "react";
 
-import { CheckCircle, ChevronRight, Clock, FileText, RotateCcw, Search, UserCheck } from "lucide-react";
+import { CheckCircle, ChevronRight, Clock, FileText, RotateCcw, Search } from "lucide-react";
 
-import { Can } from "@/access-control/permission-gates";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { PendingApproval } from "@/lib/api/proposals/types";
 
 import { useProposals } from "../proposals-context";
-import type { Proposal } from "../types";
 
-export const STATUS_CFG: Record<Proposal["status"], { className: string; icon: React.ReactNode }> = {
+export const STATUS_CFG: Record<string, { className: string; icon: React.ReactNode }> = {
   Draft: {
     className: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
     icon: <FileText className="h-3 w-3" />,
@@ -24,7 +23,7 @@ export const STATUS_CFG: Record<Proposal["status"], { className: string; icon: R
     className: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
     icon: <CheckCircle className="h-3 w-3" />,
   },
-  "Under Review": {
+  Under_Review: {
     className: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
     icon: <Clock className="h-3 w-3" />,
   },
@@ -34,12 +33,12 @@ export const STATUS_CFG: Record<Proposal["status"], { className: string; icon: R
   },
 };
 
-export const TAB_COUNTS = (proposals: Proposal[]) => ({
+export const TAB_COUNTS = (proposals: PendingApproval[]) => ({
   all: proposals.length,
-  Draft: proposals.filter((p) => p.status === "Draft").length,
-  Submitted: proposals.filter((p) => p.status === "Submitted").length,
-  "Under Review": proposals.filter((p) => p.status === "Under Review").length,
-  Revision: proposals.filter((p) => p.status === "Revision").length,
+  Draft: proposals.filter((p) => p.currentStatus === "Draft").length,
+  Submitted: proposals.filter((p) => p.currentStatus === "Submitted").length,
+  Under_Review: proposals.filter((p) => p.currentStatus === "Under_Review").length,
+  Revision: proposals.filter((p) => p.currentStatus === "Revision").length,
 });
 
 export function formatPeopleList(names: string[], max = 2): string {
@@ -49,7 +48,7 @@ export function formatPeopleList(names: string[], max = 2): string {
 }
 
 export function ProposalsTable() {
-  const { proposals, tab, setTab, search, setSearch, filtered, openDrawer } = useProposals();
+  const { proposals, isLoadingData, tab, setTab, search, setSearch, filtered, openDrawer } = useProposals();
   const counts = TAB_COUNTS(proposals);
 
   return (
@@ -74,7 +73,7 @@ export function ProposalsTable() {
             },
             {
               label: "Under Review",
-              count: counts["Under Review"],
+              count: counts.Under_Review,
               color: "text-amber-700 dark:text-amber-400",
               bg: "bg-amber-50 dark:bg-amber-900/20",
               border: "border-amber-100 dark:border-amber-900/30",
@@ -105,7 +104,7 @@ export function ProposalsTable() {
               { value: "all", label: "All", count: counts.all },
               { value: "Draft", label: "Draft", count: counts.Draft },
               { value: "Submitted", label: "Submitted", count: counts.Submitted },
-              { value: "Under Review", label: "Under Review", count: counts["Under Review"] },
+              { value: "Under_Review", label: "Under Review", count: counts.Under_Review },
               { value: "Revision", label: "Revision", count: counts.Revision },
             ].map((t) => (
               <TabsTrigger
@@ -153,18 +152,22 @@ export function ProposalsTable() {
                     Status
                   </TableHead>
                   <TableHead className="h-10 font-semibold text-slate-500 text-xs uppercase tracking-wider">
-                    Evaluator
+                    Assignments
                   </TableHead>
-                  <Can permission="BUDGET_VIEW">
-                    <TableHead className="h-10 font-semibold text-slate-500 text-xs uppercase tracking-wider">
-                      Budget
-                    </TableHead>
-                  </Can>
+                  <TableHead className="h-10 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+                    Program
+                  </TableHead>
                   <TableHead className="h-10 w-[80px]" />
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.length === 0 ? (
+                {isLoadingData ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="py-16 text-center font-medium text-slate-400 text-sm">
+                      Loading pending approvals from server...
+                    </TableCell>
+                  </TableRow>
+                ) : filtered.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="py-16 text-center text-slate-400 text-sm italic">
                       No proposals match your current filters.
@@ -172,7 +175,8 @@ export function ProposalsTable() {
                   </TableRow>
                 ) : (
                   filtered.map((p) => {
-                    const cfg = STATUS_CFG[p.status];
+                    const cfg = STATUS_CFG[p.currentStatus] || STATUS_CFG.Submitted;
+                    const initials = p.createdByName.slice(0, 2).toUpperCase();
                     return (
                       <TableRow
                         key={p.id}
@@ -185,19 +189,19 @@ export function ProposalsTable() {
                               {p.title}
                             </span>
                             <span className="font-bold text-[11px] text-slate-400 uppercase tracking-wider">
-                              {p.id} · {p.dept}
+                              {p.id.split("-")[0].toUpperCase()} · Step {p.currentStepOrder}: {p.currentApproverRole}
                             </span>
                           </div>
                         </TableCell>
                         <TableCell className="py-4">
                           <div className="flex items-center gap-2.5">
                             <Avatar className="h-7 w-7 shrink-0">
-                              <AvatarFallback className={`font-bold text-[10px] ${p.piColor}`}>
-                                {p.piAvatar}
+                              <AvatarFallback className="bg-blue-100 font-bold text-[10px] text-blue-700">
+                                {initials}
                               </AvatarFallback>
                             </Avatar>
                             <span className="truncate font-medium text-[13px] text-slate-700 dark:text-slate-300">
-                              {p.pi}
+                              {p.createdByName}
                             </span>
                           </div>
                         </TableCell>
@@ -206,33 +210,35 @@ export function ProposalsTable() {
                             className={`${cfg.className} pointer-events-none flex w-fit items-center gap-1 border-0 px-2 py-0.5 font-bold text-[11px] shadow-none`}
                           >
                             {cfg.icon}
-                            {p.status}
+                            {p.currentStatus.replace("_", " ")}
                           </Badge>
                         </TableCell>
                         <TableCell className="py-4">
-                          {p.evaluators.length > 0 ? (
-                            <div className="flex max-w-[200px] flex-col gap-0.5">
-                              <div className="flex items-center gap-1.5 font-medium text-[12px] text-slate-600 dark:text-slate-400">
-                                <UserCheck className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
-                                <span className="line-clamp-2">{formatPeopleList(p.evaluators, 2)}</span>
-                              </div>
-                              {p.evaluators.length > 2 && (
-                                <span className="pl-5 font-bold text-[10px] text-slate-400">
-                                  {p.evaluators.length} total
-                                </span>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="font-medium text-[12px] text-slate-400 italic">Unassigned</span>
-                          )}
+                          <div className="flex flex-col gap-1.5">
+                            <Badge
+                              variant="outline"
+                              className={`w-fit font-semibold text-[9px] uppercase tracking-wider ${p.evaluatorAssigned ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-400" : "border-slate-200 text-slate-500"}`}
+                            >
+                              Eval: {p.evaluatorAssigned ? "Assigned" : "Pending"}
+                            </Badge>
+                            <Badge
+                              variant="outline"
+                              className={`w-fit font-semibold text-[9px] uppercase tracking-wider ${p.advisorAssigned ? "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-900 dark:bg-violet-950 dark:text-violet-400" : "border-slate-200 text-slate-500"}`}
+                            >
+                              Adv: {p.advisorAssigned ? "Assigned" : "Pending"}
+                            </Badge>
+                          </div>
                         </TableCell>
-                        <Can permission="BUDGET_VIEW">
-                          <TableCell className="py-4">
-                            <span className="font-semibold text-[13px] text-slate-700 dark:text-slate-300">
-                              {p.budget}
-                            </span>
-                          </TableCell>
-                        </Can>
+                        <TableCell className="py-4">
+                          <div className="flex flex-col gap-1.5">
+                            <span className="font-bold text-[12px] text-slate-700 uppercase">{p.proposalProgram}</span>
+                            <Badge
+                              className={`w-fit font-bold text-[9px] shadow-none ${p.isFunded ? "bg-amber-100 text-amber-800 hover:bg-amber-100" : "bg-slate-100 text-slate-600 hover:bg-slate-100"}`}
+                            >
+                              {p.isFunded ? "FUNDED" : "UNFUNDED"}
+                            </Badge>
+                          </div>
+                        </TableCell>
                         <TableCell className="py-4 pr-4 text-right">
                           <Button
                             size="sm"

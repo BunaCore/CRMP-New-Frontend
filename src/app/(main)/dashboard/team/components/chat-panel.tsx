@@ -1,4 +1,4 @@
-/** biome-ignore-all assist/source/organizeImports: false positive */
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
 "use client";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";

@@ -174,3 +174,88 @@ export interface UserOption {
   name?: string;
   email?: string;
 }
+
+// ─── Admin Specific Types ──────────────────────────────────────────────────────
+
+export interface PendingApproval {
+  id: string;
+  title: string;
+  abstract?: string;
+  proposalProgram: string;
+  isFunded: boolean;
+  currentStatus: ProposalStatus | string;
+  submittedAt: string;
+  createdAt: string;
+  createdBy: string;
+  createdByName: string;
+  currentStepOrder: number;
+  currentApproverRole: string;
+  stepLabel: string;
+  evaluatorAssigned: boolean;
+  advisorAssigned: boolean;
+}
+
+export interface AdminProposalDetail {
+  id: string;
+  title: string;
+  type: string;
+  status: ProposalStatus | string;
+  budget: {
+    total: number;
+    items: BudgetItem[];
+  };
+  department: ProposalDepartment;
+  pi: PiMember;
+  advisors: Advisor[];
+  evaluators: Evaluator[];
+  team: TeamMember[];
+  workflow: Workflow;
+  comments: ProposalComment[];
+  defenceSchedules: DefenceSchedule[];
+  createdAt: string;
+}
+
+// ─── Evaluation Types ────────────────────────────────────────────────────────
+
+export interface AwardedScore {
+  id: string;
+  studentId: string;
+  evaluatorId: string;
+  score: number;
+  feedback: string;
+  projectId: string | null;
+  updatedAt: string;
+}
+
+export interface EvaluationRubric {
+  id: string;
+  name: string;
+  phase: "PROPOSAL" | "PROJECT";
+  type: "continuous" | "final";
+  maxPoints: number;
+  awardedScores: AwardedScore[];
+}
+
+export interface GetEvaluationsResponse {
+  proposalId: string;
+  rubrics: EvaluationRubric[];
+}
+
+export interface ScoreInput {
+  rubricId: string;
+  studentId: string;
+  score: number;
+  feedback: string;
+  projectId: string | null;
+}
+
+export interface SubmitEvaluationScoresPayload {
+  scores: ScoreInput[];
+}
+
+// ─── Proposal Members ────────────────────────────────────────────────────────
+
+export interface ProposalMemberEntry {
+  userId: string;
+  role: "PI" | "MEMBER" | string;
+}

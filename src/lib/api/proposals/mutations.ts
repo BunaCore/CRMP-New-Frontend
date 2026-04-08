@@ -3,7 +3,11 @@
  * Write actions (create, update proposals)
  */
 
-import type { CreateProposalPayload, CreateProposalResponse } from "@/lib/api/proposals/types";
+import type {
+  CreateProposalPayload,
+  CreateProposalResponse,
+  SubmitEvaluationScoresPayload,
+} from "@/lib/api/proposals/types";
 
 /**
  * Create a new proposal (as Draft)
@@ -90,4 +94,13 @@ export async function submitProposal(proposalId: string): Promise<CreateProposal
   const { apiClient } = await import("@/lib/api/client");
   const response = await apiClient.post<CreateProposalResponse>(`/proposals/${proposalId}/submit`);
   return response.data;
+}
+
+/**
+ * Submit evaluation scores for a proposal or project phase
+ * POST /proposals/:id/evaluations
+ */
+export async function submitEvaluationScores(proposalId: string, data: SubmitEvaluationScoresPayload): Promise<void> {
+  const { apiClient } = await import("@/lib/api/client");
+  await apiClient.post(`/proposals/${proposalId}/evaluations`, data);
 }
