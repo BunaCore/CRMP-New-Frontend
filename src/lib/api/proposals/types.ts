@@ -220,3 +220,48 @@ export interface AdminProposalDetail {
   defenceSchedules: DefenceSchedule[];
   createdAt: string;
 }
+
+// ─── Evaluation Types ────────────────────────────────────────────────────────
+
+export interface AwardedScore {
+  id: string;
+  studentId: string;
+  evaluatorId: string;
+  score: number;
+  feedback: string;
+  projectId: string | null;
+  updatedAt: string;
+}
+
+export interface EvaluationRubric {
+  id: string;
+  name: string;
+  phase: "PROPOSAL" | "PROJECT";
+  type: "continuous" | "final";
+  maxPoints: number;
+  awardedScores: AwardedScore[];
+}
+
+export interface GetEvaluationsResponse {
+  proposalId: string;
+  rubrics: EvaluationRubric[];
+}
+
+export interface ScoreInput {
+  rubricId: string;
+  studentId: string;
+  score: number;
+  feedback: string;
+  projectId: string | null;
+}
+
+export interface SubmitEvaluationScoresPayload {
+  scores: ScoreInput[];
+}
+
+// ─── Proposal Members ────────────────────────────────────────────────────────
+
+export interface ProposalMemberEntry {
+  userId: string;
+  role: "PI" | "MEMBER" | string;
+}

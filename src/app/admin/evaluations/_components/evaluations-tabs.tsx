@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, FileText, Layers, Search } from "lucide-react";
+import { ChevronRight, FileText, Layers, Loader2, Search } from "lucide-react";
 
 import { Can } from "@/access-control/permission-gates";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -11,7 +11,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
-import { EVAL_PROJECTS, EVAL_PROPOSALS } from "../_data/mock-evaluations";
 import { useEvaluations } from "../evaluations-context";
 import type { ProjectEvalStatus } from "../types";
 
@@ -44,6 +43,7 @@ export function EvaluationsTabs() {
     filteredProjects,
     openDrawerProposal,
     openDrawerProject,
+    isLoadingProposals,
   } = useEvaluations();
 
   return (
@@ -58,7 +58,7 @@ export function EvaluationsTabs() {
               <FileText className="mr-2 h-4 w-4" />
               Proposals
               <Badge className="ml-2 border-0 bg-slate-200 font-bold text-[10px] text-slate-700 dark:bg-slate-700 dark:text-slate-200">
-                {EVAL_PROPOSALS.length}
+                {isLoadingProposals ? "…" : filteredProposals.length}
               </Badge>
             </TabsTrigger>
             <TabsTrigger
@@ -68,7 +68,7 @@ export function EvaluationsTabs() {
               <Layers className="mr-2 h-4 w-4" />
               Projects
               <Badge className="ml-2 border-0 bg-slate-200 font-bold text-[10px] text-slate-700 dark:bg-slate-700 dark:text-slate-200">
-                {EVAL_PROJECTS.length}
+                {filteredProjects.length}
               </Badge>
             </TabsTrigger>
           </TabsList>
@@ -86,6 +86,16 @@ export function EvaluationsTabs() {
 
         <TabsContent value="proposals" className="mt-4">
           <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
+            {isLoadingProposals ? (
+              <div className="flex items-center justify-center gap-3 py-16 text-slate-400">
+                <Loader2 className="h-5 w-5 animate-spin text-indigo-500" />
+                <span className="text-sm">Loading proposals…</span>
+              </div>
+            ) : filteredProposals.length === 0 ? (
+              <div className="py-16 text-center text-slate-400 text-sm">
+                No proposals currently assigned for evaluation.
+              </div>
+            ) : (
             <Table>
               <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
                 <TableRow>
@@ -145,6 +155,7 @@ export function EvaluationsTabs() {
                 ))}
               </TableBody>
             </Table>
+            )}
           </div>
         </TabsContent>
 
