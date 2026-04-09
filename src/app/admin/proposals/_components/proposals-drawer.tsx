@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import {
   AlertTriangle,
   Banknote,
@@ -31,8 +33,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
-
-import { useEffect, useState } from "react";
 import { getAdminProposalDetails } from "@/lib/api/proposals/queries";
 import type { AdminProposalDetail } from "@/lib/api/proposals/types";
 
@@ -86,7 +86,7 @@ export function ProposalsDrawer() {
         {selected && !isLoading && details && (
           <>
             {/* Drawer Header */}
-            <SheetHeader className="shrink-0 space-y-0 border-slate-100 border-b bg-gradient-to-b from-slate-50/90 to-white px-6 pt-6 pb-4 dark:border-slate-800 dark:from-slate-900/80 dark:to-slate-950">
+            <SheetHeader className="shrink-0 space-y-0 border-slate-100 border-b bg-linear-to-b from-slate-50/90 to-white px-6 pt-6 pb-4 dark:border-slate-800 dark:from-slate-900/80 dark:to-slate-950">
               <div className="flex flex-col gap-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge className="border-0 bg-slate-200/80 font-bold text-[10px] text-slate-700 uppercase dark:bg-slate-800 dark:text-slate-300">
@@ -101,7 +101,7 @@ export function ProposalsDrawer() {
                   {details.evaluators?.slice(0, 2).map((evaluator) => (
                     <Badge
                       key={evaluator.id}
-                      className="max-w-[140px] truncate border-0 bg-emerald-100 font-bold text-[10px] text-emerald-800 dark:bg-emerald-900/35 dark:text-emerald-300"
+                      className="max-w-35 truncate border-0 bg-emerald-100 font-bold text-[10px] text-emerald-800 dark:bg-emerald-900/35 dark:text-emerald-300"
                       title={evaluator.name}
                     >
                       <UserCheck className="h-3 w-3 shrink-0" /> {evaluator.name}
@@ -131,7 +131,11 @@ export function ProposalsDrawer() {
                   {details.title}
                 </SheetTitle>
                 <SheetDescription className="font-medium text-slate-500 text-xs leading-relaxed">
-                  {details.department.name} · Date {details.createdAt.split("T")[0]} · Budget {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(details.budget.total)}
+                  {details.department.name} · Date {details.createdAt.split("T")[0]} · Budget{" "}
+                  {new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  }).format(details.budget.total)}
                 </SheetDescription>
               </div>
 
@@ -169,7 +173,9 @@ export function ProposalsDrawer() {
                       <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600 dark:text-rose-400" />
                       <div>
                         <p className="font-bold text-rose-800 text-sm dark:text-rose-300">Returned for Revision</p>
-                        <p className="mt-0.5 text-rose-600 text-xs dark:text-rose-400">Please review the timeline or comments for revision notes.</p>
+                        <p className="mt-0.5 text-rose-600 text-xs dark:text-rose-400">
+                          Please review the timeline or comments for revision notes.
+                        </p>
                       </div>
                     </div>
                   )}
@@ -196,7 +202,10 @@ export function ProposalsDrawer() {
                         Budget Requested
                       </p>
                       <p className="font-extrabold text-blue-600 text-xl dark:text-blue-400">
-                        {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(details.budget.total)}
+                        {new Intl.NumberFormat("en-US", {
+                          style: "currency",
+                          currency: "USD",
+                        }).format(details.budget.total)}
                       </p>
                     </div>
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
@@ -218,7 +227,7 @@ export function ProposalsDrawer() {
                   </div>
 
                   {/* Only show abstract if exists in backend details, else fallback to pending Approval abstract */}
-                  {(selected.abstract) && (
+                  {selected.abstract && (
                     <div>
                       <h4 className="mb-2.5 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
                         <FileText className="h-3.5 w-3.5" /> Abstract
@@ -252,7 +261,10 @@ export function ProposalsDrawer() {
                     <Badge className="ml-auto shrink-0 border-0 bg-blue-600 text-[10px] text-white">PI</Badge>
                   </div>
                   {details.team.map((member) => (
-                    <div key={member.id} className="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-3.5 dark:border-slate-800 dark:bg-slate-950">
+                    <div
+                      key={member.id}
+                      className="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-3.5 dark:border-slate-800 dark:bg-slate-950"
+                    >
                       <Avatar className="h-10 w-10">
                         <AvatarFallback className="bg-slate-100 font-bold text-slate-600 text-xs">
                           {member.name.slice(0, 2).toUpperCase()}
@@ -292,14 +304,15 @@ export function ProposalsDrawer() {
                           <Banknote className="h-3.5 w-3.5" /> Total Requested
                         </p>
                         <p className="font-extrabold text-2xl text-blue-600 dark:text-blue-400">
-                          {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(details.budget.total)}
+                          {new Intl.NumberFormat("en-US", {
+                            style: "currency",
+                            currency: "USD",
+                          }).format(details.budget.total)}
                         </p>
                       </div>
                       <div className="flex flex-col justify-center rounded-xl border border-slate-200/80 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/30">
                         <p className="mb-1 font-bold text-[10px] text-slate-500 uppercase tracking-wider">Status</p>
-                        <p className="font-semibold text-[15px] text-slate-800 dark:text-slate-200">
-                          {details.status.toString().replace("_", " ")}
-                        </p>
+                        <p className="font-semibold text-[15px] text-slate-800 dark:text-slate-200">Pending Approval</p>
                       </div>
                     </div>
 
@@ -320,24 +333,31 @@ export function ProposalsDrawer() {
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100 text-[13px] dark:divide-slate-800/80">
-                            {details.budget.items?.map((item, i) => (
-                              <tr key={`${item.description}-${i}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20">
-                                <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
-                                  {item.description}
-                                </td>
+                            {details.budget?.items?.map((item, i) => (
+                              <tr
+                                key={`${item.description}-${i}`}
+                                className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20"
+                              >
+                                <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{item.description}</td>
                                 <td className="px-4 py-3 text-right font-medium text-slate-800 dark:text-slate-200">
-                                  {new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(item.amount)}
+                                  {new Intl.NumberFormat("en-US", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }).format(item.amount)}
                                 </td>
                               </tr>
                             ))}
                           </tbody>
                           <tfoot className="bg-slate-50 dark:bg-slate-900/50">
                             <tr>
-                              <td className="px-4 py-3 font-bold text-slate-900 dark:text-slate-100">
-                                Total
-                              </td>
+                              <td className="px-4 py-3 font-bold text-slate-900 dark:text-slate-100">Total</td>
                               <td className="px-4 py-3 text-right font-bold text-blue-600 dark:text-blue-400">
-                                {new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(details.budget.total)}
+                                {details.budget?.items?.reduce((acc, curr) => acc + curr.amount, 0)
+                                  ? new Intl.NumberFormat("en-US", {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2,
+                                    }).format(details.budget?.items?.reduce((acc, curr) => acc + curr.amount, 0))
+                                  : selected.budget.reduce((acc, curr) => acc + curr.amount, 0)}
                               </td>
                             </tr>
                           </tfoot>

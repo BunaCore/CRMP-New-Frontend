@@ -1,4 +1,4 @@
-/** biome-ignore-all assist/source/organizeImports: legacy code */
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
 "use client";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -41,7 +41,10 @@ function getInitials(name: string) {
 
 function formatTime(timestamp: string) {
   const date = new Date(timestamp);
-  return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function formatDateHeader(timestamp: string) {
@@ -56,7 +59,11 @@ function formatDateHeader(timestamp: string) {
   if (date.toDateString() === yesterday.toDateString()) {
     return "Yesterday";
   }
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRemoveMember }: ChatPanelProps) {

@@ -96,65 +96,65 @@ export function EvaluationsTabs() {
                 No proposals currently assigned for evaluation.
               </div>
             ) : (
-            <Table>
-              <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
-                <TableRow>
-                  <TableHead className="pl-5 font-semibold text-xs uppercase">Proposal</TableHead>
-                  <TableHead className="font-semibold text-xs uppercase">PI</TableHead>
-                  <TableHead className="font-semibold text-xs uppercase">Stage</TableHead>
-                  <Can permission="BUDGET_VIEW">
-                    <TableHead className="font-semibold text-xs uppercase">Budget</TableHead>
-                  </Can>
-                  <TableHead className="w-[120px] pr-5 text-right font-semibold text-xs uppercase" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredProposals.map((p) => (
-                  <TableRow key={p.id} className="border-slate-100 dark:border-slate-800">
-                    <TableCell className="py-4 pl-5">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="line-clamp-1 font-semibold text-[13px] text-slate-900 dark:text-slate-100">
-                          {p.title}
-                        </span>
-                        <span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
-                          {p.id} · {p.dept}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-7 w-7">
-                          <AvatarFallback className={cn("font-bold text-[10px]", p.piColor)}>
-                            {p.piAvatar}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="font-medium text-[13px] text-slate-700 dark:text-slate-300">{p.pi}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <Badge variant="secondary" className="font-semibold text-[11px]">
-                        {p.stage}
-                      </Badge>
-                    </TableCell>
+              <Table>
+                <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
+                  <TableRow>
+                    <TableHead className="pl-5 font-semibold text-xs uppercase">Proposal</TableHead>
+                    <TableHead className="font-semibold text-xs uppercase">PI</TableHead>
+                    <TableHead className="font-semibold text-xs uppercase">Stage</TableHead>
                     <Can permission="BUDGET_VIEW">
-                      <TableCell className="py-4 font-semibold text-[13px] text-slate-700 dark:text-slate-300">
-                        {p.budget}
-                      </TableCell>
+                      <TableHead className="font-semibold text-xs uppercase">Budget</TableHead>
                     </Can>
-                    <TableCell className="py-4 pr-5 text-right">
-                      <Button
-                        size="sm"
-                        className="h-8 rounded-lg bg-indigo-600 font-semibold text-xs hover:bg-indigo-700"
-                        onClick={() => openDrawerProposal(p)}
-                      >
-                        Evaluate
-                        <ChevronRight className="ml-1 h-3.5 w-3.5" />
-                      </Button>
-                    </TableCell>
+                    <TableHead className="w-[120px] pr-5 text-right font-semibold text-xs uppercase" />
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {filteredProposals.map((p) => (
+                    <TableRow key={p.id} className="border-slate-100 dark:border-slate-800">
+                      <TableCell className="py-4 pl-5">
+                        <div className="flex flex-col gap-0.5">
+                          <span className="line-clamp-1 font-semibold text-[13px] text-slate-900 dark:text-slate-100">
+                            {p.title}
+                          </span>
+                          <span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                            {p.id} · {p.dept}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-7 w-7">
+                            <AvatarFallback className={cn("font-bold text-[10px]", p.piColor)}>
+                              {p.piAvatar}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium text-[13px] text-slate-700 dark:text-slate-300">{p.pi}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <Badge variant="secondary" className="font-semibold text-[11px]">
+                          {p.stage}
+                        </Badge>
+                      </TableCell>
+                      <Can permission="BUDGET_VIEW">
+                        <TableCell className="py-4 font-semibold text-[13px] text-slate-700 dark:text-slate-300">
+                          {p.budget}
+                        </TableCell>
+                      </Can>
+                      <TableCell className="py-4 pr-5 text-right">
+                        <Button
+                          size="sm"
+                          className="h-8 rounded-lg bg-indigo-600 font-semibold text-xs hover:bg-indigo-700"
+                          onClick={() => openDrawerProposal(p)}
+                        >
+                          Evaluate
+                          <ChevronRight className="ml-1 h-3.5 w-3.5" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             )}
           </div>
         </TabsContent>

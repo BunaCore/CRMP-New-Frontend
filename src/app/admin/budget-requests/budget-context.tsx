@@ -58,8 +58,7 @@ export function BudgetRequestsProvider({ children }: { children: React.ReactNode
       d.projectTitle.toLowerCase().includes(search.toLowerCase()) ||
       d.pi.toLowerCase().includes(search.toLowerCase()) ||
       d.projectId.toLowerCase().includes(search.toLowerCase());
-    const matchStatus =
-      statusFilter === "all" || activePhase?.status === statusFilter;
+    const matchStatus = statusFilter === "all" || activePhase?.status === statusFilter;
     return matchSearch && matchStatus;
   });
 
@@ -78,9 +77,7 @@ export function BudgetRequestsProvider({ children }: { children: React.ReactNode
 
   const handleConfirmPaid = () => {
     if (!selected || !transactionId.trim()) return;
-    const approvedAmt = adjustedAmount
-      ? parseFloat(adjustedAmount)
-      : selected.phases[selected.activePhasIndex].amount;
+    const approvedAmt = adjustedAmount ? parseFloat(adjustedAmount) : selected.phases[selected.activePhasIndex].amount;
 
     setBudgetRequests((prev) =>
       prev.map((d) => {
@@ -114,7 +111,8 @@ export function BudgetRequestsProvider({ children }: { children: React.ReactNode
           actedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
         };
       });
-      const nextActive = prev.activePhasIndex + 1 < prev.phases.length ? prev.activePhasIndex + 1 : prev.activePhasIndex;
+      const nextActive =
+        prev.activePhasIndex + 1 < prev.phases.length ? prev.activePhasIndex + 1 : prev.activePhasIndex;
       return { ...prev, phases: updatedPhases, activePhasIndex: nextActive };
     });
 

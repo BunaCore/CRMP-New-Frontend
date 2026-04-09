@@ -54,8 +54,7 @@ export function BudgetRequestDrawer() {
   const fmt = (n: number) => `Br ${new Intl.NumberFormat("en-US").format(n)}`;
 
   const activePhase = selected.phases[selected.activePhasIndex];
-  const isActionable =
-    activePhase?.status === "Pending" || activePhase?.status === "Resubmitted";
+  const isActionable = activePhase?.status === "Pending" || activePhase?.status === "Resubmitted";
 
   return (
     <Sheet open={!!selected} onOpenChange={(o) => !o && closeDrawer()}>
@@ -104,7 +103,6 @@ export function BudgetRequestDrawer() {
 
         {/* ── BODY ── */}
         <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-6 py-6 sm:px-8 sm:py-7">
-
           {/* ── ZONE A: DRAWDOWN PROGRESS ── */}
           <div className="flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-5 shadow-sm dark:border-slate-800 dark:from-slate-900/40 dark:to-slate-950">
             <div className="flex items-center gap-2">
@@ -148,7 +146,8 @@ export function BudgetRequestDrawer() {
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-slate-200 dark:bg-slate-700" />
                 <p className="font-medium text-[11px] text-slate-600 dark:text-slate-400">
-                  Remaining: <span className="font-bold text-slate-700 dark:text-slate-300">{fmt(Math.max(remaining, 0))}</span>
+                  Remaining:{" "}
+                  <span className="font-bold text-slate-700 dark:text-slate-300">{fmt(Math.max(remaining, 0))}</span>
                 </p>
               </div>
             </div>
@@ -272,7 +271,9 @@ export function BudgetRequestDrawer() {
           <div className="flex flex-col gap-3 rounded-xl border border-slate-200/80 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-900/30">
             <div className="flex items-center gap-2">
               <Banknote className="h-4 w-4 text-slate-500" />
-              <h4 className="font-bold text-[11px] text-slate-500 uppercase tracking-wider">Phase {activePhase?.phase} Budget Items</h4>
+              <h4 className="font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                Phase {activePhase?.phase} Budget Items
+              </h4>
             </div>
             <ul className="flex flex-col gap-2">
               {activePhase?.budgetItems?.map((item, i) => (
@@ -281,17 +282,21 @@ export function BudgetRequestDrawer() {
                   <span className="font-bold text-slate-900 dark:text-slate-100">{fmt(item.amount)}</span>
                 </li>
               )) ?? (
-                  <>
-                    <li className="flex items-center justify-between text-[13px]">
-                      <span className="font-medium text-slate-700 dark:text-slate-300">Equipment & Lab Supplies</span>
-                      <span className="font-bold text-slate-900 dark:text-slate-100">{fmt((activePhase?.amount ?? 0) * 0.6)}</span>
-                    </li>
-                    <li className="flex items-center justify-between text-[13px]">
-                      <span className="font-medium text-slate-700 dark:text-slate-300">Field Data Collection</span>
-                      <span className="font-bold text-slate-900 dark:text-slate-100">{fmt((activePhase?.amount ?? 0) * 0.4)}</span>
-                    </li>
-                  </>
-                )}
+                <>
+                  <li className="flex items-center justify-between text-[13px]">
+                    <span className="font-medium text-slate-700 dark:text-slate-300">Equipment & Lab Supplies</span>
+                    <span className="font-bold text-slate-900 dark:text-slate-100">
+                      {fmt((activePhase?.amount ?? 0) * 0.6)}
+                    </span>
+                  </li>
+                  <li className="flex items-center justify-between text-[13px]">
+                    <span className="font-medium text-slate-700 dark:text-slate-300">Field Data Collection</span>
+                    <span className="font-bold text-slate-900 dark:text-slate-100">
+                      {fmt((activePhase?.amount ?? 0) * 0.4)}
+                    </span>
+                  </li>
+                </>
+              )}
             </ul>
             {selected.pgOfficerNote && (
               <div className="mt-2 flex items-start gap-2 rounded border border-indigo-100 bg-indigo-50/50 p-3 dark:border-indigo-900/40 dark:bg-indigo-950/20">
@@ -349,8 +354,8 @@ export function BudgetRequestDrawer() {
             <div className="flex items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50/50 p-4 dark:border-emerald-900/30 dark:bg-emerald-950/20">
               <Circle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
               <p className="text-[13px] text-emerald-800 dark:text-emerald-300">
-                <strong>No clearance required.</strong> This is the initial Phase 1 disbursement — funds can be
-                released directly per PG Office approval.
+                <strong>No clearance required.</strong> This is the initial Phase 1 disbursement — funds can be released
+                directly per PG Office approval.
               </p>
             </div>
           )}
@@ -407,9 +412,7 @@ export function BudgetRequestDrawer() {
             <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900/30 dark:bg-emerald-950/20">
               <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
               <div>
-                <p className="font-bold text-emerald-900 text-sm dark:text-emerald-200">
-                  All phases fully disbursed
-                </p>
+                <p className="font-bold text-emerald-900 text-sm dark:text-emerald-200">All phases fully disbursed</p>
                 <p className="mt-0.5 text-[11px] text-emerald-700/80 dark:text-emerald-400/80">
                   Total of {fmt(selected.totalBudget)} has been released for this project.
                 </p>

@@ -3,8 +3,8 @@
  * Write actions (create, update proposals)
  */
 
-import type { 
-  CreateProposalPayload, 
+import type {
+  CreateProposalPayload,
   CreateProposalResponse,
   SubmitEvaluationScoresPayload,
 } from "@/lib/api/proposals/types";
@@ -100,11 +100,7 @@ export async function submitProposal(proposalId: string): Promise<CreateProposal
  * Submit evaluation scores for a proposal or project phase
  * POST /proposals/:id/evaluations
  */
-export async function submitEvaluationScores(
-  proposalId: string,
-  data: SubmitEvaluationScoresPayload
-): Promise<void> {
+export async function submitEvaluationScores(proposalId: string, data: SubmitEvaluationScoresPayload): Promise<void> {
   const { apiClient } = await import("@/lib/api/client");
   await apiClient.post(`/proposals/${proposalId}/evaluations`, data);
 }
-

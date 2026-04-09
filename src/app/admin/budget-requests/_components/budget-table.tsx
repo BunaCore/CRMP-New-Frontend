@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  AlertTriangle,
-  Banknote,
-  CheckCircle2,
-  ChevronRight,
-  Clock,
-  Download,
-  RefreshCw,
-  Search,
-} from "lucide-react";
+import { AlertTriangle, Banknote, CheckCircle2, ChevronRight, Clock, Download, RefreshCw, Search } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -62,7 +53,9 @@ export function BudgetRequestsTable() {
     return acc + d.phases.filter((p) => p.status === "Paid").reduce((s, p) => s + (p.approvedAmount ?? 0), 0);
   }, 0);
 
-  const awaitingRevision = MOCK_BUDGET_REQUESTS.filter((d) => d.phases[d.activePhasIndex]?.status === "Returned").length;
+  const awaitingRevision = MOCK_BUDGET_REQUESTS.filter(
+    (d) => d.phases[d.activePhasIndex]?.status === "Returned",
+  ).length;
 
   const fmt = (n: number) =>
     new Intl.NumberFormat("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n);
@@ -162,9 +155,7 @@ export function BudgetRequestsTable() {
               const isResubmitted = activePhase?.status === "Resubmitted";
 
               // Days waiting
-              const submittedDate = activePhase?.submittedAt
-                ? new Date(activePhase.submittedAt)
-                : null;
+              const submittedDate = activePhase?.submittedAt ? new Date(activePhase.submittedAt) : null;
               const daysWaiting = submittedDate
                 ? Math.floor((Date.now() - submittedDate.getTime()) / 86_400_000)
                 : null;
@@ -190,9 +181,7 @@ export function BudgetRequestsTable() {
                   <TableCell className="py-4">
                     <div className="flex items-center gap-2">
                       <Avatar className="h-7 w-7">
-                        <AvatarFallback className={cn("font-bold text-[10px]", d.piColor)}>
-                          {d.piAvatar}
-                        </AvatarFallback>
+                        <AvatarFallback className={cn("font-bold text-[10px]", d.piColor)}>{d.piAvatar}</AvatarFallback>
                       </Avatar>
                       <span className="font-medium text-[13px] text-slate-700 dark:text-slate-300">{d.pi}</span>
                     </div>
@@ -220,7 +209,9 @@ export function BudgetRequestsTable() {
                     Br {new Intl.NumberFormat("en-US").format(activePhase?.amount ?? 0)}
                   </TableCell>
                   <TableCell className="py-4">
-                    <Badge className={cn("flex w-fit items-center gap-1 border-0 font-bold text-[10px]", cfg.className)}>
+                    <Badge
+                      className={cn("flex w-fit items-center gap-1 border-0 font-bold text-[10px]", cfg.className)}
+                    >
                       {cfg.icon}
                       {cfg.label}
                     </Badge>

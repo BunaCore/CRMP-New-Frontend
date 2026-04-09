@@ -1,6 +1,6 @@
-/** biome-ignore-all lint/nursery/useSortedClasses: legacy code */
-/** biome-ignore-all lint/correctness/noUnusedImports: legacy code */
-/** biome-ignore-all assist/source/organizeImports: legacy code */
+/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
+/** biome-ignore-all lint/correctness/noUnusedImports: <explanation> */
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
 "use client";
 
 import {
@@ -283,11 +283,12 @@ export function TeamManagement() {
         const partnerId = selectedRoom.memberIds.find((id) => id !== CURRENT_USER_ID);
         const partner = teamMembers.find((m) => m.id === partnerId);
 
-        if (partner?.isOnline && Math.random() < 0.6) {
+        if (!partnerId || !partner) return;
+        if (partner.isOnline && Math.random() < 0.6) {
           // Show typing after a delay
           setTimeout(
             () => {
-              setTypingUsers([partnerId as string]);
+              setTypingUsers([partnerId!]);
 
               // Send reply after typing
               setTimeout(
@@ -298,12 +299,12 @@ export function TeamManagement() {
                   const reply: GroupChatMessage = {
                     id: `msg-${Date.now()}`,
                     roomId: selectedRoom.id,
-                    senderId: partnerId as string,
+                    senderId: partnerId!,
                     senderName: partner.name,
                     content: replyMessage,
                     timestamp: new Date().toISOString(),
                     isRead: true,
-                    readBy: [partnerId as string, CURRENT_USER_ID],
+                    readBy: [partnerId!, CURRENT_USER_ID],
                   };
 
                   setGroupMessages((prev) => ({

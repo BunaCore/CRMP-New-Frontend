@@ -116,13 +116,7 @@ export interface DefenceSchedule {
   createdAt: string; // ISO date
 }
 
-export type ProposalStatus =
-  | "Draft"
-  | "Under_Review"
-  | "Revision"
-  | "Accepted"
-  | "Rejected"
-  | "Pending";
+export type ProposalStatus = "Draft" | "Under_Review" | "Revision" | "Accepted" | "Rejected" | "Pending";
 
 /**
  * Full rich proposal returned by GET /proposals/detail.
@@ -199,6 +193,7 @@ export interface PendingApproval {
   stepLabel: string;
   evaluatorAssigned: boolean;
   advisorAssigned: boolean;
+  budget: BudgetItem[]; // Added budget property as an array of BudgetItem
 }
 
 export interface AdminProposalDetail {
