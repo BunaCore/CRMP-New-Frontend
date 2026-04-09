@@ -193,6 +193,7 @@ export interface PendingApproval {
   stepLabel: string;
   evaluatorAssigned: boolean;
   advisorAssigned: boolean;
+  budget: BudgetItem[]; // Added budget property as an array of BudgetItem
 }
 
 export interface AdminProposalDetail {

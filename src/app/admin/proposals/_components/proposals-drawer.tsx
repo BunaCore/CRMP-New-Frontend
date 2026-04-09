@@ -357,7 +357,7 @@ export function ProposalsDrawer() {
                                       minimumFractionDigits: 2,
                                       maximumFractionDigits: 2,
                                     }).format(details.budget?.items?.reduce((acc, curr) => acc + curr.amount, 0))
-                                  : selected.budget.replace(/[^0-9.]/g, "")}
+                                  : selected.budget.reduce((acc, curr) => acc + curr.amount, 0)}
                               </td>
                             </tr>
                           </tfoot>

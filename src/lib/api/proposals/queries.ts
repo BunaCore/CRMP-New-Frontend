@@ -93,3 +93,44 @@ export async function getAdminProposalDetails(proposalId: string): Promise<Admin
   const response = await apiClient.get<AdminProposalDetail>(`/proposals/admin/${proposalId}`);
   return response.data;
 }
+
+/**
+ * Fetch evaluations for a specific proposal.
+ * GET /proposals/evaluations/:proposalId
+ *
+ * @param proposalId - The ID of the proposal to fetch evaluations for.
+ * @returns Evaluation data for the proposal.
+ * @throws AxiosError on network or server failure.
+ */
+export async function fetchProposalEvaluations(proposalId: string): Promise<GetEvaluationsResponse> {
+  const { apiClient } = await import("@/lib/api/client");
+  const response = await apiClient.get<GetEvaluationsResponse>(`/proposals/evaluations/${proposalId}`);
+  return response.data;
+}
+
+/**
+ * Fetch members of a specific proposal.
+ * GET /proposals/members/:proposalId
+ *
+ * @param proposalId - The ID of the proposal to fetch members for.
+ * @returns Array of ProposalMemberEntry.
+ * @throws AxiosError on network or server failure.
+ */
+export async function getProposalMembers(proposalId: string): Promise<ProposalMemberEntry[]> {
+  const { apiClient } = await import("@/lib/api/client");
+  const response = await apiClient.get<ProposalMemberEntry[]>(`/proposals/members/${proposalId}`);
+  return response.data;
+}
+
+/**
+ * Fetch pending approvals for the admin dashboard.
+ * GET /proposals/pending-approvals
+ *
+ * @returns Array of PendingApproval.
+ * @throws AxiosError on network or server failure.
+ */
+export async function getPendingApprovals(): Promise<PendingApproval[]> {
+  const { apiClient } = await import("@/lib/api/client");
+  const response = await apiClient.get<PendingApproval[]>("/proposals/pending-approvals");
+  return response.data;
+}
