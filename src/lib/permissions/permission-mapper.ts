@@ -42,6 +42,7 @@ const BACKEND_TO_FRONTEND_PERMISSION_MAP: Record<string, string> = {
   "evaluation:assign": "EVALUATOR_ASSIGN",
   "evaluation:submit": "EVALUATION_SCORE_SUBMIT",
   "evaluation:read": "PROJECT_VIEW",
+  "defence:schedule": "DEFENCE_SCHEDULE",
 
   // --- Users ---
   "user:read": "USER_VIEW",

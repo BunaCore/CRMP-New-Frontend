@@ -1,8 +1,19 @@
+<<<<<<< HEAD
 /** biome-ignore-all lint/complexity/noUselessFragments: intentional suppression */
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: intentional suppression */
 /** biome-ignore-all assist/source/organizeImports: intentional suppression */
 /** biome-ignore-all lint/nursery/useSortedClasses: intentional suppression */
+=======
+/** biome-ignore-all lint/complexity/noUselessFragments: <explanation> */
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <explanation> */
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
+/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
+>>>>>>> main
 "use client";
+
+import { useEffect, useRef, useState } from "react";
+
+import { Check, CheckCheck, Hash, Info, MoreVertical, Paperclip, Send, Settings, Smile, Users } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -18,8 +29,6 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { ChatRoom, GroupChatMessage, TeamMember } from "@/lib/team-data";
-import { Check, CheckCheck, Hash, Info, MoreVertical, Paperclip, Send, Settings, Smile, Users } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 
 interface GroupChatPanelProps {
   room: ChatRoom;
@@ -43,7 +52,14 @@ function getInitials(name: string) {
 
 function formatTime(timestamp: string) {
   const date = new Date(timestamp);
+<<<<<<< HEAD
   return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+=======
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+>>>>>>> main
 }
 
 function formatDateHeader(timestamp: string) {
@@ -116,11 +132,11 @@ export function GroupChatPanel({
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, []);
 
   useEffect(() => {
     inputRef.current?.focus();
-  }, [room.id]);
+  }, []);
 
   const handleSend = () => {
     if (inputValue.trim()) {
@@ -161,16 +177,16 @@ export function GroupChatPanel({
                   <AvatarFallback className="bg-primary/10 text-primary">{getInitials(dmPartner.name)}</AvatarFallback>
                 </Avatar>
                 {dmPartner.isOnline && (
-                  <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card bg-emerald-500" />
+                  <span className="absolute right-0 bottom-0 h-3 w-3 rounded-full border-2 border-card bg-emerald-500" />
                 )}
               </div>
               <div>
                 <h3 className="font-semibold text-foreground">{dmPartner.name}</h3>
                 <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${roleColors[dmPartner.role] || ""}`}>
+                  <Badge variant="secondary" className={`px-1.5 py-0 text-[10px] ${roleColors[dmPartner.role] || ""}`}>
                     {dmPartner.role}
                   </Badge>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-muted-foreground text-xs">
                     {dmPartner.isOnline
                       ? "Online"
                       : dmPartner.lastSeen
@@ -187,7 +203,7 @@ export function GroupChatPanel({
               </div>
               <div>
                 <h3 className="font-semibold text-foreground">{room.name}</h3>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   {onlineMembers.length} online of {roomMembers.length} members
                 </p>
               </div>
@@ -199,7 +215,7 @@ export function GroupChatPanel({
           {!isDirectMessage && (
             <>
               <TooltipProvider>
-                <div className="mr-2 flex -space-x-2">
+                <div className="-space-x-2 mr-2 flex">
                   {onlineMembers.slice(0, 4).map((member) => (
                     <Tooltip key={member.id}>
                       <TooltipTrigger asChild>
@@ -209,17 +225,17 @@ export function GroupChatPanel({
                               {getInitials(member.name)}
                             </AvatarFallback>
                           </Avatar>
-                          <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full border border-card bg-emerald-500" />
+                          <span className="absolute right-0 bottom-0 h-2 w-2 rounded-full border border-card bg-emerald-500" />
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p className="font-medium">{member.name}</p>
-                        <p className="text-xs text-muted-foreground">{member.role}</p>
+                        <p className="text-muted-foreground text-xs">{member.role}</p>
                       </TooltipContent>
                     </Tooltip>
                   ))}
                   {onlineMembers.length > 4 && (
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-card bg-muted text-xs font-medium">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-card bg-muted font-medium text-xs">
                       +{onlineMembers.length - 4}
                     </div>
                   )}
@@ -282,7 +298,7 @@ export function GroupChatPanel({
               <div key={groupIdx}>
                 {/* Date Header */}
                 <div className="mb-4 flex items-center justify-center">
-                  <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
+                  <span className="rounded-full bg-muted px-3 py-1 text-muted-foreground text-xs">
                     {formatDateHeader(group.date)}
                   </span>
                 </div>
@@ -308,13 +324,13 @@ export function GroupChatPanel({
                                       </AvatarFallback>
                                     </Avatar>
                                     {sender.isOnline && (
-                                      <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-card bg-emerald-500" />
+                                      <span className="absolute right-0 bottom-0 h-2.5 w-2.5 rounded-full border-2 border-card bg-emerald-500" />
                                     )}
                                   </div>
                                 </TooltipTrigger>
                                 <TooltipContent side="left">
                                   <p className="font-medium">{sender.name}</p>
-                                  <p className="text-xs text-muted-foreground">{sender.role}</p>
+                                  <p className="text-muted-foreground text-xs">{sender.role}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -325,10 +341,10 @@ export function GroupChatPanel({
                         <div className={`max-w-[70%] ${isSent ? "items-end" : "items-start"}`}>
                           {showAvatar && !isSent && sender && (
                             <div className="mb-1 flex items-center gap-2">
-                              <span className="text-sm font-medium text-foreground">{sender.name}</span>
+                              <span className="font-medium text-foreground text-sm">{sender.name}</span>
                               <Badge
                                 variant="secondary"
-                                className={`text-[10px] px-1.5 py-0 ${roleColors[sender.role] || ""}`}
+                                className={`px-1.5 py-0 text-[10px] ${roleColors[sender.role] || ""}`}
                               >
                                 {sender.role
                                   .split(" ")
@@ -343,8 +359,8 @@ export function GroupChatPanel({
                           <div
                             className={`rounded-2xl px-4 py-2 ${
                               isSent
-                                ? "bg-primary text-primary-foreground rounded-br-md"
-                                : "bg-muted text-foreground rounded-bl-md"
+                                ? "rounded-br-md bg-primary text-primary-foreground"
+                                : "rounded-bl-md bg-muted text-foreground"
                             }`}
                           >
                             <p className="text-sm leading-relaxed">{message.content}</p>
@@ -356,8 +372,7 @@ export function GroupChatPanel({
                           >
                             <span>{formatTime(message.timestamp)}</span>
                             {isSent && (
-                              <>
-                                {message.readBy.length > 1 ? (
+                              message.readBy.length > 1 ? (
                                   <TooltipProvider>
                                     <Tooltip>
                                       <TooltipTrigger asChild>
@@ -380,8 +395,7 @@ export function GroupChatPanel({
                                   </TooltipProvider>
                                 ) : (
                                   <Check className="h-3 w-3" />
-                                )}
-                              </>
+                                )
                             )}
                           </div>
                         </div>
@@ -394,7 +408,7 @@ export function GroupChatPanel({
 
             {/* Typing Indicator */}
             {typingMemberNames.length > 0 && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
                 <div className="flex gap-1">
                   <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50 [animation-delay:-0.3s]" />
                   <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50 [animation-delay:-0.15s]" />
@@ -416,13 +430,13 @@ export function GroupChatPanel({
         {showMembers && (
           <div className="w-56 border-l bg-background">
             <div className="border-b p-3">
-              <h4 className="text-sm font-medium">Members ({roomMembers.length})</h4>
+              <h4 className="font-medium text-sm">Members ({roomMembers.length})</h4>
             </div>
             <ScrollArea className="h-[calc(100%-45px)]">
               <div className="p-2">
                 {/* Online Members */}
                 <div className="mb-3">
-                  <p className="mb-2 px-2 text-xs font-medium text-muted-foreground uppercase">
+                  <p className="mb-2 px-2 font-medium text-muted-foreground text-xs uppercase">
                     Online - {onlineMembers.length}
                   </p>
                   {onlineMembers.map((member) => (
@@ -433,10 +447,10 @@ export function GroupChatPanel({
                             {getInitials(member.name)}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full border border-card bg-emerald-500" />
+                        <span className="absolute right-0 bottom-0 h-2 w-2 rounded-full border border-card bg-emerald-500" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-xs font-medium">{member.name}</p>
+                        <p className="truncate font-medium text-xs">{member.name}</p>
                         <p className="truncate text-[10px] text-muted-foreground">{member.role}</p>
                       </div>
                     </div>
@@ -446,7 +460,7 @@ export function GroupChatPanel({
                 {/* Offline Members */}
                 {roomMembers.filter((m) => !m.isOnline).length > 0 && (
                   <div>
-                    <p className="mb-2 px-2 text-xs font-medium text-muted-foreground uppercase">
+                    <p className="mb-2 px-2 font-medium text-muted-foreground text-xs uppercase">
                       Offline - {roomMembers.filter((m) => !m.isOnline).length}
                     </p>
                     {roomMembers
@@ -462,7 +476,7 @@ export function GroupChatPanel({
                             </AvatarFallback>
                           </Avatar>
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-xs font-medium">{member.name}</p>
+                            <p className="truncate font-medium text-xs">{member.name}</p>
                             <p className="truncate text-[10px] text-muted-foreground">
                               {member.lastSeen ? getRelativeTime(member.lastSeen) : "Offline"}
                             </p>
@@ -497,7 +511,7 @@ export function GroupChatPanel({
               }
               className="pr-10"
             />
-            <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2">
+            <Button variant="ghost" size="icon" className="-translate-y-1/2 absolute top-1/2 right-1 h-7 w-7">
               <Smile className="h-4 w-4 text-muted-foreground" />
               <span className="sr-only">Add emoji</span>
             </Button>

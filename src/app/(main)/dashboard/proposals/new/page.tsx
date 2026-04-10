@@ -12,10 +12,10 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { getDepartmentsSelector } from "@/lib/api/departments/queries";
@@ -23,6 +23,7 @@ import { createProposal } from "@/lib/api/proposals/mutations";
 import type { DepartmentOption, UserOption } from "@/lib/api/proposals/types";
 import { type ProposalMemberRole, ProposalProgram } from "@/lib/api/proposals/types";
 import { getAdvisors, getUsers } from "@/lib/api/users/queries";
+import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 
 /**----------------------
@@ -81,8 +82,21 @@ export default function NewProposalPage() {
     const loadSelectors = async () => {
       try {
         setLoadingSelectors(true);
-        const [depts, advs, membs] = await Promise.all([getDepartmentsSelector(), getAdvisors(), getUsers()]);
-        setDepartments(depts);
+        // We still call the API but we prefer the specific engineering samples requested
+        const [_, advs, membs] = await Promise.all([getDepartmentsSelector(), getAdvisors(), getUsers()]);
+
+        const sampleDepartments = [
+          { value: "dept-1", label: "Computer Science and Engineering" },
+          { value: "dept-2", label: "Software Engineering" },
+          { value: "dept-3", label: "Communication Engineering" },
+          { value: "dept-4", label: "Architectural Engineering" },
+          { value: "dept-5", label: "Civil Engineering" },
+          { value: "dept-6", label: "Water Engineering" },
+          { value: "dept-7", label: "Mechanical Engineering" },
+          { value: "dept-8", label: "Chemical Engineering" },
+        ];
+
+        setDepartments(sampleDepartments);
         setAdvisors(advs);
         setMembers(membs);
       } catch (error) {
@@ -317,9 +331,10 @@ export default function NewProposalPage() {
         <CardContent className="flex-1 p-0">
           {/* STEP 1: DRAFT */}
           {currentStep === 0 && (
-            <div className="fade-in slide-in-from-right-4 mx-auto mt-4 flex max-w-3xl animate-in flex-col gap-5 duration-500">
+            <div className="fade-in slide-in-from-right-4 mx-auto mt-4 flex max-w-4xl animate-in flex-col gap-6 duration-500">
+              {/* Proposal Title - Full Width */}
               <div className="grid gap-1.5">
-                <Label htmlFor="title" className="font-medium text-sm">
+                <Label htmlFor="title" className="font-semibold text-sm">
                   Proposal Title
                 </Label>
                 <Input
@@ -327,69 +342,65 @@ export default function NewProposalPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Next-Gen Photovoltaic Micro-Cells..."
-                  className="h-10 rounded-md bg-white text-sm dark:bg-slate-950"
+                  className="h-10 rounded-md bg-white font-medium text-sm shadow-xs transition-shadow focus:shadow-md dark:bg-slate-950"
                 />
               </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="abstract" className="font-medium text-sm">
-                  Abstract & Core Objectives
-                </Label>
-                <Textarea
-                  id="abstract"
-                  value={abstract}
-                  onChange={(e) => setAbstract(e.target.value)}
-                  placeholder="Provide a comprehensive summary of the research scope, expected outcomes, and scientific merit..."
-                  className="min-h-[140px] resize-y rounded-md bg-white text-sm dark:bg-slate-950"
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="researchArea" className="font-medium text-sm">
-                  Research Area
-                </Label>
-                <Input
-                  id="researchArea"
-                  value={researchArea}
-                  onChange={(e) => setResearchArea(e.target.value)}
-                  placeholder="e.g. Renewable Energy, Machine Learning..."
-                  className="h-10 rounded-md bg-white text-sm dark:bg-slate-950"
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="proposalProgram" className="font-medium text-sm">
-                  Proposal Program
-                </Label>
-                <Select value={proposalProgram} onValueChange={(val) => setProposalProgram(val as ProposalProgram)}>
-                  <SelectTrigger className="h-10 rounded-md bg-white text-sm dark:bg-slate-950">
-                    <SelectValue placeholder="Select a program..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={ProposalProgram.UG}>Undergraduate (UG)</SelectItem>
-                    <SelectItem value={ProposalProgram.PG}>Postgraduate (PG)</SelectItem>
-                    <SelectItem value={ProposalProgram.GENERAL}>General</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="departmentId" className="font-medium text-sm">
-                  Department
-                </Label>
-                <Select value={departmentId} onValueChange={setDepartmentId} disabled={loadingSelectors}>
-                  <SelectTrigger className="h-10 rounded-md bg-white text-sm dark:bg-slate-950">
-                    <SelectValue placeholder={loadingSelectors ? "Loading..." : "Select a department..."} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {departments.map((dept) => (
-                      <SelectItem key={dept.value} value={dept.value}>
-                        {dept.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+
+              {/* Research Info - Grid Layout */}
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="grid gap-1.5">
-                  <Label htmlFor="durationMonths" className="font-medium text-sm">
-                    Duration (Months)
+                  <Label htmlFor="researchArea" className="font-semibold text-slate-700 text-sm dark:text-slate-300">
+                    Research Area
+                  </Label>
+                  <Input
+                    id="researchArea"
+                    value={researchArea}
+                    onChange={(e) => setResearchArea(e.target.value)}
+                    placeholder="e.g. Renewable Energy..."
+                    className="h-10 rounded-md bg-white text-sm dark:bg-slate-950"
+                  />
+                </div>
+
+                <div className="grid gap-1.5">
+                  <Label htmlFor="proposalProgram" className="font-semibold text-slate-700 text-sm dark:text-slate-300">
+                    Proposal Program
+                  </Label>
+                  <Select value={proposalProgram} onValueChange={(val) => setProposalProgram(val as ProposalProgram)}>
+                    <SelectTrigger className="h-10 rounded-md bg-white text-sm dark:bg-slate-950">
+                      <SelectValue placeholder="Select a program..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={ProposalProgram.UG}>Undergraduate (UG)</SelectItem>
+                      <SelectItem value={ProposalProgram.PG}>Postgraduate (PG)</SelectItem>
+                      <SelectItem value={ProposalProgram.GENERAL}>General</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid gap-1.5 sm:col-span-2 lg:col-span-1">
+                  <Label htmlFor="departmentId" className="font-semibold text-slate-700 text-sm dark:text-slate-300">
+                    Host Department
+                  </Label>
+                  <Select value={departmentId} onValueChange={setDepartmentId} disabled={loadingSelectors}>
+                    <SelectTrigger className="h-10 rounded-md bg-white text-sm dark:bg-slate-950">
+                      <SelectValue placeholder={loadingSelectors ? "Loading..." : "Select a department..."} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {departments.map((dept) => (
+                        <SelectItem key={dept.value} value={dept.value}>
+                          {dept.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Duration & Funding Toggle */}
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="grid gap-1.5">
+                  <Label htmlFor="durationMonths" className="font-semibold text-sm">
+                    Estimated Duration (Months)
                   </Label>
                   <Input
                     id="durationMonths"
@@ -401,12 +412,53 @@ export default function NewProposalPage() {
                     className="h-10 rounded-md bg-white text-sm dark:bg-slate-950"
                   />
                 </div>
-                <div className="flex items-end">
-                  <div className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-950">
-                    <Checkbox
+                <div className="flex flex-col justify-end">
+                  <Label className="mb-2 font-semibold text-slate-700 text-sm dark:text-slate-300">
+                    Grant & Funding
+                  </Label>
+                  {/* biome-ignore lint/a11y/useSemanticElements: Nested interactive elements (Switch) prevent using button */}
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setIsFunded(!isFunded)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setIsFunded(!isFunded);
+                      }
+                    }}
+                    className={cn(
+                      "group flex h-16 cursor-pointer select-none items-center justify-between rounded-xl border p-4 transition-all duration-300",
+                      isFunded
+                        ? "border-blue-200 bg-blue-50/50 shadow-[0_0_15px_rgba(59,130,246,0.1)] dark:border-blue-800/50 dark:bg-blue-900/10"
+                        : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-950",
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={cn(
+                          "flex h-8 w-8 items-center justify-center rounded-lg border transition-colors",
+                          isFunded
+                            ? "border-blue-600 bg-blue-600 text-white shadow-sm"
+                            : "border-slate-200 bg-slate-50 text-slate-400 dark:border-slate-800 dark:bg-slate-900",
+                        )}
+                      >
+                        <Plus className={cn("h-4 w-4 transition-transform duration-300", isFunded && "rotate-45")} />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-[13px] text-slate-900 leading-tight dark:text-slate-100">
+                          Is this a funded project?
+                        </span>
+                        <span className="text-[11px] text-slate-500">
+                          If enabled, the Department Head will release the budget for this project.
+                        </span>
+                      </div>
+                    </div>
+                    <Switch
                       id="isFunded"
                       checked={isFunded}
-                      onCheckedChange={(checked) => setIsFunded(Boolean(checked))}
+                      onCheckedChange={setIsFunded}
+                      className="data-[state=checked]:bg-blue-600"
                     />
                     <Label htmlFor="isFunded" className="cursor-pointer font-medium text-sm">
                       Is Funded
@@ -414,8 +466,22 @@ export default function NewProposalPage() {
                   </div>
                 </div>
               </div>
+
               <div className="grid gap-1.5">
-                <Label className="font-medium text-sm">Supporting Document</Label>
+                <Label htmlFor="abstract" className="font-semibold text-sm">
+                  Abstract & Core Objectives
+                </Label>
+                <Textarea
+                  id="abstract"
+                  value={abstract}
+                  onChange={(e) => setAbstract(e.target.value)}
+                  placeholder="Provide a comprehensive summary of the research scope, expected outcomes, and scientific merit..."
+                  className="min-h-[140px] resize-y rounded-md bg-white text-sm dark:bg-slate-950"
+                />
+              </div>
+
+              <div className="grid gap-1.5">
+                <Label className="font-semibold text-sm">Supporting Layout Files</Label>
                 <input
                   type="file"
                   id="file-upload"
@@ -425,17 +491,20 @@ export default function NewProposalPage() {
                 />
                 <label
                   htmlFor="file-upload"
-                  className="flex cursor-pointer flex-col items-center justify-center rounded-lg border border-slate-300 border-dashed bg-slate-50/50 p-6 text-center transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900/30 dark:hover:bg-slate-800/50"
+                  className="flex cursor-pointer flex-col items-center justify-center rounded-lg border border-slate-300 border-dashed bg-slate-50/20 p-8 text-center transition-all hover:border-slate-400 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/20 dark:hover:bg-slate-800/50"
                 >
-                  <FileUp className="mb-2 h-5 w-5 text-slate-400" />
-                  <p className="font-medium text-[13px] text-slate-700 dark:text-slate-300">
-                    Upload full proposal layout (Optional)
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
+                    <FileUp className="h-5 w-5" />
+                  </div>
+                  <p className="mt-2 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                    Upload full proposal layout
                   </p>
-                  <p className="mt-0.5 text-[11px] text-slate-500">PDF or DOCX (max 10MB)</p>
+                  <p className="mt-0.5 text-balance text-slate-500 text-xs">PDF or DOCX (maximum 10MB)</p>
                   {file && (
-                    <Badge className="mt-3 border border-slate-200 bg-slate-100 px-2 py-0.5 text-slate-700 text-xs shadow-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                      {file.name}
-                    </Badge>
+                    <div className="mt-4 flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50/50 px-3 py-1 text-blue-700 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-300">
+                      <Check className="h-3.5 w-3.5" />
+                      <span className="max-w-[200px] truncate font-semibold text-xs">{file.name}</span>
+                    </div>
                   )}
                 </label>
               </div>
@@ -639,61 +708,75 @@ export default function NewProposalPage() {
 
           {/* STEP 3: BUDGET */}
           {currentStep === 2 && (
-            <div className="fade-in slide-in-from-right-4 mx-auto mt-4 flex max-w-4xl animate-in flex-col gap-4 duration-500">
-              {/* Simple Header */}
-              <div className="mb-2 flex items-end justify-between border-slate-200 border-b pb-2 dark:border-slate-800">
+            <div className="fade-in slide-in-from-right-4 mx-auto mt-4 flex max-w-4xl animate-in flex-col gap-5 duration-500">
+              {/* Financial Dashboard Header */}
+              <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-slate-100 bg-slate-50/40 p-5 sm:flex-row dark:border-slate-800 dark:bg-slate-900/10">
                 <div>
-                  <h3 className="font-semibold text-slate-900 dark:text-slate-100">Financial Breakdown</h3>
-                  <p className="text-slate-500 text-xs">Provide detailed estimate of needed funds.</p>
+                  <h3 className="font-bold text-slate-800 text-sm tracking-tight dark:text-slate-100">
+                    Project Financial Breakdown
+                  </h3>
+                  <p className="mt-1 text-slate-500 text-xs">Itemize all estimated expenditures for this research.</p>
                 </div>
-                <div className="text-right">
-                  <p className="font-bold text-[10px] text-slate-500 uppercase">Total Requested</p>
-                  <p className="font-bold text-blue-600 text-xl dark:text-blue-400">
-                    $
-                    {calculateTotalBudget().toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </p>
+                <div className="flex items-center gap-6">
+                  <div className="hidden h-10 w-px bg-slate-200 sm:block dark:bg-slate-800" />
+                  <div className="text-right">
+                    <p className="font-bold text-[10px] text-slate-400 uppercase tracking-widest">
+                      Initial Grant Estimate
+                    </p>
+                    <p className="font-bold text-2xl text-blue-600 dark:text-blue-400">
+                      $
+                      {calculateTotalBudget().toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              <div className="overflow-hidden rounded-md border border-slate-200 dark:border-slate-800">
+              {/* Table Construction */}
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
                 <Table>
-                  <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
-                    <TableRow>
-                      <TableHead className="h-9 w-[25%] font-semibold text-xs">Category</TableHead>
-                      <TableHead className="h-9 font-semibold text-xs">Justification</TableHead>
-                      <TableHead className="h-9 w-[150px] text-right font-semibold text-xs">Amount ($)</TableHead>
-                      <TableHead className="h-9 w-[50px]" />
+                  <TableHeader className="bg-slate-50/50 dark:bg-slate-900/50">
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="h-11 w-[20%] px-4 font-bold text-slate-700 text-xs uppercase tracking-wider dark:text-slate-300">
+                        Category
+                      </TableHead>
+                      <TableHead className="h-11 px-4 font-bold text-slate-700 text-xs uppercase tracking-wider dark:text-slate-300">
+                        Justification / Details
+                      </TableHead>
+                      <TableHead className="h-11 w-[180px] px-4 text-right font-bold text-slate-700 text-xs uppercase tracking-wider dark:text-slate-300">
+                        Amount ($)
+                      </TableHead>
+                      <TableHead className="h-11 w-[60px]" />
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {budgetRows.map((row) => (
-                      <TableRow key={row.id}>
-                        <TableCell className="p-2">
+                      <TableRow key={row.id} className="group border-slate-100 dark:border-slate-800/50">
+                        <TableCell className="p-2 px-3">
                           <Input
                             placeholder="e.g. Travel"
                             value={row.title}
                             onChange={(e) => handleUpdateBudgetRow(row.id, "title", e.target.value)}
-                            className="h-8 border-slate-200 text-sm focus-visible:ring-1 dark:border-slate-800"
+                            className="h-9 border-none bg-transparent font-medium text-sm focus-visible:ring-1 focus-visible:ring-blue-500/30"
                           />
                         </TableCell>
-                        <TableCell className="p-2">
+                        <TableCell className="p-2 px-3">
                           <Input
-                            placeholder="Details..."
+                            placeholder="e.g. Academic conference flights..."
                             value={row.description}
                             onChange={(e) => handleUpdateBudgetRow(row.id, "description", e.target.value)}
-                            className="h-8 border-slate-200 text-sm focus-visible:ring-1 dark:border-slate-800"
+                            className="h-9 border-none bg-transparent text-sm focus-visible:ring-1 focus-visible:ring-blue-500/30 dark:text-slate-300"
                           />
                         </TableCell>
-                        <TableCell className="p-2">
+                        <TableCell className="p-2 px-3">
                           <Input
                             type="number"
                             placeholder="0.00"
                             value={row.amount}
                             onChange={(e) => handleUpdateBudgetRow(row.id, "amount", e.target.value)}
-                            className="h-8 border-slate-200 text-right font-medium text-sm focus-visible:ring-1 dark:border-slate-800"
+                            className="h-9 border-none bg-transparent text-right font-bold text-blue-600 focus-visible:ring-1 focus-visible:ring-blue-500/30 dark:text-blue-400"
                           />
                         </TableCell>
                         <TableCell className="p-2 text-right">
@@ -701,25 +784,33 @@ export default function NewProposalPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleRemoveBudgetRow(row.id)}
-                            className="h-8 w-8 text-slate-400 hover:text-red-500"
+                            className="h-8 w-8 text-slate-300 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 dark:hover:bg-red-900/20"
                           >
-                            <Trash2 className="h-3.5 w-3.5" />
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
+                {budgetRows.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-10 text-center">
+                    <p className="text-slate-400 text-sm italic">No budget items added yet.</p>
+                  </div>
+                )}
               </div>
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleAddBudgetRow}
-                className="mt-2 h-8 w-fit border-dashed text-xs"
-              >
-                <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Row
-              </Button>
+              <div className="flex justify-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddBudgetRow}
+                  className="h-9 gap-2 border-dashed bg-slate-50/50 px-6 font-semibold text-slate-600 shadow-none hover:border-slate-300 hover:bg-slate-100 dark:bg-slate-900/20 dark:text-slate-400"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Add Expenditure Line
+                </Button>
+              </div>
             </div>
           )}
 
@@ -818,23 +909,26 @@ export default function NewProposalPage() {
                 </div>
 
                 {/* 3. Budget */}
-                <div className="flex flex-col md:flex-row">
-                  <div className="shrink-0 border-slate-200 border-r bg-slate-50 p-4 md:w-1/4 dark:border-slate-700 dark:bg-slate-900">
-                    <p className="font-bold text-[11px] text-slate-500 uppercase tracking-wider">3. Budget Est.</p>
-                  </div>
-                  <div className="flex flex-1 items-center p-4">
-                    <div>
-                      <p className="mb-1 font-medium text-slate-500 text-xs">Total Funds Requested</p>
-                      <p className="font-bold text-slate-900 text-xl dark:text-slate-100">
-                        $
-                        {calculateTotalBudget().toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                        })}
-                      </p>
-                      <p className="mt-1 text-slate-400 text-xs">Spanning {budgetRows.length} categorized items.</p>
+                {isFunded && (
+                  <div className="flex flex-col md:flex-row">
+                    <div className="shrink-0 border-slate-200 border-r bg-slate-50 p-4 md:w-1/4 dark:border-slate-700 dark:bg-slate-900">
+                      <p className="font-bold text-[11px] text-slate-500 uppercase tracking-wider">3. Budget Est.</p>
+                    </div>
+                    <div className="flex flex-1 items-center p-4">
+                      <div>
+                        <p className="mb-1 font-medium text-slate-500 text-xs">Total Funds Requested</p>
+                        <p className="font-bold text-slate-900 text-xl dark:text-slate-100">
+                          $
+                          {calculateTotalBudget().toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </p>
+                        <p className="mt-1 text-slate-400 text-xs">Spanning {budgetRows.length} categorized items.</p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           )}

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /** biome-ignore-all assist/source/organizeImports: intentional suppression */
+=======
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
+>>>>>>> main
 "use client";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -19,8 +23,10 @@ type ChatMessage = Omit<GroupChatMessage, "roomId" | "senderName" | "readBy"> & 
   senderId: string;
   isRead: boolean;
 };
-import { Check, CheckCheck, MoreVertical, Paperclip, Send, Smile, User } from "lucide-react";
+
 import { useEffect, useRef, useState } from "react";
+
+import { Check, CheckCheck, MoreVertical, Paperclip, Send, Smile, User } from "lucide-react";
 
 interface ChatPanelProps {
   member: TeamMember;
@@ -41,7 +47,14 @@ function getInitials(name: string) {
 
 function formatTime(timestamp: string) {
   const date = new Date(timestamp);
+<<<<<<< HEAD
   return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+=======
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+>>>>>>> main
 }
 
 function formatDateHeader(timestamp: string) {
@@ -56,7 +69,15 @@ function formatDateHeader(timestamp: string) {
   if (date.toDateString() === yesterday.toDateString()) {
     return "Yesterday";
   }
+<<<<<<< HEAD
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+=======
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+>>>>>>> main
 }
 
 export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRemoveMember }: ChatPanelProps) {

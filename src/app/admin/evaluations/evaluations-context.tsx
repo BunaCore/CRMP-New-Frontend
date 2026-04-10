@@ -1,11 +1,14 @@
 "use client";
 
 import type React from "react";
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+
+import { getPendingApprovals } from "@/lib/api/proposals/queries";
+import type { PendingApproval } from "@/lib/api/proposals/types";
 
 import { ADVISORS, EVALUATORS } from "../proposals/_data/mock-proposals";
 import type { Evaluator } from "../proposals/types";
-import { DEMO_RUBRIC, EVAL_PROJECTS, EVAL_PROPOSALS } from "./_data/mock-evaluations";
+import { DEMO_RUBRIC } from "./_data/mock-evaluations";
 import type { DrawerTab, EvalProjectRow, EvalProposalRow, MainTab, RubricItem } from "./types";
 
 export function rubricTotals(items: RubricItem[]) {
@@ -65,6 +68,8 @@ interface EvaluationsContextValue {
   selectionKey: string;
   isEvalApproved: boolean;
   isEvalRejected: boolean;
+
+  isLoadingProposals: boolean;
 
   filteredProposals: EvalProposalRow[];
   filteredProjects: EvalProjectRow[];
@@ -138,12 +143,38 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
 
   const totals = useMemo(() => rubricTotals(rubric), [rubric]);
 
-  const filteredProposals = EVAL_PROPOSALS.filter((p) =>
+  // ── Real API: proposals table data ───────────────────────────────────────────
+  const [apiProposals, setApiProposals] = useState<EvalProposalRow[]>([]);
+  const [isLoadingProposals, setIsLoadingProposals] = useState(true);
+
+  useEffect(() => {
+    setIsLoadingProposals(true);
+    getPendingApprovals()
+      .then((data: PendingApproval[]) => {
+        const mapped: EvalProposalRow[] = data.map((p) => ({
+          id: p.id,
+          title: p.title,
+          pi: p.createdByName,
+          piAvatar: p.createdByName.slice(0, 2).toUpperCase(),
+          piColor: "bg-indigo-100 text-indigo-700",
+          dept: p.currentApproverRole,
+          stage: p.stepLabel,
+          budget: "—", // Budget not in PendingApproval — fetched in drawer
+        }));
+        setApiProposals(mapped);
+      })
+      .catch(() => {
+        // silently fall back to empty; error shown in UI
+        setApiProposals([]);
+      })
+      .finally(() => setIsLoadingProposals(false));
+  }, []);
+
+  const filteredProposals = apiProposals.filter((p) =>
     (p.title + p.pi + p.id + p.dept).toLowerCase().includes(search.toLowerCase()),
   );
-  const filteredProjects = EVAL_PROJECTS.filter((p) =>
-    (p.title + p.lead + p.id + p.dept).toLowerCase().includes(search.toLowerCase()),
-  );
+  // Projects: no dedicated backend endpoint yet — keep empty until connected
+  const filteredProjects: EvalProjectRow[] = [];
 
   const filteredEvals = EVALUATORS.filter((e) =>
     (e.name + e.specialty).toLowerCase().includes(evalSearch.toLowerCase()),
@@ -253,6 +284,7 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
         selectionKey,
         isEvalApproved,
         isEvalRejected,
+        isLoadingProposals,
         filteredProposals,
         filteredProjects,
         openDrawerProposal,

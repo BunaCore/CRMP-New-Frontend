@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 /** biome-ignore-all assist/source/organizeImports: intentional suppression */
+=======
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
+>>>>>>> main
 "use client";
+
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +21,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { departmentOptions, roleOptions, statusOptions } from "@/lib/team-data";
-import { useState } from "react";
 
 interface AddMemberDialogProps {
   open: boolean;

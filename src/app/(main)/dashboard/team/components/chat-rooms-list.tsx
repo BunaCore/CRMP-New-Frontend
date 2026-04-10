@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 /** biome-ignore-all assist/source/organizeImports: intentional suppression */
+=======
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
+>>>>>>> main
 "use client";
+
+import { Hash, MessageSquarePlus, Search, User } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ChatRoom, TeamMember } from "@/lib/team-data";
-import { Hash, MessageSquarePlus, Search, User } from "lucide-react";
 
 interface ChatRoomsListProps {
   rooms: ChatRoom[];

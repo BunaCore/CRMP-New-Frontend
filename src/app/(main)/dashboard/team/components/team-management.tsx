@@ -1,21 +1,30 @@
+<<<<<<< HEAD
 /** biome-ignore-all lint/nursery/useSortedClasses: intentional suppression */
 /** biome-ignore-all lint/style/noNonNullAssertion: intentional suppression */
 /** biome-ignore-all lint/correctness/noUnusedImports: intentional suppression */
 /** biome-ignore-all assist/source/organizeImports: intentional suppression */
+=======
+/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
+/** biome-ignore-all lint/correctness/noUnusedImports: <explanation> */
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
+>>>>>>> main
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
+
+import { Hash, } from "lucide-react";
+
 import {
+  autoReplyMessages,
   type ChatRoom,
   type GroupChatMessage,
-  type TeamMember,
-  autoReplyMessages,
   chatRooms as initialChatRooms,
   directMessages as initialDirectMessages,
   groupChatMessages as initialGroupMessages,
   teamMembers as initialTeamMembers,
+  type TeamMember,
 } from "@/lib/team-data";
-import { Hash, User } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { ChatRoomsList } from "./chat-rooms-list";
 import { GroupChatPanel } from "./group-chat-panel";
 
@@ -284,10 +293,15 @@ export function TeamManagement() {
         const partnerId = selectedRoom.memberIds.find((id) => id !== CURRENT_USER_ID);
         const partner = teamMembers.find((m) => m.id === partnerId);
 
+<<<<<<< HEAD
         if (partner?.isOnline && Math.random() < 0.6) {
+=======
+        if (!partnerId || !partner) return;
+        if (partner.isOnline && Math.random() < 0.6) {
+>>>>>>> main
           // Show typing after a delay
           setTimeout(
-            () => {
+            () => 
               setTypingUsers([partnerId!]);
 
               // Send reply after typing
@@ -319,8 +333,7 @@ export function TeamManagement() {
                   );
                 },
                 2000 + Math.random() * 2000,
-              );
-            },
+              );,
             1000 + Math.random() * 2000,
           );
         }
@@ -395,8 +408,8 @@ export function TeamManagement() {
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
               <Hash className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="mt-4 text-lg font-medium text-foreground">No conversation selected</h3>
-            <p className="mt-1 text-sm text-muted-foreground">Select a chat room or start a direct message</p>
+            <h3 className="mt-4 font-medium text-foreground text-lg">No conversation selected</h3>
+            <p className="mt-1 text-muted-foreground text-sm">Select a chat room or start a direct message</p>
           </div>
         )}
       </div>

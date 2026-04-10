@@ -1,6 +1,13 @@
+<<<<<<< HEAD
 /** biome-ignore-all assist/source/organizeImports: intentional suppression */
 /** biome-ignore-all lint/nursery/useSortedClasses: intentional suppression */
+=======
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
+/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
+>>>>>>> main
 "use client";
+
+import { Plus, Search } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -8,8 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { type TeamMember, roleOptions, statusOptions } from "@/lib/team-data";
-import { Plus, Search } from "lucide-react";
+import { roleOptions, statusOptions, type TeamMember } from "@/lib/team-data";
 import { cn } from "@/lib/utils";
 
 interface TeamListProps {
@@ -77,7 +83,7 @@ export function TeamList({
 
         {/* Search */}
         <div className="relative mb-3">
-          <Search className="absolute h-4 left-3 text-muted-foreground top-1/2 w-4 -translate-y-1/2" />
+          <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search members..."
             value={searchQuery}
@@ -102,7 +108,11 @@ export function TeamList({
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={onStatusFilterChange}>
+<<<<<<< HEAD
             <SelectTrigger className="h-8 w-[100px] text-xs">
+=======
+            <SelectTrigger className="h-8 w-25 text-xs">
+>>>>>>> main
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -153,11 +163,11 @@ export function TeamList({
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-medium text-sm text-foreground truncate">{member.name}</p>
+                      <p className="truncate font-medium text-foreground text-sm">{member.name}</p>
                     </div>
                     <Badge
                       variant="outline"
-                      className={cn("mt-1 text-[10px] px-1.5 py-0 font-normal", getRoleBadgeVariant(member.role))}
+                      className={cn("mt-1 px-1.5 py-0 font-normal text-[10px]", getRoleBadgeVariant(member.role))}
                     >
                       {member.role}
                     </Badge>
@@ -171,7 +181,7 @@ export function TeamList({
 
       {/* Footer */}
       <div className="border-t p-3">
-        <p className="text-xs text-muted-foreground text-center">
+        <p className="text-center text-muted-foreground text-xs">
           {members.length} member{members.length !== 1 ? "s" : ""} shown
         </p>
       </div>

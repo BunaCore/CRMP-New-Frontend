@@ -29,9 +29,37 @@ import {
 } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useSession } from "@/context/SessionContext";
 
 export default function DashboardPage() {
   const [showRSVPModal, setShowRSVPModal] = useState(false);
+  const { user } = useSession();
+
+  // Role labels for header
+  const getRoleLabel = (roles: string[] | undefined) => {
+    if (!roles || roles.length === 0) return "Researcher";
+    const map: Record<string, string> = {
+      PI: "Principal Investigator",
+      RAD: "Research & Dev.",
+      RA: "Research Associate",
+      ADRPM: "Assoc. Dir. RPM",
+      AC: "Academic Coordinator",
+      VPRTT: "VP Research",
+      Finance: "Finance",
+      Coordinator: "Coordinator",
+      Department: "Department Head",
+      "College/School": "College / School",
+      PGMO: "PG Management",
+      "Examiner/Evaluator": "Evaluator",
+      Advisor: "Advisor",
+      Evaluator: "Evaluator",
+      DGC_MEMBER: "DGC Member",
+      PG_OFFICE: "PG Office",
+    };
+    return map[roles[0]] ?? roles[0];
+  };
+
+  const roleLabel = getRoleLabel(user?.roles);
 
   // Mock data for projects
   const projects = [
@@ -175,10 +203,11 @@ export default function DashboardPage() {
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="font-semibold text-3xl text-slate-900 tracking-tight dark:text-slate-100">
-            Principal Investigator Dashboard
+            {roleLabel} Dashboard
           </h1>
           <p className="mt-1.5 font-medium text-slate-500 text-sm dark:text-slate-400">
-            Welcome back. Here&apos;s an overview of your research projects and team.
+            Welcome back{user?.name ? `, ${user.name}` : ""}. Here&apos;s an overview of your research projects and
+            team.
           </p>
         </div>
         <Button className="w-full rounded-full border-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 font-medium text-white shadow transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-md sm:w-auto">

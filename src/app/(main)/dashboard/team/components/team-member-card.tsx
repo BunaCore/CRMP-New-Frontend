@@ -1,7 +1,12 @@
+<<<<<<< HEAD
 /** biome-ignore-all assist/source/organizeImports: intentional suppression */
+=======
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
+>>>>>>> main
 "use client";
 
 import { Eye, Mail, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
