@@ -183,5 +183,26 @@ const DEFAULT_MOCK: LoginResponse = {
 /** Returns a mock successful login response for the given email (~600ms simulated delay). */
 export async function getMockLoginResponse(email: string): Promise<LoginResponse> {
   await new Promise((resolve) => setTimeout(resolve, 600));
-  return MOCK_USERS[email.toLowerCase()] ?? DEFAULT_MOCK;
+
+  const normalizedEmail = email.toLowerCase();
+
+  // If user exists in our specific list, return them
+  if (MOCK_USERS[normalizedEmail]) {
+    return MOCK_USERS[normalizedEmail];
+  }
+
+  // Otherwise, create a dynamic user on the fly based on the entered email
+  // This makes "any" login work with the data provided.
+  const nameFromEmail = email.split("@")[0].replace(/[._-]/g, " ");
+  const capitalizedName = nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1);
+
+  return {
+    access_token: `mock_token_${Math.random().toString(36).substring(7)}`,
+    user: {
+      ...DEFAULT_MOCK.user,
+      id: `usr_${Math.floor(Math.random() * 1000)}`,
+      email: normalizedEmail,
+      fullName: capitalizedName,
+    },
+  };
 }

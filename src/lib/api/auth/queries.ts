@@ -9,7 +9,7 @@ import type { UserProfile } from "@/lib/api/auth/types";
 import { mapBackendPermissionsToFrontend } from "@/lib/permissions/permission-mapper";
 
 // ─── 🟢 MOCK SWITCH ──────────────────────────────────────────
-const USE_MOCK = false;
+const USE_MOCK = true;
 // ─────────────────────────────────────────────────────────────
 
 /**
