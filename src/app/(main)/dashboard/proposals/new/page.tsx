@@ -519,7 +519,7 @@ export default function NewProposalPage() {
                                 <span className="font-medium text-blue-700 text-xs dark:text-blue-300">
                                   {user.fullName}
                                 </span>
-                                <Badge className="h-5 bg-blue-600 text-white text-[10px] px-1.5">PI</Badge>
+                                <Badge className="h-5 bg-blue-600 px-1.5 text-[10px] text-white">PI</Badge>
                               </div>
                               <span className="text-[10px] text-slate-500">Added automatically</span>
                             </div>
@@ -782,7 +782,7 @@ export default function NewProposalPage() {
                             className="flex items-center gap-1 truncate rounded border border-blue-200 bg-blue-50 px-2 py-1 font-medium text-[13px] text-blue-800 dark:border-blue-800/50 dark:bg-blue-900/20 dark:text-blue-300"
                           >
                             <span className="truncate">{user.fullName}</span>
-                            <Badge className="h-4 bg-blue-600 text-white text-[10px] px-1 whitespace-nowrap">PI</Badge>
+                            <Badge className="h-4 whitespace-nowrap bg-blue-600 px-1 text-[10px] text-white">PI</Badge>
                           </div>
                         ) : null;
                       })()}

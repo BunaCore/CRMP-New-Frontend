@@ -30,7 +30,6 @@ export default function ProposalDetailsPage() {
   const params = useParams();
   const id = params?.id || "PRP-044";
 
-  // ─── MOCK FEATURE TOGGLE ─────────────────────────
   const SHOW_MOCK_APPOINTMENT = true;
   const mockAppointment = {
     title: "Quantum Computing Simulation",

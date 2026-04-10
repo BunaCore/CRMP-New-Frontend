@@ -108,8 +108,8 @@ export function BudgetRequestModals() {
                 />
               </div>
               <p className="text-[10px] text-slate-400">
-                Use this to partially approve if receipts do not cover the full requested amount. The
-                difference rolls back to remaining budget.
+                Use this to partially approve if receipts do not cover the full requested amount. The difference rolls
+                back to remaining budget.
               </p>
             </div>
           </div>
@@ -155,10 +155,7 @@ export function BudgetRequestModals() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label
-                htmlFor="return-comment"
-                className="font-semibold text-[12px] text-slate-700 dark:text-slate-300"
-              >
+              <Label htmlFor="return-comment" className="font-semibold text-[12px] text-slate-700 dark:text-slate-300">
                 Reason for return <span className="text-rose-500">*</span>
               </Label>
               <Textarea

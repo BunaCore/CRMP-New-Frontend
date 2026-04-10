@@ -1,22 +1,53 @@
 "use client";
 
-import { useProposals } from "../proposals-context";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Check, GraduationCap, Search, UserCheck, XCircle } from "lucide-react";
+
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { UserCheck, GraduationCap, Check, XCircle, Search } from "lucide-react";
+
+import { useProposals } from "../proposals-context";
 
 export function ActionsAndModals() {
   const {
     selected,
-    showAssign, setShowAssign, evalSearch, setEvalSearch, filteredEvals, pickedEvalIds, toggleEvalPick, handleAssignConfirm,
-    showAssignAdvisor, setShowAssignAdvisor, advisorSearch, setAdvisorSearch, filteredAdvisors, pickedAdvisorIds, toggleAdvisorPick, handleAssignAdvisorConfirm,
-    showTimelineApprove, setShowTimelineApprove, timelineApproveNote, setTimelineApproveNote, handleTimelineApproveSubmit,
-    showTimelineReject, setShowTimelineReject, timelineRejectComment, setTimelineRejectComment, handleTimelineRejectSubmit
+    showAssign,
+    setShowAssign,
+    evalSearch,
+    setEvalSearch,
+    filteredEvals,
+    pickedEvalIds,
+    toggleEvalPick,
+    handleAssignConfirm,
+    showAssignAdvisor,
+    setShowAssignAdvisor,
+    advisorSearch,
+    setAdvisorSearch,
+    filteredAdvisors,
+    pickedAdvisorIds,
+    toggleAdvisorPick,
+    handleAssignAdvisorConfirm,
+    showTimelineApprove,
+    setShowTimelineApprove,
+    timelineApproveNote,
+    setTimelineApproveNote,
+    handleTimelineApproveSubmit,
+    showTimelineReject,
+    setShowTimelineReject,
+    timelineRejectComment,
+    setTimelineRejectComment,
+    handleTimelineRejectSubmit,
   } = useProposals();
 
   return (
@@ -66,7 +97,9 @@ export function ActionsAndModals() {
                     <AvatarFallback className={`font-bold text-[11px] ${ev.color}`}>{ev.avatar}</AvatarFallback>
                   </Avatar>
                   <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate font-semibold text-[13px] text-slate-900 dark:text-slate-100">{ev.name}</span>
+                    <span className="truncate font-semibold text-[13px] text-slate-900 dark:text-slate-100">
+                      {ev.name}
+                    </span>
                     <span className="truncate font-medium text-[11px] text-slate-500">{ev.specialty}</span>
                   </div>
                   <span className="shrink-0 font-bold text-[10px] text-slate-400">{ev.assigned} pool</span>
@@ -76,10 +109,10 @@ export function ActionsAndModals() {
           </div>
 
           <DialogFooter className="flex flex-col gap-2 border-slate-100 border-t px-6 py-4 sm:flex-row sm:items-center dark:border-slate-800">
-            <p className="mr-auto font-medium text-slate-500 text-xs">
-              {pickedEvalIds.length} selected
-            </p>
-            <Button variant="outline" size="sm" className="h-9" onClick={() => setShowAssign(false)}>Cancel</Button>
+            <p className="mr-auto font-medium text-slate-500 text-xs">{pickedEvalIds.length} selected</p>
+            <Button variant="outline" size="sm" className="h-9" onClick={() => setShowAssign(false)}>
+              Cancel
+            </Button>
             <Button
               size="sm"
               className="h-9 flex-1 bg-blue-600 font-semibold text-white hover:bg-blue-700"
@@ -138,7 +171,9 @@ export function ActionsAndModals() {
                     <AvatarFallback className={`font-bold text-[11px] ${ad.color}`}>{ad.avatar}</AvatarFallback>
                   </Avatar>
                   <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate font-semibold text-[13px] text-slate-900 dark:text-slate-100">{ad.name}</span>
+                    <span className="truncate font-semibold text-[13px] text-slate-900 dark:text-slate-100">
+                      {ad.name}
+                    </span>
                     <span className="truncate font-medium text-[11px] text-slate-500">{ad.specialty}</span>
                   </div>
                   <span className="shrink-0 font-bold text-[10px] text-slate-400">{ad.assigned} active</span>
@@ -148,10 +183,10 @@ export function ActionsAndModals() {
           </div>
 
           <DialogFooter className="flex flex-col gap-2 border-slate-100 border-t px-6 py-4 sm:flex-row sm:items-center dark:border-slate-800">
-            <p className="mr-auto font-medium text-slate-500 text-xs">
-              {pickedAdvisorIds.length} selected
-            </p>
-            <Button variant="outline" size="sm" className="h-9" onClick={() => setShowAssignAdvisor(false)}>Cancel</Button>
+            <p className="mr-auto font-medium text-slate-500 text-xs">{pickedAdvisorIds.length} selected</p>
+            <Button variant="outline" size="sm" className="h-9" onClick={() => setShowAssignAdvisor(false)}>
+              Cancel
+            </Button>
             <Button
               size="sm"
               className="h-9 flex-1 bg-violet-600 font-semibold text-white hover:bg-violet-700"
@@ -178,17 +213,23 @@ export function ActionsAndModals() {
               <DialogTitle className="font-bold text-base">Confirm approval</DialogTitle>
             </div>
             <DialogDescription className="ml-11 text-slate-500 text-xs">
-              Your approval will advance this proposal to the next step in the chain. Add an optional note for the record.
+              Your approval will advance this proposal to the next step in the chain. Add an optional note for the
+              record.
             </DialogDescription>
           </DialogHeader>
 
           <div className="flex flex-col gap-4 px-6 py-5">
             <div className="rounded-lg border border-slate-100 bg-slate-50 p-3.5 dark:border-slate-800 dark:bg-slate-900/50">
               <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Proposal</p>
-              <p className="mt-0.5 line-clamp-2 font-semibold text-[13px] text-slate-800 dark:text-slate-200">{selected?.title}</p>
+              <p className="mt-0.5 line-clamp-2 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                {selected?.title}
+              </p>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="timeline-approve-note" className="font-semibold text-[12px] text-slate-700 dark:text-slate-300">
+              <Label
+                htmlFor="timeline-approve-note"
+                className="font-semibold text-[12px] text-slate-700 dark:text-slate-300"
+              >
                 Optional note
               </Label>
               <Textarea
@@ -202,7 +243,9 @@ export function ActionsAndModals() {
           </div>
 
           <DialogFooter className="flex gap-2 border-slate-100 border-t px-6 py-4 dark:border-slate-800">
-            <Button variant="outline" size="sm" className="h-9" onClick={() => setShowTimelineApprove(false)}>Cancel</Button>
+            <Button variant="outline" size="sm" className="h-9" onClick={() => setShowTimelineApprove(false)}>
+              Cancel
+            </Button>
             <Button
               size="sm"
               className="h-9 flex-1 bg-emerald-600 font-semibold text-white hover:bg-emerald-700"
@@ -235,10 +278,15 @@ export function ActionsAndModals() {
           <div className="flex flex-col gap-4 px-6 py-5">
             <div className="rounded-lg border border-slate-100 bg-slate-50 p-3.5 dark:border-slate-800 dark:bg-slate-900/50">
               <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Proposal</p>
-              <p className="mt-0.5 line-clamp-2 font-semibold text-[13px] text-slate-800 dark:text-slate-200">{selected?.title}</p>
+              <p className="mt-0.5 line-clamp-2 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                {selected?.title}
+              </p>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="timeline-reject-comment" className="font-semibold text-[12px] text-slate-700 dark:text-slate-300">
+              <Label
+                htmlFor="timeline-reject-comment"
+                className="font-semibold text-[12px] text-slate-700 dark:text-slate-300"
+              >
                 Reason for rejection <span className="text-rose-500">*</span>
               </Label>
               <Textarea
@@ -253,7 +301,9 @@ export function ActionsAndModals() {
           </div>
 
           <DialogFooter className="flex gap-2 border-slate-100 border-t px-6 py-4 dark:border-slate-800">
-            <Button variant="outline" size="sm" className="h-9" onClick={() => setShowTimelineReject(false)}>Cancel</Button>
+            <Button variant="outline" size="sm" className="h-9" onClick={() => setShowTimelineReject(false)}>
+              Cancel
+            </Button>
             <Button
               size="sm"
               className="h-9 flex-1 bg-rose-600 font-semibold text-white hover:bg-rose-700"

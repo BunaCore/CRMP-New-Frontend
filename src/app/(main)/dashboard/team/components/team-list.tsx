@@ -1,5 +1,5 @@
-/** biome-ignore-all assist/source/organizeImports: <explanation> */
-/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
+/** biome-ignore-all assist/source/organizeImports: intentional suppression */
+/** biome-ignore-all lint/nursery/useSortedClasses: intentional suppression */
 "use client";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";

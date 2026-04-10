@@ -1,6 +1,7 @@
-/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
-/** biome-ignore-all lint/correctness/noUnusedImports: <explanation> */
-/** biome-ignore-all assist/source/organizeImports: <explanation> */
+/** biome-ignore-all lint/nursery/useSortedClasses: intentional suppression */
+/** biome-ignore-all lint/style/noNonNullAssertion: intentional suppression */
+/** biome-ignore-all lint/correctness/noUnusedImports: intentional suppression */
+/** biome-ignore-all assist/source/organizeImports: intentional suppression */
 "use client";
 
 import {

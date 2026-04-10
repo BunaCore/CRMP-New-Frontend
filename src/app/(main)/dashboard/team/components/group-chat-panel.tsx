@@ -1,7 +1,7 @@
-/** biome-ignore-all lint/complexity/noUselessFragments: <explanation> */
-/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <explanation> */
-/** biome-ignore-all assist/source/organizeImports: <explanation> */
-/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
+/** biome-ignore-all lint/complexity/noUselessFragments: intentional suppression */
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: intentional suppression */
+/** biome-ignore-all assist/source/organizeImports: intentional suppression */
+/** biome-ignore-all lint/nursery/useSortedClasses: intentional suppression */
 "use client";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";

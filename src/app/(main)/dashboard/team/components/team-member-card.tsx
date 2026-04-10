@@ -1,4 +1,4 @@
-/** biome-ignore-all assist/source/organizeImports: <explanation> */
+/** biome-ignore-all assist/source/organizeImports: intentional suppression */
 "use client";
 
 import { Eye, Mail, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
