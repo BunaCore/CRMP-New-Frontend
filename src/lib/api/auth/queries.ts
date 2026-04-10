@@ -21,8 +21,14 @@ const USE_MOCK = true;
  */
 export async function getCurrentUser(): Promise<UserProfile | null> {
   if (USE_MOCK) {
+    // If running on server (SSR), we can't access Zustand's localStorage persistence.
+    // Return null to allow the client to handle session restoration after hydration.
+    if (typeof window === "undefined") {
+      return null;
+    }
+
     // Simulate a short delay for realism
-    await new Promise((r) => setTimeout(r, 300));
+    await new Promise((r) => setTimeout(r, 100));
     // Read the persisted Zustand user (survives page reload via localStorage)
     const { useAuthStore } = await import("@/stores/authStore");
     return useAuthStore.getState().user;

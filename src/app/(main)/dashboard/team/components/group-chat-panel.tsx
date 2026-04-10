@@ -283,8 +283,8 @@ export function GroupChatPanel({
         {/* Messages Area */}
         <ScrollArea className="flex-1 p-4" ref={scrollRef}>
           <div className="space-y-6">
-            {groupedMessages.map((group, groupIdx) => (
-              <div key={groupIdx}>
+            {groupedMessages.map((group) => (
+              <div key={group.date}>
                 {/* Date Header */}
                 <div className="mb-4 flex items-center justify-center">
                   <span className="rounded-full bg-muted px-3 py-1 text-muted-foreground text-xs">

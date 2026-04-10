@@ -7,13 +7,12 @@ import { Code2, Loader2, Terminal } from "lucide-react";
 import { useTheme } from "next-themes";
 
 interface EditorPanelProps {
-  id: string;
   language: string;
   initialContent: string;
   onChange: (value: string) => void;
 }
 
-export function EditorPanel({ id, language, initialContent, onChange }: EditorPanelProps) {
+export function EditorPanel({ language, initialContent, onChange }: EditorPanelProps) {
   const [content, setContent] = React.useState(initialContent);
   const { theme, systemTheme } = useTheme();
 
