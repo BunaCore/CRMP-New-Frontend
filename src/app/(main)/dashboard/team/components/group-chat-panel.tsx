@@ -1,14 +1,7 @@
-<<<<<<< HEAD
 /** biome-ignore-all lint/complexity/noUselessFragments: intentional suppression */
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: intentional suppression */
 /** biome-ignore-all assist/source/organizeImports: intentional suppression */
 /** biome-ignore-all lint/nursery/useSortedClasses: intentional suppression */
-=======
-/** biome-ignore-all lint/complexity/noUselessFragments: <explanation> */
-/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <explanation> */
-/** biome-ignore-all assist/source/organizeImports: <explanation> */
-/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
->>>>>>> main
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -52,14 +45,10 @@ function getInitials(name: string) {
 
 function formatTime(timestamp: string) {
   const date = new Date(timestamp);
-<<<<<<< HEAD
-  return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
-=======
   return date.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
   });
->>>>>>> main
 }
 
 function formatDateHeader(timestamp: string) {
@@ -371,32 +360,31 @@ export function GroupChatPanel({
                             } text-muted-foreground`}
                           >
                             <span>{formatTime(message.timestamp)}</span>
-                            {isSent && (
-                              message.readBy.length > 1 ? (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <span className="flex items-center gap-0.5">
-                                          <CheckCheck className="h-3 w-3 text-primary" />
-                                          <span className="text-primary">{message.readBy.length - 1}</span>
-                                        </span>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p className="text-xs">
-                                          Read by{" "}
-                                          {message.readBy
-                                            .filter((id) => id !== currentUserId)
-                                            .map((id) => memberMap.get(id)?.name.split(" ")[0])
-                                            .filter(Boolean)
-                                            .join(", ")}
-                                        </p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
-                                ) : (
-                                  <Check className="h-3 w-3" />
-                                )
-                            )}
+                            {isSent &&
+                              (message.readBy.length > 1 ? (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <span className="flex items-center gap-0.5">
+                                        <CheckCheck className="h-3 w-3 text-primary" />
+                                        <span className="text-primary">{message.readBy.length - 1}</span>
+                                      </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p className="text-xs">
+                                        Read by{" "}
+                                        {message.readBy
+                                          .filter((id) => id !== currentUserId)
+                                          .map((id) => memberMap.get(id)?.name.split(" ")[0])
+                                          .filter(Boolean)
+                                          .join(", ")}
+                                      </p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              ) : (
+                                <Check className="h-3 w-3" />
+                              ))}
                           </div>
                         </div>
                       </div>

@@ -1,6 +1,5 @@
 "use client";
 
-<<<<<<< HEAD
 import * as React from "react";
 
 import Link from "next/link";
@@ -104,39 +103,24 @@ export default function ProjectsPage() {
                   className="group flex h-28 w-full flex-col items-start justify-between rounded-xl border border-slate-200 bg-white p-5 text-left font-normal shadow-sm outline-none transition-colors hover:bg-slate-50 focus:ring-[1px] focus:ring-blue-500"
                 >
                   <Plus className="h-5 w-5 text-slate-400 transition-colors group-hover:text-blue-500" />
-                  <span className="font-semibold text-[14px] text-slate-800">Create Project</span>
+                  <span className="font-semibold text-[14px] text-slate-800">Create Section</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="border-slate-200 bg-white sm:max-w-md">
+              <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                  <DialogTitle className="text-slate-800">Create Project</DialogTitle>
-                  <DialogDescription className="text-slate-500">
-                    Enter a distinct name for your new workspace or project.
-                  </DialogDescription>
+                  <DialogTitle>Create new section</DialogTitle>
+                  <DialogDescription>Add a new section to organize your project data.</DialogDescription>
                 </DialogHeader>
-                <div className="py-4">
-                  <Input
-                    id="name"
-                    placeholder="Project Workspace"
-                    className="w-full border-slate-200 bg-white focus-visible:ring-blue-500"
-                    autoFocus
-                  />
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <label htmlFor="name" className="text-right text-sm">
+                      Name
+                    </label>
+                    <Input id="name" placeholder="Project section name" className="col-span-3" />
+                  </div>
                 </div>
                 <DialogFooter>
-                  <Button
-                    variant="secondary"
-                    className="bg-slate-100 text-slate-700 hover:bg-slate-200"
-                    onClick={() => setIsCreateOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    className="bg-blue-600 text-white hover:bg-blue-700"
-                    onClick={() => {
-                      alert("Project Created!");
-                      setIsCreateOpen(false);
-                    }}
-                  >
+                  <Button type="submit" onClick={() => setIsCreateOpen(false)}>
                     Create
                   </Button>
                 </DialogFooter>
@@ -204,7 +188,6 @@ export default function ProjectsPage() {
                     >
                       {getFileIcon(doc.type)}
                       <span className="truncate">{doc.title}</span>{" "}
-                      {/* Using the actual mocked title instead of strict truncation */}
                     </Link>
                   </TableCell>
                   <TableCell className="py-4 text-[14px] text-slate-600">{doc.authors || "--"}</TableCell>
@@ -225,55 +208,6 @@ export default function ProjectsPage() {
             </TableBody>
           </Table>
         </div>
-=======
-import { useState } from "react";
-
-import { useRouter } from "next/navigation";
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockProjects, type Project } from "@/data/projects";
-
-export default function ProjectsPage() {
-  const router = useRouter();
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-
-  // Only display Approved projects for this workflow
-  const approvedProjects = mockProjects.filter((p) => p.status === "Approved");
-
-  const handleProjectClick = (project: Project) => {
-    setSelectedProject(project);
-  };
-
-  const closeDialog = () => setSelectedProject(null);
-
-  return (
-    <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 p-4 pt-0 md:p-8">
-      <div className="flex flex-col gap-2">
-        <h1 className="font-extrabold text-4xl tracking-tight lg:text-5xl">Projects</h1>
-        <p className="text-lg text-muted-foreground">Select an approved project to open its unified workspace.</p>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {approvedProjects.map((project) => (
-          <button
-            key={project.id}
-            onClick={() => handleProjectClick(project)}
-            className="group focus-none block h-full cursor-pointer"
-            type="button"
-          >
-            <Card className="group relative h-full overflow-hidden border-muted-foreground/10 bg-card transition-all duration-300 hover:scale-[1.02] hover:bg-accent/5 hover:shadow-xl active:scale-[0.98]">
-              <div className="absolute top-0 left-0 h-1 w-full bg-primary opacity-0 transition-opacity group-hover:opacity-100" />
-              <CardHeader className="pb-3">
-                <CardTitle>{project.name}</CardTitle>
-                <CardDescription>{project.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p>{project.description}</p>
-              </CardContent>
-            </Card>
-          </button>
-        ))}
->>>>>>> main
       </div>
     </div>
   );

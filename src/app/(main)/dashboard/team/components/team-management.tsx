@@ -1,18 +1,12 @@
-<<<<<<< HEAD
 /** biome-ignore-all lint/nursery/useSortedClasses: intentional suppression */
 /** biome-ignore-all lint/style/noNonNullAssertion: intentional suppression */
 /** biome-ignore-all lint/correctness/noUnusedImports: intentional suppression */
 /** biome-ignore-all assist/source/organizeImports: intentional suppression */
-=======
-/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
-/** biome-ignore-all lint/correctness/noUnusedImports: <explanation> */
-/** biome-ignore-all assist/source/organizeImports: <explanation> */
->>>>>>> main
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
 
-import { Hash, } from "lucide-react";
+import { Hash } from "lucide-react";
 
 import {
   autoReplyMessages,
@@ -293,15 +287,11 @@ export function TeamManagement() {
         const partnerId = selectedRoom.memberIds.find((id) => id !== CURRENT_USER_ID);
         const partner = teamMembers.find((m) => m.id === partnerId);
 
-<<<<<<< HEAD
-        if (partner?.isOnline && Math.random() < 0.6) {
-=======
         if (!partnerId || !partner) return;
         if (partner.isOnline && Math.random() < 0.6) {
->>>>>>> main
           // Show typing after a delay
           setTimeout(
-            () => 
+            () => {
               setTypingUsers([partnerId!]);
 
               // Send reply after typing
@@ -333,7 +323,8 @@ export function TeamManagement() {
                   );
                 },
                 2000 + Math.random() * 2000,
-              );,
+              );
+            },
             1000 + Math.random() * 2000,
           );
         }

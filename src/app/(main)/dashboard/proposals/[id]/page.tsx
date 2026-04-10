@@ -297,21 +297,9 @@ export default function ProposalDetailsPage() {
   const params = useParams();
   const proposalId = params?.id as string;
 
-<<<<<<< HEAD
-  const _SHOW_MOCK_APPOINTMENT = true;
-  const _mockAppointment = {
-    title: "Quantum Computing Simulation",
-    date: "14 Mar 2025",
-    time: "10:00 AM (EAT)",
-    venue: "Main Campus — Senate Hall",
-    message:
-      "Please ensure your presentation is strictly 15 minutes. The evaluation committee has already reviewed your abstract.",
-  };
-=======
   const [proposal, setProposal] = React.useState<ResearcherProposal | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
->>>>>>> main
 
   // ─── Fetch ─────────────────────────────────────────────────────────────────
 

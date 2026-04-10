@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 /** biome-ignore-all assist/source/organizeImports: intentional suppression */
-=======
-/** biome-ignore-all assist/source/organizeImports: <explanation> */
->>>>>>> main
 "use client";
 
 import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
@@ -72,11 +68,7 @@ export function TeamTable({ members, onView, onEdit, onRemove }: TeamTableProps)
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-<<<<<<< HEAD
-            <TableHead className="w-[300px]">Member</TableHead>
-=======
             <TableHead className="w-75">Member</TableHead>
->>>>>>> main
             <TableHead>Role</TableHead>
             <TableHead>Department</TableHead>
             <TableHead>Status</TableHead>

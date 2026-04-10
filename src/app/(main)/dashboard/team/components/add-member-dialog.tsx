@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 /** biome-ignore-all assist/source/organizeImports: intentional suppression */
-=======
-/** biome-ignore-all assist/source/organizeImports: <explanation> */
->>>>>>> main
 "use client";
 
 import { useState } from "react";

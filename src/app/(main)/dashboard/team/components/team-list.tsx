@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 /** biome-ignore-all assist/source/organizeImports: intentional suppression */
 /** biome-ignore-all lint/nursery/useSortedClasses: intentional suppression */
-=======
-/** biome-ignore-all assist/source/organizeImports: <explanation> */
-/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
->>>>>>> main
 "use client";
 
 import { Plus, Search } from "lucide-react";
@@ -108,11 +103,7 @@ export function TeamList({
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-<<<<<<< HEAD
-            <SelectTrigger className="h-8 w-[100px] text-xs">
-=======
             <SelectTrigger className="h-8 w-25 text-xs">
->>>>>>> main
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
