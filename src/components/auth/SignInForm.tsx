@@ -96,18 +96,18 @@ export function SignInForm() {
           disabled={isLoading}
           {...register("email")}
         />
-        {errors.email && <p className="font-medium text-red-500 text-sm">{errors.email.message}</p>}
+        {errors.email && <p className="text-sm font-medium text-red-500">{errors.email.message}</p>}
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label htmlFor="password">Password</Label>
-          <a href="/login" className="font-medium text-blue-600 text-sm hover:text-blue-500 dark:text-blue-400">
+          <a href="/login" className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
             Forgot password?
           </a>
         </div>
         <Input id="password" type="password" disabled={isLoading} {...register("password")} />
-        {errors.password && <p className="font-medium text-red-500 text-sm">{errors.password.message}</p>}
+        {errors.password && <p className="text-sm font-medium text-red-500">{errors.password.message}</p>}
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>
@@ -121,9 +121,9 @@ export function SignInForm() {
         )}
       </Button>
 
-      <div className="mt-4 text-center text-slate-500 text-sm dark:text-slate-400">
+      <div className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
         <p>Testing accounts (Mock Data):</p>
-        <ul className="mt-1 flex flex-wrap justify-center gap-2 font-medium text-slate-600 text-xs dark:text-slate-300">
+        <ul className="mt-1 flex flex-wrap justify-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-300">
           <li>pi@crmp.edu</li>
           <li>&bull;</li>
           <li>rad@crmp.edu</li>

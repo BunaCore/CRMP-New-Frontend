@@ -189,7 +189,7 @@ const { access_token, user } = useAuthStore.getState();
 console.log(access_token, user);
 
 // Check localStorage
-JSON.parse(localStorage.getItem('auth-store'));
+JSON.parse(localStorage.getItem("auth-store"));
 ```
 
 ### Check network requests

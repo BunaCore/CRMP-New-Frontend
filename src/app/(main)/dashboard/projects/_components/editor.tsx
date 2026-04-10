@@ -99,9 +99,9 @@ const MenuBar = ({
   if (!editor) return null;
 
   return (
-    <div className="sticky top-0 z-20 flex flex-col border-b bg-background/50 backdrop-blur-md">
+    <div className="bg-background/50 sticky top-0 z-20 flex flex-col border-b backdrop-blur-md">
       {/* Navigation & Title Bar Section */}
-      <div className="flex items-center justify-between border-b bg-muted/5 px-4 py-1.5">
+      <div className="bg-muted/5 flex items-center justify-between border-b px-4 py-1.5">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
@@ -112,21 +112,21 @@ const MenuBar = ({
             <ArrowLeft className="h-4 w-4" />
           </Button>
 
-          <div className="h-4 w-px bg-border" />
+          <div className="bg-border h-4 w-px" />
 
-          <div className="flex items-center gap-2 text-muted-foreground/60">
+          <div className="text-muted-foreground/60 flex items-center gap-2">
             <input
               type="text"
               value={workspaceTitle}
               onChange={(e) => setWorkspaceTitle(e.target.value)}
               placeholder="Untitled Workspace"
-              className="min-w-75 border-none bg-transparent font-bold text-[11px] text-foreground outline-none transition-all placeholder:font-normal placeholder:italic focus:ring-0"
+              className="text-foreground min-w-75 border-none bg-transparent text-[11px] font-bold transition-all outline-none placeholder:font-normal placeholder:italic focus:ring-0"
             />
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="font-black text-[9px] text-muted-foreground/30 uppercase tracking-[0.2em]">
+          <span className="text-muted-foreground/30 text-[9px] font-black tracking-[0.2em] uppercase">
             Editing Mode
           </span>
         </div>
@@ -161,7 +161,7 @@ const MenuBar = ({
           {/* Typography Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 min-w-25 justify-between gap-2 px-2 font-medium text-xs">
+              <Button variant="ghost" size="sm" className="h-8 min-w-25 justify-between gap-2 px-2 text-xs font-medium">
                 {editor.isActive("heading", { level: 1 })
                   ? "Heading 1"
                   : editor.isActive("heading", { level: 2 })
@@ -179,19 +179,19 @@ const MenuBar = ({
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-                className="font-bold text-lg"
+                className="text-lg font-bold"
               >
                 Heading 1
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                className="font-semibold text-base"
+                className="text-base font-semibold"
               >
                 Heading 2
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-                className="font-medium text-sm"
+                className="text-sm font-medium"
               >
                 Heading 3
               </DropdownMenuItem>
@@ -252,14 +252,14 @@ const MenuBar = ({
                     <button
                       type="button"
                       key={color}
-                      className="h-6 w-6 rounded-md border border-border"
+                      className="border-border h-6 w-6 rounded-md border"
                       style={{ backgroundColor: color }}
                       onClick={() => editor.chain().focus().setColor(color).run()}
                     />
                   ))}
                   <button
                     type="button"
-                    className="col-span-5 mt-1 rounded py-1 font-bold text-[10px] uppercase hover:bg-muted"
+                    className="hover:bg-muted col-span-5 mt-1 rounded py-1 text-[10px] font-bold uppercase"
                     onClick={() => editor.chain().focus().unsetColor().run()}
                   >
                     Reset Color
@@ -423,7 +423,7 @@ const MenuBar = ({
 
         {/* Right Info Section */}
         <div className="ml-4 flex min-w-fit items-center gap-2 border-l pl-4">
-          <div className="font-bold text-[10px] text-muted-foreground/50 uppercase tracking-tighter">
+          <div className="text-muted-foreground/50 text-[10px] font-bold tracking-tighter uppercase">
             {editor.storage.characterCount.words()} Words
           </div>
           <Button
@@ -453,7 +453,7 @@ const MenuBar = ({
                 <Download className="h-4 w-4" /> Export as Word
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive">
+              <DropdownMenuItem className="text-destructive focus:text-destructive gap-2">
                 <Trash2 className="h-4 w-4" /> Delete Workspace
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -579,7 +579,7 @@ export default function DocumentEditor({ initialContent, workspaceId, projectId 
   };
 
   return (
-    <div className="anim-in fade-in flex h-full flex-col overflow-hidden bg-background duration-700">
+    <div className="anim-in fade-in bg-background flex h-full flex-col overflow-hidden duration-700">
       <MenuBar editor={editor} onAddImage={addImage} onSetLink={setLink} projectId={projectId} />
 
       <div className="project-editor-container custom-scrollbar flex-1 overflow-y-auto scroll-smooth">
@@ -589,7 +589,7 @@ export default function DocumentEditor({ initialContent, workspaceId, projectId 
       {editor && (
         <BubbleMenu
           editor={editor}
-          className="fade-in zoom-in-95 flex animate-in items-center gap-0.5 rounded-full border bg-card p-1 shadow-2xl duration-200"
+          className="fade-in zoom-in-95 animate-in bg-card flex items-center gap-0.5 rounded-full border p-1 shadow-2xl duration-200"
         >
           <Button
             variant="ghost"
@@ -625,12 +625,12 @@ export default function DocumentEditor({ initialContent, workspaceId, projectId 
       {editor && (
         <FloatingMenu
           editor={editor}
-          className="slide-in-from-left-4 flex animate-in items-center gap-1 rounded-xl border border-primary/10 bg-card p-1 shadow-lg duration-300"
+          className="slide-in-from-left-4 animate-in border-primary/10 bg-card flex items-center gap-1 rounded-xl border p-1 shadow-lg duration-300"
         >
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 w-8 rounded-lg p-0 hover:bg-primary/5"
+            className="hover:bg-primary/5 h-8 w-8 rounded-lg p-0"
             onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
           >
             <Heading1 className="h-4 w-4" />
@@ -638,12 +638,12 @@ export default function DocumentEditor({ initialContent, workspaceId, projectId 
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 w-8 rounded-lg p-0 hover:bg-primary/5"
+            className="hover:bg-primary/5 h-8 w-8 rounded-lg p-0"
             onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           >
             <Heading2 className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm" className="h-8 w-8 rounded-lg p-0 hover:bg-primary/5" onClick={addImage}>
+          <Button variant="ghost" size="sm" className="hover:bg-primary/5 h-8 w-8 rounded-lg p-0" onClick={addImage}>
             <Plus className="h-4 w-4" />
           </Button>
         </FloatingMenu>

@@ -13,7 +13,7 @@ function WorkspaceContent({ project, workspaceId }: { project: { id: string }; w
   const { isChatOpen } = useWorkspace();
 
   return (
-    <div className="group relative mx-2 mb-2 flex h-[calc(100vh-(--spacing(12)))] overflow-hidden rounded-2xl border bg-background shadow-inner">
+    <div className="group bg-background relative mx-2 mb-2 flex h-[calc(100vh-(--spacing(12)))] overflow-hidden rounded-2xl border shadow-inner">
       {/* Main Content - Takes full width or shifts for sidebar */}
       <main
         className={cn(

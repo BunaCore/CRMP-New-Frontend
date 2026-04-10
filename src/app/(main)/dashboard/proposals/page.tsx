@@ -150,8 +150,8 @@ export default function ProposalsPage() {
       {/* Header Section */}
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-semibold text-3xl text-slate-900 tracking-tight dark:text-slate-100">My Proposals</h1>
-          <p className="mt-1 text-slate-500 text-sm dark:text-slate-400">
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">My Proposals</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Track and manage all your research proposals in one place.
           </p>
         </div>
@@ -168,12 +168,12 @@ export default function ProposalsPage() {
         <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-900/50 dark:bg-red-950/30">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
           <div className="flex flex-1 items-start justify-between gap-4">
-            <p className="text-red-700 text-sm dark:text-red-300">{error}</p>
+            <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
             <Button
               variant="ghost"
               size="sm"
               onClick={fetchProposals}
-              className="h-7 shrink-0 rounded-full px-3 text-red-700 text-xs hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-900/30"
+              className="h-7 shrink-0 rounded-full px-3 text-xs text-red-700 hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-900/30"
             >
               <RefreshCw className="mr-1.5 h-3 w-3" />
               Retry
@@ -187,7 +187,7 @@ export default function ProposalsPage() {
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="mb-6 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
             {/* Tab List */}
-            <div className="-mb-1 scrollbar-hide w-full overflow-x-auto pb-1 md:w-auto">
+            <div className="scrollbar-hide -mb-1 w-full overflow-x-auto pb-1 md:w-auto">
               <TabsList className="h-auto rounded-lg border border-slate-200/50 bg-slate-100/50 p-1 dark:border-slate-800/50 dark:bg-slate-900/50">
                 {TABS.map((tab) => (
                   <TabsTrigger
@@ -197,7 +197,7 @@ export default function ProposalsPage() {
                   >
                     {tab.label}
                     {!loading && tabCounts[tab.value] > 0 && (
-                      <span className="ml-1.5 rounded-full bg-slate-200 px-1.5 py-0.5 font-semibold text-[10px] text-slate-600 leading-none data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700 dark:bg-slate-700 dark:text-slate-400">
+                      <span className="ml-1.5 rounded-full bg-slate-200 px-1.5 py-0.5 text-[10px] leading-none font-semibold text-slate-600 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700 dark:bg-slate-700 dark:text-slate-400">
                         {tabCounts[tab.value]}
                       </span>
                     )}
@@ -232,7 +232,7 @@ export default function ProposalsPage() {
             </div>
           </div>
 
-          <TabsContent value={activeTab} className="mt-0 focus-visible:outline-none focus-visible:ring-0">
+          <TabsContent value={activeTab} className="mt-0 focus-visible:ring-0 focus-visible:outline-none">
             <Card className="overflow-hidden rounded-xl border-slate-200/60 bg-white shadow-none dark:border-slate-800/60 dark:bg-slate-950/50">
               <CardContent className="p-0">
                 <Table>
@@ -265,7 +265,7 @@ export default function ProposalsPage() {
                           className="border-slate-100 transition-colors hover:bg-slate-50/50 dark:border-slate-800/50 dark:hover:bg-slate-800/20"
                         >
                           {/* ID */}
-                          <TableCell className="px-6 py-4 font-medium font-mono text-slate-500 text-xs dark:text-slate-400">
+                          <TableCell className="px-6 py-4 font-mono text-xs font-medium text-slate-500 dark:text-slate-400">
                             {shortProposalId(proposal.id)}
                           </TableCell>
 
@@ -275,7 +275,7 @@ export default function ProposalsPage() {
                               <span className="line-clamp-1 font-semibold text-slate-800 dark:text-slate-200">
                                 {proposal.title}
                               </span>
-                              <span className="line-clamp-1 text-slate-500 text-xs">
+                              <span className="line-clamp-1 text-xs text-slate-500">
                                 {proposal.department?.name ?? "—"}
                                 {proposal.type ? ` · ${proposal.type}` : ""}
                               </span>
@@ -286,7 +286,7 @@ export default function ProposalsPage() {
                           <TableCell className="px-6 py-4">
                             <Badge
                               variant="outline"
-                              className={`${getStatusBadgeClass(proposal.status)} inline-flex items-center whitespace-nowrap rounded px-2.5 py-0.5 shadow-none`}
+                              className={`${getStatusBadgeClass(proposal.status)} inline-flex items-center rounded px-2.5 py-0.5 whitespace-nowrap shadow-none`}
                             >
                               {getStatusLabel(proposal.status)}
                             </Badge>
@@ -295,10 +295,10 @@ export default function ProposalsPage() {
                           {/* Date */}
                           <TableCell className="hidden px-6 py-4 md:table-cell">
                             <div className="flex flex-col gap-1">
-                              <span className="text-slate-700 text-sm dark:text-slate-300">
+                              <span className="text-sm text-slate-700 dark:text-slate-300">
                                 {formatProposalDate(proposal.createdAt)}
                               </span>
-                              <span className="flex items-center gap-1 text-slate-500 text-xs">
+                              <span className="flex items-center gap-1 text-xs text-slate-500">
                                 <Clock className="h-3 w-3" />
                                 {formatRelativeDate(proposal.createdAt)}
                               </span>
@@ -318,7 +318,7 @@ export default function ProposalsPage() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-lg">
-                                <DropdownMenuLabel className="font-normal text-slate-500 text-xs">
+                                <DropdownMenuLabel className="text-xs font-normal text-slate-500">
                                   Proposal Actions
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
@@ -361,24 +361,24 @@ export default function ProposalsPage() {
                             </div>
                             {search ? (
                               <>
-                                <p className="font-medium text-slate-700 text-sm dark:text-slate-300">
+                                <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                   No proposals match &ldquo;{search}&rdquo;
                                 </p>
                                 <Button
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => setSearch("")}
-                                  className="h-7 rounded-full text-slate-500 text-xs"
+                                  className="h-7 rounded-full text-xs text-slate-500"
                                 >
                                   Clear search
                                 </Button>
                               </>
                             ) : (
                               <>
-                                <p className="font-medium text-slate-700 text-sm dark:text-slate-300">
+                                <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                   No proposals in this category
                                 </p>
-                                <p className="max-w-xs text-center text-slate-400 text-xs">
+                                <p className="max-w-xs text-center text-xs text-slate-400">
                                   {activeTab === "all"
                                     ? "You haven't submitted any proposals yet. Start by creating a new one."
                                     : `No proposals with status "${getStatusLabel(activeTab)}" found.`}

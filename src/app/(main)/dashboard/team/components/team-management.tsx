@@ -395,12 +395,12 @@ export function TeamManagement() {
             onViewProfile={handleViewProfile}
           />
         ) : (
-          <div className="flex flex-1 flex-col items-center justify-center bg-card">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-              <Hash className="h-8 w-8 text-muted-foreground" />
+          <div className="bg-card flex flex-1 flex-col items-center justify-center">
+            <div className="bg-muted flex h-16 w-16 items-center justify-center rounded-full">
+              <Hash className="text-muted-foreground h-8 w-8" />
             </div>
-            <h3 className="mt-4 font-medium text-foreground text-lg">No conversation selected</h3>
-            <p className="mt-1 text-muted-foreground text-sm">Select a chat room or start a direct message</p>
+            <h3 className="text-foreground mt-4 text-lg font-medium">No conversation selected</h3>
+            <p className="text-muted-foreground mt-1 text-sm">Select a chat room or start a direct message</p>
           </div>
         )}
       </div>

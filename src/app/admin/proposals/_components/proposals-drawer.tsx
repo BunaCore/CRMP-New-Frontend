@@ -75,7 +75,7 @@ export function ProposalsDrawer() {
   return (
     <Sheet open={!!selected} onOpenChange={(o) => !o && closeDrawer()}>
       <SheetContent
-        className="flex w-full flex-col overflow-hidden border-slate-200/80 border-l bg-white p-0 shadow-2xl sm:max-w-[800px] xl:max-w-[1000px] dark:border-slate-800 dark:bg-slate-950"
+        className="flex w-full flex-col overflow-hidden border-l border-slate-200/80 bg-white p-0 shadow-2xl sm:max-w-[800px] xl:max-w-[1000px] dark:border-slate-800 dark:bg-slate-950"
         side="right"
       >
         {selected && isLoading && (
@@ -86,14 +86,14 @@ export function ProposalsDrawer() {
         {selected && !isLoading && details && (
           <>
             {/* Drawer Header */}
-            <SheetHeader className="shrink-0 space-y-0 border-slate-100 border-b bg-linear-to-b from-slate-50/90 to-white px-6 pt-6 pb-4 dark:border-slate-800 dark:from-slate-900/80 dark:to-slate-950">
+            <SheetHeader className="shrink-0 space-y-0 border-b border-slate-100 bg-linear-to-b from-slate-50/90 to-white px-6 pt-6 pb-4 dark:border-slate-800 dark:from-slate-900/80 dark:to-slate-950">
               <div className="flex flex-col gap-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge className="border-0 bg-slate-200/80 font-bold text-[10px] text-slate-700 uppercase dark:bg-slate-800 dark:text-slate-300">
+                  <Badge className="border-0 bg-slate-200/80 text-[10px] font-bold text-slate-700 uppercase dark:bg-slate-800 dark:text-slate-300">
                     {selected.id}
                   </Badge>
                   <Badge
-                    className={`${STATUS_CFG[details.status.toString()]?.className || "bg-blue-100 text-blue-700"} pointer-events-none flex items-center gap-1 border-0 font-bold text-[10px]`}
+                    className={`${STATUS_CFG[details.status.toString()]?.className || "bg-blue-100 text-blue-700"} pointer-events-none flex items-center gap-1 border-0 text-[10px] font-bold`}
                   >
                     {STATUS_CFG[details.status.toString()]?.icon}
                     {details.status.toString().replace("_", " ")}
@@ -101,36 +101,36 @@ export function ProposalsDrawer() {
                   {details.evaluators?.slice(0, 2).map((evaluator) => (
                     <Badge
                       key={evaluator.id}
-                      className="max-w-35 truncate border-0 bg-emerald-100 font-bold text-[10px] text-emerald-800 dark:bg-emerald-900/35 dark:text-emerald-300"
+                      className="max-w-35 truncate border-0 bg-emerald-100 text-[10px] font-bold text-emerald-800 dark:bg-emerald-900/35 dark:text-emerald-300"
                       title={evaluator.name}
                     >
                       <UserCheck className="h-3 w-3 shrink-0" /> {evaluator.name}
                     </Badge>
                   ))}
                   {(details.evaluators?.length ?? 0) > 2 && (
-                    <Badge className="border-0 bg-emerald-50 font-bold text-[10px] text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400">
+                    <Badge className="border-0 bg-emerald-50 text-[10px] font-bold text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400">
                       +{details.evaluators.length - 2} evaluators
                     </Badge>
                   )}
                   {details.advisors?.slice(0, 2).map((advisor) => (
                     <Badge
                       key={advisor.id}
-                      className="max-w-[140px] truncate border-0 bg-violet-100 font-bold text-[10px] text-violet-800 dark:bg-violet-900/35 dark:text-violet-300"
+                      className="max-w-[140px] truncate border-0 bg-violet-100 text-[10px] font-bold text-violet-800 dark:bg-violet-900/35 dark:text-violet-300"
                       title={advisor.name}
                     >
                       <GraduationCap className="h-3 w-3 shrink-0" /> {advisor.name}
                     </Badge>
                   ))}
                   {(details.advisors?.length ?? 0) > 2 && (
-                    <Badge className="border-0 bg-violet-50 font-bold text-[10px] text-violet-700 dark:bg-violet-900/20 dark:text-violet-400">
+                    <Badge className="border-0 bg-violet-50 text-[10px] font-bold text-violet-700 dark:bg-violet-900/20 dark:text-violet-400">
                       +{details.advisors.length - 2} advisors
                     </Badge>
                   )}
                 </div>
-                <SheetTitle className="pr-2 font-bold text-[16px] text-slate-900 leading-snug tracking-tight dark:text-slate-100">
+                <SheetTitle className="pr-2 text-[16px] leading-snug font-bold tracking-tight text-slate-900 dark:text-slate-100">
                   {details.title}
                 </SheetTitle>
-                <SheetDescription className="font-medium text-slate-500 text-xs leading-relaxed">
+                <SheetDescription className="text-xs leading-relaxed font-medium text-slate-500">
                   {details.department.name} · Date {details.createdAt.split("T")[0]} · Budget{" "}
                   {new Intl.NumberFormat("en-US", {
                     style: "currency",
@@ -151,7 +151,7 @@ export function ProposalsDrawer() {
                     type="button"
                     key={t.id}
                     onClick={() => setDrawerTab(t.id)}
-                    className={`rounded-lg px-4 py-2 font-semibold text-xs transition-all ${
+                    className={`rounded-lg px-4 py-2 text-xs font-semibold transition-all ${
                       drawerTab === t.id
                         ? "bg-white text-blue-700 shadow-sm dark:bg-slate-800 dark:text-blue-400"
                         : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
@@ -172,8 +172,8 @@ export function ProposalsDrawer() {
                     <div className="flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-900/30 dark:bg-rose-900/10">
                       <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600 dark:text-rose-400" />
                       <div>
-                        <p className="font-bold text-rose-800 text-sm dark:text-rose-300">Returned for Revision</p>
-                        <p className="mt-0.5 text-rose-600 text-xs dark:text-rose-400">
+                        <p className="text-sm font-bold text-rose-800 dark:text-rose-300">Returned for Revision</p>
+                        <p className="mt-0.5 text-xs text-rose-600 dark:text-rose-400">
                           Please review the timeline or comments for revision notes.
                         </p>
                       </div>
@@ -183,25 +183,25 @@ export function ProposalsDrawer() {
                   {/* Key Stats */}
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                      <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                      <p className="mb-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
                         Principal Investigator
                       </p>
                       <div className="flex items-center gap-2">
                         <Avatar className="h-7 w-7">
-                          <AvatarFallback className="bg-blue-100 font-bold text-[10px] text-blue-700">
+                          <AvatarFallback className="bg-blue-100 text-[10px] font-bold text-blue-700">
                             {details.pi.name.slice(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="truncate font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                        <span className="truncate text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                           {details.pi.name}
                         </span>
                       </div>
                     </div>
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                      <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                      <p className="mb-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
                         Budget Requested
                       </p>
-                      <p className="font-extrabold text-blue-600 text-xl dark:text-blue-400">
+                      <p className="text-xl font-extrabold text-blue-600 dark:text-blue-400">
                         {new Intl.NumberFormat("en-US", {
                           style: "currency",
                           currency: "USD",
@@ -209,17 +209,17 @@ export function ProposalsDrawer() {
                       </p>
                     </div>
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                      <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                      <p className="mb-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
                         Date Submitted
                       </p>
-                      <p className="flex items-center gap-1.5 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                      <p className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                         <Calendar className="h-3.5 w-3.5 text-slate-400" />
                         {details.createdAt.split("T")[0]}
                       </p>
                     </div>
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                      <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Team Size</p>
-                      <p className="flex items-center gap-1.5 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                      <p className="mb-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">Team Size</p>
+                      <p className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                         <Users className="h-3.5 w-3.5 text-slate-400" />
                         {details.team.length + 1} members
                       </p>
@@ -229,10 +229,10 @@ export function ProposalsDrawer() {
                   {/* Only show abstract if exists in backend details, else fallback to pending Approval abstract */}
                   {selected.abstract && (
                     <div>
-                      <h4 className="mb-2.5 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                      <h4 className="mb-2.5 flex items-center gap-2 text-[11px] font-bold tracking-wider text-slate-500 uppercase">
                         <FileText className="h-3.5 w-3.5" /> Abstract
                       </h4>
-                      <p className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-[13px] text-slate-600 leading-relaxed dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
+                      <p className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-[13px] leading-relaxed text-slate-600 dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
                         {selected.abstract}
                       </p>
                     </div>
@@ -243,18 +243,18 @@ export function ProposalsDrawer() {
               {/* ── TAB: TEAM ── */}
               {drawerTab === "team" && (
                 <div className="flex flex-col gap-3">
-                  <h4 className="flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                  <h4 className="flex items-center gap-2 text-[11px] font-bold tracking-wider text-slate-500 uppercase">
                     <Users className="h-3.5 w-3.5" /> Research Team
                   </h4>
                   <div className="flex items-center gap-4 rounded-lg border border-blue-100 bg-blue-50/50 p-3.5 dark:border-blue-900/30 dark:bg-blue-900/10">
                     <Avatar className="h-10 w-10 border-2 border-blue-200 dark:border-blue-800">
-                      <AvatarFallback className="bg-blue-100 font-bold text-blue-700 text-xs">
+                      <AvatarFallback className="bg-blue-100 text-xs font-bold text-blue-700">
                         {details.pi.name.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex min-w-0 flex-col">
-                      <span className="font-bold text-slate-900 text-sm dark:text-slate-100">{details.pi.name}</span>
-                      <span className="font-semibold text-blue-600 text-xs dark:text-blue-400">
+                      <span className="text-sm font-bold text-slate-900 dark:text-slate-100">{details.pi.name}</span>
+                      <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">
                         Principal Investigator
                       </span>
                     </div>
@@ -266,13 +266,13 @@ export function ProposalsDrawer() {
                       className="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-3.5 dark:border-slate-800 dark:bg-slate-950"
                     >
                       <Avatar className="h-10 w-10">
-                        <AvatarFallback className="bg-slate-100 font-bold text-slate-600 text-xs">
+                        <AvatarFallback className="bg-slate-100 text-xs font-bold text-slate-600">
                           {member.name.slice(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex min-w-0 flex-col">
-                        <span className="font-bold text-slate-900 text-sm dark:text-slate-100">{member.name}</span>
-                        <span className="font-medium text-slate-500 text-xs">Member</span>
+                        <span className="text-sm font-bold text-slate-900 dark:text-slate-100">{member.name}</span>
+                        <span className="text-xs font-medium text-slate-500">Member</span>
                       </div>
                     </div>
                   ))}
@@ -289,8 +289,8 @@ export function ProposalsDrawer() {
                         <AlertTriangle className="h-6 w-6" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-900 text-sm dark:text-slate-100">Access Denied</h4>
-                        <p className="mt-1 max-w-[280px] text-slate-500 text-xs dark:text-slate-400">
+                        <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">Access Denied</h4>
+                        <p className="mt-1 max-w-[280px] text-xs text-slate-500 dark:text-slate-400">
                           You do not have the required permissions to view the financial breakdown of this proposal.
                         </p>
                       </div>
@@ -300,10 +300,10 @@ export function ProposalsDrawer() {
                   <div className="flex flex-col gap-6">
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <div className="flex flex-col justify-center rounded-xl border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm dark:border-slate-800 dark:from-slate-900/50 dark:to-slate-950">
-                        <p className="mb-1 flex items-center gap-1.5 font-bold text-[10px] text-slate-500 uppercase tracking-wider">
+                        <p className="mb-1 flex items-center gap-1.5 text-[10px] font-bold tracking-wider text-slate-500 uppercase">
                           <Banknote className="h-3.5 w-3.5" /> Total Requested
                         </p>
-                        <p className="font-extrabold text-2xl text-blue-600 dark:text-blue-400">
+                        <p className="text-2xl font-extrabold text-blue-600 dark:text-blue-400">
                           {new Intl.NumberFormat("en-US", {
                             style: "currency",
                             currency: "USD",
@@ -311,23 +311,23 @@ export function ProposalsDrawer() {
                         </p>
                       </div>
                       <div className="flex flex-col justify-center rounded-xl border border-slate-200/80 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/30">
-                        <p className="mb-1 font-bold text-[10px] text-slate-500 uppercase tracking-wider">Status</p>
-                        <p className="font-semibold text-[15px] text-slate-800 dark:text-slate-200">Pending Approval</p>
+                        <p className="mb-1 text-[10px] font-bold tracking-wider text-slate-500 uppercase">Status</p>
+                        <p className="text-[15px] font-semibold text-slate-800 dark:text-slate-200">Pending Approval</p>
                       </div>
                     </div>
 
                     <div>
-                      <h4 className="mb-3 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                      <h4 className="mb-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase">
                         Budget Breakdown
                       </h4>
                       <div className="overflow-hidden rounded-xl border border-slate-200 shadow-sm dark:border-slate-800">
                         <table className="w-full text-left text-sm">
                           <thead className="bg-slate-50/80 dark:bg-slate-900/50">
                             <tr>
-                              <th className="px-4 py-3 font-semibold text-slate-600 text-xs dark:text-slate-400">
+                              <th className="px-4 py-3 text-xs font-semibold text-slate-600 dark:text-slate-400">
                                 Description
                               </th>
-                              <th className="px-4 py-3 text-right font-semibold text-slate-600 text-xs dark:text-slate-400">
+                              <th className="px-4 py-3 text-right text-xs font-semibold text-slate-600 dark:text-slate-400">
                                 Amount
                               </th>
                             </tr>
@@ -377,8 +377,8 @@ export function ProposalsDrawer() {
                         <Sparkles className="h-4 w-4" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-900 text-sm dark:text-slate-100">Approval chain</h4>
-                        <p className="font-medium text-[11px] text-slate-500 dark:text-slate-400">
+                        <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">Approval chain</h4>
+                        <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                           Completed steps show prior approvals. Your step is where you approve or reject. Later steps
                           stay inactive.
                         </p>
@@ -425,31 +425,31 @@ export function ProposalsDrawer() {
                             >
                               <div className="flex flex-wrap items-start justify-between gap-2">
                                 <div>
-                                  <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider dark:text-slate-500">
+                                  <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500">
                                     Step {step.stepOrder} · {step.role}
                                   </p>
-                                  <p className="mt-0.5 font-semibold text-slate-900 text-sm dark:text-slate-100">
+                                  <p className="mt-0.5 text-sm font-semibold text-slate-900 dark:text-slate-100">
                                     {isCurrent ? "You" : step.approverUserId || "Assigned Approver"}
                                   </p>
                                   {isCompleted && (
-                                    <p className="mt-1 flex items-center gap-1 font-medium text-[11px] text-emerald-700 dark:text-emerald-400">
+                                    <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-emerald-700 dark:text-emerald-400">
                                       <CheckCircle className="h-3 w-3 shrink-0" />
                                       Approved
                                     </p>
                                   )}
                                   {isUpcoming && (
-                                    <p className="mt-1 font-medium text-[11px] text-slate-400 italic dark:text-slate-500">
+                                    <p className="mt-1 text-[11px] font-medium text-slate-400 italic dark:text-slate-500">
                                       Awaiting earlier approvals
                                     </p>
                                   )}
                                 </div>
                                 {isCompleted && (
-                                  <Badge className="shrink-0 border-0 bg-emerald-100 font-bold text-[10px] text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+                                  <Badge className="shrink-0 border-0 bg-emerald-100 text-[10px] font-bold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
                                     Done
                                   </Badge>
                                 )}
                                 {isCurrent && (
-                                  <Badge className="shrink-0 border-0 bg-blue-100 font-bold text-[10px] text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
+                                  <Badge className="shrink-0 border-0 bg-blue-100 text-[10px] font-bold text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
                                     Your turn
                                   </Badge>
                                 )}
@@ -460,14 +460,14 @@ export function ProposalsDrawer() {
                                   permission="PROJECT_APPROVE"
                                   fallback={
                                     <div className="mt-4 flex rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800/80 dark:bg-slate-900/20">
-                                      <p className="font-medium text-slate-500 text-xs italic">
+                                      <p className="text-xs font-medium text-slate-500 italic">
                                         Awaiting authorized personnel. You do not have permission to approve or reject
                                         this proposal step.
                                       </p>
                                     </div>
                                   }
                                 >
-                                  <div className="mt-4 flex flex-wrap gap-2 border-slate-100 border-t pt-4 dark:border-slate-800/80">
+                                  <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4 dark:border-slate-800/80">
                                     <Button
                                       type="button"
                                       size="sm"
@@ -505,29 +505,29 @@ export function ProposalsDrawer() {
 
       <Dialog open={showTimelineApprove} onOpenChange={setShowTimelineApprove}>
         <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[460px]">
-          <DialogHeader className="border-slate-100 border-b px-6 pt-6 pb-4 dark:border-slate-800">
+          <DialogHeader className="border-b border-slate-100 px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-emerald-100 p-2 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400">
                 <Check className="h-5 w-5" />
               </div>
-              <DialogTitle className="font-bold text-base">Confirm approval</DialogTitle>
+              <DialogTitle className="text-base font-bold">Confirm approval</DialogTitle>
             </div>
-            <DialogDescription className="ml-11 text-slate-500 text-xs">
+            <DialogDescription className="ml-11 text-xs text-slate-500">
               Your approval will advance this proposal to the next step in the chain. Add an optional note for the
               record.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4 px-6 py-5">
             <div className="rounded-lg border border-slate-100 bg-slate-50 p-3.5 dark:border-slate-800 dark:bg-slate-900/50">
-              <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Proposal</p>
-              <p className="mt-0.5 line-clamp-2 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+              <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Proposal</p>
+              <p className="mt-0.5 line-clamp-2 text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                 {selected?.title}
               </p>
             </div>
             <div className="flex flex-col gap-1.5">
               <Label
                 htmlFor="timeline-approve-note"
-                className="font-semibold text-[12px] text-slate-700 dark:text-slate-300"
+                className="text-[12px] font-semibold text-slate-700 dark:text-slate-300"
               >
                 Optional note
               </Label>
@@ -539,7 +539,7 @@ export function ProposalsDrawer() {
               />
             </div>
           </div>
-          <DialogFooter className="flex gap-2 border-slate-100 border-t px-6 py-4 dark:border-slate-800">
+          <DialogFooter className="flex gap-2 border-t border-slate-100 px-6 py-4 dark:border-slate-800">
             <Button variant="outline" size="sm" className="h-9" onClick={() => setShowTimelineApprove(false)}>
               Cancel
             </Button>
@@ -557,28 +557,28 @@ export function ProposalsDrawer() {
 
       <Dialog open={showTimelineReject} onOpenChange={setShowTimelineReject}>
         <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[460px]">
-          <DialogHeader className="border-slate-100 border-b px-6 pt-6 pb-4 dark:border-slate-800">
+          <DialogHeader className="border-b border-slate-100 px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-rose-100 p-2 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400">
                 <XCircle className="h-5 w-5" />
               </div>
-              <DialogTitle className="font-bold text-base">Reject at this step</DialogTitle>
+              <DialogTitle className="text-base font-bold">Reject at this step</DialogTitle>
             </div>
-            <DialogDescription className="ml-11 text-slate-500 text-xs">
+            <DialogDescription className="ml-11 text-xs text-slate-500">
               Explain why the proposal cannot proceed.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4 px-6 py-5">
             <div className="rounded-lg border border-slate-100 bg-slate-50 p-3.5 dark:border-slate-800 dark:bg-slate-900/50">
-              <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Proposal</p>
-              <p className="mt-0.5 line-clamp-2 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+              <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Proposal</p>
+              <p className="mt-0.5 line-clamp-2 text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                 {selected?.title}
               </p>
             </div>
             <div className="flex flex-col gap-1.5">
               <Label
                 htmlFor="timeline-reject-comment"
-                className="font-semibold text-[12px] text-slate-700 dark:text-slate-300"
+                className="text-[12px] font-semibold text-slate-700 dark:text-slate-300"
               >
                 Reason for rejection <span className="text-rose-500">*</span>
               </Label>
@@ -588,10 +588,10 @@ export function ProposalsDrawer() {
                 value={timelineRejectComment}
                 onChange={(e) => setTimelineRejectComment(e.target.value)}
               />
-              <p className="font-medium text-[10px] text-slate-400">{timelineRejectComment.length} / 1000 characters</p>
+              <p className="text-[10px] font-medium text-slate-400">{timelineRejectComment.length} / 1000 characters</p>
             </div>
           </div>
-          <DialogFooter className="flex gap-2 border-slate-100 border-t px-6 py-4 dark:border-slate-800">
+          <DialogFooter className="flex gap-2 border-t border-slate-100 px-6 py-4 dark:border-slate-800">
             <Button variant="outline" size="sm" className="h-9" onClick={() => setShowTimelineReject(false)}>
               Cancel
             </Button>

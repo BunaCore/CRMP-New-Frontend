@@ -91,8 +91,8 @@ export function ProposalsTable() {
             key={s.label}
             className={`rounded-xl border ${s.border} ${s.bg} flex items-center justify-between px-4 py-3 shadow-sm`}
           >
-            <span className="font-bold text-slate-500 text-xs uppercase tracking-wider">{s.label}</span>
-            <span className={`font-extrabold text-2xl ${s.color}`}>{s.count}</span>
+            <span className="text-xs font-bold tracking-wider text-slate-500 uppercase">{s.label}</span>
+            <span className={`text-2xl font-extrabold ${s.color}`}>{s.count}</span>
           </div>
         ))}
       </div>
@@ -110,11 +110,11 @@ export function ProposalsTable() {
               <TabsTrigger
                 key={t.value}
                 value={t.value}
-                className="h-8 rounded-md px-3 font-semibold text-xs data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-950"
+                className="h-8 rounded-md px-3 text-xs font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-950"
               >
                 {t.label}
                 <span
-                  className={`ml-1.5 rounded-full px-1.5 py-0.5 font-bold text-[10px] ${
+                  className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
                     tab === t.value
                       ? "bg-blue-600 text-white"
                       : "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-400"
@@ -127,7 +127,7 @@ export function ProposalsTable() {
           </TabsList>
 
           <div className="relative w-full sm:w-[280px]">
-            <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-3.5 w-3.5 text-slate-400" />
+            <Search className="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
             <Input
               placeholder="Search by title, PI or ID..."
               className="h-9 rounded-lg border-slate-200 bg-white pl-8 text-sm dark:border-slate-800 dark:bg-slate-950"
@@ -142,19 +142,19 @@ export function ProposalsTable() {
             <Table>
               <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
                 <TableRow className="border-slate-200 dark:border-slate-800">
-                  <TableHead className="h-10 w-[38%] pl-5 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+                  <TableHead className="h-10 w-[38%] pl-5 text-xs font-semibold tracking-wider text-slate-500 uppercase">
                     Proposal
                   </TableHead>
-                  <TableHead className="h-10 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+                  <TableHead className="h-10 text-xs font-semibold tracking-wider text-slate-500 uppercase">
                     PI
                   </TableHead>
-                  <TableHead className="h-10 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+                  <TableHead className="h-10 text-xs font-semibold tracking-wider text-slate-500 uppercase">
                     Status
                   </TableHead>
-                  <TableHead className="h-10 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+                  <TableHead className="h-10 text-xs font-semibold tracking-wider text-slate-500 uppercase">
                     Assignments
                   </TableHead>
-                  <TableHead className="h-10 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+                  <TableHead className="h-10 text-xs font-semibold tracking-wider text-slate-500 uppercase">
                     Program
                   </TableHead>
                   <TableHead className="h-10 w-[80px]" />
@@ -163,13 +163,13 @@ export function ProposalsTable() {
               <TableBody>
                 {isLoadingData ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="py-16 text-center font-medium text-slate-400 text-sm">
+                    <TableCell colSpan={6} className="py-16 text-center text-sm font-medium text-slate-400">
                       Loading pending approvals from server...
                     </TableCell>
                   </TableRow>
                 ) : filtered.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="py-16 text-center text-slate-400 text-sm italic">
+                    <TableCell colSpan={6} className="py-16 text-center text-sm text-slate-400 italic">
                       No proposals match your current filters.
                     </TableCell>
                   </TableRow>
@@ -185,10 +185,10 @@ export function ProposalsTable() {
                       >
                         <TableCell className="py-4 pl-5">
                           <div className="flex flex-col gap-0.5">
-                            <span className="line-clamp-1 font-semibold text-[13px] text-slate-900 leading-tight dark:text-slate-100">
+                            <span className="line-clamp-1 text-[13px] leading-tight font-semibold text-slate-900 dark:text-slate-100">
                               {p.title}
                             </span>
-                            <span className="font-bold text-[11px] text-slate-400 uppercase tracking-wider">
+                            <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">
                               {p.id.split("-")[0].toUpperCase()} · Step {p.currentStepOrder}: {p.currentApproverRole}
                             </span>
                           </div>
@@ -196,18 +196,18 @@ export function ProposalsTable() {
                         <TableCell className="py-4">
                           <div className="flex items-center gap-2.5">
                             <Avatar className="h-7 w-7 shrink-0">
-                              <AvatarFallback className="bg-blue-100 font-bold text-[10px] text-blue-700">
+                              <AvatarFallback className="bg-blue-100 text-[10px] font-bold text-blue-700">
                                 {initials}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="truncate font-medium text-[13px] text-slate-700 dark:text-slate-300">
+                            <span className="truncate text-[13px] font-medium text-slate-700 dark:text-slate-300">
                               {p.createdByName}
                             </span>
                           </div>
                         </TableCell>
                         <TableCell className="py-4">
                           <Badge
-                            className={`${cfg.className} pointer-events-none flex w-fit items-center gap-1 border-0 px-2 py-0.5 font-bold text-[11px] shadow-none`}
+                            className={`${cfg.className} pointer-events-none flex w-fit items-center gap-1 border-0 px-2 py-0.5 text-[11px] font-bold shadow-none`}
                           >
                             {cfg.icon}
                             {p.currentStatus.replace("_", " ")}
@@ -217,13 +217,13 @@ export function ProposalsTable() {
                           <div className="flex flex-col gap-1.5">
                             <Badge
                               variant="outline"
-                              className={`w-fit font-semibold text-[9px] uppercase tracking-wider ${p.evaluatorAssigned ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-400" : "border-slate-200 text-slate-500"}`}
+                              className={`w-fit text-[9px] font-semibold tracking-wider uppercase ${p.evaluatorAssigned ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-400" : "border-slate-200 text-slate-500"}`}
                             >
                               Eval: {p.evaluatorAssigned ? "Assigned" : "Pending"}
                             </Badge>
                             <Badge
                               variant="outline"
-                              className={`w-fit font-semibold text-[9px] uppercase tracking-wider ${p.advisorAssigned ? "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-900 dark:bg-violet-950 dark:text-violet-400" : "border-slate-200 text-slate-500"}`}
+                              className={`w-fit text-[9px] font-semibold tracking-wider uppercase ${p.advisorAssigned ? "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-900 dark:bg-violet-950 dark:text-violet-400" : "border-slate-200 text-slate-500"}`}
                             >
                               Adv: {p.advisorAssigned ? "Assigned" : "Pending"}
                             </Badge>
@@ -231,9 +231,9 @@ export function ProposalsTable() {
                         </TableCell>
                         <TableCell className="py-4">
                           <div className="flex flex-col gap-1.5">
-                            <span className="font-bold text-[12px] text-slate-700 uppercase">{p.proposalProgram}</span>
+                            <span className="text-[12px] font-bold text-slate-700 uppercase">{p.proposalProgram}</span>
                             <Badge
-                              className={`w-fit font-bold text-[9px] shadow-none ${p.isFunded ? "bg-amber-100 text-amber-800 hover:bg-amber-100" : "bg-slate-100 text-slate-600 hover:bg-slate-100"}`}
+                              className={`w-fit text-[9px] font-bold shadow-none ${p.isFunded ? "bg-amber-100 text-amber-800 hover:bg-amber-100" : "bg-slate-100 text-slate-600 hover:bg-slate-100"}`}
                             >
                               {p.isFunded ? "FUNDED" : "UNFUNDED"}
                             </Badge>
@@ -243,7 +243,7 @@ export function ProposalsTable() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="h-8 rounded-lg px-3 font-semibold text-blue-600 text-xs opacity-0 transition-opacity hover:bg-blue-50 group-hover:opacity-100 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                            className="h-8 rounded-lg px-3 text-xs font-semibold text-blue-600 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
                             onClick={(e) => {
                               e.stopPropagation();
                               openDrawer(p);
@@ -259,15 +259,15 @@ export function ProposalsTable() {
               </TableBody>
             </Table>
 
-            <div className="flex items-center justify-between border-slate-100 border-t px-5 py-3 dark:border-slate-800">
-              <p className="font-medium text-slate-400 text-xs">
+            <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3 dark:border-slate-800">
+              <p className="text-xs font-medium text-slate-400">
                 Showing {filtered.length} of {proposals.length} proposals
               </p>
               {tab !== "all" && (
                 <button
                   type="button"
                   onClick={() => setTab("all")}
-                  className="font-semibold text-blue-600 text-xs hover:underline dark:text-blue-400"
+                  className="text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400"
                 >
                   View all
                 </button>

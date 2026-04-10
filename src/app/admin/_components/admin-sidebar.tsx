@@ -46,7 +46,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
             <SidebarMenuButton asChild>
               <Link prefetch={false} href="/admin">
                 <Command />
-                <span className="font-semibold text-base">{APP_CONFIG.name} - Admin Space</span>
+                <span className="text-base font-semibold">{APP_CONFIG.name} - Admin Space</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -58,7 +58,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-          <div className="w-full px-2 pb-2 text-center text-muted-foreground text-xs">
+          <div className="text-muted-foreground w-full px-2 pb-2 text-center text-xs">
             Logged in as: <span className="font-bold">{user?.roles[0] || "Unknown"}</span>
           </div>
         </SidebarMenu>

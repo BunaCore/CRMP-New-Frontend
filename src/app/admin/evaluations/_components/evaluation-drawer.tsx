@@ -187,30 +187,30 @@ export function EvaluationDrawer() {
     <Sheet open={drawerOpen} onOpenChange={(o) => !o && closeDrawer()}>
       <SheetContent
         side="right"
-        className="flex w-full flex-col overflow-hidden border-slate-200/80 border-l p-0 shadow-2xl sm:max-w-[920px] xl:max-w-[1100px] dark:border-slate-800"
+        className="flex w-full flex-col overflow-hidden border-l border-slate-200/80 p-0 shadow-2xl sm:max-w-[920px] xl:max-w-[1100px] dark:border-slate-800"
       >
         {drawerTitle && (
           <>
-            <SheetHeader className="shrink-0 space-y-0 border-slate-100 border-b bg-gradient-to-br from-indigo-50/90 via-white to-white px-6 pt-6 pb-4 dark:border-slate-800 dark:from-indigo-950/40 dark:via-slate-950 dark:to-slate-950">
+            <SheetHeader className="shrink-0 space-y-0 border-b border-slate-100 bg-gradient-to-br from-indigo-50/90 via-white to-white px-6 pt-6 pb-4 dark:border-slate-800 dark:from-indigo-950/40 dark:via-slate-950 dark:to-slate-950">
               <div className="flex flex-wrap items-center gap-2">
-                <Badge className="border-0 bg-white/80 font-bold text-[10px] text-slate-700 shadow-sm dark:bg-slate-800 dark:text-slate-200">
+                <Badge className="border-0 bg-white/80 text-[10px] font-bold text-slate-700 shadow-sm dark:bg-slate-800 dark:text-slate-200">
                   {drawerKind === "proposal" ? "Proposal evaluation" : "Project evaluation"}
                 </Badge>
                 {drawerKind === "project" && activeProject && (
                   <Badge
-                    className={cn("border-0 font-bold text-[10px]", STATUS_STYLES[activeProject.evalStatus].className)}
+                    className={cn("border-0 text-[10px] font-bold", STATUS_STYLES[activeProject.evalStatus].className)}
                   >
                     {activeProject.evalStatus}
                   </Badge>
                 )}
                 {isEvalApproved && (
-                  <Badge className="border-0 bg-emerald-600 font-bold text-[10px] text-white">
+                  <Badge className="border-0 bg-emerald-600 text-[10px] font-bold text-white">
                     <CheckCircle2 className="mr-1 h-3 w-3" />
                     Evaluation approved
                   </Badge>
                 )}
               </div>
-              <SheetTitle className="mt-2 pr-2 text-left font-bold text-[17px] text-slate-900 leading-snug dark:text-slate-100">
+              <SheetTitle className="mt-2 pr-2 text-left text-[17px] leading-snug font-bold text-slate-900 dark:text-slate-100">
                 {drawerTitle}
               </SheetTitle>
               <SheetDescription className="text-left text-xs leading-relaxed">{drawerSubtitle}</SheetDescription>
@@ -229,7 +229,7 @@ export function EvaluationDrawer() {
                     type="button"
                     onClick={() => setDrawerTab(t.id)}
                     className={cn(
-                      "flex shrink-0 items-center justify-center gap-2 rounded-lg px-3 py-2 font-semibold text-xs transition-all",
+                      "flex shrink-0 items-center justify-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-all",
                       drawerTab === t.id
                         ? "bg-white text-indigo-700 shadow-sm dark:bg-slate-800 dark:text-indigo-400"
                         : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200",
@@ -249,43 +249,43 @@ export function EvaluationDrawer() {
                   {/* Key Stats */}
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                      <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                      <p className="mb-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
                         Principal Investigator
                       </p>
                       <div className="flex items-center gap-2">
                         <Avatar className="h-7 w-7">
                           <AvatarFallback
-                            className={`font-bold text-[10px] ${drawerKind === "proposal" ? activeProposal?.piColor : activeProject?.leadColor}`}
+                            className={`text-[10px] font-bold ${drawerKind === "proposal" ? activeProposal?.piColor : activeProject?.leadColor}`}
                           >
                             {drawerKind === "proposal" ? activeProposal?.piAvatar : activeProject?.leadAvatar}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="truncate font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                        <span className="truncate text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                           {drawerKind === "proposal" ? activeProposal?.pi : activeProject?.lead}
                         </span>
                       </div>
                     </div>
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                      <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                      <p className="mb-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
                         Budget Requested
                       </p>
-                      <p className="font-extrabold text-indigo-600 text-xl dark:text-indigo-400">
+                      <p className="text-xl font-extrabold text-indigo-600 dark:text-indigo-400">
                         {drawerKind === "proposal" ? activeProposal?.budget : activeProject?.budget}
                       </p>
                     </div>
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                      <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                      <p className="mb-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
                         Date Submitted
                       </p>
-                      <p className="flex items-center gap-1.5 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                      <p className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                         <CalendarDays className="h-3.5 w-3.5 text-slate-400" />
                         {/* biome-ignore lint/suspicious/noExplicitAny: dynamic access allowed for mockup */}
                         {(activeProposal as any)?.submittedDate || "Mar 12, 2025"}
                       </p>
                     </div>
                     <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                      <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Team Size</p>
-                      <p className="flex items-center gap-1.5 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                      <p className="mb-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">Team Size</p>
+                      <p className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                         <Users className="h-3.5 w-3.5 text-slate-400" />
                         {/* biome-ignore lint/suspicious/noExplicitAny: dynamic access allowed for mockup */}
                         {(activeProposal as any)?.teamCount || 3} members
@@ -295,10 +295,10 @@ export function EvaluationDrawer() {
 
                   {/* Abstract */}
                   <div>
-                    <h4 className="mb-2.5 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                    <h4 className="mb-2.5 flex items-center gap-2 text-[11px] font-bold tracking-wider text-slate-500 uppercase">
                       <FileText className="h-3.5 w-3.5" /> Abstract
                     </h4>
-                    <p className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-[13px] text-slate-600 leading-relaxed dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
+                    <p className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-[13px] leading-relaxed text-slate-600 dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
                       {/* biome-ignore lint/suspicious/noExplicitAny: dynamic access allowed for mockup */}
                       {(activeProposal as any)?.abstract ||
                         "Abstract details are under evaluation. Provide comprehensive details regarding the evaluated item."}
@@ -307,7 +307,7 @@ export function EvaluationDrawer() {
 
                   {/* Admin Workflow Actions */}
                   <div>
-                    <h4 className="mb-3 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                    <h4 className="mb-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase">
                       Workflow Actions
                     </h4>
                     <div className="grid grid-cols-1 gap-2.5 lg:grid-cols-2">
@@ -329,8 +329,8 @@ export function EvaluationDrawer() {
                             <UserCheck className="h-4 w-4" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="font-bold text-[13px] leading-tight">Assign Evaluators</p>
-                            <p className="mt-0.5 line-clamp-2 font-medium text-[11px] text-blue-700/80 dark:text-blue-400/80">
+                            <p className="text-[13px] leading-tight font-bold">Assign Evaluators</p>
+                            <p className="mt-0.5 line-clamp-2 text-[11px] font-medium text-blue-700/80 dark:text-blue-400/80">
                               {(activeProposal as { evaluators?: string[] })?.evaluators?.length
                                 ? `${(activeProposal as { evaluators?: string[] })?.evaluators?.length} assigned: ${formatPeopleList((activeProposal as { evaluators?: string[] })?.evaluators || [], 3)}`
                                 : "No evaluators assigned"}
@@ -358,8 +358,8 @@ export function EvaluationDrawer() {
                             <GraduationCap className="h-4 w-4" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="font-bold text-[13px] leading-tight">Assign Advisor</p>
-                            <p className="mt-0.5 line-clamp-2 font-medium text-[11px] text-violet-700/80 dark:text-violet-400/80">
+                            <p className="text-[13px] leading-tight font-bold">Assign Advisor</p>
+                            <p className="mt-0.5 line-clamp-2 text-[11px] font-medium text-violet-700/80 dark:text-violet-400/80">
                               {(activeProposal as { advisors?: string[] })?.advisors?.length
                                 ? `${(activeProposal as { advisors?: string[] })?.advisors?.length} assigned: ${formatPeopleList((activeProposal as { advisors?: string[] })?.advisors || [], 3)}`
                                 : "No advisors assigned"}
@@ -376,28 +376,28 @@ export function EvaluationDrawer() {
               {/* ── TAB: TEAM ── */}
               {drawerTab === "team" && (
                 <div className="flex flex-col gap-3">
-                  <h4 className="flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                  <h4 className="flex items-center gap-2 text-[11px] font-bold tracking-wider text-slate-500 uppercase">
                     <Users className="h-3.5 w-3.5" /> Research Team
                   </h4>
                   <div className="flex items-center gap-4 rounded-lg border border-indigo-100 bg-indigo-50/50 p-3.5 dark:border-indigo-900/30 dark:bg-indigo-900/10">
                     <Avatar className="h-10 w-10 border-2 border-indigo-200 dark:border-indigo-800">
                       <AvatarFallback
-                        className={`font-bold text-xs ${drawerKind === "proposal" ? activeProposal?.piColor : activeProject?.leadColor}`}
+                        className={`text-xs font-bold ${drawerKind === "proposal" ? activeProposal?.piColor : activeProject?.leadColor}`}
                       >
                         {drawerKind === "proposal" ? activeProposal?.piAvatar : activeProject?.leadAvatar}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex min-w-0 flex-col">
-                      <span className="font-bold text-slate-900 text-sm dark:text-slate-100">
+                      <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
                         {drawerKind === "proposal" ? activeProposal?.pi : activeProject?.lead}
                       </span>
-                      <span className="font-semibold text-indigo-600 text-xs dark:text-indigo-400">
+                      <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
                         Principal Investigator
                       </span>
                     </div>
                     <Badge className="ml-auto shrink-0 border-0 bg-indigo-600 text-[10px] text-white">PI</Badge>
                   </div>
-                  <p className="rounded-lg border border-slate-200 border-dashed py-6 text-center text-slate-400 text-xs italic dark:border-slate-700">
+                  <p className="rounded-lg border border-dashed border-slate-200 py-6 text-center text-xs text-slate-400 italic dark:border-slate-700">
                     Full team details will appear here once connected to the backend.
                   </p>
                 </div>
@@ -408,33 +408,33 @@ export function EvaluationDrawer() {
                 <div className="flex flex-col gap-6">
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div className="flex flex-col justify-center rounded-xl border border-slate-200/80 bg-gradient-to-br from-indigo-50 to-white p-4 shadow-sm dark:border-slate-800 dark:from-indigo-950/50 dark:to-slate-950">
-                      <p className="mb-1 flex items-center gap-1.5 font-bold text-[10px] text-slate-500 uppercase tracking-wider">
+                      <p className="mb-1 flex items-center gap-1.5 text-[10px] font-bold tracking-wider text-slate-500 uppercase">
                         <Banknote className="h-3.5 w-3.5" /> Total Requested
                       </p>
-                      <p className="font-extrabold text-2xl text-indigo-600 dark:text-indigo-400">
+                      <p className="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400">
                         {drawerKind === "proposal" ? activeProposal?.budget : activeProject?.budget}
                       </p>
                     </div>
                     <div className="flex flex-col justify-center rounded-xl border border-slate-200/80 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/30">
-                      <p className="mb-1 font-bold text-[10px] text-slate-500 uppercase tracking-wider">Status</p>
-                      <p className="font-semibold text-[15px] text-slate-800 dark:text-slate-200">
+                      <p className="mb-1 text-[10px] font-bold tracking-wider text-slate-500 uppercase">Status</p>
+                      <p className="text-[15px] font-semibold text-slate-800 dark:text-slate-200">
                         {drawerKind === "project" && activeProject ? activeProject.evalStatus : "Under Evaluation"}
                       </p>
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="mb-3 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                    <h4 className="mb-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase">
                       Budget Breakdown
                     </h4>
                     <div className="overflow-hidden rounded-xl border border-slate-200 shadow-sm dark:border-slate-800">
                       <table className="w-full text-left text-sm">
                         <thead className="bg-slate-50/80 dark:bg-slate-900/50">
                           <tr>
-                            <th className="px-4 py-3 font-semibold text-slate-600 text-xs dark:text-slate-400">
+                            <th className="px-4 py-3 text-xs font-semibold text-slate-600 dark:text-slate-400">
                               Description
                             </th>
-                            <th className="px-4 py-3 text-right font-semibold text-slate-600 text-xs dark:text-slate-400">
+                            <th className="px-4 py-3 text-right text-xs font-semibold text-slate-600 dark:text-slate-400">
                               Amount
                             </th>
                           </tr>
@@ -493,32 +493,32 @@ export function EvaluationDrawer() {
                   {/* Header row */}
                   <div className="flex flex-wrap items-end justify-between gap-3">
                     <div>
-                      <h3 className="font-bold text-slate-900 text-sm dark:text-slate-100">Evaluation rubric</h3>
-                      <p className="mt-0.5 text-slate-500 text-xs">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Evaluation rubric</h3>
+                      <p className="mt-0.5 text-xs text-slate-500">
                         {drawerKind === "proposal" ? "Proposal phase" : "Project phase"} rubrics · adjust scores and
                         submit.
                       </p>
                     </div>
                     {!scoresLoading && filteredApiRubrics.length > 0 && (
                       <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 dark:border-indigo-900/50 dark:bg-indigo-950/40">
-                        <p className="font-bold text-[10px] text-indigo-800 uppercase tracking-wider dark:text-indigo-300">
+                        <p className="text-[10px] font-bold tracking-wider text-indigo-800 uppercase dark:text-indigo-300">
                           Aggregate
                         </p>
-                        <p className="font-black text-indigo-900 text-lg tabular-nums dark:text-indigo-100">
+                        <p className="text-lg font-black text-indigo-900 tabular-nums dark:text-indigo-100">
                           {apiAggregate.earned.toFixed(2)}{" "}
-                          <span className="font-semibold text-slate-500 text-sm">/ {apiAggregate.max}</span>
+                          <span className="text-sm font-semibold text-slate-500">/ {apiAggregate.max}</span>
                         </p>
                       </div>
                     )}
                     {/* Fallback: no API data yet — show local mock totals */}
                     {!scoresLoading && filteredApiRubrics.length === 0 && (
                       <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 dark:border-indigo-900/50 dark:bg-indigo-950/40">
-                        <p className="font-bold text-[10px] text-indigo-800 uppercase tracking-wider dark:text-indigo-300">
+                        <p className="text-[10px] font-bold tracking-wider text-indigo-800 uppercase dark:text-indigo-300">
                           Aggregate
                         </p>
-                        <p className="font-black text-indigo-900 text-lg tabular-nums dark:text-indigo-100">
+                        <p className="text-lg font-black text-indigo-900 tabular-nums dark:text-indigo-100">
                           {totals.earned.toFixed(2)}{" "}
-                          <span className="font-semibold text-slate-500 text-sm">/ {totals.max}</span>
+                          <span className="text-sm font-semibold text-slate-500">/ {totals.max}</span>
                         </p>
                       </div>
                     )}
@@ -528,7 +528,7 @@ export function EvaluationDrawer() {
                   {scoresLoading && (
                     <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 py-12 dark:border-slate-800 dark:bg-slate-900/30">
                       <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-                      <p className="text-slate-500 text-xs">Loading rubrics from server…</p>
+                      <p className="text-xs text-slate-500">Loading rubrics from server…</p>
                     </div>
                   )}
 
@@ -546,19 +546,19 @@ export function EvaluationDrawer() {
                             <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-indigo-500 to-violet-500 opacity-80" />
                             <div className="flex flex-col gap-3 pl-2 sm:flex-row sm:items-center sm:justify-between">
                               <div className="flex min-w-0 items-start gap-3">
-                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 font-black text-indigo-600 text-sm dark:bg-slate-800 dark:text-indigo-400">
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-sm font-black text-indigo-600 dark:bg-slate-800 dark:text-indigo-400">
                                   {i + 1}
                                 </span>
                                 <div className="min-w-0">
-                                  <p className="font-bold text-slate-900 text-sm dark:text-slate-100">{row.name}</p>
+                                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100">{row.name}</p>
                                   <div className="mt-1 flex flex-wrap items-center gap-2">
                                     <Badge
                                       variant="outline"
-                                      className="border-slate-200 font-semibold text-[10px] uppercase dark:border-slate-700"
+                                      className="border-slate-200 text-[10px] font-semibold uppercase dark:border-slate-700"
                                     >
                                       {row.type}
                                     </Badge>
-                                    <span className="font-medium text-[11px] text-slate-500">
+                                    <span className="text-[11px] font-medium text-slate-500">
                                       Max {row.maxPoints} pts
                                     </span>
                                   </div>
@@ -566,10 +566,10 @@ export function EvaluationDrawer() {
                               </div>
                               <div className="flex w-full flex-col gap-2 sm:w-52">
                                 <div className="flex items-baseline justify-between gap-2">
-                                  <span className="font-bold text-slate-500 text-xs">Result</span>
-                                  <span className="font-black text-indigo-700 text-lg tabular-nums dark:text-indigo-300">
+                                  <span className="text-xs font-bold text-slate-500">Result</span>
+                                  <span className="text-lg font-black text-indigo-700 tabular-nums dark:text-indigo-300">
                                     {draft.score.toFixed(2)}
-                                    <span className="font-semibold text-slate-400 text-sm"> / {row.maxPoints}</span>
+                                    <span className="text-sm font-semibold text-slate-400"> / {row.maxPoints}</span>
                                   </span>
                                 </div>
                                 <Progress value={pct} className="h-2 bg-slate-100 dark:bg-slate-800" />
@@ -578,7 +578,7 @@ export function EvaluationDrawer() {
                             {/* Score + Feedback inputs */}
                             <div className="mt-3 flex flex-col gap-2 pl-2 sm:pl-12">
                               <div className="flex items-center gap-2">
-                                <Label className="w-14 shrink-0 font-semibold text-[11px] text-slate-500">Score</Label>
+                                <Label className="w-14 shrink-0 text-[11px] font-semibold text-slate-500">Score</Label>
                                 <Input
                                   type="number"
                                   step="0.01"
@@ -597,7 +597,7 @@ export function EvaluationDrawer() {
                                 />
                               </div>
                               <div className="flex items-start gap-2">
-                                <Label className="mt-1.5 w-14 shrink-0 font-semibold text-[11px] text-slate-500">
+                                <Label className="mt-1.5 w-14 shrink-0 text-[11px] font-semibold text-slate-500">
                                   Note
                                 </Label>
                                 <Textarea
@@ -632,35 +632,35 @@ export function EvaluationDrawer() {
                             <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-indigo-500 to-violet-500 opacity-80" />
                             <div className="flex flex-col gap-3 pl-2 sm:flex-row sm:items-center sm:justify-between">
                               <div className="flex min-w-0 items-start gap-3">
-                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 font-black text-indigo-600 text-sm dark:bg-slate-800 dark:text-indigo-400">
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-sm font-black text-indigo-600 dark:bg-slate-800 dark:text-indigo-400">
                                   {row.order}
                                 </span>
                                 <div className="min-w-0">
-                                  <p className="font-bold text-slate-900 text-sm dark:text-slate-100">{row.name}</p>
+                                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100">{row.name}</p>
                                   <div className="mt-1 flex flex-wrap items-center gap-2">
                                     <Badge
                                       variant="outline"
-                                      className="border-slate-200 font-semibold text-[10px] uppercase dark:border-slate-700"
+                                      className="border-slate-200 text-[10px] font-semibold uppercase dark:border-slate-700"
                                     >
                                       {row.kind}
                                     </Badge>
-                                    <span className="font-medium text-[11px] text-slate-500">Max {row.max} pts</span>
+                                    <span className="text-[11px] font-medium text-slate-500">Max {row.max} pts</span>
                                   </div>
                                 </div>
                               </div>
                               <div className="flex w-full flex-col gap-2 sm:w-52">
                                 <div className="flex items-baseline justify-between gap-2">
-                                  <span className="font-bold text-slate-500 text-xs">Result</span>
-                                  <span className="font-black text-indigo-700 text-lg tabular-nums dark:text-indigo-300">
+                                  <span className="text-xs font-bold text-slate-500">Result</span>
+                                  <span className="text-lg font-black text-indigo-700 tabular-nums dark:text-indigo-300">
                                     {row.score}
-                                    <span className="font-semibold text-slate-400 text-sm"> / {row.max}</span>
+                                    <span className="text-sm font-semibold text-slate-400"> / {row.max}</span>
                                   </span>
                                 </div>
                                 <Progress value={pct} className="h-2 bg-slate-100 dark:bg-slate-800" />
                               </div>
                             </div>
                             <div className="mt-3 flex items-center gap-2 pl-2 sm:pl-12">
-                              <Label className="w-14 shrink-0 font-semibold text-[11px] text-slate-500">Edit</Label>
+                              <Label className="w-14 shrink-0 text-[11px] font-semibold text-slate-500">Edit</Label>
                               <Input
                                 type="number"
                                 step="0.01"
@@ -690,7 +690,7 @@ export function EvaluationDrawer() {
                     <Can
                       permission="EVALUATION_SCORE_SUBMIT"
                       fallback={
-                        <p className="font-medium text-[11px] text-slate-500 italic">
+                        <p className="text-[11px] font-medium text-slate-500 italic">
                           You do not have permission to submit these evaluations.
                         </p>
                       }
@@ -721,10 +721,10 @@ export function EvaluationDrawer() {
                       <CalendarDays className="h-6 w-6" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-base text-slate-900 tracking-tight dark:text-slate-100">
+                      <h3 className="text-base font-bold tracking-tight text-slate-900 dark:text-slate-100">
                         Defence Appointment
                       </h3>
-                      <p className="mt-1 text-[13px] text-slate-500 leading-relaxed dark:text-slate-400">
+                      <p className="mt-1 text-[13px] leading-relaxed text-slate-500 dark:text-slate-400">
                         Schedule the evaluation defence. A calendar invitation will be automatically drafted for the PI
                         upon confirmation.
                       </p>
@@ -733,7 +733,7 @@ export function EvaluationDrawer() {
 
                   <div className="grid grid-cols-1 gap-5 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm md:grid-cols-2 dark:border-slate-800/60 dark:bg-slate-950">
                     <div className="flex flex-col gap-2.5">
-                      <Label className="font-bold text-[12px] text-slate-700 uppercase tracking-widest dark:text-slate-300">
+                      <Label className="text-[12px] font-bold tracking-widest text-slate-700 uppercase dark:text-slate-300">
                         Date
                       </Label>
                       <Popover>
@@ -760,12 +760,12 @@ export function EvaluationDrawer() {
                     <div className="flex flex-col gap-2.5">
                       <Label
                         htmlFor="def-time"
-                        className="font-bold text-[12px] text-slate-700 uppercase tracking-widest dark:text-slate-300"
+                        className="text-[12px] font-bold tracking-widest text-slate-700 uppercase dark:text-slate-300"
                       >
                         Time (EAT)
                       </Label>
                       <div className="relative">
-                        <Clock className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 h-4 w-4 text-indigo-500" />
+                        <Clock className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-indigo-500" />
                         <Input
                           id="def-time"
                           type="time"
@@ -779,7 +779,7 @@ export function EvaluationDrawer() {
                     <div className="flex flex-col gap-2.5 md:col-span-2">
                       <Label
                         htmlFor="def-venue"
-                        className="font-bold text-[12px] text-slate-700 uppercase tracking-widest dark:text-slate-300"
+                        className="text-[12px] font-bold tracking-widest text-slate-700 uppercase dark:text-slate-300"
                       >
                         Location / Link
                       </Label>
@@ -795,7 +795,7 @@ export function EvaluationDrawer() {
                     <div className="flex flex-col gap-2.5 md:col-span-2">
                       <Label
                         htmlFor="def-msg"
-                        className="font-bold text-[12px] text-slate-700 uppercase tracking-widest dark:text-slate-300"
+                        className="text-[12px] font-bold tracking-widest text-slate-700 uppercase dark:text-slate-300"
                       >
                         Direct Message to PI
                       </Label>
@@ -822,7 +822,7 @@ export function EvaluationDrawer() {
                       <div className="flex items-center gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 sm:flex-1 dark:border-emerald-900/60 dark:bg-emerald-950/40">
                         <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
                         <div className="min-w-0">
-                          <p className="font-bold text-[12px] text-emerald-900 dark:text-emerald-200">
+                          <p className="text-[12px] font-bold text-emerald-900 dark:text-emerald-200">
                             Invitation successfully queued
                           </p>
                         </div>
@@ -841,8 +841,8 @@ export function EvaluationDrawer() {
                         <Sparkles className="h-4 w-4" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-900 text-sm dark:text-slate-100">Approval chain</h4>
-                        <p className="font-medium text-[11px] text-slate-500 dark:text-slate-400">
+                        <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">Approval chain</h4>
+                        <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                           Completed steps show prior approvals. Your step is where you approve or reject. Later steps
                           stay inactive.
                         </p>
@@ -895,42 +895,42 @@ export function EvaluationDrawer() {
                             >
                               <div className="flex flex-wrap items-start justify-between gap-2">
                                 <div>
-                                  <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider dark:text-slate-500">
+                                  <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500">
                                     Step {idx + 1} · {step.role}
                                   </p>
-                                  <p className="mt-0.5 font-semibold text-slate-900 text-sm dark:text-slate-100">
+                                  <p className="mt-0.5 text-sm font-semibold text-slate-900 dark:text-slate-100">
                                     {step.state === "current" ? "You" : step.approverName}
                                   </p>
                                   {isCompleted && (step.approvedAt || isEvalApproved) && (
-                                    <p className="mt-1 flex items-center gap-1 font-medium text-[11px] text-emerald-700 dark:text-emerald-400">
+                                    <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-emerald-700 dark:text-emerald-400">
                                       <CheckCircle className="h-3 w-3 shrink-0" />
                                       Approved · {step.approvedAt || "Just now"}
                                     </p>
                                   )}
                                   {isRejectedHere && (
-                                    <p className="mt-1 flex items-center gap-1 font-medium text-[11px] text-rose-700 dark:text-rose-400">
+                                    <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-rose-700 dark:text-rose-400">
                                       <AlertTriangle className="h-3 w-3 shrink-0" />
                                       Rejected · Just now
                                     </p>
                                   )}
                                   {isUpcoming && (
-                                    <p className="mt-1 font-medium text-[11px] text-slate-400 italic dark:text-slate-500">
+                                    <p className="mt-1 text-[11px] font-medium text-slate-400 italic dark:text-slate-500">
                                       Awaiting earlier approvals
                                     </p>
                                   )}
                                 </div>
                                 {isCompleted && (
-                                  <Badge className="shrink-0 border-0 bg-emerald-100 font-bold text-[10px] text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+                                  <Badge className="shrink-0 border-0 bg-emerald-100 text-[10px] font-bold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
                                     Done
                                   </Badge>
                                 )}
                                 {isRejectedHere && (
-                                  <Badge className="shrink-0 border-0 bg-rose-100 font-bold text-[10px] text-rose-800 dark:bg-rose-900/40 dark:text-rose-300">
+                                  <Badge className="shrink-0 border-0 bg-rose-100 text-[10px] font-bold text-rose-800 dark:bg-rose-900/40 dark:text-rose-300">
                                     Rejected
                                   </Badge>
                                 )}
                                 {isCurrent && (
-                                  <Badge className="shrink-0 border-0 bg-indigo-100 font-bold text-[10px] text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300">
+                                  <Badge className="shrink-0 border-0 bg-indigo-100 text-[10px] font-bold text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300">
                                     Your turn
                                   </Badge>
                                 )}
@@ -941,14 +941,14 @@ export function EvaluationDrawer() {
                                   permission="PROJECT_APPROVE"
                                   fallback={
                                     <div className="mt-4 flex rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800/80 dark:bg-slate-900/20">
-                                      <p className="font-medium text-slate-500 text-xs italic">
+                                      <p className="text-xs font-medium text-slate-500 italic">
                                         Awaiting authorized personnel. You do not have permission to approve or reject
                                         this evaluation step.
                                       </p>
                                     </div>
                                   }
                                 >
-                                  <div className="mt-4 flex flex-wrap gap-2 border-slate-100 border-t pt-4 dark:border-slate-800/80">
+                                  <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4 dark:border-slate-800/80">
                                     <Button
                                       type="button"
                                       size="sm"

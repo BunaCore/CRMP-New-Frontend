@@ -65,11 +65,11 @@ export function TeamList({
   onStatusFilterChange,
 }: TeamListProps) {
   return (
-    <div className="flex h-full flex-col border-r bg-card">
+    <div className="bg-card flex h-full flex-col border-r">
       {/* Header */}
       <div className="border-b p-4">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-semibold text-foreground text-lg">Team Members</h2>
+          <h2 className="text-foreground text-lg font-semibold">Team Members</h2>
           <Button onClick={onAddMember} size="sm">
             <Plus className="mr-1 h-4 w-4" />
             Add
@@ -78,7 +78,7 @@ export function TeamList({
 
         {/* Search */}
         <div className="relative mb-3">
-          <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
+          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             placeholder="Search members..."
             value={searchQuery}
@@ -124,7 +124,7 @@ export function TeamList({
           {members.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <p className="text-muted-foreground text-sm">No members found</p>
-              <p className="mt-1 text-muted-foreground text-xs">Try adjusting your filters</p>
+              <p className="text-muted-foreground mt-1 text-xs">Try adjusting your filters</p>
             </div>
           ) : (
             <div className="space-y-1">
@@ -141,24 +141,24 @@ export function TeamList({
                 >
                   <div className="relative shrink-0">
                     <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-primary/10 font-medium text-primary text-sm">
+                      <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
                         {getInitials(member.name)}
                       </AvatarFallback>
                     </Avatar>
                     <span
                       className={cn(
-                        "absolute right-0 bottom-0 h-2.5 w-2.5 rounded-full border-2 border-card",
+                        "border-card absolute right-0 bottom-0 h-2.5 w-2.5 rounded-full border-2",
                         member.status === "Active" ? "bg-emerald-500" : "bg-muted-foreground/50",
                       )}
                     />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="truncate font-medium text-foreground text-sm">{member.name}</p>
+                      <p className="text-foreground truncate text-sm font-medium">{member.name}</p>
                     </div>
                     <Badge
                       variant="outline"
-                      className={cn("mt-1 px-1.5 py-0 font-normal text-[10px]", getRoleBadgeVariant(member.role))}
+                      className={cn("mt-1 px-1.5 py-0 text-[10px] font-normal", getRoleBadgeVariant(member.role))}
                     >
                       {member.role}
                     </Badge>
@@ -172,7 +172,7 @@ export function TeamList({
 
       {/* Footer */}
       <div className="border-t p-3">
-        <p className="text-center text-muted-foreground text-xs">
+        <p className="text-muted-foreground text-center text-xs">
           {members.length} member{members.length !== 1 ? "s" : ""} shown
         </p>
       </div>

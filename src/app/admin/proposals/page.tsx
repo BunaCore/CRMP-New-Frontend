@@ -13,11 +13,11 @@ export default function AdminProposalsPage() {
         {/* ── Header ── */}
         <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
           <div>
-            <h1 className="flex items-center gap-2 font-bold text-2xl text-slate-900 tracking-tight dark:text-slate-100">
+            <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               <FileText className="h-6 w-6 text-blue-600 dark:text-blue-500" />
               Proposal Management
             </h1>
-            <p className="mt-0.5 text-slate-500 text-sm">
+            <p className="mt-0.5 text-sm text-slate-500">
               Route, assign, and manage all submitted research proposals across the university.
             </p>
           </div>

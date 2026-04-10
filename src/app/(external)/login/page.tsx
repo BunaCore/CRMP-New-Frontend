@@ -16,8 +16,8 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-[100dvh] w-full bg-slate-50 font-sans dark:bg-slate-950">
       {/* Left Panel: Graphic / Brand Side */}
-      <div className="relative hidden w-0 w-1/2 flex-1 flex-col justify-center border-slate-200 border-r bg-white px-10 pt-10 lg:flex dark:border-slate-800 dark:bg-slate-900">
-        <div className="absolute inset-0 z-0 bg-[url('/media/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+      <div className="relative hidden w-0 w-1/2 flex-1 flex-col justify-center border-r border-slate-200 bg-white px-10 pt-10 lg:flex dark:border-slate-800 dark:bg-slate-900">
+        <div className="absolute inset-0 z-0 bg-[url('/media/grid.svg')] [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] bg-center" />
 
         <div className="relative z-10 mx-auto flex max-w-xl flex-col items-center justify-center text-center">
           <div className="mb-6 inline-flex h-16 items-center justify-center rounded-2xl border border-blue-600/20 bg-blue-600/10 p-4 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
@@ -36,7 +36,7 @@ export default function LoginPage() {
               <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
           </div>
-          <h1 className="font-extrabold text-4xl text-slate-900 tracking-tight sm:text-5xl dark:text-white">
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl dark:text-white">
             {APP_CONFIG.meta.title || "CRMP"} Access Portal
           </h1>
           <p className="mt-6 text-lg text-slate-600 dark:text-slate-400">
@@ -60,10 +60,10 @@ export default function LoginPage() {
               </svg>
             </Link>
 
-            <h2 className="mt-2 font-bold text-3xl text-slate-900 tracking-tight dark:text-white">
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
               Sign in to your account
             </h2>
-            <p className="mt-2 text-slate-600 text-sm dark:text-slate-400">
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
               Need access?{" "}
               <a
                 href="mailto:support@crmp.com"

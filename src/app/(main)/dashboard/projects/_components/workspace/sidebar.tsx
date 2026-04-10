@@ -41,17 +41,17 @@ export function Sidebar({ projectName }: SidebarProps) {
   };
 
   return (
-    <div className="flex h-full w-72 shrink-0 flex-col gap-4 border-r bg-muted/20 p-4 transition-all duration-300">
+    <div className="bg-muted/20 flex h-full w-72 shrink-0 flex-col gap-4 border-r p-4 transition-all duration-300">
       <div className="flex flex-col gap-4">
         <Link
           href="/dashboard/projects"
-          className="group mb-2 flex items-center gap-2 text-muted-foreground text-xs transition-colors hover:text-primary"
+          className="group text-muted-foreground hover:text-primary mb-2 flex items-center gap-2 text-xs transition-colors"
         >
-          <ArrowLeft className="group-hover:-translate-x-1 h-3 w-3 transition-transform" />
+          <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-1" />
           Back to Projects
         </Link>
         <div className="flex items-center justify-between">
-          <h2 className="flex-1 truncate font-bold text-xl tracking-tight" title={projectName}>
+          <h2 className="flex-1 truncate text-xl font-bold tracking-tight" title={projectName}>
             {projectName}
           </h2>
         </div>
@@ -70,7 +70,7 @@ export function Sidebar({ projectName }: SidebarProps) {
         >
           <Layout className="h-4 w-4" />
           <span>Workspace</span>
-          {activeView === "editor" && <div className="absolute right-3 h-1.5 w-1.5 rounded-full bg-primary" />}
+          {activeView === "editor" && <div className="bg-primary absolute right-3 h-1.5 w-1.5 rounded-full" />}
         </Button>
       </div>
 
@@ -78,14 +78,14 @@ export function Sidebar({ projectName }: SidebarProps) {
 
       <div className="flex flex-1 flex-col gap-4 overflow-hidden">
         <div className="flex items-center justify-between px-2">
-          <h3 className="flex items-center gap-2 font-semibold text-muted-foreground/80 text-xs uppercase tracking-wider">
+          <h3 className="text-muted-foreground/80 flex items-center gap-2 text-xs font-semibold tracking-wider uppercase">
             <Files className="h-3 w-3" />
             Files
           </h3>
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6 rounded-md hover:bg-primary/10 hover:text-primary"
+            className="hover:bg-primary/10 hover:text-primary h-6 w-6 rounded-md"
             onClick={() => fileInputRef.current?.click()}
           >
             <Plus className="h-4 w-4" />
@@ -111,7 +111,7 @@ export function Sidebar({ projectName }: SidebarProps) {
               className={cn(
                 "group relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-all duration-200",
                 activeFile?.id === file.id
-                  ? "bg-primary/10 font-medium text-primary"
+                  ? "bg-primary/10 text-primary font-medium"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
@@ -136,9 +136,9 @@ export function Sidebar({ projectName }: SidebarProps) {
           ))}
 
           {files.length === 0 && (
-            <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed bg-muted/10 p-8 opacity-60">
-              <Upload className="h-8 w-8 text-muted-foreground/40" />
-              <p className="text-center text-muted-foreground text-xs leading-relaxed">
+            <div className="bg-muted/10 flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed p-8 opacity-60">
+              <Upload className="text-muted-foreground/40 h-8 w-8" />
+              <p className="text-muted-foreground text-center text-xs leading-relaxed">
                 No files uploaded yet. <br />
                 Drag & drop or Click +
               </p>

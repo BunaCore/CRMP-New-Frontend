@@ -267,9 +267,9 @@ export default function NewProposalPage() {
    *------------------------*/
   const renderStepper = () => (
     <div className="relative mx-auto mb-6 flex w-full max-w-2xl justify-between">
-      <div className="-z-10 absolute top-[16px] right-[5%] left-[5%] h-[2px] bg-slate-100 dark:bg-slate-800" />
+      <div className="absolute top-[16px] right-[5%] left-[5%] -z-10 h-[2px] bg-slate-100 dark:bg-slate-800" />
       <div
-        className="-z-10 absolute top-[16px] left-[5%] h-[2px] bg-blue-600 transition-all duration-500 ease-in-out"
+        className="absolute top-[16px] left-[5%] -z-10 h-[2px] bg-blue-600 transition-all duration-500 ease-in-out"
         style={{ width: `calc(${(currentStep / (STEPS.length - 1)) * 90}%)` }}
       />
       {STEPS.map((step, index) => {
@@ -278,7 +278,7 @@ export default function NewProposalPage() {
         return (
           <div key={step.title} className="relative z-10 flex w-1/4 flex-col items-center gap-1.5">
             <div
-              className={`flex h-8 w-8 items-center justify-center rounded-full font-semibold text-[13px] transition-all ease-out ${
+              className={`flex h-8 w-8 items-center justify-center rounded-full text-[13px] font-semibold transition-all ease-out ${
                 isActive
                   ? "bg-blue-600 text-white ring-2 ring-blue-100 dark:ring-blue-900/50"
                   : isCompleted
@@ -290,7 +290,7 @@ export default function NewProposalPage() {
             </div>
             <div className="text-center">
               <p
-                className={`font-bold text-[11px] uppercase tracking-wider ${isActive ? "text-blue-700 dark:text-blue-400" : isCompleted ? "text-slate-700 dark:text-slate-300" : "text-slate-400"}`}
+                className={`text-[11px] font-bold tracking-wider uppercase ${isActive ? "text-blue-700 dark:text-blue-400" : isCompleted ? "text-slate-700 dark:text-slate-300" : "text-slate-400"}`}
               >
                 {step.title}
               </p>
@@ -309,13 +309,13 @@ export default function NewProposalPage() {
           <Button
             variant="ghost"
             size="sm"
-            className="-ml-2 h-7 rounded px-2 text-slate-500 text-xs transition-all hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="-ml-2 h-7 rounded px-2 text-xs text-slate-500 transition-all hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Back to Proposals
           </Button>
         </Link>
         <div>
-          <h1 className="font-semibold text-2xl text-slate-900 tracking-tight dark:text-slate-100">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
             New Research Proposal
           </h1>
           <p className="mt-0.5 text-[13px] text-slate-500 dark:text-slate-400">
@@ -331,10 +331,10 @@ export default function NewProposalPage() {
         <CardContent className="flex-1 p-0">
           {/* STEP 1: DRAFT */}
           {currentStep === 0 && (
-            <div className="fade-in slide-in-from-right-4 mx-auto mt-4 flex max-w-4xl animate-in flex-col gap-6 duration-500">
+            <div className="fade-in slide-in-from-right-4 animate-in mx-auto mt-4 flex max-w-4xl flex-col gap-6 duration-500">
               {/* Proposal Title - Full Width */}
               <div className="grid gap-1.5">
-                <Label htmlFor="title" className="font-semibold text-sm">
+                <Label htmlFor="title" className="text-sm font-semibold">
                   Proposal Title
                 </Label>
                 <Input
@@ -342,14 +342,14 @@ export default function NewProposalPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Next-Gen Photovoltaic Micro-Cells..."
-                  className="h-10 rounded-md bg-white font-medium text-sm shadow-xs transition-shadow focus:shadow-md dark:bg-slate-950"
+                  className="h-10 rounded-md bg-white text-sm font-medium shadow-xs transition-shadow focus:shadow-md dark:bg-slate-950"
                 />
               </div>
 
               {/* Research Info - Grid Layout */}
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="grid gap-1.5">
-                  <Label htmlFor="researchArea" className="font-semibold text-slate-700 text-sm dark:text-slate-300">
+                  <Label htmlFor="researchArea" className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                     Research Area
                   </Label>
                   <Input
@@ -362,7 +362,7 @@ export default function NewProposalPage() {
                 </div>
 
                 <div className="grid gap-1.5">
-                  <Label htmlFor="proposalProgram" className="font-semibold text-slate-700 text-sm dark:text-slate-300">
+                  <Label htmlFor="proposalProgram" className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                     Proposal Program
                   </Label>
                   <Select value={proposalProgram} onValueChange={(val) => setProposalProgram(val as ProposalProgram)}>
@@ -378,7 +378,7 @@ export default function NewProposalPage() {
                 </div>
 
                 <div className="grid gap-1.5 sm:col-span-2 lg:col-span-1">
-                  <Label htmlFor="departmentId" className="font-semibold text-slate-700 text-sm dark:text-slate-300">
+                  <Label htmlFor="departmentId" className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                     Host Department
                   </Label>
                   <Select value={departmentId} onValueChange={setDepartmentId} disabled={loadingSelectors}>
@@ -399,7 +399,7 @@ export default function NewProposalPage() {
               {/* Duration & Funding Toggle */}
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div className="grid gap-1.5">
-                  <Label htmlFor="durationMonths" className="font-semibold text-sm">
+                  <Label htmlFor="durationMonths" className="text-sm font-semibold">
                     Estimated Duration (Months)
                   </Label>
                   <Input
@@ -413,7 +413,7 @@ export default function NewProposalPage() {
                   />
                 </div>
                 <div className="flex flex-col justify-end">
-                  <Label className="mb-2 font-semibold text-slate-700 text-sm dark:text-slate-300">
+                  <Label className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
                     Grant & Funding
                   </Label>
                   {/* biome-ignore lint/a11y/useSemanticElements: Nested interactive elements (Switch) prevent using button */}
@@ -428,7 +428,7 @@ export default function NewProposalPage() {
                       }
                     }}
                     className={cn(
-                      "group flex h-16 cursor-pointer select-none items-center justify-between rounded-xl border p-4 transition-all duration-300",
+                      "group flex h-16 cursor-pointer items-center justify-between rounded-xl border p-4 transition-all duration-300 select-none",
                       isFunded
                         ? "border-blue-200 bg-blue-50/50 shadow-[0_0_15px_rgba(59,130,246,0.1)] dark:border-blue-800/50 dark:bg-blue-900/10"
                         : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-950",
@@ -446,7 +446,7 @@ export default function NewProposalPage() {
                         <Plus className={cn("h-4 w-4 transition-transform duration-300", isFunded && "rotate-45")} />
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-bold text-[13px] text-slate-900 leading-tight dark:text-slate-100">
+                        <span className="text-[13px] leading-tight font-bold text-slate-900 dark:text-slate-100">
                           Is this a funded project?
                         </span>
                         <span className="text-[11px] text-slate-500">
@@ -460,7 +460,7 @@ export default function NewProposalPage() {
                       onCheckedChange={setIsFunded}
                       className="data-[state=checked]:bg-blue-600"
                     />
-                    <Label htmlFor="isFunded" className="cursor-pointer font-medium text-sm">
+                    <Label htmlFor="isFunded" className="cursor-pointer text-sm font-medium">
                       Is Funded
                     </Label>
                   </div>
@@ -468,7 +468,7 @@ export default function NewProposalPage() {
               </div>
 
               <div className="grid gap-1.5">
-                <Label htmlFor="abstract" className="font-semibold text-sm">
+                <Label htmlFor="abstract" className="text-sm font-semibold">
                   Abstract & Core Objectives
                 </Label>
                 <Textarea
@@ -481,7 +481,7 @@ export default function NewProposalPage() {
               </div>
 
               <div className="grid gap-1.5">
-                <Label className="font-semibold text-sm">Supporting Layout Files</Label>
+                <Label className="text-sm font-semibold">Supporting Layout Files</Label>
                 <input
                   type="file"
                   id="file-upload"
@@ -491,19 +491,19 @@ export default function NewProposalPage() {
                 />
                 <label
                   htmlFor="file-upload"
-                  className="flex cursor-pointer flex-col items-center justify-center rounded-lg border border-slate-300 border-dashed bg-slate-50/20 p-8 text-center transition-all hover:border-slate-400 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/20 dark:hover:bg-slate-800/50"
+                  className="flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50/20 p-8 text-center transition-all hover:border-slate-400 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/20 dark:hover:bg-slate-800/50"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
                     <FileUp className="h-5 w-5" />
                   </div>
-                  <p className="mt-2 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                  <p className="mt-2 text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                     Upload full proposal layout
                   </p>
-                  <p className="mt-0.5 text-balance text-slate-500 text-xs">PDF or DOCX (maximum 10MB)</p>
+                  <p className="mt-0.5 text-xs text-balance text-slate-500">PDF or DOCX (maximum 10MB)</p>
                   {file && (
                     <div className="mt-4 flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50/50 px-3 py-1 text-blue-700 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-300">
                       <Check className="h-3.5 w-3.5" />
-                      <span className="max-w-[200px] truncate font-semibold text-xs">{file.name}</span>
+                      <span className="max-w-[200px] truncate text-xs font-semibold">{file.name}</span>
                     </div>
                   )}
                 </label>
@@ -513,16 +513,16 @@ export default function NewProposalPage() {
 
           {/* STEP 2: TEAM */}
           {currentStep === 1 && (
-            <div className="fade-in slide-in-from-right-4 mt-4 grid min-h-[400px] animate-in grid-cols-1 gap-8 divide-slate-100 rounded-lg border border-slate-100 bg-slate-50/30 duration-500 lg:grid-cols-2 lg:divide-x dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900/10">
+            <div className="fade-in slide-in-from-right-4 animate-in mt-4 grid min-h-[400px] grid-cols-1 gap-8 divide-slate-100 rounded-lg border border-slate-100 bg-slate-50/30 duration-500 lg:grid-cols-2 lg:divide-x dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900/10">
               {/* Members (Left) */}
               <div className="flex flex-col gap-4 p-4 lg:p-6 lg:pr-8">
                 <div>
-                  <h3 className="font-semibold text-slate-900 text-sm dark:text-slate-100">Members</h3>
-                  <p className="mb-3 text-slate-500 text-xs">
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Members</h3>
+                  <p className="mb-3 text-xs text-slate-500">
                     You are automatically included as PI. Add team members below.
                   </p>
                   <div className="relative w-full">
-                    <Search className="-translate-y-1/2 absolute top-1/2 left-2.5 h-3.5 w-3.5 text-slate-400" />
+                    <Search className="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
                     <Input
                       placeholder="Search members by name..."
                       className="h-9 rounded-md bg-white pl-8 text-sm dark:bg-slate-950"
@@ -534,11 +534,11 @@ export default function NewProposalPage() {
 
                 <div className="flex flex-col gap-2 overflow-y-auto pr-1">
                   {teamSearch.trim().length === 0 ? (
-                    <div className="rounded-md border border-slate-200 border-dashed bg-white p-6 text-center text-slate-400 text-sm dark:bg-slate-950/50">
+                    <div className="rounded-md border border-dashed border-slate-200 bg-white p-6 text-center text-sm text-slate-400 dark:bg-slate-950/50">
                       Type above to search for available collaborators.
                     </div>
                   ) : filteredTeam.length === 0 ? (
-                    <div className="p-4 text-center text-slate-500 text-xs italic">No exact matches found.</div>
+                    <div className="p-4 text-center text-xs text-slate-500 italic">No exact matches found.</div>
                   ) : (
                     filteredTeam.map((member) => {
                       const isSelected = selectedTeam.includes(member.value);
@@ -554,12 +554,12 @@ export default function NewProposalPage() {
                           }`}
                         >
                           <Avatar className="h-8 w-8">
-                            <AvatarFallback className="font-bold text-[10px]">
+                            <AvatarFallback className="text-[10px] font-bold">
                               {member.label?.substring(0, 2).toUpperCase() || "?"}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex min-w-0 flex-1 flex-col">
-                            <span className="truncate font-semibold text-[13px] text-slate-900 leading-tight dark:text-slate-100">
+                            <span className="truncate text-[13px] leading-tight font-semibold text-slate-900 dark:text-slate-100">
                               {member.label}
                             </span>
                           </div>
@@ -571,8 +571,8 @@ export default function NewProposalPage() {
 
                   {/* Selected count display inside team column */}
                   {selectedTeam.length > 0 && teamSearch.trim() === "" && (
-                    <div className="mt-4 border-slate-100 border-t pt-4 dark:border-slate-800">
-                      <p className="mb-2 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+                    <div className="mt-4 border-t border-slate-100 pt-4 dark:border-slate-800">
+                      <p className="mb-2 text-xs font-semibold tracking-wider text-slate-500 uppercase">
                         Team ({selectedTeam.length + 1})
                       </p>
                       <div className="flex flex-col gap-2">
@@ -585,7 +585,7 @@ export default function NewProposalPage() {
                               className="flex items-center justify-between rounded-md border border-blue-200 bg-blue-50 p-2 dark:border-blue-800/50 dark:bg-blue-900/20"
                             >
                               <div className="flex flex-1 items-center gap-2">
-                                <span className="font-medium text-blue-700 text-xs dark:text-blue-300">
+                                <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
                                   {user.fullName}
                                 </span>
                                 <Badge className="h-5 bg-blue-600 px-1.5 text-[10px] text-white">PI</Badge>
@@ -602,7 +602,7 @@ export default function NewProposalPage() {
                               key={id}
                               className="flex items-center justify-between rounded-md bg-slate-100 p-2 dark:bg-slate-800/50"
                             >
-                              <span className="font-medium text-xs">{m.label}</span>
+                              <span className="text-xs font-medium">{m.label}</span>
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -623,10 +623,10 @@ export default function NewProposalPage() {
               {/* Advisor (Right) */}
               <div className="flex flex-col gap-4 p-4 lg:p-6 lg:pl-8">
                 <div>
-                  <h3 className="font-semibold text-slate-900 text-sm dark:text-slate-100">Primary Advisor</h3>
-                  <p className="mb-3 text-slate-500 text-xs">Select exactly one faculty advisor.</p>
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Primary Advisor</h3>
+                  <p className="mb-3 text-xs text-slate-500">Select exactly one faculty advisor.</p>
                   <div className="relative w-full">
-                    <Search className="-translate-y-1/2 absolute top-1/2 left-2.5 h-3.5 w-3.5 text-slate-400" />
+                    <Search className="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
                     <Input
                       placeholder="Search advisors..."
                       className="h-9 rounded-md bg-white pl-8 text-sm dark:bg-slate-950"
@@ -638,11 +638,11 @@ export default function NewProposalPage() {
 
                 <div className="flex flex-col gap-2 overflow-y-auto pr-1">
                   {advisorSearch.trim().length === 0 ? (
-                    <div className="rounded-md border border-slate-200 border-dashed bg-white p-6 text-center text-slate-400 text-sm dark:bg-slate-950/50">
+                    <div className="rounded-md border border-dashed border-slate-200 bg-white p-6 text-center text-sm text-slate-400 dark:bg-slate-950/50">
                       Type above to search for an advisor.
                     </div>
                   ) : filteredAdvisors.length === 0 ? (
-                    <div className="p-4 text-center text-slate-500 text-xs italic">No exact matches found.</div>
+                    <div className="p-4 text-center text-xs text-slate-500 italic">No exact matches found.</div>
                   ) : (
                     filteredAdvisors.map((adv) => {
                       const isSelected = selectedAdvisor === adv.value;
@@ -658,12 +658,12 @@ export default function NewProposalPage() {
                           }`}
                         >
                           <Avatar className="h-8 w-8">
-                            <AvatarFallback className="font-bold text-[10px]">
+                            <AvatarFallback className="text-[10px] font-bold">
                               {adv.label?.substring(0, 2).toUpperCase() || "?"}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex min-w-0 flex-1 flex-col">
-                            <span className="truncate font-semibold text-[13px] text-slate-900 leading-tight dark:text-slate-100">
+                            <span className="truncate text-[13px] leading-tight font-semibold text-slate-900 dark:text-slate-100">
                               {adv.label}
                             </span>
                           </div>
@@ -677,15 +677,15 @@ export default function NewProposalPage() {
 
                   {/* Selected count display inside advisor column */}
                   {selectedAdvisor && advisorSearch.trim() === "" && (
-                    <div className="mt-4 border-slate-100 border-t pt-4 dark:border-slate-800">
-                      <p className="mb-2 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+                    <div className="mt-4 border-t border-slate-100 pt-4 dark:border-slate-800">
+                      <p className="mb-2 text-xs font-semibold tracking-wider text-slate-500 uppercase">
                         Currently Selected
                       </p>
                       {(() => {
                         const a = advisors.find((adv) => adv.value === selectedAdvisor);
                         return a ? (
                           <div className="flex items-center justify-between rounded-md border border-indigo-100 bg-indigo-50 p-2 dark:border-indigo-800 dark:bg-indigo-900/30">
-                            <span className="font-semibold text-indigo-800 text-xs dark:text-indigo-300">
+                            <span className="text-xs font-semibold text-indigo-800 dark:text-indigo-300">
                               {a.label}
                             </span>
                             <Button
@@ -708,22 +708,22 @@ export default function NewProposalPage() {
 
           {/* STEP 3: BUDGET */}
           {currentStep === 2 && (
-            <div className="fade-in slide-in-from-right-4 mx-auto mt-4 flex max-w-4xl animate-in flex-col gap-5 duration-500">
+            <div className="fade-in slide-in-from-right-4 animate-in mx-auto mt-4 flex max-w-4xl flex-col gap-5 duration-500">
               {/* Financial Dashboard Header */}
               <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-slate-100 bg-slate-50/40 p-5 sm:flex-row dark:border-slate-800 dark:bg-slate-900/10">
                 <div>
-                  <h3 className="font-bold text-slate-800 text-sm tracking-tight dark:text-slate-100">
+                  <h3 className="text-sm font-bold tracking-tight text-slate-800 dark:text-slate-100">
                     Project Financial Breakdown
                   </h3>
-                  <p className="mt-1 text-slate-500 text-xs">Itemize all estimated expenditures for this research.</p>
+                  <p className="mt-1 text-xs text-slate-500">Itemize all estimated expenditures for this research.</p>
                 </div>
                 <div className="flex items-center gap-6">
                   <div className="hidden h-10 w-px bg-slate-200 sm:block dark:bg-slate-800" />
                   <div className="text-right">
-                    <p className="font-bold text-[10px] text-slate-400 uppercase tracking-widest">
+                    <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
                       Initial Grant Estimate
                     </p>
-                    <p className="font-bold text-2xl text-blue-600 dark:text-blue-400">
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                       $
                       {calculateTotalBudget().toLocaleString(undefined, {
                         minimumFractionDigits: 2,
@@ -739,13 +739,13 @@ export default function NewProposalPage() {
                 <Table>
                   <TableHeader className="bg-slate-50/50 dark:bg-slate-900/50">
                     <TableRow className="hover:bg-transparent">
-                      <TableHead className="h-11 w-[20%] px-4 font-bold text-slate-700 text-xs uppercase tracking-wider dark:text-slate-300">
+                      <TableHead className="h-11 w-[20%] px-4 text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
                         Category
                       </TableHead>
-                      <TableHead className="h-11 px-4 font-bold text-slate-700 text-xs uppercase tracking-wider dark:text-slate-300">
+                      <TableHead className="h-11 px-4 text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
                         Justification / Details
                       </TableHead>
-                      <TableHead className="h-11 w-[180px] px-4 text-right font-bold text-slate-700 text-xs uppercase tracking-wider dark:text-slate-300">
+                      <TableHead className="h-11 w-[180px] px-4 text-right text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
                         Amount ($)
                       </TableHead>
                       <TableHead className="h-11 w-[60px]" />
@@ -759,7 +759,7 @@ export default function NewProposalPage() {
                             placeholder="e.g. Travel"
                             value={row.title}
                             onChange={(e) => handleUpdateBudgetRow(row.id, "title", e.target.value)}
-                            className="h-9 border-none bg-transparent font-medium text-sm focus-visible:ring-1 focus-visible:ring-blue-500/30"
+                            className="h-9 border-none bg-transparent text-sm font-medium focus-visible:ring-1 focus-visible:ring-blue-500/30"
                           />
                         </TableCell>
                         <TableCell className="p-2 px-3">
@@ -784,7 +784,7 @@ export default function NewProposalPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleRemoveBudgetRow(row.id)}
-                            className="h-8 w-8 text-slate-300 opacity-0 transition-opacity hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 dark:hover:bg-red-900/20"
+                            className="h-8 w-8 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -795,7 +795,7 @@ export default function NewProposalPage() {
                 </Table>
                 {budgetRows.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-10 text-center">
-                    <p className="text-slate-400 text-sm italic">No budget items added yet.</p>
+                    <p className="text-sm text-slate-400 italic">No budget items added yet.</p>
                   </div>
                 )}
               </div>
@@ -816,13 +816,13 @@ export default function NewProposalPage() {
 
           {/* STEP 4: REVIEW */}
           {currentStep === 3 && (
-            <div className="fade-in slide-in-from-right-4 mx-auto mt-4 flex max-w-4xl animate-in flex-col gap-6 duration-500">
-              <div className="mb-2 flex items-end justify-between border-slate-200 border-b pb-3 dark:border-slate-800">
+            <div className="fade-in slide-in-from-right-4 animate-in mx-auto mt-4 flex max-w-4xl flex-col gap-6 duration-500">
+              <div className="mb-2 flex items-end justify-between border-b border-slate-200 pb-3 dark:border-slate-800">
                 <div>
-                  <h2 className="font-semibold text-slate-900 text-xl dark:text-slate-100">Review & Submit</h2>
-                  <p className="text-slate-500 text-sm">Please verify the details below before official submission.</p>
+                  <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Review & Submit</h2>
+                  <p className="text-sm text-slate-500">Please verify the details below before official submission.</p>
                 </div>
-                <Badge className="border-0 bg-emerald-100 font-bold text-[10px] text-emerald-800 uppercase tracking-widest shadow-none hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400">
+                <Badge className="border-0 bg-emerald-100 text-[10px] font-bold tracking-widest text-emerald-800 uppercase shadow-none hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400">
                   Ready
                 </Badge>
               </div>
@@ -830,24 +830,24 @@ export default function NewProposalPage() {
               {/* Data Table Review */}
               <div className="flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950/50">
                 {/* 1. Basic Details */}
-                <div className="flex flex-col border-slate-200 border-b md:flex-row dark:border-slate-700">
-                  <div className="shrink-0 border-slate-200 border-r bg-slate-50 p-4 md:w-1/4 dark:border-slate-700 dark:bg-slate-900">
-                    <p className="font-bold text-[11px] text-slate-500 uppercase tracking-wider">1. Basic Details</p>
+                <div className="flex flex-col border-b border-slate-200 md:flex-row dark:border-slate-700">
+                  <div className="shrink-0 border-r border-slate-200 bg-slate-50 p-4 md:w-1/4 dark:border-slate-700 dark:bg-slate-900">
+                    <p className="text-[11px] font-bold tracking-wider text-slate-500 uppercase">1. Basic Details</p>
                   </div>
                   <div className="flex flex-1 flex-col gap-3 p-4">
                     <div>
-                      <p className="mb-0.5 font-medium text-slate-500 text-xs">Proposal Title</p>
-                      <p className="font-semibold text-slate-900 text-sm dark:text-slate-100">{title || "—"}</p>
+                      <p className="mb-0.5 text-xs font-medium text-slate-500">Proposal Title</p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{title || "—"}</p>
                     </div>
                     <div>
-                      <p className="mb-0.5 font-medium text-slate-500 text-xs">Abstract Summary</p>
-                      <p className="whitespace-pre-wrap text-slate-700 text-sm leading-relaxed dark:text-slate-300">
+                      <p className="mb-0.5 text-xs font-medium text-slate-500">Abstract Summary</p>
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-700 dark:text-slate-300">
                         {abstract || "—"}
                       </p>
                     </div>
                     <div>
-                      <p className="mb-0.5 font-medium text-slate-500 text-xs">Attachments</p>
-                      <p className="font-medium text-slate-700 text-sm dark:text-slate-300">
+                      <p className="mb-0.5 text-xs font-medium text-slate-500">Attachments</p>
+                      <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                         {file ? file.name : "None"}
                       </p>
                     </div>
@@ -855,14 +855,14 @@ export default function NewProposalPage() {
                 </div>
 
                 {/* 2. Team */}
-                <div className="flex flex-col border-slate-200 border-b md:flex-row dark:border-slate-700">
-                  <div className="shrink-0 border-slate-200 border-r bg-slate-50 p-4 md:w-1/4 dark:border-slate-700 dark:bg-slate-900">
-                    <p className="font-bold text-[11px] text-slate-500 uppercase tracking-wider">2. Project Team</p>
+                <div className="flex flex-col border-b border-slate-200 md:flex-row dark:border-slate-700">
+                  <div className="shrink-0 border-r border-slate-200 bg-slate-50 p-4 md:w-1/4 dark:border-slate-700 dark:bg-slate-900">
+                    <p className="text-[11px] font-bold tracking-wider text-slate-500 uppercase">2. Project Team</p>
                   </div>
                   <div className="flex flex-1 flex-col gap-4 p-4">
                     <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
                       <div className="col-span-full mb-1">
-                        <p className="font-medium text-slate-500 text-xs">Members ({selectedTeam.length + 1})</p>
+                        <p className="text-xs font-medium text-slate-500">Members ({selectedTeam.length + 1})</p>
                       </div>
                       {/* Current user as PI */}
                       {(() => {
@@ -870,10 +870,10 @@ export default function NewProposalPage() {
                         return user ? (
                           <div
                             key="pi-badge"
-                            className="flex items-center gap-1 truncate rounded border border-blue-200 bg-blue-50 px-2 py-1 font-medium text-[13px] text-blue-800 dark:border-blue-800/50 dark:bg-blue-900/20 dark:text-blue-300"
+                            className="flex items-center gap-1 truncate rounded border border-blue-200 bg-blue-50 px-2 py-1 text-[13px] font-medium text-blue-800 dark:border-blue-800/50 dark:bg-blue-900/20 dark:text-blue-300"
                           >
                             <span className="truncate">{user.fullName}</span>
-                            <Badge className="h-4 whitespace-nowrap bg-blue-600 px-1 text-[10px] text-white">PI</Badge>
+                            <Badge className="h-4 bg-blue-600 px-1 text-[10px] whitespace-nowrap text-white">PI</Badge>
                           </div>
                         ) : null;
                       })()}
@@ -884,7 +884,7 @@ export default function NewProposalPage() {
                             return m ? (
                               <div
                                 key={id}
-                                className="truncate rounded border border-slate-200 bg-slate-100 px-2 py-1 font-medium text-[13px] text-slate-800 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
+                                className="truncate rounded border border-slate-200 bg-slate-100 px-2 py-1 text-[13px] font-medium text-slate-800 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-200"
                               >
                                 {m.label}
                               </div>
@@ -893,16 +893,16 @@ export default function NewProposalPage() {
                         : null}
                     </div>
                     <div className="mt-1">
-                      <p className="mb-1 font-medium text-slate-500 text-xs">Primary Advisor</p>
+                      <p className="mb-1 text-xs font-medium text-slate-500">Primary Advisor</p>
                       {selectedAdvisor ? (
                         (() => {
                           const a = advisors.find((adv) => adv.value === selectedAdvisor);
                           return a ? (
-                            <p className="font-semibold text-[13px] text-indigo-700 dark:text-indigo-400">{a.label}</p>
+                            <p className="text-[13px] font-semibold text-indigo-700 dark:text-indigo-400">{a.label}</p>
                           ) : null;
                         })()
                       ) : (
-                        <p className="text-slate-400 text-sm italic">None</p>
+                        <p className="text-sm text-slate-400 italic">None</p>
                       )}
                     </div>
                   </div>
@@ -911,20 +911,20 @@ export default function NewProposalPage() {
                 {/* 3. Budget */}
                 {isFunded && (
                   <div className="flex flex-col md:flex-row">
-                    <div className="shrink-0 border-slate-200 border-r bg-slate-50 p-4 md:w-1/4 dark:border-slate-700 dark:bg-slate-900">
-                      <p className="font-bold text-[11px] text-slate-500 uppercase tracking-wider">3. Budget Est.</p>
+                    <div className="shrink-0 border-r border-slate-200 bg-slate-50 p-4 md:w-1/4 dark:border-slate-700 dark:bg-slate-900">
+                      <p className="text-[11px] font-bold tracking-wider text-slate-500 uppercase">3. Budget Est.</p>
                     </div>
                     <div className="flex flex-1 items-center p-4">
                       <div>
-                        <p className="mb-1 font-medium text-slate-500 text-xs">Total Funds Requested</p>
-                        <p className="font-bold text-slate-900 text-xl dark:text-slate-100">
+                        <p className="mb-1 text-xs font-medium text-slate-500">Total Funds Requested</p>
+                        <p className="text-xl font-bold text-slate-900 dark:text-slate-100">
                           $
                           {calculateTotalBudget().toLocaleString(undefined, {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
                           })}
                         </p>
-                        <p className="mt-1 text-slate-400 text-xs">Spanning {budgetRows.length} categorized items.</p>
+                        <p className="mt-1 text-xs text-slate-400">Spanning {budgetRows.length} categorized items.</p>
                       </div>
                     </div>
                   </div>
@@ -935,7 +935,7 @@ export default function NewProposalPage() {
         </CardContent>
 
         {/* Navigation Footer placed nicely inside the form Card but at the bottom */}
-        <div className="mt-10 flex w-full items-center justify-between border-slate-100 border-t pt-4 dark:border-slate-800">
+        <div className="mt-10 flex w-full items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
           <Button
             variant="outline"
             size="sm"

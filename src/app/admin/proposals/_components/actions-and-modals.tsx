@@ -57,18 +57,18 @@ export function ActionsAndModals() {
          ═══════════════════════════════════════════════ */}
       <Dialog open={showAssign} onOpenChange={setShowAssign}>
         <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[480px]">
-          <DialogHeader className="border-slate-100 border-b px-6 pt-6 pb-4 dark:border-slate-800">
+          <DialogHeader className="border-b border-slate-100 px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-blue-100 p-2 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
                 <UserCheck className="h-5 w-5" />
               </div>
-              <DialogTitle className="font-bold text-base">Assign Evaluator</DialogTitle>
+              <DialogTitle className="text-base font-bold">Assign Evaluator</DialogTitle>
             </div>
-            <DialogDescription className="ml-11 text-slate-500 text-xs">
+            <DialogDescription className="ml-11 text-xs text-slate-500">
               Select one or more evaluators from the faculty pool. All selected members will be notified.
             </DialogDescription>
             <div className="relative mt-3">
-              <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-slate-400" />
+              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 placeholder="Search evaluators by name or specialty..."
                 className="h-9 border-slate-200 bg-slate-50 pl-9 text-sm dark:border-slate-800 dark:bg-slate-900"
@@ -94,22 +94,22 @@ export function ActionsAndModals() {
                 >
                   <Checkbox checked={on} className="pointer-events-none shrink-0" aria-hidden />
                   <Avatar className="h-9 w-9 shrink-0">
-                    <AvatarFallback className={`font-bold text-[11px] ${ev.color}`}>{ev.avatar}</AvatarFallback>
+                    <AvatarFallback className={`text-[11px] font-bold ${ev.color}`}>{ev.avatar}</AvatarFallback>
                   </Avatar>
                   <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate font-semibold text-[13px] text-slate-900 dark:text-slate-100">
+                    <span className="truncate text-[13px] font-semibold text-slate-900 dark:text-slate-100">
                       {ev.name}
                     </span>
-                    <span className="truncate font-medium text-[11px] text-slate-500">{ev.specialty}</span>
+                    <span className="truncate text-[11px] font-medium text-slate-500">{ev.specialty}</span>
                   </div>
-                  <span className="shrink-0 font-bold text-[10px] text-slate-400">{ev.assigned} pool</span>
+                  <span className="shrink-0 text-[10px] font-bold text-slate-400">{ev.assigned} pool</span>
                 </button>
               );
             })}
           </div>
 
-          <DialogFooter className="flex flex-col gap-2 border-slate-100 border-t px-6 py-4 sm:flex-row sm:items-center dark:border-slate-800">
-            <p className="mr-auto font-medium text-slate-500 text-xs">{pickedEvalIds.length} selected</p>
+          <DialogFooter className="flex flex-col gap-2 border-t border-slate-100 px-6 py-4 sm:flex-row sm:items-center dark:border-slate-800">
+            <p className="mr-auto text-xs font-medium text-slate-500">{pickedEvalIds.length} selected</p>
             <Button variant="outline" size="sm" className="h-9" onClick={() => setShowAssign(false)}>
               Cancel
             </Button>
@@ -131,18 +131,18 @@ export function ActionsAndModals() {
          ═══════════════════════════════════════════════ */}
       <Dialog open={showAssignAdvisor} onOpenChange={setShowAssignAdvisor}>
         <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[480px]">
-          <DialogHeader className="border-slate-100 border-b px-6 pt-6 pb-4 dark:border-slate-800">
+          <DialogHeader className="border-b border-slate-100 px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-violet-100 p-2 text-violet-600 dark:bg-violet-900/40 dark:text-violet-400">
                 <GraduationCap className="h-5 w-5" />
               </div>
-              <DialogTitle className="font-bold text-base">Assign Advisor</DialogTitle>
+              <DialogTitle className="text-base font-bold">Assign Advisor</DialogTitle>
             </div>
-            <DialogDescription className="ml-11 text-slate-500 text-xs">
+            <DialogDescription className="ml-11 text-xs text-slate-500">
               Select one or more research advisors. All selected advisors will be linked to this proposal.
             </DialogDescription>
             <div className="relative mt-3">
-              <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-slate-400" />
+              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 placeholder="Search advisors by name or focus area..."
                 className="h-9 border-slate-200 bg-slate-50 pl-9 text-sm dark:border-slate-800 dark:bg-slate-900"
@@ -168,22 +168,22 @@ export function ActionsAndModals() {
                 >
                   <Checkbox checked={on} className="pointer-events-none shrink-0" aria-hidden />
                   <Avatar className="h-9 w-9 shrink-0">
-                    <AvatarFallback className={`font-bold text-[11px] ${ad.color}`}>{ad.avatar}</AvatarFallback>
+                    <AvatarFallback className={`text-[11px] font-bold ${ad.color}`}>{ad.avatar}</AvatarFallback>
                   </Avatar>
                   <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate font-semibold text-[13px] text-slate-900 dark:text-slate-100">
+                    <span className="truncate text-[13px] font-semibold text-slate-900 dark:text-slate-100">
                       {ad.name}
                     </span>
-                    <span className="truncate font-medium text-[11px] text-slate-500">{ad.specialty}</span>
+                    <span className="truncate text-[11px] font-medium text-slate-500">{ad.specialty}</span>
                   </div>
-                  <span className="shrink-0 font-bold text-[10px] text-slate-400">{ad.assigned} active</span>
+                  <span className="shrink-0 text-[10px] font-bold text-slate-400">{ad.assigned} active</span>
                 </button>
               );
             })}
           </div>
 
-          <DialogFooter className="flex flex-col gap-2 border-slate-100 border-t px-6 py-4 sm:flex-row sm:items-center dark:border-slate-800">
-            <p className="mr-auto font-medium text-slate-500 text-xs">{pickedAdvisorIds.length} selected</p>
+          <DialogFooter className="flex flex-col gap-2 border-t border-slate-100 px-6 py-4 sm:flex-row sm:items-center dark:border-slate-800">
+            <p className="mr-auto text-xs font-medium text-slate-500">{pickedAdvisorIds.length} selected</p>
             <Button variant="outline" size="sm" className="h-9" onClick={() => setShowAssignAdvisor(false)}>
               Cancel
             </Button>
@@ -205,14 +205,14 @@ export function ActionsAndModals() {
          ═══════════════════════════════════════════════ */}
       <Dialog open={showTimelineApprove} onOpenChange={setShowTimelineApprove}>
         <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[460px]">
-          <DialogHeader className="border-slate-100 border-b px-6 pt-6 pb-4 dark:border-slate-800">
+          <DialogHeader className="border-b border-slate-100 px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-emerald-100 p-2 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400">
                 <Check className="h-5 w-5" />
               </div>
-              <DialogTitle className="font-bold text-base">Confirm approval</DialogTitle>
+              <DialogTitle className="text-base font-bold">Confirm approval</DialogTitle>
             </div>
-            <DialogDescription className="ml-11 text-slate-500 text-xs">
+            <DialogDescription className="ml-11 text-xs text-slate-500">
               Your approval will advance this proposal to the next step in the chain. Add an optional note for the
               record.
             </DialogDescription>
@@ -220,15 +220,15 @@ export function ActionsAndModals() {
 
           <div className="flex flex-col gap-4 px-6 py-5">
             <div className="rounded-lg border border-slate-100 bg-slate-50 p-3.5 dark:border-slate-800 dark:bg-slate-900/50">
-              <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Proposal</p>
-              <p className="mt-0.5 line-clamp-2 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+              <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Proposal</p>
+              <p className="mt-0.5 line-clamp-2 text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                 {selected?.title}
               </p>
             </div>
             <div className="flex flex-col gap-1.5">
               <Label
                 htmlFor="timeline-approve-note"
-                className="font-semibold text-[12px] text-slate-700 dark:text-slate-300"
+                className="text-[12px] font-semibold text-slate-700 dark:text-slate-300"
               >
                 Optional note
               </Label>
@@ -242,7 +242,7 @@ export function ActionsAndModals() {
             </div>
           </div>
 
-          <DialogFooter className="flex gap-2 border-slate-100 border-t px-6 py-4 dark:border-slate-800">
+          <DialogFooter className="flex gap-2 border-t border-slate-100 px-6 py-4 dark:border-slate-800">
             <Button variant="outline" size="sm" className="h-9" onClick={() => setShowTimelineApprove(false)}>
               Cancel
             </Button>
@@ -263,29 +263,29 @@ export function ActionsAndModals() {
          ═══════════════════════════════════════════════ */}
       <Dialog open={showTimelineReject} onOpenChange={setShowTimelineReject}>
         <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[460px]">
-          <DialogHeader className="border-slate-100 border-b px-6 pt-6 pb-4 dark:border-slate-800">
+          <DialogHeader className="border-b border-slate-100 px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-rose-100 p-2 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400">
                 <XCircle className="h-5 w-5" />
               </div>
-              <DialogTitle className="font-bold text-base">Reject at this step</DialogTitle>
+              <DialogTitle className="text-base font-bold">Reject at this step</DialogTitle>
             </div>
-            <DialogDescription className="ml-11 text-slate-500 text-xs">
+            <DialogDescription className="ml-11 text-xs text-slate-500">
               Explain why the proposal cannot proceed. The PI and prior reviewers will need this context.
             </DialogDescription>
           </DialogHeader>
 
           <div className="flex flex-col gap-4 px-6 py-5">
             <div className="rounded-lg border border-slate-100 bg-slate-50 p-3.5 dark:border-slate-800 dark:bg-slate-900/50">
-              <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Proposal</p>
-              <p className="mt-0.5 line-clamp-2 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+              <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Proposal</p>
+              <p className="mt-0.5 line-clamp-2 text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                 {selected?.title}
               </p>
             </div>
             <div className="flex flex-col gap-1.5">
               <Label
                 htmlFor="timeline-reject-comment"
-                className="font-semibold text-[12px] text-slate-700 dark:text-slate-300"
+                className="text-[12px] font-semibold text-slate-700 dark:text-slate-300"
               >
                 Reason for rejection <span className="text-rose-500">*</span>
               </Label>
@@ -296,11 +296,11 @@ export function ActionsAndModals() {
                 value={timelineRejectComment}
                 onChange={(e) => setTimelineRejectComment(e.target.value)}
               />
-              <p className="font-medium text-[10px] text-slate-400">{timelineRejectComment.length} / 1000 characters</p>
+              <p className="text-[10px] font-medium text-slate-400">{timelineRejectComment.length} / 1000 characters</p>
             </div>
           </div>
 
-          <DialogFooter className="flex gap-2 border-slate-100 border-t px-6 py-4 dark:border-slate-800">
+          <DialogFooter className="flex gap-2 border-t border-slate-100 px-6 py-4 dark:border-slate-800">
             <Button variant="outline" size="sm" className="h-9" onClick={() => setShowTimelineReject(false)}>
               Cancel
             </Button>

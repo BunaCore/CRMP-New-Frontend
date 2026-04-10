@@ -31,18 +31,18 @@ export function EditorPanel({ language, initialContent, onChange }: EditorPanelP
   };
 
   return (
-    <div className="relative flex h-full flex-col border-border border-r bg-background">
+    <div className="border-border bg-background relative flex h-full flex-col border-r">
       {/* Editor Toolbar */}
-      <div className="relative z-10 flex h-12 w-full flex-shrink-0 items-center justify-between border-border border-b bg-muted/30 px-5 text-muted-foreground">
+      <div className="border-border bg-muted/30 text-muted-foreground relative z-10 flex h-12 w-full flex-shrink-0 items-center justify-between border-b px-5">
         <div className="flex items-center gap-2">
           {language === "typescript" || language === "javascript" ? (
             <Code2 className="h-4 w-4 text-yellow-500" />
           ) : (
             <Terminal className="h-4 w-4 text-sky-500" />
           )}
-          <span className="font-medium font-mono text-[13px] text-foreground uppercase">{language} Editor</span>
+          <span className="text-foreground font-mono text-[13px] font-medium uppercase">{language} Editor</span>
         </div>
-        <div className="flex items-center gap-3 font-medium text-[12px] text-muted-foreground">
+        <div className="text-muted-foreground flex items-center gap-3 text-[12px] font-medium">
           <span>Live Sync</span>
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
@@ -52,7 +52,7 @@ export function EditorPanel({ language, initialContent, onChange }: EditorPanelP
       </div>
 
       {/* Monaco Editor Container */}
-      <div className="relative w-full flex-1 bg-background">
+      <div className="bg-background relative w-full flex-1">
         <Editor
           height="100%"
           language={language}
@@ -71,9 +71,9 @@ export function EditorPanel({ language, initialContent, onChange }: EditorPanelP
             wordWrap: "on",
           }}
           loading={
-            <div className="flex h-full w-full items-center justify-center gap-2 bg-background text-muted-foreground">
-              <Loader2 className="h-5 w-5 animate-spin text-primary" />
-              <span className="font-medium text-sm">Initializing Workspace...</span>
+            <div className="bg-background text-muted-foreground flex h-full w-full items-center justify-center gap-2">
+              <Loader2 className="text-primary h-5 w-5 animate-spin" />
+              <span className="text-sm font-medium">Initializing Workspace...</span>
             </div>
           }
         />

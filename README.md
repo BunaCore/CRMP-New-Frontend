@@ -38,8 +38,6 @@ Sidebars are filtered using config-driven permission rules (no role checks).
 - Admin sidebar authorization:
   - `src/navigation/sidebar/admin-nav-config.ts`
 
-
-
 The app treats:
 
 - `PROJECT_CREATE`-capable users as PI space users (`/dashboard`)
@@ -122,51 +120,50 @@ If permissions change on the backend, users may need to clear cookies or re-logi
 
 We built this as a cleaner alternative with features often missing in others, such as theme toggling and layout controls, while keeping the design modern, minimal, and flexible.
 
-
-
 > [!TIP]
 > I’m also working on Nuxt.js, Svelte, and React (Vite + TanStack Router) versions of this dashboard. They’ll be live soon.
 
 ## Features
 
-- Built with Next.js 16, TypeScript, Tailwind CSS v4, and Shadcn UI  
-- Responsive and mobile-friendly  
-- Customizable theme presets (light/dark modes with color schemes like Tangerine, Brutalist, and more)  
-- Flexible layouts (collapsible sidebar, variable content widths)  
-- Authentication flows and screens  
-- Prebuilt dashboards (Default, CRM, Finance) with more coming soon  
-- Role-Based Access Control (RBAC) with config-driven UI and multi-tenant support *(planned)*  
-
+- Built with Next.js 16, TypeScript, Tailwind CSS v4, and Shadcn UI
+- Responsive and mobile-friendly
+- Customizable theme presets (light/dark modes with color schemes like Tangerine, Brutalist, and more)
+- Flexible layouts (collapsible sidebar, variable content widths)
+- Authentication flows and screens
+- Prebuilt dashboards (Default, CRM, Finance) with more coming soon
+- Role-Based Access Control (RBAC) with config-driven UI and multi-tenant support _(planned)_
 
 ## Tech Stack
 
-- **Framework**: Next.js 16 (App Router), TypeScript, Tailwind CSS v4  
-- **UI Components**: Shadcn UI  
-- **Validation**: Zod  
-- **Forms & State Management**: React Hook Form, Zustand  
-- **Tables & Data Handling**: TanStack Table  
-- **Tooling & DX**: Biome, Husky  
+- **Framework**: Next.js 16 (App Router), TypeScript, Tailwind CSS v4
+- **UI Components**: Shadcn UI
+- **Validation**: Zod
+- **Forms & State Management**: React Hook Form, Zustand
+- **Tables & Data Handling**: TanStack Table
+- **Tooling & DX**: Biome, Husky
 
 ## Screens
 
 ### Available
-- Default Dashboard  
-- CRM Dashboard  
-- Finance Dashboard  
+
+- Default Dashboard
+- CRM Dashboard
+- Finance Dashboard
 - Authentication (4 screens)
 
 ### Coming Soon
-- Analytics Dashboard  
-- eCommerce Dashboard  
-- Academy Dashboard  
-- Logistics Dashboard  
-- Email Page  
-- Chat Page  
-- Calendar Page  
-- Kanban Board  
-- Invoice Page  
-- Users Management  
-- Roles Management  
+
+- Analytics Dashboard
+- eCommerce Dashboard
+- Academy Dashboard
+- Logistics Dashboard
+- Email Page
+- Chat Page
+- Calendar Page
+- Kanban Board
+- Invoice Page
+- Users Management
+- Roles Management
 
 ## Colocation File System Architecture
 
@@ -191,13 +188,12 @@ _Deploy your own copy with one click._
    ```bash
    git clone https://github.com/arhamkhnz/next-shadcn-admin-dashboard.git
    ```
-   
 2. **Navigate into the project**
    ```bash
     cd next-shadcn-admin-dashboard
    ```
-   
 3. **Install dependencies**
+
    ```bash
     npm install
    ```
@@ -212,9 +208,11 @@ Your app will be running at [http://localhost:3000](http://localhost:3000)
 ### Formatting and Linting
 
 Format, lint, and organize imports
+
 ```bash
 npx @biomejs/biome check --write
 ```
+
 > For more information on available rules, fixes, and CLI options, refer to the [Biome documentation](https://biomejs.dev/).
 
 ---
@@ -225,6 +223,5 @@ npx @biomejs/biome check --write
 ---
 
 Contributions are welcome. Feel free to open issues, feature requests, or start a discussion.
-
 
 **Happy Vibe Coding!**

@@ -21,11 +21,11 @@ export default function BudgetRequestsPage() {
           {/* ── PAGE HEADER ── */}
           <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
             <div>
-              <h1 className="flex items-center gap-2 font-bold text-2xl text-slate-900 tracking-tight dark:text-slate-100">
+              <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
                 <Coins className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                 Budget Requests
               </h1>
-              <p className="mt-0.5 max-w-2xl text-slate-500 text-sm">
+              <p className="mt-0.5 max-w-2xl text-sm text-slate-500">
                 Review fund release requests, validate clearance documents, and stamp payments as transferred. All
                 actions are recorded with bank transaction references for audit compliance.
               </p>

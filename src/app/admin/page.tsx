@@ -39,18 +39,18 @@ export default function AdminDashboardPage() {
       {/* ----------------- TOP HEADER ----------------- */}
       <header className="mb-8 flex w-full flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div className="flex flex-col gap-1">
-          <h1 className="flex items-center gap-3 font-extrabold text-3xl text-slate-900 tracking-tight dark:text-slate-100">
+          <h1 className="flex items-center gap-3 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
             <LayoutDashboard className="h-8 w-8 text-blue-600 dark:text-blue-500" />
             Research Control Center
           </h1>
-          <p className="font-medium text-[15px] text-slate-500 dark:text-slate-400">
+          <p className="text-[15px] font-medium text-slate-500 dark:text-slate-400">
             Welcome back, {currentUser.name}. Here's an overview of the university research ecosystem today.
           </p>
         </div>
 
         <div className="flex w-full items-center gap-4 md:w-auto">
           <div className="relative w-full md:w-[280px]">
-            <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-slate-400" />
+            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input
               type="text"
               placeholder="Search projects, researchers..."
@@ -66,7 +66,7 @@ export default function AdminDashboardPage() {
             <span className="absolute top-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-red-500 dark:border-slate-900" />
           </Button>
           <Avatar className="h-10 w-10 shrink-0 border-2 border-white shadow-sm dark:border-slate-800">
-            <AvatarFallback className="bg-blue-600 font-bold text-sm text-white">AD</AvatarFallback>
+            <AvatarFallback className="bg-blue-600 text-sm font-bold text-white">AD</AvatarFallback>
           </Avatar>
         </div>
       </header>
@@ -84,8 +84,8 @@ export default function AdminDashboardPage() {
                 +12% from last month
               </Badge>
             </div>
-            <p className="mb-1 font-semibold text-slate-500 text-sm uppercase tracking-wider">Total Active Projects</p>
-            <h2 className="font-extrabold text-4xl text-slate-900 tracking-tight dark:text-slate-100">142</h2>
+            <p className="mb-1 text-sm font-semibold tracking-wider text-slate-500 uppercase">Total Active Projects</p>
+            <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">142</h2>
           </CardContent>
         </Card>
 
@@ -99,8 +99,8 @@ export default function AdminDashboardPage() {
                 Requires Attention
               </Badge>
             </div>
-            <p className="mb-1 font-semibold text-slate-500 text-sm uppercase tracking-wider">Pending Approvals</p>
-            <h2 className="font-extrabold text-4xl text-slate-900 tracking-tight dark:text-slate-100">28</h2>
+            <p className="mb-1 text-sm font-semibold tracking-wider text-slate-500 uppercase">Pending Approvals</p>
+            <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">28</h2>
           </CardContent>
         </Card>
 
@@ -116,9 +116,9 @@ export default function AdminDashboardPage() {
                 6 Awaiting Release
               </Badge>
             </div>
-            <p className="mb-1 font-semibold text-slate-500 text-sm uppercase tracking-wider">Budget Processing</p>
-            <h2 className="font-extrabold text-4xl text-slate-900 tracking-tight dark:text-slate-100">
-              <span className="mr-1 font-semibold text-2xl text-slate-400">$</span>2.4M
+            <p className="mb-1 text-sm font-semibold tracking-wider text-slate-500 uppercase">Budget Processing</p>
+            <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">
+              <span className="mr-1 text-2xl font-semibold text-slate-400">$</span>2.4M
             </h2>
           </CardContent>
         </Card>
@@ -131,8 +131,8 @@ export default function AdminDashboardPage() {
                 <CheckCircle2 className="h-6 w-6" />
               </div>
             </div>
-            <p className="mb-1 font-semibold text-slate-500 text-sm uppercase tracking-wider">Completed (YTD)</p>
-            <h2 className="font-extrabold text-4xl text-slate-900 tracking-tight dark:text-slate-100">56</h2>
+            <p className="mb-1 text-sm font-semibold tracking-wider text-slate-500 uppercase">Completed (YTD)</p>
+            <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">56</h2>
           </CardContent>
         </Card>
       </div>
@@ -145,16 +145,16 @@ export default function AdminDashboardPage() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <Card className="border-slate-200/60 bg-white shadow-sm dark:border-slate-800/60 dark:bg-slate-950">
               <CardHeader className="pb-2">
-                <CardTitle className="font-bold text-lg text-slate-800 dark:text-slate-100">
+                <CardTitle className="text-lg font-bold text-slate-800 dark:text-slate-100">
                   Project Status Distribution
                 </CardTitle>
-                <CardDescription className="font-semibold text-slate-400 text-xs uppercase tracking-wider">
+                <CardDescription className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
                   Current Lifecycle Stages
                 </CardDescription>
               </CardHeader>
               <CardContent className="mt-2 mb-2 flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <div className="flex justify-between font-medium text-sm">
+                  <div className="flex justify-between text-sm font-medium">
                     <span className="text-slate-600 dark:text-slate-400">Review & Evaluation</span>
                     <span className="font-bold">45</span>
                   </div>
@@ -163,7 +163,7 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <div className="flex justify-between font-medium text-sm">
+                  <div className="flex justify-between text-sm font-medium">
                     <span className="text-slate-600 dark:text-slate-400">Active Execution</span>
                     <span className="font-bold">78</span>
                   </div>
@@ -172,7 +172,7 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <div className="flex justify-between font-medium text-sm">
+                  <div className="flex justify-between text-sm font-medium">
                     <span className="text-slate-600 dark:text-slate-400">Completed & Closed</span>
                     <span className="font-bold">19</span>
                   </div>
@@ -185,10 +185,10 @@ export default function AdminDashboardPage() {
 
             <Card className="border-slate-200/60 bg-white shadow-sm dark:border-slate-800/60 dark:bg-slate-950">
               <CardHeader className="pb-2">
-                <CardTitle className="font-bold text-lg text-slate-800 dark:text-slate-100">
+                <CardTitle className="text-lg font-bold text-slate-800 dark:text-slate-100">
                   Budget Trend Overview
                 </CardTitle>
-                <CardDescription className="font-semibold text-slate-400 text-xs uppercase tracking-wider">
+                <CardDescription className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
                   Funding Requested vs Approved
                 </CardDescription>
               </CardHeader>
@@ -200,7 +200,7 @@ export default function AdminDashboardPage() {
                       className="mx-1 w-full rounded-t-md bg-gradient-to-t from-indigo-500 to-blue-400 opacity-80 transition-opacity group-hover:opacity-100"
                       style={{ height: `${val}%` }}
                     />
-                    <span className="mt-2 font-bold text-[10px] text-slate-400 uppercase">M{i + 1}</span>
+                    <span className="mt-2 text-[10px] font-bold text-slate-400 uppercase">M{i + 1}</span>
                   </div>
                 ))}
               </CardContent>
@@ -209,11 +209,11 @@ export default function AdminDashboardPage() {
 
           {/* Core Admin Actions Panel */}
           <Card className="border-slate-200/60 bg-white shadow-sm dark:border-slate-800/60 dark:bg-slate-950">
-            <CardHeader className="border-slate-100 border-b pb-4 dark:border-slate-800">
-              <CardTitle className="font-bold text-lg text-slate-800 dark:text-slate-100">
+            <CardHeader className="border-b border-slate-100 pb-4 dark:border-slate-800">
+              <CardTitle className="text-lg font-bold text-slate-800 dark:text-slate-100">
                 Administrative Action Hub
               </CardTitle>
-              <CardDescription className="font-medium text-slate-500 text-xs">
+              <CardDescription className="text-xs font-medium text-slate-500">
                 Fast access to operational workflows based on your clearance.
               </CardDescription>
             </CardHeader>
@@ -223,16 +223,16 @@ export default function AdminDashboardPage() {
                 <div className="mb-3 rounded-2xl bg-blue-50 p-3 text-blue-600 transition-transform group-hover:scale-110 dark:bg-blue-900/20 dark:text-blue-400">
                   <FileSearch className="h-6 w-6" />
                 </div>
-                <h4 className="font-semibold text-slate-900 text-sm dark:text-slate-100">Evaluations</h4>
-                <p className="mt-1 font-medium text-[11px] text-slate-500">Assign Reviewers</p>
+                <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Evaluations</h4>
+                <p className="mt-1 text-[11px] font-medium text-slate-500">Assign Reviewers</p>
               </div>
               {/* Action 2 */}
               <div className="group flex cursor-pointer flex-col items-center p-6 text-center transition-colors hover:bg-slate-50 dark:hover:bg-slate-900">
                 <div className="mb-3 rounded-2xl bg-emerald-50 p-3 text-emerald-600 transition-transform group-hover:scale-110 dark:bg-emerald-900/20 dark:text-emerald-400">
                   <Coins className="h-6 w-6" />
                 </div>
-                <h4 className="font-semibold text-slate-900 text-sm dark:text-slate-100">Budget Release</h4>
-                <p className="mt-1 font-medium text-[11px] text-slate-500">Approve Tranches</p>
+                <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Budget Release</h4>
+                <p className="mt-1 text-[11px] font-medium text-slate-500">Approve Tranches</p>
               </div>
               {/* Action 3 */}
               <div className="group relative flex cursor-pointer flex-col items-center p-6 text-center transition-colors hover:bg-slate-50 dark:hover:bg-slate-900">
@@ -240,28 +240,28 @@ export default function AdminDashboardPage() {
                 <div className="mb-3 rounded-2xl bg-amber-50 p-3 text-amber-600 transition-transform group-hover:scale-110 dark:bg-amber-900/20 dark:text-amber-400">
                   <ShieldAlert className="h-6 w-6" />
                 </div>
-                <h4 className="font-semibold text-slate-900 text-sm dark:text-slate-100">Terminations</h4>
-                <p className="mt-1 font-medium text-[11px] text-slate-500">Handle Extensions</p>
+                <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Terminations</h4>
+                <p className="mt-1 text-[11px] font-medium text-slate-500">Handle Extensions</p>
               </div>
               {/* Action 4 */}
               <div className="group flex cursor-pointer flex-col items-center p-6 text-center transition-colors hover:bg-slate-50 dark:hover:bg-slate-900">
                 <div className="mb-3 rounded-2xl bg-indigo-50 p-3 text-indigo-600 transition-transform group-hover:scale-110 dark:bg-indigo-900/20 dark:text-indigo-400">
                   <UserCog className="h-6 w-6" />
                 </div>
-                <h4 className="font-semibold text-slate-900 text-sm dark:text-slate-100">User Roles</h4>
-                <p className="mt-1 font-medium text-[11px] text-slate-500">Manage Personnel</p>
+                <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">User Roles</h4>
+                <p className="mt-1 text-[11px] font-medium text-slate-500">Manage Personnel</p>
               </div>
             </CardContent>
           </Card>
 
           {/* Pending Reviews Table */}
           <Card className="overflow-hidden border-slate-200/60 bg-white shadow-sm dark:border-slate-800/60 dark:bg-slate-950">
-            <CardHeader className="flex flex-row items-center justify-between border-slate-100 border-b pb-4 dark:border-slate-800">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 pb-4 dark:border-slate-800">
               <div>
-                <CardTitle className="font-bold text-lg text-slate-800 dark:text-slate-100">
+                <CardTitle className="text-lg font-bold text-slate-800 dark:text-slate-100">
                   Recent Proposal Submissions
                 </CardTitle>
-                <CardDescription className="mt-1 font-medium text-slate-500 text-xs">
+                <CardDescription className="mt-1 text-xs font-medium text-slate-500">
                   Ready for high-level administrative review.
                 </CardDescription>
               </div>
@@ -272,16 +272,16 @@ export default function AdminDashboardPage() {
             <Table>
               <TableHeader className="bg-slate-50/50 dark:bg-slate-900/30">
                 <TableRow className="border-slate-100 dark:border-slate-800">
-                  <TableHead className="h-10 w-[45%] font-semibold text-slate-600 text-xs dark:text-slate-400">
+                  <TableHead className="h-10 w-[45%] text-xs font-semibold text-slate-600 dark:text-slate-400">
                     Project Title
                   </TableHead>
-                  <TableHead className="h-10 font-semibold text-slate-600 text-xs dark:text-slate-400">
+                  <TableHead className="h-10 text-xs font-semibold text-slate-600 dark:text-slate-400">
                     Lead PI
                   </TableHead>
-                  <TableHead className="h-10 w-[120px] font-semibold text-slate-600 text-xs dark:text-slate-400">
+                  <TableHead className="h-10 w-[120px] text-xs font-semibold text-slate-600 dark:text-slate-400">
                     Status
                   </TableHead>
-                  <TableHead className="h-10 text-right font-semibold text-slate-600 text-xs dark:text-slate-400">
+                  <TableHead className="h-10 text-right text-xs font-semibold text-slate-600 dark:text-slate-400">
                     Action
                   </TableHead>
                 </TableRow>
@@ -311,15 +311,15 @@ export default function AdminDashboardPage() {
                     key={row.title}
                     className="group border-slate-100 hover:bg-slate-50/50 dark:border-slate-800 dark:hover:bg-slate-900/30"
                   >
-                    <TableCell className="max-w-0 truncate font-semibold text-[13px] text-slate-900 dark:text-slate-100">
+                    <TableCell className="max-w-0 truncate text-[13px] font-semibold text-slate-900 dark:text-slate-100">
                       {row.title}
                     </TableCell>
-                    <TableCell className="max-w-[100px] truncate font-medium text-[12px] text-slate-500">
+                    <TableCell className="max-w-[100px] truncate text-[12px] font-medium text-slate-500">
                       {row.pi}
                     </TableCell>
                     <TableCell>
                       <Badge
-                        className={`${row.badge} pointer-events-none border-0 px-2 py-0.5 font-bold text-[10px] uppercase shadow-none`}
+                        className={`${row.badge} pointer-events-none border-0 px-2 py-0.5 text-[10px] font-bold uppercase shadow-none`}
                       >
                         {row.status}
                       </Badge>
@@ -328,7 +328,7 @@ export default function AdminDashboardPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-7 rounded font-semibold text-xs transition-colors group-hover:border-blue-200 group-hover:bg-blue-50 group-hover:text-blue-600 dark:group-hover:border-blue-800 dark:group-hover:bg-blue-900/20 dark:group-hover:text-blue-400"
+                        className="h-7 rounded text-xs font-semibold transition-colors group-hover:border-blue-200 group-hover:bg-blue-50 group-hover:text-blue-600 dark:group-hover:border-blue-800 dark:group-hover:bg-blue-900/20 dark:group-hover:text-blue-400"
                       >
                         Inspect
                       </Button>
@@ -344,8 +344,8 @@ export default function AdminDashboardPage() {
         <div className="flex flex-col gap-6 xl:gap-8">
           {/* Urgent Priority Tasks */}
           <Card className="border-red-200/50 bg-gradient-to-b from-white to-red-50/30 shadow-sm dark:border-red-900/30 dark:from-slate-950 dark:to-red-950/10">
-            <CardHeader className="border-red-100 border-b pb-3 dark:border-red-900/20">
-              <CardTitle className="flex items-center gap-2 font-bold text-md text-slate-900 dark:text-slate-100">
+            <CardHeader className="border-b border-red-100 pb-3 dark:border-red-900/20">
+              <CardTitle className="text-md flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100">
                 <AlertCircle className="h-5 w-5 text-red-500" /> Action Required
               </CardTitle>
             </CardHeader>
@@ -355,10 +355,10 @@ export default function AdminDashboardPage() {
                   <Files className="h-4 w-4" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-[13px] text-slate-900 dark:text-slate-200">
+                  <h4 className="text-[13px] font-bold text-slate-900 dark:text-slate-200">
                     Extension Request: PRJ-901
                   </h4>
-                  <p className="mt-0.5 font-medium text-[11px] text-slate-500 leading-tight">
+                  <p className="mt-0.5 text-[11px] leading-tight font-medium text-slate-500">
                     Dr. Carter requested a 3-month timeline extension. Review needed.
                   </p>
                 </div>
@@ -368,10 +368,10 @@ export default function AdminDashboardPage() {
                   <Users className="h-4 w-4" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-[13px] text-slate-900 dark:text-slate-200">
+                  <h4 className="text-[13px] font-bold text-slate-900 dark:text-slate-200">
                     Team Replacement Conflict
                   </h4>
-                  <p className="mt-0.5 font-medium text-[11px] text-slate-500 leading-tight">
+                  <p className="mt-0.5 text-[11px] leading-tight font-medium text-slate-500">
                     Pending approval to replace Co-PI in Active Project P-204.
                   </p>
                 </div>
@@ -381,44 +381,44 @@ export default function AdminDashboardPage() {
 
           {/* System Timeline / Activity */}
           <Card className="h-full min-h-[#300px] flex-1 flex-col border-slate-200/60 bg-white shadow-sm dark:border-slate-800/60 dark:bg-slate-950">
-            <CardHeader className="border-slate-100 border-b pb-4 dark:border-slate-800">
-              <CardTitle className="font-bold text-md text-slate-800 dark:text-slate-100">
+            <CardHeader className="border-b border-slate-100 pb-4 dark:border-slate-800">
+              <CardTitle className="text-md font-bold text-slate-800 dark:text-slate-100">
                 Live System Activity
               </CardTitle>
             </CardHeader>
-            <CardContent className="relative ml-6 flex flex-1 flex-col gap-8 border-slate-100 border-l-2 pt-6 pr-2 pb-6 pl-6 dark:border-slate-800">
+            <CardContent className="relative ml-6 flex flex-1 flex-col gap-8 border-l-2 border-slate-100 pt-6 pr-2 pb-6 pl-6 dark:border-slate-800">
               {/* Activity 1 */}
               <div className="relative">
-                <span className="-left-[35px] absolute top-0 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-emerald-100 text-emerald-600 shadow-sm dark:border-slate-950 dark:bg-emerald-900/40 dark:text-emerald-400">
+                <span className="absolute top-0 -left-[35px] flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-emerald-100 text-emerald-600 shadow-sm dark:border-slate-950 dark:bg-emerald-900/40 dark:text-emerald-400">
                   <Check className="h-3.5 w-3.5" />
                 </span>
-                <p className="mb-1 font-bold text-[10px] text-slate-400 uppercase tracking-wider">10 mins ago</p>
-                <p className="mb-0.5 font-semibold text-[13px] text-slate-800 leading-tight dark:text-slate-200">
+                <p className="mb-1 text-[10px] font-bold tracking-wider text-slate-400 uppercase">10 mins ago</p>
+                <p className="mb-0.5 text-[13px] leading-tight font-semibold text-slate-800 dark:text-slate-200">
                   Project P-908 Budget Finalized
                 </p>
-                <p className="font-medium text-slate-500 text-xs">Finance Dept released Phase II funding.</p>
+                <p className="text-xs font-medium text-slate-500">Finance Dept released Phase II funding.</p>
               </div>
               {/* Activity 2 */}
               <div className="relative">
-                <span className="-left-[35px] absolute top-0 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-blue-100 text-blue-600 shadow-sm dark:border-slate-950 dark:bg-blue-900/40 dark:text-blue-400">
+                <span className="absolute top-0 -left-[35px] flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-blue-100 text-blue-600 shadow-sm dark:border-slate-950 dark:bg-blue-900/40 dark:text-blue-400">
                   <FileText className="h-3.5 w-3.5" />
                 </span>
-                <p className="mb-1 font-bold text-[10px] text-slate-400 uppercase tracking-wider">1 hr ago</p>
-                <p className="mb-0.5 font-semibold text-[13px] text-slate-800 leading-tight dark:text-slate-200">
+                <p className="mb-1 text-[10px] font-bold tracking-wider text-slate-400 uppercase">1 hr ago</p>
+                <p className="mb-0.5 text-[13px] leading-tight font-semibold text-slate-800 dark:text-slate-200">
                   New Proposal Uploaded
                 </p>
-                <p className="font-medium text-slate-500 text-xs">Submitted by Dr. Emily Wong (Chemistry).</p>
+                <p className="text-xs font-medium text-slate-500">Submitted by Dr. Emily Wong (Chemistry).</p>
               </div>
               {/* Activity 3 */}
               <div className="relative">
-                <span className="-left-[35px] absolute top-0 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-slate-100 text-slate-600 shadow-sm dark:border-slate-950 dark:bg-slate-800 dark:text-slate-400">
+                <span className="absolute top-0 -left-[35px] flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-slate-100 text-slate-600 shadow-sm dark:border-slate-950 dark:bg-slate-800 dark:text-slate-400">
                   <UserPlus className="h-3.5 w-3.5" />
                 </span>
-                <p className="mb-1 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Yesterday</p>
-                <p className="mb-0.5 font-semibold text-[13px] text-slate-800 leading-tight dark:text-slate-200">
+                <p className="mb-1 text-[10px] font-bold tracking-wider text-slate-400 uppercase">Yesterday</p>
+                <p className="mb-0.5 text-[13px] leading-tight font-semibold text-slate-800 dark:text-slate-200">
                   Reviewer Access Granted
                 </p>
-                <p className="font-medium text-slate-500 text-xs">Assigned Prof X to Evaluate Sub-023.</p>
+                <p className="text-xs font-medium text-slate-500">Assigned Prof X to Evaluate Sub-023.</p>
               </div>
             </CardContent>
           </Card>

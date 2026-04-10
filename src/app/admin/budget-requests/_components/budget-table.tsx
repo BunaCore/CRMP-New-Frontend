@@ -65,26 +65,26 @@ export function BudgetRequestsTable() {
       {/* ── METRIC CARDS ── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="flex flex-col gap-1 rounded-2xl border border-amber-200/60 bg-gradient-to-br from-amber-50 to-white p-5 shadow-sm dark:border-amber-900/30 dark:from-amber-950/30 dark:to-slate-950">
-          <p className="flex items-center gap-1.5 font-bold text-[10px] text-amber-700 uppercase tracking-wider dark:text-amber-400">
+          <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-wider text-amber-700 uppercase dark:text-amber-400">
             <Clock className="h-3.5 w-3.5" /> Total Pending Disbursements
           </p>
-          <p className="font-black text-2xl text-amber-700 dark:text-amber-300">Br {fmt(totalPending)}</p>
+          <p className="text-2xl font-black text-amber-700 dark:text-amber-300">Br {fmt(totalPending)}</p>
           <p className="text-[11px] text-amber-600/80 dark:text-amber-500">Awaiting Finance action</p>
         </div>
 
         <div className="flex flex-col gap-1 rounded-2xl border border-emerald-200/60 bg-gradient-to-br from-emerald-50 to-white p-5 shadow-sm dark:border-emerald-900/30 dark:from-emerald-950/30 dark:to-slate-950">
-          <p className="flex items-center gap-1.5 font-bold text-[10px] text-emerald-700 uppercase tracking-wider dark:text-emerald-400">
+          <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-wider text-emerald-700 uppercase dark:text-emerald-400">
             <CheckCircle2 className="h-3.5 w-3.5" /> Disbursed (All Time)
           </p>
-          <p className="font-black text-2xl text-emerald-700 dark:text-emerald-300">Br {fmt(disbursedThisMonth)}</p>
+          <p className="text-2xl font-black text-emerald-700 dark:text-emerald-300">Br {fmt(disbursedThisMonth)}</p>
           <p className="text-[11px] text-emerald-600/80 dark:text-emerald-500">Cleared &amp; stamped as paid</p>
         </div>
 
         <div className="flex flex-col gap-1 rounded-2xl border border-rose-200/60 bg-gradient-to-br from-rose-50 to-white p-5 shadow-sm dark:border-rose-900/30 dark:from-rose-950/30 dark:to-slate-950">
-          <p className="flex items-center gap-1.5 font-bold text-[10px] text-rose-700 uppercase tracking-wider dark:text-rose-400">
+          <p className="flex items-center gap-1.5 text-[10px] font-bold tracking-wider text-rose-700 uppercase dark:text-rose-400">
             <AlertTriangle className="h-3.5 w-3.5" /> Awaiting PI Correction
           </p>
-          <p className="font-black text-2xl text-rose-700 dark:text-rose-300">{awaitingRevision}</p>
+          <p className="text-2xl font-black text-rose-700 dark:text-rose-300">{awaitingRevision}</p>
           <p className="text-[11px] text-rose-600/80 dark:text-rose-500">Returned for clearance fix</p>
         </div>
       </div>
@@ -107,7 +107,7 @@ export function BudgetRequestsTable() {
 
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative w-full sm:w-72">
-            <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-3.5 w-3.5 text-slate-400" />
+            <Search className="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
             <Input
               placeholder="Search project, PI, ID…"
               className="h-9 rounded-lg pl-9 dark:bg-slate-950"
@@ -131,20 +131,20 @@ export function BudgetRequestsTable() {
         <Table>
           <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
             <TableRow>
-              <TableHead className="pl-5 font-semibold text-xs uppercase">Project</TableHead>
-              <TableHead className="font-semibold text-xs uppercase">PI</TableHead>
-              <TableHead className="font-semibold text-xs uppercase">Mode</TableHead>
-              <TableHead className="font-semibold text-xs uppercase">Phase</TableHead>
-              <TableHead className="font-semibold text-xs uppercase">Amount</TableHead>
-              <TableHead className="font-semibold text-xs uppercase">Status</TableHead>
-              <TableHead className="font-semibold text-xs uppercase">Days Waiting</TableHead>
-              <TableHead className="w-[120px] pr-5 text-right font-semibold text-xs uppercase" />
+              <TableHead className="pl-5 text-xs font-semibold uppercase">Project</TableHead>
+              <TableHead className="text-xs font-semibold uppercase">PI</TableHead>
+              <TableHead className="text-xs font-semibold uppercase">Mode</TableHead>
+              <TableHead className="text-xs font-semibold uppercase">Phase</TableHead>
+              <TableHead className="text-xs font-semibold uppercase">Amount</TableHead>
+              <TableHead className="text-xs font-semibold uppercase">Status</TableHead>
+              <TableHead className="text-xs font-semibold uppercase">Days Waiting</TableHead>
+              <TableHead className="w-[120px] pr-5 text-right text-xs font-semibold uppercase" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={8} className="py-12 text-center text-slate-400 text-sm italic">
+                <TableCell colSpan={8} className="py-12 text-center text-sm text-slate-400 italic">
                   No budget requests match your current filters.
                 </TableCell>
               </TableRow>
@@ -170,10 +170,10 @@ export function BudgetRequestsTable() {
                 >
                   <TableCell className="py-4 pl-5">
                     <div className="flex flex-col gap-0.5">
-                      <span className="line-clamp-1 font-semibold text-[13px] text-slate-900 dark:text-slate-100">
+                      <span className="line-clamp-1 text-[13px] font-semibold text-slate-900 dark:text-slate-100">
                         {d.projectTitle}
                       </span>
-                      <span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                      <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
                         {d.projectId} · {d.dept}
                       </span>
                     </div>
@@ -181,15 +181,15 @@ export function BudgetRequestsTable() {
                   <TableCell className="py-4">
                     <div className="flex items-center gap-2">
                       <Avatar className="h-7 w-7">
-                        <AvatarFallback className={cn("font-bold text-[10px]", d.piColor)}>{d.piAvatar}</AvatarFallback>
+                        <AvatarFallback className={cn("text-[10px] font-bold", d.piColor)}>{d.piAvatar}</AvatarFallback>
                       </Avatar>
-                      <span className="font-medium text-[13px] text-slate-700 dark:text-slate-300">{d.pi}</span>
+                      <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300">{d.pi}</span>
                     </div>
                   </TableCell>
                   <TableCell className="py-4">
                     <Badge
                       className={cn(
-                        "border-0 font-semibold text-[10px]",
+                        "border-0 text-[10px] font-semibold",
                         d.mode === "All-at-once"
                           ? "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300"
                           : "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
@@ -200,17 +200,17 @@ export function BudgetRequestsTable() {
                     </Badge>
                   </TableCell>
                   <TableCell className="py-4">
-                    <span className="font-bold text-slate-800 text-sm dark:text-slate-200">
+                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200">
                       {d.activePhasIndex + 1}{" "}
-                      <span className="font-medium text-slate-400 text-xs">/ {d.phases.length}</span>
+                      <span className="text-xs font-medium text-slate-400">/ {d.phases.length}</span>
                     </span>
                   </TableCell>
-                  <TableCell className="py-4 font-semibold text-[13px] text-slate-700 dark:text-slate-300">
+                  <TableCell className="py-4 text-[13px] font-semibold text-slate-700 dark:text-slate-300">
                     Br {new Intl.NumberFormat("en-US").format(activePhase?.amount ?? 0)}
                   </TableCell>
                   <TableCell className="py-4">
                     <Badge
-                      className={cn("flex w-fit items-center gap-1 border-0 font-bold text-[10px]", cfg.className)}
+                      className={cn("flex w-fit items-center gap-1 border-0 text-[10px] font-bold", cfg.className)}
                     >
                       {cfg.icon}
                       {cfg.label}
@@ -220,20 +220,20 @@ export function BudgetRequestsTable() {
                     {daysWaiting !== null ? (
                       <span
                         className={cn(
-                          "font-semibold text-sm",
+                          "text-sm font-semibold",
                           daysWaiting > 7 ? "text-rose-600" : "text-slate-600 dark:text-slate-300",
                         )}
                       >
                         {daysWaiting}d
                       </span>
                     ) : (
-                      <span className="text-slate-300 text-sm">—</span>
+                      <span className="text-sm text-slate-300">—</span>
                     )}
                   </TableCell>
                   <TableCell className="py-4 pr-5 text-right">
                     <Button
                       size="sm"
-                      className="h-8 rounded-lg bg-emerald-600 font-semibold text-xs hover:bg-emerald-700"
+                      className="h-8 rounded-lg bg-emerald-600 text-xs font-semibold hover:bg-emerald-700"
                       onClick={() => openDrawer(d)}
                     >
                       Review

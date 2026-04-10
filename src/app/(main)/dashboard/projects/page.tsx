@@ -85,25 +85,25 @@ export default function ProjectsPage() {
 
         {/* Quick actions section */}
         <div className="mt-4 mb-10">
-          <h2 className="mb-4 px-2 font-semibold text-slate-500 text-sm uppercase tracking-wide">Quick actions</h2>
+          <h2 className="mb-4 px-2 text-sm font-semibold tracking-wide text-slate-500 uppercase">Quick actions</h2>
           <div className="grid grid-cols-2 gap-4 px-2 lg:grid-cols-4">
             <Button
               variant="outline"
               onClick={handleUpload}
-              className="group flex h-28 w-full flex-col items-start justify-between rounded-xl border border-slate-200 bg-white p-5 text-left font-normal shadow-sm outline-none transition-colors hover:bg-slate-50 focus:ring-[1px] focus:ring-blue-500"
+              className="group flex h-28 w-full flex-col items-start justify-between rounded-xl border border-slate-200 bg-white p-5 text-left font-normal shadow-sm transition-colors outline-none hover:bg-slate-50 focus:ring-[1px] focus:ring-blue-500"
             >
               <Upload className="h-5 w-5 text-slate-400 transition-colors group-hover:text-blue-500" />
-              <span className="font-semibold text-[14px] text-slate-800">Upload Data</span>
+              <span className="text-[14px] font-semibold text-slate-800">Upload Data</span>
             </Button>
 
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="group flex h-28 w-full flex-col items-start justify-between rounded-xl border border-slate-200 bg-white p-5 text-left font-normal shadow-sm outline-none transition-colors hover:bg-slate-50 focus:ring-[1px] focus:ring-blue-500"
+                  className="group flex h-28 w-full flex-col items-start justify-between rounded-xl border border-slate-200 bg-white p-5 text-left font-normal shadow-sm transition-colors outline-none hover:bg-slate-50 focus:ring-[1px] focus:ring-blue-500"
                 >
                   <Plus className="h-5 w-5 text-slate-400 transition-colors group-hover:text-blue-500" />
-                  <span className="font-semibold text-[14px] text-slate-800">Create Section</span>
+                  <span className="text-[14px] font-semibold text-slate-800">Create Section</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
@@ -130,19 +130,19 @@ export default function ProjectsPage() {
             <Button
               variant="outline"
               onClick={handleChatFile}
-              className="group flex h-28 w-full flex-col items-start justify-between rounded-xl border border-slate-200 bg-white p-5 text-left font-normal shadow-sm outline-none transition-colors hover:bg-slate-50 focus:ring-[1px] focus:ring-blue-500"
+              className="group flex h-28 w-full flex-col items-start justify-between rounded-xl border border-slate-200 bg-white p-5 text-left font-normal shadow-sm transition-colors outline-none hover:bg-slate-50 focus:ring-[1px] focus:ring-blue-500"
             >
               <FileText className="h-5 w-5 text-slate-400 transition-colors group-hover:text-blue-500" />
-              <span className="font-semibold text-[14px] text-slate-800">Chat with file</span>
+              <span className="text-[14px] font-semibold text-slate-800">Chat with file</span>
             </Button>
 
             <Button
               variant="outline"
               onClick={handleChatFolder}
-              className="group flex h-28 w-full flex-col items-start justify-between rounded-xl border border-slate-200 bg-white p-5 text-left font-normal shadow-sm outline-none transition-colors hover:bg-slate-50 focus:ring-[1px] focus:ring-blue-500"
+              className="group flex h-28 w-full flex-col items-start justify-between rounded-xl border border-slate-200 bg-white p-5 text-left font-normal shadow-sm transition-colors outline-none hover:bg-slate-50 focus:ring-[1px] focus:ring-blue-500"
             >
               <Folder className="h-5 w-5 text-slate-400 transition-colors group-hover:text-blue-500" />
-              <span className="font-semibold text-[14px] text-slate-800">Chat with folder</span>
+              <span className="text-[14px] font-semibold text-slate-800">Chat with folder</span>
             </Button>
           </div>
         </div>
@@ -151,23 +151,23 @@ export default function ProjectsPage() {
         <div className="mt-12 px-2 pb-16">
           <Table className="w-full border-collapse">
             <TableHeader>
-              <TableRow className="border-slate-200 border-b hover:bg-transparent">
+              <TableRow className="border-b border-slate-200 hover:bg-transparent">
                 <TableHead className="w-[45px] px-2 py-3">
                   <Checkbox className="border-slate-300 data-[state=checked]:bg-blue-600" />
                 </TableHead>
-                <TableHead className="w-[40%] py-3 font-semibold text-[13px] text-slate-500 uppercase tracking-wider">
+                <TableHead className="w-[40%] py-3 text-[13px] font-semibold tracking-wider text-slate-500 uppercase">
                   Title
                 </TableHead>
-                <TableHead className="w-[20%] py-3 font-semibold text-[13px] text-slate-500 uppercase tracking-wider">
+                <TableHead className="w-[20%] py-3 text-[13px] font-semibold tracking-wider text-slate-500 uppercase">
                   Authors / Team
                 </TableHead>
-                <TableHead className="w-[15%] py-3 font-semibold text-[13px] text-slate-500 uppercase tracking-wider">
+                <TableHead className="w-[15%] py-3 text-[13px] font-semibold tracking-wider text-slate-500 uppercase">
                   Added
                 </TableHead>
-                <TableHead className="w-[15%] py-3 font-semibold text-[13px] text-slate-500 uppercase tracking-wider">
+                <TableHead className="w-[15%] py-3 text-[13px] font-semibold tracking-wider text-slate-500 uppercase">
                   Size
                 </TableHead>
-                <TableHead className="w-[10%] py-3 font-semibold text-[13px] text-slate-500 uppercase tracking-wider">
+                <TableHead className="w-[10%] py-3 text-[13px] font-semibold tracking-wider text-slate-500 uppercase">
                   Type
                 </TableHead>
               </TableRow>
@@ -176,7 +176,7 @@ export default function ProjectsPage() {
               {files.map((doc) => (
                 <TableRow
                   key={doc.id}
-                  className="group border-slate-100 border-b transition-colors hover:bg-slate-50/70"
+                  className="group border-b border-slate-100 transition-colors hover:bg-slate-50/70"
                 >
                   <TableCell className="px-2 py-4">
                     <Checkbox className="border-slate-300 data-[state=checked]:bg-blue-600" />
@@ -193,7 +193,7 @@ export default function ProjectsPage() {
                   <TableCell className="py-4 text-[14px] text-slate-600">{doc.authors || "--"}</TableCell>
                   <TableCell className="py-4 text-[14px] text-slate-600">{doc.date}</TableCell>
                   <TableCell className="py-4 text-[14px] text-slate-600">{doc.size}</TableCell>
-                  <TableCell className="py-4 font-medium font-mono text-[13px] text-slate-600 uppercase">
+                  <TableCell className="py-4 font-mono text-[13px] font-medium text-slate-600 uppercase">
                     {doc.type}
                   </TableCell>
                 </TableRow>

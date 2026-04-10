@@ -64,18 +64,18 @@ function getInitials(name: string) {
 
 export function TeamMemberCard({ member, onView, onEdit, onRemove }: TeamMemberCardProps) {
   return (
-    <Card className="group relative overflow-hidden transition-all duration-200 hover:border-primary/20 hover:shadow-md">
+    <Card className="group hover:border-primary/20 relative overflow-hidden transition-all duration-200 hover:shadow-md">
       <CardContent className="p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-4">
-            <Avatar className="h-14 w-14 border-2 border-background shadow-sm">
+            <Avatar className="border-background h-14 w-14 border-2 shadow-sm">
               <AvatarImage src={member.avatar} alt={member.name} />
-              <AvatarFallback className="bg-primary/10 font-semibold text-lg text-primary">
+              <AvatarFallback className="bg-primary/10 text-primary text-lg font-semibold">
                 {getInitials(member.name)}
               </AvatarFallback>
             </Avatar>
             <div className="space-y-1.5">
-              <h3 className="font-semibold text-foreground leading-none">{member.name}</h3>
+              <h3 className="text-foreground leading-none font-semibold">{member.name}</h3>
               <p className="text-muted-foreground text-sm">{member.department}</p>
               <div className="flex items-center gap-2 pt-1">
                 <Badge variant="outline" className={getRoleBadgeVariant(member.role)}>
@@ -116,10 +116,10 @@ export function TeamMemberCard({ member, onView, onEdit, onRemove }: TeamMemberC
           </DropdownMenu>
         </div>
 
-        <div className="mt-4 border-border/50 border-t pt-4">
+        <div className="border-border/50 mt-4 border-t pt-4">
           <a
             href={`mailto:${member.email}`}
-            className="flex items-center gap-2 text-muted-foreground text-sm transition-colors hover:text-primary"
+            className="text-muted-foreground hover:text-primary flex items-center gap-2 text-sm transition-colors"
           >
             <Mail className="h-4 w-4" />
             {member.email}
@@ -127,12 +127,12 @@ export function TeamMemberCard({ member, onView, onEdit, onRemove }: TeamMemberC
           {member.expertise.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-1.5">
               {member.expertise.slice(0, 3).map((skill) => (
-                <span key={skill} className="rounded-full bg-secondary px-2 py-0.5 text-secondary-foreground text-xs">
+                <span key={skill} className="bg-secondary text-secondary-foreground rounded-full px-2 py-0.5 text-xs">
                   {skill}
                 </span>
               ))}
               {member.expertise.length > 3 && (
-                <span className="rounded-full bg-secondary px-2 py-0.5 text-muted-foreground text-xs">
+                <span className="bg-secondary text-muted-foreground rounded-full px-2 py-0.5 text-xs">
                   +{member.expertise.length - 3}
                 </span>
               )}

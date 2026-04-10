@@ -53,7 +53,7 @@ export function AccountSwitcher({
         {users.map((user) => (
           <DropdownMenuItem
             key={user.email}
-            className={cn("p-0", user.id === activeUser.id && "border-l-2 border-l-primary bg-accent/50")}
+            className={cn("p-0", user.id === activeUser.id && "border-l-primary bg-accent/50 border-l-2")}
             onClick={() => setActiveUser(user)}
           >
             <div className="flex w-full items-center justify-between gap-2 px-1 py-1.5">

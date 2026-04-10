@@ -96,12 +96,12 @@ export function ChatRoomsList({
   };
 
   return (
-    <div className="flex h-full flex-col border-r bg-background">
+    <div className="bg-background flex h-full flex-col border-r">
       {/* Header */}
       <div className="border-b px-4 py-3">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="font-semibold text-foreground text-lg">Team Chat</h2>
+            <h2 className="text-foreground text-lg font-semibold">Team Chat</h2>
             <p className="text-muted-foreground text-xs">{members.filter((m) => m.isOnline).length} members online</p>
           </div>
           <Button size="icon" variant="outline" className="h-8 w-8" onClick={onCreateRoom}>
@@ -114,7 +114,7 @@ export function ChatRoomsList({
       {/* Search & Filter */}
       <div className="space-y-3 p-3">
         <div className="relative">
-          <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
+          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             placeholder="Search conversations..."
             value={searchQuery}
@@ -142,11 +142,11 @@ export function ChatRoomsList({
         <div className="p-2">
           {filteredRooms.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                <Hash className="h-6 w-6 text-muted-foreground" />
+              <div className="bg-muted flex h-12 w-12 items-center justify-center rounded-full">
+                <Hash className="text-muted-foreground h-6 w-6" />
               </div>
-              <p className="mt-3 font-medium text-foreground text-sm">No conversations found</p>
-              <p className="mt-1 text-muted-foreground text-xs">
+              <p className="text-foreground mt-3 text-sm font-medium">No conversations found</p>
+              <p className="text-muted-foreground mt-1 text-xs">
                 {searchQuery ? "Try a different search" : "Create a new conversation to get started"}
               </p>
             </div>
@@ -165,7 +165,7 @@ export function ChatRoomsList({
                     key={room.id}
                     onClick={() => onSelectRoom(room)}
                     className={`flex w-full items-start gap-3 rounded-lg p-3 text-left transition-colors ${
-                      isSelected ? "border border-primary/20 bg-primary/10" : "border border-transparent hover:bg-muted"
+                      isSelected ? "border-primary/20 bg-primary/10 border" : "hover:bg-muted border border-transparent"
                     }`}
                   >
                     {/* Room Icon or Avatar */}
@@ -177,7 +177,7 @@ export function ChatRoomsList({
                           </AvatarFallback>
                         </Avatar>
                         {isPartnerOnline && (
-                          <span className="absolute right-0 bottom-0 h-3 w-3 rounded-full border-2 border-background bg-emerald-500" />
+                          <span className="border-background absolute right-0 bottom-0 h-3 w-3 rounded-full border-2 bg-emerald-500" />
                         )}
                       </div>
                     ) : (
@@ -194,19 +194,19 @@ export function ChatRoomsList({
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
                         <span
-                          className={`truncate font-medium text-sm ${isSelected ? "text-primary" : "text-foreground"}`}
+                          className={`truncate text-sm font-medium ${isSelected ? "text-primary" : "text-foreground"}`}
                         >
                           {displayName}
                         </span>
-                        <span className="shrink-0 text-[10px] text-muted-foreground">
+                        <span className="text-muted-foreground shrink-0 text-[10px]">
                           {formatRelativeTime(room.lastActivity)}
                         </span>
                       </div>
                       <div className="mt-0.5 flex items-center justify-between gap-2">
                         {room.type === "direct" && partner ? (
-                          <span className="truncate text-muted-foreground text-xs">{partner.role}</span>
+                          <span className="text-muted-foreground truncate text-xs">{partner.role}</span>
                         ) : (
-                          <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
+                          <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
                             <span className="flex items-center gap-1">
                               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                               {onlineCount} online
@@ -216,13 +216,13 @@ export function ChatRoomsList({
                           </div>
                         )}
                         {room.unreadCount && room.unreadCount > 0 && (
-                          <Badge variant="default" className="h-5 min-w-5 rounded-full px-1.5 font-bold text-[10px]">
+                          <Badge variant="default" className="h-5 min-w-5 rounded-full px-1.5 text-[10px] font-bold">
                             {room.unreadCount > 99 ? "99+" : room.unreadCount}
                           </Badge>
                         )}
                       </div>
                       {room.description && room.type === "group" && (
-                        <p className="mt-1 truncate text-muted-foreground/70 text-xs">{room.description}</p>
+                        <p className="text-muted-foreground/70 mt-1 truncate text-xs">{room.description}</p>
                       )}
                     </div>
                   </button>
@@ -235,28 +235,28 @@ export function ChatRoomsList({
         {/* Start New Direct Message Section */}
         {filterType !== "group" && availableForDM.length > 0 && (
           <div className="border-t p-3">
-            <p className="mb-2 font-medium text-muted-foreground text-xs uppercase">Start a conversation</p>
+            <p className="text-muted-foreground mb-2 text-xs font-medium uppercase">Start a conversation</p>
             <div className="space-y-1">
               {availableForDM.slice(0, 3).map((member) => (
                 <button
                   type="button"
                   key={member.id}
                   onClick={() => onStartDirectMessage(member.id)}
-                  className="flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-muted"
+                  className="hover:bg-muted flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors"
                 >
                   <div className="relative">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="bg-muted text-xs">{getInitials(member.name)}</AvatarFallback>
                     </Avatar>
                     {member.isOnline && (
-                      <span className="absolute right-0 bottom-0 h-2 w-2 rounded-full border border-background bg-emerald-500" />
+                      <span className="border-background absolute right-0 bottom-0 h-2 w-2 rounded-full border bg-emerald-500" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-foreground text-sm">{member.name}</p>
-                    <p className="truncate text-muted-foreground text-xs">{member.department}</p>
+                    <p className="text-foreground truncate text-sm font-medium">{member.name}</p>
+                    <p className="text-muted-foreground truncate text-xs">{member.department}</p>
                   </div>
-                  <User className="h-4 w-4 text-muted-foreground" />
+                  <User className="text-muted-foreground h-4 w-4" />
                 </button>
               ))}
             </div>
@@ -266,7 +266,7 @@ export function ChatRoomsList({
 
       {/* Online Members Quick View */}
       <div className="border-t p-3">
-        <p className="mb-2 font-medium text-muted-foreground text-xs uppercase">Active Now</p>
+        <p className="text-muted-foreground mb-2 text-xs font-medium uppercase">Active Now</p>
         <div className="flex flex-wrap gap-1">
           {members
             .filter((m) => m.isOnline)
@@ -289,16 +289,16 @@ export function ChatRoomsList({
                 className="group relative"
                 title={member.name}
               >
-                <Avatar className="h-8 w-8 border-2 border-background transition-transform group-hover:scale-110">
+                <Avatar className="border-background h-8 w-8 border-2 transition-transform group-hover:scale-110">
                   <AvatarFallback className="bg-primary/10 text-primary text-xs">
                     {getInitials(member.name)}
                   </AvatarFallback>
                 </Avatar>
-                <span className="absolute right-0 bottom-0 h-2.5 w-2.5 rounded-full border-2 border-background bg-emerald-500" />
+                <span className="border-background absolute right-0 bottom-0 h-2.5 w-2.5 rounded-full border-2 bg-emerald-500" />
               </button>
             ))}
           {members.filter((m) => m.isOnline).length > 6 && (
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted font-medium text-xs">
+            <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium">
               +{members.filter((m) => m.isOnline).length - 6}
             </div>
           )}

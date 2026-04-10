@@ -70,15 +70,15 @@ export function ViewMemberDialog({ member, open, onOpenChange }: ViewMemberDialo
       <DialogContent className="sm:max-w-120">
         <DialogHeader className="pb-4">
           <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16 border-2 border-background shadow-md">
+            <Avatar className="border-background h-16 w-16 border-2 shadow-md">
               <AvatarImage src={member.avatar} alt={member.name} />
-              <AvatarFallback className="bg-primary/10 text-primary font-semibold text-xl">
+              <AvatarFallback className="bg-primary/10 text-primary text-xl font-semibold">
                 {getInitials(member.name)}
               </AvatarFallback>
             </Avatar>
             <div>
               <DialogTitle className="text-xl">{member.name}</DialogTitle>
-              <DialogDescription className="flex items-center gap-2 mt-1">
+              <DialogDescription className="mt-1 flex items-center gap-2">
                 <Badge variant="outline" className={getRoleBadgeVariant(member.role)}>
                   {member.role}
                 </Badge>
@@ -94,11 +94,11 @@ export function ViewMemberDialog({ member, open, onOpenChange }: ViewMemberDialo
 
         <div className="space-y-4 py-4">
           <div className="flex items-center gap-3 text-sm">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary">
-              <Mail className="h-4 w-4 text-muted-foreground" />
+            <div className="bg-secondary flex h-9 w-9 items-center justify-center rounded-lg">
+              <Mail className="text-muted-foreground h-4 w-4" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Email</p>
+              <p className="text-muted-foreground text-xs">Email</p>
               <a href={`mailto:${member.email}`} className="text-foreground hover:text-primary transition-colors">
                 {member.email}
               </a>
@@ -106,18 +106,18 @@ export function ViewMemberDialog({ member, open, onOpenChange }: ViewMemberDialo
           </div>
 
           <div className="flex items-center gap-3 text-sm">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary">
-              <Building2 className="h-4 w-4 text-muted-foreground" />
+            <div className="bg-secondary flex h-9 w-9 items-center justify-center rounded-lg">
+              <Building2 className="text-muted-foreground h-4 w-4" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Department</p>
+              <p className="text-muted-foreground text-xs">Department</p>
               <p className="text-foreground">{member.department}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3 text-sm">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+            <div className="bg-secondary flex h-9 w-9 items-center justify-center rounded-lg">
+              <Calendar className="text-muted-foreground h-4 w-4" />
             </div>
             <div>
               <p className="text-muted-foreground text-xs">Joined Date</p>
@@ -133,16 +133,16 @@ export function ViewMemberDialog({ member, open, onOpenChange }: ViewMemberDialo
 
           {member.expertise.length > 0 && (
             <div className="flex items-start gap-3 text-sm">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary shrink-0">
-                <Sparkles className="h-4 w-4 text-muted-foreground" />
+              <div className="bg-secondary flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
+                <Sparkles className="text-muted-foreground h-4 w-4" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground mb-2">Expertise</p>
+                <p className="text-muted-foreground mb-2 text-xs">Expertise</p>
                 <div className="flex flex-wrap gap-1.5">
                   {member.expertise.map((skill) => (
                     <span
                       key={skill}
-                      className="text-xs px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground"
+                      className="bg-secondary text-secondary-foreground rounded-full px-2.5 py-1 text-xs"
                     >
                       {skill}
                     </span>

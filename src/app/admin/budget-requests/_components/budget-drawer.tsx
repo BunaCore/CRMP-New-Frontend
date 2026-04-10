@@ -60,18 +60,18 @@ export function BudgetRequestDrawer() {
     <Sheet open={!!selected} onOpenChange={(o) => !o && closeDrawer()}>
       <SheetContent
         side="right"
-        className="flex w-full flex-col overflow-hidden border-slate-200/80 border-l bg-white p-0 shadow-2xl sm:max-w-[800px] xl:max-w-[960px] dark:border-slate-800 dark:bg-slate-950"
+        className="flex w-full flex-col overflow-hidden border-l border-slate-200/80 bg-white p-0 shadow-2xl sm:max-w-[800px] xl:max-w-[960px] dark:border-slate-800 dark:bg-slate-950"
       >
         {/* ── HEADER ── */}
-        <SheetHeader className="shrink-0 space-y-0 border-slate-100 border-b bg-gradient-to-b from-emerald-50/70 via-white to-white px-6 pt-6 pb-4 dark:border-slate-800 dark:from-emerald-950/20 dark:via-slate-950 dark:to-slate-950">
+        <SheetHeader className="shrink-0 space-y-0 border-b border-slate-100 bg-gradient-to-b from-emerald-50/70 via-white to-white px-6 pt-6 pb-4 dark:border-slate-800 dark:from-emerald-950/20 dark:via-slate-950 dark:to-slate-950">
           <div className="flex flex-col gap-2">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="border-0 bg-slate-200/80 font-bold text-[10px] text-slate-700 uppercase dark:bg-slate-800 dark:text-slate-300">
+              <Badge className="border-0 bg-slate-200/80 text-[10px] font-bold text-slate-700 uppercase dark:bg-slate-800 dark:text-slate-300">
                 {selected.projectId}
               </Badge>
               <Badge
                 className={cn(
-                  "flex items-center gap-1 border-0 font-bold text-[10px]",
+                  "flex items-center gap-1 border-0 text-[10px] font-bold",
                   selected.mode === "All-at-once"
                     ? "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300"
                     : "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
@@ -83,7 +83,7 @@ export function BudgetRequestDrawer() {
               {activePhase?.status && (
                 <Badge
                   className={cn(
-                    "flex items-center gap-1 border-0 font-bold text-[10px]",
+                    "flex items-center gap-1 border-0 text-[10px] font-bold",
                     STATUS_CFG[activePhase.status].className,
                   )}
                 >
@@ -92,10 +92,10 @@ export function BudgetRequestDrawer() {
                 </Badge>
               )}
             </div>
-            <SheetTitle className="pr-2 font-bold text-[16px] text-slate-900 leading-snug tracking-tight dark:text-slate-100">
+            <SheetTitle className="pr-2 text-[16px] leading-snug font-bold tracking-tight text-slate-900 dark:text-slate-100">
               {selected.projectTitle}
             </SheetTitle>
-            <SheetDescription className="font-medium text-slate-500 text-xs leading-relaxed">
+            <SheetDescription className="text-xs leading-relaxed font-medium text-slate-500">
               {selected.dept} · {selected.pi} · Total Budget: {fmt(selected.totalBudget)}
             </SheetDescription>
           </div>
@@ -110,8 +110,8 @@ export function BudgetRequestDrawer() {
                 <Banknote className="h-4 w-4" />
               </div>
               <div>
-                <h4 className="font-bold text-slate-900 text-sm dark:text-slate-100">Budget Drawdown Overview</h4>
-                <p className="font-medium text-[11px] text-slate-500 dark:text-slate-400">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">Budget Drawdown Overview</h4>
+                <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                   All phases shown — paid, pending, and locked.
                 </p>
               </div>
@@ -133,19 +133,19 @@ export function BudgetRequestDrawer() {
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-emerald-500" />
-                <p className="font-medium text-[11px] text-slate-600 dark:text-slate-400">
+                <p className="text-[11px] font-medium text-slate-600 dark:text-slate-400">
                   Paid: <span className="font-bold text-emerald-700 dark:text-emerald-400">{fmt(totalPaid)}</span>
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-amber-400" />
-                <p className="font-medium text-[11px] text-slate-600 dark:text-slate-400">
+                <p className="text-[11px] font-medium text-slate-600 dark:text-slate-400">
                   Pending: <span className="font-bold text-amber-700 dark:text-amber-400">{fmt(totalPending)}</span>
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-slate-200 dark:bg-slate-700" />
-                <p className="font-medium text-[11px] text-slate-600 dark:text-slate-400">
+                <p className="text-[11px] font-medium text-slate-600 dark:text-slate-400">
                   Remaining:{" "}
                   <span className="font-bold text-slate-700 dark:text-slate-300">{fmt(Math.max(remaining, 0))}</span>
                 </p>
@@ -198,22 +198,22 @@ export function BudgetRequestDrawer() {
                       >
                         <div className="flex flex-wrap items-start justify-between gap-2">
                           <div>
-                            <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider dark:text-slate-500">
+                            <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500">
                               Phase {phase.phase}
                             </p>
-                            <p className="mt-0.5 font-semibold text-slate-900 text-sm dark:text-slate-100">
+                            <p className="mt-0.5 text-sm font-semibold text-slate-900 dark:text-slate-100">
                               {phase.label}
                             </p>
-                            <p className="font-bold text-[13px] text-slate-700 dark:text-slate-300">
+                            <p className="text-[13px] font-bold text-slate-700 dark:text-slate-300">
                               {fmt(phase.amount)}
                               {phase.approvedAmount && phase.approvedAmount !== phase.amount && (
-                                <span className="ml-1.5 font-medium text-[11px] text-emerald-600">
+                                <span className="ml-1.5 text-[11px] font-medium text-emerald-600">
                                   (approved: {fmt(phase.approvedAmount)})
                                 </span>
                               )}
                             </p>
                             {isPaid && phase.actedAt && (
-                              <p className="mt-1 flex items-center gap-1 font-medium text-[11px] text-emerald-700 dark:text-emerald-400">
+                              <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-emerald-700 dark:text-emerald-400">
                                 <CheckCircle2 className="h-3 w-3" />
                                 Paid on {phase.actedAt}
                                 {phase.transactionId && (
@@ -224,35 +224,35 @@ export function BudgetRequestDrawer() {
                               </p>
                             )}
                             {isReturned && phase.financeComment && (
-                              <p className="mt-1 flex items-start gap-1 font-medium text-[11px] text-rose-700 dark:text-rose-400">
+                              <p className="mt-1 flex items-start gap-1 text-[11px] font-medium text-rose-700 dark:text-rose-400">
                                 <XCircle className="mt-0.5 h-3 w-3 shrink-0" />
                                 {phase.financeComment}
                               </p>
                             )}
                             {isLocked && (
-                              <p className="mt-1 font-medium text-[11px] text-slate-400 italic dark:text-slate-500">
+                              <p className="mt-1 text-[11px] font-medium text-slate-400 italic dark:text-slate-500">
                                 Locked — awaiting prior phase clearance
                               </p>
                             )}
                           </div>
                           <div className="flex flex-wrap gap-1.5">
                             {isPaid && (
-                              <Badge className="border-0 bg-emerald-100 font-bold text-[10px] text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+                              <Badge className="border-0 bg-emerald-100 text-[10px] font-bold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
                                 <Check className="mr-1 h-3 w-3 stroke-[3]" /> Paid
                               </Badge>
                             )}
                             {isReturned && (
-                              <Badge className="border-0 bg-rose-100 font-bold text-[10px] text-rose-800 dark:bg-rose-900/40 dark:text-rose-300">
+                              <Badge className="border-0 bg-rose-100 text-[10px] font-bold text-rose-800 dark:bg-rose-900/40 dark:text-rose-300">
                                 Returned
                               </Badge>
                             )}
                             {isActive && !isPaid && !isReturned && (
-                              <Badge className="border-0 bg-amber-100 font-bold text-[10px] text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
+                              <Badge className="border-0 bg-amber-100 text-[10px] font-bold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
                                 Active Request
                               </Badge>
                             )}
                             {phase.clearanceFileName && (
-                              <Badge className="flex cursor-pointer items-center gap-1 border-0 bg-blue-100 font-bold text-[10px] text-blue-800 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300">
+                              <Badge className="flex cursor-pointer items-center gap-1 border-0 bg-blue-100 text-[10px] font-bold text-blue-800 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300">
                                 <FileCheck className="h-3 w-3" />
                                 {phase.clearanceFileName}
                               </Badge>
@@ -271,7 +271,7 @@ export function BudgetRequestDrawer() {
           <div className="flex flex-col gap-3 rounded-xl border border-slate-200/80 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-900/30">
             <div className="flex items-center gap-2">
               <Banknote className="h-4 w-4 text-slate-500" />
-              <h4 className="font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+              <h4 className="text-[11px] font-bold tracking-wider text-slate-500 uppercase">
                 Phase {activePhase?.phase} Budget Items
               </h4>
             </div>
@@ -301,8 +301,8 @@ export function BudgetRequestDrawer() {
             {selected.pgOfficerNote && (
               <div className="mt-2 flex items-start gap-2 rounded border border-indigo-100 bg-indigo-50/50 p-3 dark:border-indigo-900/40 dark:bg-indigo-950/20">
                 <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-indigo-500" />
-                <p className="text-[12px] text-indigo-700 leading-relaxed dark:text-indigo-300">
-                  <span className="mb-0.5 block font-semibold text-[10px] uppercase">PG Officer Note</span>
+                <p className="text-[12px] leading-relaxed text-indigo-700 dark:text-indigo-300">
+                  <span className="mb-0.5 block text-[10px] font-semibold uppercase">PG Officer Note</span>
                   {selected.pgOfficerNote}
                 </p>
               </div>
@@ -313,8 +313,8 @@ export function BudgetRequestDrawer() {
           <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/40">
             <Building2 className="mt-0.5 h-4 w-4 shrink-0 text-slate-500 dark:text-slate-400" />
             <div>
-              <p className="font-bold text-[11px] text-slate-500 uppercase tracking-wider">Bank / Payment Routing</p>
-              <p className="mt-0.5 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+              <p className="text-[11px] font-bold tracking-wider text-slate-500 uppercase">Bank / Payment Routing</p>
+              <p className="mt-0.5 text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                 {selected.bankRoutingInfo}
               </p>
             </div>
@@ -323,7 +323,7 @@ export function BudgetRequestDrawer() {
           {/* ── ZONE D: CURRENT CLEARANCE DOCUMENT ── */}
           {activePhase?.clearanceFileName && (
             <div className="flex flex-col gap-3">
-              <h4 className="font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+              <h4 className="text-[11px] font-bold tracking-wider text-slate-500 uppercase">
                 Attached Clearance Document
               </h4>
               <div className="flex items-center gap-3 rounded-xl border-2 border-blue-200 bg-blue-50/60 p-4 dark:border-blue-900/40 dark:bg-blue-950/20">
@@ -331,7 +331,7 @@ export function BudgetRequestDrawer() {
                   <FileText className="h-6 w-6" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-bold text-[13px] text-blue-900 dark:text-blue-200">
+                  <p className="text-[13px] font-bold text-blue-900 dark:text-blue-200">
                     {activePhase.clearanceFileName}
                   </p>
                   <p className="mt-0.5 text-[11px] text-blue-700/80 dark:text-blue-400/80">
@@ -366,7 +366,7 @@ export function BudgetRequestDrawer() {
               permission="BUDGET_APPROVE"
               fallback={
                 <div className="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800/80 dark:bg-slate-900/20">
-                  <p className="font-medium text-slate-500 text-xs italic">
+                  <p className="text-xs font-medium text-slate-500 italic">
                     You do not have permission to approve or return disbursement requests.
                   </p>
                 </div>
@@ -375,7 +375,7 @@ export function BudgetRequestDrawer() {
               <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
                 <div className="flex items-center gap-2">
                   <Stamp className="h-4 w-4 text-slate-500" />
-                  <h4 className="font-bold text-slate-900 text-sm dark:text-slate-100">Finance Action</h4>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100">Finance Action</h4>
                 </div>
                 <p className="text-[12px] text-slate-500 dark:text-slate-400">
                   Releasing{" "}
@@ -384,7 +384,7 @@ export function BudgetRequestDrawer() {
                   </strong>
                   . Verify routing information and clearance document before proceeding.
                 </p>
-                <div className="flex flex-wrap gap-2 border-slate-100 border-t pt-4 dark:border-slate-800">
+                <div className="flex flex-wrap gap-2 border-t border-slate-100 pt-4 dark:border-slate-800">
                   <Button
                     type="button"
                     className="h-10 min-w-[160px] flex-1 bg-emerald-600 font-semibold text-white shadow-sm hover:bg-emerald-700"
@@ -412,7 +412,7 @@ export function BudgetRequestDrawer() {
             <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900/30 dark:bg-emerald-950/20">
               <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
               <div>
-                <p className="font-bold text-emerald-900 text-sm dark:text-emerald-200">All phases fully disbursed</p>
+                <p className="text-sm font-bold text-emerald-900 dark:text-emerald-200">All phases fully disbursed</p>
                 <p className="mt-0.5 text-[11px] text-emerald-700/80 dark:text-emerald-400/80">
                   Total of {fmt(selected.totalBudget)} has been released for this project.
                 </p>

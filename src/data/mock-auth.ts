@@ -89,14 +89,7 @@ const MOCK_USERS: Record<string, LoginResponse> = {
       role: "Advisor",
       department: "Research Advisory Board",
       avatarUrl: "",
-      permissions: [
-        "ADMIN_VIEW",
-        "PROJECT_VIEW",
-        "PROJECT_RECOMMEND",
-
-        "PROJECT_VIEW",
-        "PROJECT_REVIEW",
-      ],
+      permissions: ["ADMIN_VIEW", "PROJECT_VIEW", "PROJECT_RECOMMEND", "PROJECT_VIEW", "PROJECT_REVIEW"],
     },
   },
   "evaluator@crmp.edu": {

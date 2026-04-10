@@ -142,12 +142,12 @@ function WorkflowStepItem({ step, isLast }: { step: WorkflowStep; isLast: boolea
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-800 text-sm dark:text-slate-200">{step.label}</span>
-            <span className="rounded bg-slate-100 px-1.5 py-0.5 font-medium text-[10px] text-slate-500 uppercase tracking-wide dark:bg-slate-800 dark:text-slate-400">
+            <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{step.label}</span>
+            <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-slate-500 uppercase dark:bg-slate-800 dark:text-slate-400">
               {step.role.replace(/_/g, " ")}
             </span>
             {step.isActive && (
-              <span className="rounded-full bg-blue-100 px-2 py-0.5 font-semibold text-[10px] text-blue-700 dark:bg-blue-900/40 dark:text-blue-400">
+              <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-400">
                 Current
               </span>
             )}
@@ -158,7 +158,7 @@ function WorkflowStepItem({ step, isLast }: { step: WorkflowStep; isLast: boolea
         </div>
 
         {step.comment && (
-          <p className="border-slate-100 border-t pt-2 text-slate-600 text-sm leading-relaxed dark:border-slate-800 dark:text-slate-400">
+          <p className="border-t border-slate-100 pt-2 text-sm leading-relaxed text-slate-600 dark:border-slate-800 dark:text-slate-400">
             &ldquo;{step.comment}&rdquo;
           </p>
         )}
@@ -180,7 +180,7 @@ function CommentItem({ comment }: { comment: ProposalComment }) {
         }`}
       >
         <AvatarFallback
-          className={`font-semibold text-sm ${
+          className={`text-sm font-semibold ${
             comment.isResolved
               ? "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
               : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
@@ -193,7 +193,7 @@ function CommentItem({ comment }: { comment: ProposalComment }) {
       <div className="flex flex-1 flex-col gap-1.5">
         <div className="flex items-baseline justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono font-semibold text-slate-900 text-xs dark:text-slate-100">
+            <span className="font-mono text-xs font-semibold text-slate-900 dark:text-slate-100">
               {shortProposalId(comment.authorId)}
             </span>
             {comment.isResolved ? (
@@ -206,7 +206,7 @@ function CommentItem({ comment }: { comment: ProposalComment }) {
               </Badge>
             )}
           </div>
-          <span className="shrink-0 font-medium text-[11px] text-slate-400">
+          <span className="shrink-0 text-[11px] font-medium text-slate-400">
             {formatRelativeDate(comment.createdAt)}
           </span>
         </div>
@@ -244,8 +244,8 @@ function DefenceCard({ schedule }: { schedule: DefenceSchedule }) {
 
   return (
     <Card className="rounded-xl border-amber-200/50 bg-gradient-to-b from-amber-50 to-white shadow-md dark:border-amber-900/50 dark:from-amber-950/40 dark:to-slate-950">
-      <CardHeader className="border-amber-100/50 border-b bg-amber-500/10 pb-4 dark:border-amber-900/20 dark:bg-amber-500/5">
-        <CardTitle className="flex items-center gap-2 text-amber-900 text-lg dark:text-amber-400">
+      <CardHeader className="border-b border-amber-100/50 bg-amber-500/10 pb-4 dark:border-amber-900/20 dark:bg-amber-500/5">
+        <CardTitle className="flex items-center gap-2 text-lg text-amber-900 dark:text-amber-400">
           <Calendar className="h-5 w-5" />
           Defence Scheduled
         </CardTitle>
@@ -254,9 +254,9 @@ function DefenceCard({ schedule }: { schedule: DefenceSchedule }) {
         <div className="flex flex-col gap-4">
           {/* Date & Time */}
           <div>
-            <p className="font-bold text-[10px] text-slate-400 uppercase tracking-widest">Date & Time</p>
-            <p className="mt-0.5 font-bold text-lg text-slate-800 dark:text-slate-200">{dateStr}</p>
-            <span className="flex items-center gap-1.5 font-medium text-slate-500 text-sm">
+            <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Date & Time</p>
+            <p className="mt-0.5 text-lg font-bold text-slate-800 dark:text-slate-200">{dateStr}</p>
+            <span className="flex items-center gap-1.5 text-sm font-medium text-slate-500">
               <Clock className="h-3.5 w-3.5" />
               {timeStr}
             </span>
@@ -266,8 +266,8 @@ function DefenceCard({ schedule }: { schedule: DefenceSchedule }) {
 
           {/* Location */}
           <div>
-            <p className="font-bold text-[10px] text-slate-400 uppercase tracking-widest">Location</p>
-            <span className="mt-1 flex items-start gap-1.5 font-semibold text-slate-700 text-sm dark:text-slate-300">
+            <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Location</p>
+            <span className="mt-1 flex items-start gap-1.5 text-sm font-semibold text-slate-700 dark:text-slate-300">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
               {schedule.location}
             </span>
@@ -276,10 +276,10 @@ function DefenceCard({ schedule }: { schedule: DefenceSchedule }) {
           {/* Note from coordinator */}
           {schedule.note && (
             <div className="rounded-xl border border-amber-100 bg-amber-50/50 p-4 dark:border-amber-900/30 dark:bg-amber-900/10">
-              <p className="font-bold text-[10px] text-amber-700 uppercase tracking-widest dark:text-amber-400">
+              <p className="text-[10px] font-bold tracking-widest text-amber-700 uppercase dark:text-amber-400">
                 Coordinator Note
               </p>
-              <p className="mt-1 text-amber-900 text-sm leading-relaxed dark:text-amber-200">{schedule.note}</p>
+              <p className="mt-1 text-sm leading-relaxed text-amber-900 dark:text-amber-200">{schedule.note}</p>
             </div>
           )}
 
@@ -347,7 +347,7 @@ export default function ProposalDetailsPage() {
           <AlertCircle className="h-10 w-10 text-red-400" />
           <div>
             <p className="font-semibold text-red-800 dark:text-red-300">{error ?? "Not found"}</p>
-            <p className="mt-1 text-red-600 text-sm dark:text-red-400">
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
               The proposal may have been removed or you may not have permission to view it.
             </p>
           </div>
@@ -400,13 +400,13 @@ export default function ProposalDetailsPage() {
           <div className="flex flex-wrap items-center gap-2">
             <Badge
               variant="outline"
-              className="border-slate-200 px-2 py-0.5 font-mono font-semibold text-slate-500 text-xs dark:border-slate-700 dark:text-slate-400"
+              className="border-slate-200 px-2 py-0.5 font-mono text-xs font-semibold text-slate-500 dark:border-slate-700 dark:text-slate-400"
             >
               {shortProposalId(proposal.id)}
             </Badge>
             <Badge
               variant="outline"
-              className="border-slate-200 px-2 py-0.5 font-semibold text-slate-500 text-xs dark:border-slate-700 dark:text-slate-400"
+              className="border-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-500 dark:border-slate-700 dark:text-slate-400"
             >
               {proposal.type}
             </Badge>
@@ -419,12 +419,12 @@ export default function ProposalDetailsPage() {
           </div>
 
           {/* Title */}
-          <h1 className="font-bold text-2xl text-slate-900 tracking-tight md:text-3xl dark:text-slate-100">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl dark:text-slate-100">
             {proposal.title}
           </h1>
 
           {/* Meta info */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-medium text-slate-500 text-sm">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium text-slate-500">
             <div className="flex items-center gap-1.5">
               <User className="h-4 w-4" />
               {proposal.pi?.name ?? "Unknown"}
@@ -442,7 +442,7 @@ export default function ProposalDetailsPage() {
           {/* Workflow progress bar */}
           {workflowSteps.length > 0 && (
             <div className="mt-1 flex flex-col gap-1.5">
-              <div className="flex items-center justify-between text-slate-500 text-xs">
+              <div className="flex items-center justify-between text-xs text-slate-500">
                 <span className="flex items-center gap-1">
                   <ChevronRight className="h-3.5 w-3.5 text-blue-500" />
                   Step {proposal.workflow.currentStepOrder} of {proposal.workflow.steps.length}
@@ -482,11 +482,11 @@ export default function ProposalDetailsPage() {
 
       {/* ── Tabs ──────────────────────────────────────────────────────────────── */}
       <Tabs defaultValue="overview" className="mt-2 w-full">
-        <TabsList className="scrollbar-hide h-12 w-full flex-nowrap justify-start overflow-x-auto rounded-none border-slate-200 border-b bg-transparent p-0 dark:border-slate-800">
+        <TabsList className="scrollbar-hide h-12 w-full flex-nowrap justify-start overflow-x-auto rounded-none border-b border-slate-200 bg-transparent p-0 dark:border-slate-800">
           {/* Overview */}
           <TabsTrigger
             value="overview"
-            className="rounded-none border-transparent border-b-2 px-6 py-3 font-medium text-slate-500 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-700 data-[state=active]:shadow-none dark:data-[state=active]:text-blue-400"
+            className="rounded-none border-b-2 border-transparent px-6 py-3 font-medium text-slate-500 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-700 data-[state=active]:shadow-none dark:data-[state=active]:text-blue-400"
           >
             <FileText className="mr-2 h-4 w-4" /> Overview
           </TabsTrigger>
@@ -494,7 +494,7 @@ export default function ProposalDetailsPage() {
           {/* Feedback */}
           <TabsTrigger
             value="feedback"
-            className="rounded-none border-transparent border-b-2 px-6 py-3 font-medium text-slate-500 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-700 data-[state=active]:shadow-none dark:data-[state=active]:text-blue-400"
+            className="rounded-none border-b-2 border-transparent px-6 py-3 font-medium text-slate-500 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-700 data-[state=active]:shadow-none dark:data-[state=active]:text-blue-400"
           >
             <MessageSquare className="mr-2 h-4 w-4" /> Comments
             {unresolvedCount > 0 && (
@@ -507,7 +507,7 @@ export default function ProposalDetailsPage() {
           {/* Workflow */}
           <TabsTrigger
             value="workflow"
-            className="rounded-none border-transparent border-b-2 px-6 py-3 font-medium text-slate-500 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-700 data-[state=active]:shadow-none dark:data-[state=active]:text-blue-400"
+            className="rounded-none border-b-2 border-transparent px-6 py-3 font-medium text-slate-500 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-700 data-[state=active]:shadow-none dark:data-[state=active]:text-blue-400"
           >
             <Loader2 className="mr-2 h-4 w-4" /> Workflow
           </TabsTrigger>
@@ -516,7 +516,7 @@ export default function ProposalDetailsPage() {
           {hasDefence && (
             <TabsTrigger
               value="defence"
-              className="rounded-none border-transparent border-b-2 px-6 py-3 font-medium text-slate-500 data-[state=active]:border-amber-600 data-[state=active]:bg-transparent data-[state=active]:text-amber-700 data-[state=active]:shadow-none dark:data-[state=active]:text-amber-400"
+              className="rounded-none border-b-2 border-transparent px-6 py-3 font-medium text-slate-500 data-[state=active]:border-amber-600 data-[state=active]:bg-transparent data-[state=active]:text-amber-700 data-[state=active]:shadow-none dark:data-[state=active]:text-amber-400"
             >
               <Award className="mr-2 h-4 w-4" /> Defence
               <Badge className="ml-2 h-4 rounded-full border-0 bg-amber-100 px-1.5 py-0 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400">
@@ -534,7 +534,7 @@ export default function ProposalDetailsPage() {
               <div className="flex flex-col gap-6 lg:col-span-2">
                 {/* Proposal info summary */}
                 <Card className="overflow-hidden rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
-                  <CardHeader className="border-slate-100 border-b bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
+                  <CardHeader className="border-b border-slate-100 bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
                     <CardTitle className="text-lg text-slate-800 dark:text-slate-200">Proposal Information</CardTitle>
                   </CardHeader>
                   <CardContent className="grid grid-cols-2 gap-x-6 gap-y-4 p-6 text-sm sm:grid-cols-3">
@@ -553,7 +553,7 @@ export default function ProposalDetailsPage() {
                       },
                     ].map(({ label, value }) => (
                       <div key={label} className="flex flex-col gap-1">
-                        <span className="font-medium text-slate-500 text-xs uppercase tracking-wider">{label}</span>
+                        <span className="text-xs font-medium tracking-wider text-slate-500 uppercase">{label}</span>
                         <span className="font-semibold text-slate-800 dark:text-slate-200">{value}</span>
                       </div>
                     ))}
@@ -565,8 +565,8 @@ export default function ProposalDetailsPage() {
                   <div className="flex items-start gap-4 rounded-xl border border-amber-200 bg-amber-50/70 p-5 dark:border-amber-900/50 dark:bg-amber-950/30">
                     <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
                     <div className="flex-1">
-                      <p className="font-semibold text-amber-900 text-sm dark:text-amber-300">Revisions Required</p>
-                      <p className="mt-1 text-amber-800 text-sm leading-relaxed dark:text-amber-400">
+                      <p className="text-sm font-semibold text-amber-900 dark:text-amber-300">Revisions Required</p>
+                      <p className="mt-1 text-sm leading-relaxed text-amber-800 dark:text-amber-400">
                         Your proposal requires revisions based on evaluator feedback. Please review the comments tab and
                         update your submission.
                       </p>
@@ -595,10 +595,10 @@ export default function ProposalDetailsPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-semibold text-slate-800 text-sm dark:text-slate-200">
+                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                           {proposal.pi?.name ?? "Unknown"}
                         </p>
-                        <p className="text-slate-500 text-xs">Principal Investigator</p>
+                        <p className="text-xs text-slate-500">Principal Investigator</p>
                       </div>
                     </div>
                   </CardContent>
@@ -617,18 +617,18 @@ export default function ProposalDetailsPage() {
                     <CardContent className="flex flex-col gap-4">
                       {(proposal.advisors ?? []).length > 0 && (
                         <div>
-                          <p className="mb-2 font-bold text-[10px] text-slate-400 uppercase tracking-widest">
+                          <p className="mb-2 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
                             Advisors
                           </p>
                           <div className="flex flex-col gap-2">
                             {(proposal.advisors ?? []).map((a) => (
                               <div key={a.id} className="flex items-center gap-2.5">
                                 <Avatar className="h-7 w-7 border border-slate-200 dark:border-slate-700">
-                                  <AvatarFallback className="bg-slate-100 font-semibold text-[10px] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                  <AvatarFallback className="bg-slate-100 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                                     {getNameInitials(a.name)}
                                   </AvatarFallback>
                                 </Avatar>
-                                <span className="text-slate-700 text-sm dark:text-slate-300">{a.name}</span>
+                                <span className="text-sm text-slate-700 dark:text-slate-300">{a.name}</span>
                               </div>
                             ))}
                           </div>
@@ -637,18 +637,18 @@ export default function ProposalDetailsPage() {
 
                       {(proposal.team ?? []).length > 0 && (
                         <div>
-                          <p className="mb-2 font-bold text-[10px] text-slate-400 uppercase tracking-widest">
+                          <p className="mb-2 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
                             Team Members
                           </p>
                           <div className="flex flex-col gap-2">
                             {(proposal.team ?? []).map((m) => (
                               <div key={m.id} className="flex items-center gap-2.5">
                                 <Avatar className="h-7 w-7 border border-slate-200 dark:border-slate-700">
-                                  <AvatarFallback className="bg-slate-100 font-semibold text-[10px] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                  <AvatarFallback className="bg-slate-100 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                                     {getNameInitials(m.name)}
                                   </AvatarFallback>
                                 </Avatar>
-                                <span className="text-slate-700 text-sm dark:text-slate-300">{m.name}</span>
+                                <span className="text-sm text-slate-700 dark:text-slate-300">{m.name}</span>
                               </div>
                             ))}
                           </div>
@@ -657,18 +657,18 @@ export default function ProposalDetailsPage() {
 
                       {(proposal.evaluators ?? []).length > 0 && (
                         <div>
-                          <p className="mb-2 font-bold text-[10px] text-slate-400 uppercase tracking-widest">
+                          <p className="mb-2 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
                             Evaluators
                           </p>
                           <div className="flex flex-col gap-2">
                             {(proposal.evaluators ?? []).map((e) => (
                               <div key={e.id} className="flex items-center gap-2.5">
                                 <Avatar className="h-7 w-7 border border-slate-200 dark:border-slate-700">
-                                  <AvatarFallback className="bg-slate-100 font-semibold text-[10px] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                  <AvatarFallback className="bg-slate-100 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                                     {getNameInitials(e.name)}
                                   </AvatarFallback>
                                 </Avatar>
-                                <span className="text-slate-700 text-sm dark:text-slate-300">{e.name}</span>
+                                <span className="text-sm text-slate-700 dark:text-slate-300">{e.name}</span>
                               </div>
                             ))}
                           </div>
@@ -684,10 +684,10 @@ export default function ProposalDetailsPage() {
           {/* ── Feedback / Comments Tab ────────────────────────────────────────── */}
           <TabsContent value="feedback" className="mt-0 focus-visible:outline-none">
             <Card className="overflow-hidden rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
-              <CardHeader className="border-slate-100 border-b bg-slate-50/30 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
+              <CardHeader className="border-b border-slate-100 bg-slate-50/30 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg text-slate-800 dark:text-slate-200">Reviewer Comments</CardTitle>
-                  <div className="flex items-center gap-2 text-slate-500 text-xs">
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
                     <span>
                       {proposal.comments.length} comment
                       {proposal.comments.length !== 1 ? "s" : ""}
@@ -707,8 +707,8 @@ export default function ProposalDetailsPage() {
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
                       <MessageSquare className="h-6 w-6 text-slate-400 dark:text-slate-500" />
                     </div>
-                    <p className="font-medium text-slate-700 text-sm dark:text-slate-300">No comments yet</p>
-                    <p className="max-w-xs text-slate-400 text-xs">
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">No comments yet</p>
+                    <p className="max-w-xs text-xs text-slate-400">
                       Comments from reviewers and evaluators will appear here.
                     </p>
                   </div>
@@ -728,13 +728,13 @@ export default function ProposalDetailsPage() {
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
               <div className="lg:col-span-2">
                 <Card className="overflow-hidden rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
-                  <CardHeader className="border-slate-100 border-b bg-slate-50/30 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
+                  <CardHeader className="border-b border-slate-100 bg-slate-50/30 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
                     <CardTitle className="text-lg text-slate-800 dark:text-slate-200">Approval Workflow</CardTitle>
                     <CardDescription>Real-time status of every review step for this proposal.</CardDescription>
                   </CardHeader>
                   <CardContent className="pt-6">
                     {workflowSteps.length === 0 ? (
-                      <p className="py-8 text-center text-slate-400 text-sm">No workflow steps configured.</p>
+                      <p className="py-8 text-center text-sm text-slate-400">No workflow steps configured.</p>
                     ) : (
                       <div>
                         {workflowSteps.map((step, i) => (
@@ -754,7 +754,7 @@ export default function ProposalDetailsPage() {
                   </CardHeader>
                   <CardContent className="flex flex-col gap-4">
                     <div>
-                      <div className="mb-1.5 flex justify-between text-slate-500 text-xs">
+                      <div className="mb-1.5 flex justify-between text-xs text-slate-500">
                         <span>
                           Step {proposal.workflow.currentStepOrder} of {proposal.workflow.steps.length}
                         </span>
@@ -794,8 +794,8 @@ export default function ProposalDetailsPage() {
                         },
                       ].map(({ label, count, color }) => (
                         <div key={label} className="flex items-center justify-between">
-                          <span className="text-slate-500 text-xs">{label}</span>
-                          <span className={`font-bold text-sm ${color}`}>{count}</span>
+                          <span className="text-xs text-slate-500">{label}</span>
+                          <span className={`text-sm font-bold ${color}`}>{count}</span>
                         </div>
                       ))}
                     </div>
@@ -817,7 +817,7 @@ export default function ProposalDetailsPage() {
                 {/* All schedules if multiple */}
                 <div className="flex flex-col gap-6 lg:col-span-2">
                   <Card className="rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
-                    <CardHeader className="border-slate-100 border-b bg-slate-50/30 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
+                    <CardHeader className="border-b border-slate-100 bg-slate-50/30 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
                       <CardTitle className="text-lg text-slate-800 dark:text-slate-200">
                         All Defence Appointments
                       </CardTitle>
@@ -831,15 +831,15 @@ export default function ProposalDetailsPage() {
                         <div
                           key={schedule.id}
                           className={`flex flex-col gap-2 px-6 py-4 ${
-                            i < defenceSchedules.length - 1 ? "border-slate-100 border-b dark:border-slate-800" : ""
+                            i < defenceSchedules.length - 1 ? "border-b border-slate-100 dark:border-slate-800" : ""
                           }`}
                         >
                           <div className="flex flex-wrap items-start justify-between gap-2">
                             <div className="flex flex-col gap-1">
-                              <p className="font-semibold text-slate-800 text-sm dark:text-slate-200">
+                              <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                                 {formatProposalDate(schedule.defenceDate)}
                               </p>
-                              <span className="flex items-center gap-1.5 text-slate-500 text-xs">
+                              <span className="flex items-center gap-1.5 text-xs text-slate-500">
                                 <MapPin className="h-3 w-3" />
                                 {schedule.location}
                               </span>
@@ -851,7 +851,7 @@ export default function ProposalDetailsPage() {
                             )}
                           </div>
                           {schedule.note && (
-                            <p className="rounded-lg border border-slate-100 bg-slate-50 p-3 text-slate-600 text-xs leading-relaxed dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
+                            <p className="rounded-lg border border-slate-100 bg-slate-50 p-3 text-xs leading-relaxed text-slate-600 dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
                               {schedule.note}
                             </p>
                           )}

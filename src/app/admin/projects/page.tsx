@@ -252,14 +252,14 @@ export default function AdminProjectsPage() {
       {/* ── Header ── */}
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h1 className="flex items-center gap-2 font-bold text-2xl text-slate-900 tracking-tight dark:text-slate-100">
+          <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
             <FolderOpen className="h-6 w-6 text-blue-600 dark:text-blue-500" />
             Projects Registry
           </h1>
-          <p className="mt-0.5 text-slate-500 text-sm">Manage and inspect all active university research projects.</p>
+          <p className="mt-0.5 text-sm text-slate-500">Manage and inspect all active university research projects.</p>
         </div>
         <Can permission="ADMIN_VIEW">
-          <Button className="h-9 rounded-lg bg-blue-600 font-semibold text-sm text-white shadow-sm hover:bg-blue-700">
+          <Button className="h-9 rounded-lg bg-blue-600 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
             <Download className="mr-2 h-4 w-4" /> Export Registry
           </Button>
         </Can>
@@ -268,7 +268,7 @@ export default function AdminProjectsPage() {
       {/* ── Filter Bar ── */}
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
-          <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-slate-400" />
+          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Search by project name, PI, or code..."
             className="h-9 rounded-lg border-slate-200 bg-white pl-9 text-sm dark:border-slate-800 dark:bg-slate-950"
@@ -298,19 +298,19 @@ export default function AdminProjectsPage() {
         <Table>
           <TableHeader className="bg-slate-50 dark:bg-slate-900/50">
             <TableRow className="border-slate-200 dark:border-slate-800">
-              <TableHead className="h-10 w-[35%] pl-5 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+              <TableHead className="h-10 w-[35%] pl-5 text-xs font-semibold tracking-wider text-slate-500 uppercase">
                 Project
               </TableHead>
-              <TableHead className="h-10 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+              <TableHead className="h-10 text-xs font-semibold tracking-wider text-slate-500 uppercase">
                 Principal Investigator
               </TableHead>
-              <TableHead className="h-10 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+              <TableHead className="h-10 text-xs font-semibold tracking-wider text-slate-500 uppercase">
                 Status
               </TableHead>
-              <TableHead className="h-10 w-[180px] font-semibold text-slate-500 text-xs uppercase tracking-wider">
+              <TableHead className="h-10 w-[180px] text-xs font-semibold tracking-wider text-slate-500 uppercase">
                 Progress
               </TableHead>
-              <TableHead className="h-10 font-semibold text-slate-500 text-xs uppercase tracking-wider">
+              <TableHead className="h-10 text-xs font-semibold tracking-wider text-slate-500 uppercase">
                 Budget
               </TableHead>
               <TableHead className="h-10 w-[80px]" />
@@ -319,7 +319,7 @@ export default function AdminProjectsPage() {
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="py-16 text-center text-slate-400 text-sm italic">
+                <TableCell colSpan={6} className="py-16 text-center text-sm text-slate-400 italic">
                   No projects match your search.
                 </TableCell>
               </TableRow>
@@ -335,10 +335,10 @@ export default function AdminProjectsPage() {
                     {/* Name + Code */}
                     <TableCell className="py-4 pl-5">
                       <div className="flex flex-col gap-0.5">
-                        <span className="line-clamp-1 font-semibold text-[13px] text-slate-900 leading-tight dark:text-slate-100">
+                        <span className="line-clamp-1 text-[13px] leading-tight font-semibold text-slate-900 dark:text-slate-100">
                           {project.name}
                         </span>
-                        <span className="font-bold text-[11px] text-slate-400 uppercase tracking-wider">
+                        <span className="text-[11px] font-bold tracking-wider text-slate-400 uppercase">
                           {project.code} · {project.dept}
                         </span>
                       </div>
@@ -348,11 +348,11 @@ export default function AdminProjectsPage() {
                     <TableCell className="py-4">
                       <div className="flex items-center gap-2.5">
                         <Avatar className="h-7 w-7 shrink-0">
-                          <AvatarFallback className={`font-bold text-[10px] ${project.piColor}`}>
+                          <AvatarFallback className={`text-[10px] font-bold ${project.piColor}`}>
                             {project.piAvatar}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="truncate font-medium text-[13px] text-slate-700 dark:text-slate-300">
+                        <span className="truncate text-[13px] font-medium text-slate-700 dark:text-slate-300">
                           {project.pi}
                         </span>
                       </div>
@@ -361,7 +361,7 @@ export default function AdminProjectsPage() {
                     {/* Status */}
                     <TableCell className="py-4">
                       <Badge
-                        className={`${cfg.className} pointer-events-none flex w-fit items-center gap-1 border-0 px-2 py-0.5 font-bold text-[11px] shadow-none`}
+                        className={`${cfg.className} pointer-events-none flex w-fit items-center gap-1 border-0 px-2 py-0.5 text-[11px] font-bold shadow-none`}
                       >
                         {cfg.icon}
                         {cfg.label}
@@ -377,7 +377,7 @@ export default function AdminProjectsPage() {
                             style={{ width: `${project.progress}%` }}
                           />
                         </div>
-                        <span className="w-9 shrink-0 text-right font-bold text-[12px] text-slate-600 dark:text-slate-400">
+                        <span className="w-9 shrink-0 text-right text-[12px] font-bold text-slate-600 dark:text-slate-400">
                           {project.progress}%
                         </span>
                       </div>
@@ -385,7 +385,7 @@ export default function AdminProjectsPage() {
 
                     {/* Budget */}
                     <TableCell className="py-4">
-                      <span className="font-semibold text-[13px] text-slate-700 dark:text-slate-300">
+                      <span className="text-[13px] font-semibold text-slate-700 dark:text-slate-300">
                         {project.budget}
                       </span>
                     </TableCell>
@@ -395,7 +395,7 @@ export default function AdminProjectsPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-8 rounded-lg px-3 font-semibold text-blue-600 text-xs opacity-0 transition-opacity hover:bg-blue-50 group-hover:opacity-100 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                        className="h-8 rounded-lg px-3 text-xs font-semibold text-blue-600 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
                         onClick={(e) => {
                           e.stopPropagation();
                           openDrawer(project);
@@ -412,15 +412,15 @@ export default function AdminProjectsPage() {
         </Table>
 
         {/* Footer count */}
-        <div className="flex items-center justify-between border-slate-100 border-t px-5 py-3 dark:border-slate-800">
-          <p className="font-medium text-slate-400 text-xs">
+        <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3 dark:border-slate-800">
+          <p className="text-xs font-medium text-slate-400">
             Showing {filtered.length} of {MOCK_PROJECTS.length} projects
           </p>
           {statusFilter !== "All" && (
             <button
               type="button"
               onClick={() => setStatusFilter("All")}
-              className="font-semibold text-blue-600 text-xs hover:underline dark:text-blue-400"
+              className="text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400"
             >
               Clear filter
             </button>
@@ -431,30 +431,30 @@ export default function AdminProjectsPage() {
       {/* ── Project Details Drawer ── */}
       <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
         <SheetContent
-          className="flex w-full flex-col overflow-hidden border-slate-200/80 border-l bg-white p-0 shadow-2xl sm:max-w-[800px] xl:max-w-[1000px] dark:border-slate-800 dark:bg-slate-950"
+          className="flex w-full flex-col overflow-hidden border-l border-slate-200/80 bg-white p-0 shadow-2xl sm:max-w-[800px] xl:max-w-[1000px] dark:border-slate-800 dark:bg-slate-950"
           side="right"
         >
           {selected && (
             <>
               {/* Drawer Header */}
-              <SheetHeader className="shrink-0 space-y-0 border-slate-100 border-b bg-gradient-to-b from-slate-50/90 to-white px-6 pt-6 pb-4 dark:border-slate-800 dark:from-slate-900/80 dark:to-slate-950">
+              <SheetHeader className="shrink-0 space-y-0 border-b border-slate-100 bg-gradient-to-b from-slate-50/90 to-white px-6 pt-6 pb-4 dark:border-slate-800 dark:from-slate-900/80 dark:to-slate-950">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <Badge className="border-0 bg-slate-200/80 font-bold text-[10px] text-slate-700 uppercase dark:bg-slate-800 dark:text-slate-300">
+                      <Badge className="border-0 bg-slate-200/80 text-[10px] font-bold text-slate-700 uppercase dark:bg-slate-800 dark:text-slate-300">
                         {selected.code}
                       </Badge>
                       <Badge
-                        className={`${STATUS_CONFIG[selected.status].className} pointer-events-none flex items-center gap-1 border-0 font-bold text-[10px]`}
+                        className={`${STATUS_CONFIG[selected.status].className} pointer-events-none flex items-center gap-1 border-0 text-[10px] font-bold`}
                       >
                         {STATUS_CONFIG[selected.status].icon}
                         {selected.status}
                       </Badge>
                     </div>
-                    <SheetTitle className="pr-2 font-bold text-[16px] text-slate-900 leading-snug tracking-tight dark:text-slate-100">
+                    <SheetTitle className="pr-2 text-[16px] leading-snug font-bold tracking-tight text-slate-900 dark:text-slate-100">
                       {selected.name}
                     </SheetTitle>
-                    <SheetDescription className="font-medium text-slate-500 text-xs leading-relaxed">
+                    <SheetDescription className="text-xs leading-relaxed font-medium text-slate-500">
                       {selected.dept} · {selected.startDate} → {selected.endDate}
                     </SheetDescription>
                   </div>
@@ -468,7 +468,7 @@ export default function AdminProjectsPage() {
                       style={{ width: `${selected.progress}%` }}
                     />
                   </div>
-                  <span className="w-10 shrink-0 text-right font-bold text-slate-700 text-sm dark:text-slate-300">
+                  <span className="w-10 shrink-0 text-right text-sm font-bold text-slate-700 dark:text-slate-300">
                     {selected.progress}%
                   </span>
                 </div>
@@ -480,7 +480,7 @@ export default function AdminProjectsPage() {
                       type="button"
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`rounded-lg px-4 py-2 font-semibold text-xs capitalize transition-all ${
+                      className={`rounded-lg px-4 py-2 text-xs font-semibold capitalize transition-all ${
                         activeTab === tab
                           ? "bg-white text-blue-700 shadow-sm dark:bg-slate-800 dark:text-blue-400"
                           : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
@@ -500,38 +500,38 @@ export default function AdminProjectsPage() {
                     {/* Key Stats Row */}
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                        <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                        <p className="mb-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
                           Principal Investigator
                         </p>
                         <div className="flex items-center gap-2">
                           <Avatar className="h-7 w-7">
-                            <AvatarFallback className={`font-bold text-[10px] ${selected.piColor}`}>
+                            <AvatarFallback className={`text-[10px] font-bold ${selected.piColor}`}>
                               {selected.piAvatar}
                             </AvatarFallback>
                           </Avatar>
-                          <p className="truncate font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                          <p className="truncate text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                             {selected.pi}
                           </p>
                         </div>
                       </div>
                       <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                        <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                        <p className="mb-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
                           Total Budget
                         </p>
-                        <p className="font-extrabold text-blue-600 text-xl dark:text-blue-400">{selected.budget}</p>
+                        <p className="text-xl font-extrabold text-blue-600 dark:text-blue-400">{selected.budget}</p>
                       </div>
                       <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                        <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                        <p className="mb-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
                           Start Date
                         </p>
-                        <p className="flex items-center gap-1.5 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                        <p className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                           <Calendar className="h-3.5 w-3.5 text-slate-400" />
                           {selected.startDate}
                         </p>
                       </div>
                       <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                        <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">End Date</p>
-                        <p className="flex items-center gap-1.5 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                        <p className="mb-1.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">End Date</p>
+                        <p className="flex items-center gap-1.5 text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                           <Calendar className="h-3.5 w-3.5 text-slate-400" />
                           {selected.endDate}
                         </p>
@@ -540,22 +540,22 @@ export default function AdminProjectsPage() {
 
                     {/* Abstract */}
                     <div>
-                      <h4 className="mb-2.5 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                      <h4 className="mb-2.5 flex items-center gap-2 text-[11px] font-bold tracking-wider text-slate-500 uppercase">
                         <FileText className="h-3.5 w-3.5" /> Project Abstract
                       </h4>
-                      <p className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-[13px] text-slate-600 leading-relaxed dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
+                      <p className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-[13px] leading-relaxed text-slate-600 dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
                         {selected.abstract}
                       </p>
                     </div>
 
                     {/* Admin Actions */}
                     <div>
-                      <h4 className="mb-3 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                      <h4 className="mb-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase">
                         Admin Actions
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         <Can permission="BUDGET_APPROVE">
-                          <Button size="sm" variant="outline" className="h-8 font-semibold text-xs">
+                          <Button size="sm" variant="outline" className="h-8 text-xs font-semibold">
                             Approve Budget Release
                           </Button>
                         </Can>
@@ -564,12 +564,12 @@ export default function AdminProjectsPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 border-red-200 font-semibold text-red-600 text-xs hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-900/20"
+                            className="h-8 border-red-200 text-xs font-semibold text-red-600 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-900/20"
                           >
                             Suspend / Terminate
                           </Button>
                         </Can>
-                        <Button size="sm" variant="outline" className="h-8 font-semibold text-xs">
+                        <Button size="sm" variant="outline" className="h-8 text-xs font-semibold">
                           View Report
                         </Button>
                       </div>
@@ -580,22 +580,22 @@ export default function AdminProjectsPage() {
                 {/* ── TAB: TEAM ── */}
                 {activeTab === "team" && (
                   <div className="flex flex-col gap-3">
-                    <h4 className="flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                    <h4 className="flex items-center gap-2 text-[11px] font-bold tracking-wider text-slate-500 uppercase">
                       <Users className="h-3.5 w-3.5" /> Research Team ({selected.team.length + 1} members)
                     </h4>
 
                     {/* PI Row */}
                     <div className="flex items-center gap-4 rounded-lg border border-blue-100 bg-blue-50/50 p-3.5 dark:border-blue-900/30 dark:bg-blue-900/10">
                       <Avatar className="h-10 w-10 border-2 border-blue-200 dark:border-blue-800">
-                        <AvatarFallback className={`font-bold text-xs ${selected.piColor}`}>
+                        <AvatarFallback className={`text-xs font-bold ${selected.piColor}`}>
                           {selected.piAvatar}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex min-w-0 flex-col">
-                        <span className="truncate font-bold text-slate-900 text-sm dark:text-slate-100">
+                        <span className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">
                           {selected.pi}
                         </span>
-                        <span className="font-semibold text-blue-600 text-xs dark:text-blue-400">
+                        <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">
                           Principal Investigator
                         </span>
                       </div>
@@ -609,13 +609,13 @@ export default function AdminProjectsPage() {
                         className="flex items-center gap-4 rounded-lg border border-slate-100 bg-slate-50/30 p-3.5 transition-colors hover:bg-slate-100/60 dark:border-slate-800 dark:bg-slate-900/20 dark:hover:bg-slate-900/40"
                       >
                         <Avatar className="h-10 w-10">
-                          <AvatarFallback className={`font-bold text-xs ${m.color}`}>{m.avatar}</AvatarFallback>
+                          <AvatarFallback className={`text-xs font-bold ${m.color}`}>{m.avatar}</AvatarFallback>
                         </Avatar>
                         <div className="flex min-w-0 flex-col">
-                          <span className="truncate font-semibold text-slate-900 text-sm dark:text-slate-100">
+                          <span className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
                             {m.name}
                           </span>
-                          <span className="font-medium text-slate-500 text-xs">{m.role}</span>
+                          <span className="text-xs font-medium text-slate-500">{m.role}</span>
                         </div>
                       </div>
                     ))}
@@ -625,15 +625,15 @@ export default function AdminProjectsPage() {
                 {/* ── TAB: TIMELINE ── */}
                 {activeTab === "timeline" && (
                   <div className="flex flex-col gap-0">
-                    <h4 className="mb-5 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                    <h4 className="mb-5 flex items-center gap-2 text-[11px] font-bold tracking-wider text-slate-500 uppercase">
                       <Clock className="h-3.5 w-3.5" /> Project Milestones
                     </h4>
-                    <div className="relative ml-3 flex flex-col gap-0 border-slate-200 border-l-2 dark:border-slate-700">
+                    <div className="relative ml-3 flex flex-col gap-0 border-l-2 border-slate-200 dark:border-slate-700">
                       {selected.timeline.map((event) => (
                         <div key={`${event.date}-${event.label}`} className="relative pb-7 pl-6 last:pb-0">
                           {/* Dot */}
                           <div
-                            className={`-left-[9px] absolute top-0.5 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white dark:border-slate-950 ${
+                            className={`absolute top-0.5 -left-[9px] flex h-4 w-4 items-center justify-center rounded-full border-2 border-white dark:border-slate-950 ${
                               event.status === "done"
                                 ? "bg-emerald-500"
                                 : event.status === "active"
@@ -643,9 +643,9 @@ export default function AdminProjectsPage() {
                           >
                             {event.status === "done" && <CheckCircle2 className="h-2.5 w-2.5 text-white" />}
                           </div>
-                          <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">{event.date}</p>
+                          <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">{event.date}</p>
                           <p
-                            className={`mt-0.5 font-semibold text-sm ${
+                            className={`mt-0.5 text-sm font-semibold ${
                               event.status === "done"
                                 ? "text-slate-600 dark:text-slate-400"
                                 : event.status === "active"
@@ -656,7 +656,7 @@ export default function AdminProjectsPage() {
                             {event.label}
                           </p>
                           {event.status === "active" && (
-                            <span className="mt-1 inline-block rounded-full bg-blue-50 px-2 py-0.5 font-bold text-[10px] text-blue-600 dark:bg-blue-900/20 dark:text-blue-500">
+                            <span className="mt-1 inline-block rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:bg-blue-900/20 dark:text-blue-500">
                               IN PROGRESS
                             </span>
                           )}

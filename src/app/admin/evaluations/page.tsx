@@ -13,11 +13,11 @@ export default function AdminEvaluationsPage() {
       <div className="flex flex-1 flex-col gap-5 p-4 md:p-6 lg:p-8">
         <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
           <div>
-            <h1 className="flex items-center gap-2 font-bold text-2xl text-slate-900 tracking-tight dark:text-slate-100">
+            <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               <ClipboardList className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
               Evaluations
             </h1>
-            <p className="mt-0.5 max-w-2xl text-slate-500 text-sm">
+            <p className="mt-0.5 max-w-2xl text-sm text-slate-500">
               Review scoring rubrics, schedule defences, and approve completed evaluations for proposals and funded
               projects.
             </p>

@@ -64,7 +64,7 @@ function getInitials(name: string) {
 
 export function TeamTable({ members, onView, onEdit, onRemove }: TeamTableProps) {
   return (
-    <div className="rounded-lg border bg-card">
+    <div className="bg-card rounded-lg border">
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
@@ -80,14 +80,14 @@ export function TeamTable({ members, onView, onEdit, onRemove }: TeamTableProps)
             <TableRow key={member.id} className="group">
               <TableCell>
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10 border border-border">
+                  <Avatar className="border-border h-10 w-10 border">
                     <AvatarImage src={member.avatar} alt={member.name} />
-                    <AvatarFallback className="bg-primary/10 font-medium text-primary text-sm">
+                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
                       {getInitials(member.name)}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-medium text-foreground">{member.name}</p>
+                    <p className="text-foreground font-medium">{member.name}</p>
                     <p className="text-muted-foreground text-sm">{member.email}</p>
                   </div>
                 </div>

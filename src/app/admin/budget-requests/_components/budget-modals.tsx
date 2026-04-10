@@ -42,14 +42,14 @@ export function BudgetRequestModals() {
       {/* ── STAMP AS PAID DIALOG ── */}
       <Dialog open={showPaidDialog} onOpenChange={setShowPaidDialog}>
         <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[480px]">
-          <DialogHeader className="border-slate-100 border-b px-6 pt-6 pb-4 dark:border-slate-800">
+          <DialogHeader className="border-b border-slate-100 px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-emerald-100 p-2 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400">
                 <Stamp className="h-5 w-5" />
               </div>
-              <DialogTitle className="font-bold text-base">Confirm Transfer & Stamp as Paid</DialogTitle>
+              <DialogTitle className="text-base font-bold">Confirm Transfer & Stamp as Paid</DialogTitle>
             </div>
-            <DialogDescription className="ml-11 text-slate-500 text-xs">
+            <DialogDescription className="ml-11 text-xs text-slate-500">
               This action marks the budget request as released. Enter the bank transaction ID for audit traceability.
             </DialogDescription>
           </DialogHeader>
@@ -58,14 +58,14 @@ export function BudgetRequestModals() {
             {/* Context */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-lg border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/50">
-                <p className="font-bold text-[10px] text-slate-400 uppercase">Phase</p>
-                <p className="mt-0.5 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Phase</p>
+                <p className="mt-0.5 text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                   Phase {activePhase?.phase} — {activePhase?.label}
                 </p>
               </div>
               <div className="rounded-lg border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/50">
-                <p className="font-bold text-[10px] text-slate-400 uppercase">Amount Requested</p>
-                <p className="mt-0.5 font-bold text-[15px] text-emerald-600 dark:text-emerald-400">
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Amount Requested</p>
+                <p className="mt-0.5 text-[15px] font-bold text-emerald-600 dark:text-emerald-400">
                   {fmt(activePhase?.amount ?? 0)}
                 </p>
               </div>
@@ -73,7 +73,7 @@ export function BudgetRequestModals() {
 
             {/* Transaction ID — mandatory */}
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="txn-id" className="font-semibold text-[12px] text-slate-700 dark:text-slate-300">
+              <Label htmlFor="txn-id" className="text-[12px] font-semibold text-slate-700 dark:text-slate-300">
                 Bank Transaction / Reference ID <span className="text-rose-500">*</span>
               </Label>
               <Input
@@ -88,12 +88,12 @@ export function BudgetRequestModals() {
 
             {/* Adjust amount — optional */}
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="adj-amount" className="font-semibold text-[12px] text-slate-700 dark:text-slate-300">
+              <Label htmlFor="adj-amount" className="text-[12px] font-semibold text-slate-700 dark:text-slate-300">
                 Adjusted Approved Amount{" "}
                 <span className="font-normal text-slate-400">(optional — leave blank for full amount)</span>
               </Label>
               <div className="relative">
-                <span className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 font-semibold text-slate-400 text-sm">
+                <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm font-semibold text-slate-400">
                   Br
                 </span>
                 <Input
@@ -114,7 +114,7 @@ export function BudgetRequestModals() {
             </div>
           </div>
 
-          <DialogFooter className="flex gap-2 border-slate-100 border-t px-6 py-4 dark:border-slate-800">
+          <DialogFooter className="flex gap-2 border-t border-slate-100 px-6 py-4 dark:border-slate-800">
             <Button variant="outline" size="sm" className="h-9" onClick={() => setShowPaidDialog(false)}>
               Cancel
             </Button>
@@ -134,28 +134,28 @@ export function BudgetRequestModals() {
       {/* ── RETURN FOR CORRECTION DIALOG ── */}
       <Dialog open={showReturnDialog} onOpenChange={setShowReturnDialog}>
         <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[460px]">
-          <DialogHeader className="border-slate-100 border-b px-6 pt-6 pb-4 dark:border-slate-800">
+          <DialogHeader className="border-b border-slate-100 px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-rose-100 p-2 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400">
                 <XCircle className="h-5 w-5" />
               </div>
-              <DialogTitle className="font-bold text-base">Return for Correction</DialogTitle>
+              <DialogTitle className="text-base font-bold">Return for Correction</DialogTitle>
             </div>
-            <DialogDescription className="ml-11 text-slate-500 text-xs">
+            <DialogDescription className="ml-11 text-xs text-slate-500">
               The PI will be informed and must resubmit a corrected clearance document before the funds can be released.
             </DialogDescription>
           </DialogHeader>
 
           <div className="flex flex-col gap-4 px-6 py-5">
             <div className="rounded-lg border border-slate-100 bg-slate-50 p-3.5 dark:border-slate-800 dark:bg-slate-900/50">
-              <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">Project</p>
-              <p className="mt-0.5 line-clamp-2 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+              <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Project</p>
+              <p className="mt-0.5 line-clamp-2 text-[13px] font-semibold text-slate-800 dark:text-slate-200">
                 {selected?.projectTitle}
               </p>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="return-comment" className="font-semibold text-[12px] text-slate-700 dark:text-slate-300">
+              <Label htmlFor="return-comment" className="text-[12px] font-semibold text-slate-700 dark:text-slate-300">
                 Reason for return <span className="text-rose-500">*</span>
               </Label>
               <Textarea
@@ -165,11 +165,11 @@ export function BudgetRequestModals() {
                 value={returnComment}
                 onChange={(e) => setReturnComment(e.target.value)}
               />
-              <p className="font-medium text-[10px] text-slate-400">{returnComment.length} / 600 characters</p>
+              <p className="text-[10px] font-medium text-slate-400">{returnComment.length} / 600 characters</p>
             </div>
           </div>
 
-          <DialogFooter className="flex gap-2 border-slate-100 border-t px-6 py-4 dark:border-slate-800">
+          <DialogFooter className="flex gap-2 border-t border-slate-100 px-6 py-4 dark:border-slate-800">
             <Button variant="outline" size="sm" className="h-9" onClick={() => setShowReturnDialog(false)}>
               Cancel
             </Button>

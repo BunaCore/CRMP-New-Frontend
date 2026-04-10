@@ -111,24 +111,24 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
   });
 
   return (
-    <div className="flex h-full flex-col bg-card">
+    <div className="bg-card flex h-full flex-col">
       {/* Chat Header */}
       <div className="flex items-center justify-between border-b px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="relative">
             <Avatar className="h-10 w-10">
-              <AvatarFallback className="bg-primary/10 font-medium text-primary">
+              <AvatarFallback className="bg-primary/10 text-primary font-medium">
                 {getInitials(member.name)}
               </AvatarFallback>
             </Avatar>
             <span
-              className={`absolute right-0 bottom-0 h-3 w-3 rounded-full border-2 border-card ${
+              className={`border-card absolute right-0 bottom-0 h-3 w-3 rounded-full border-2 ${
                 member.status === "Active" ? "bg-emerald-500" : "bg-muted-foreground/50"
               }`}
             />
           </div>
           <div>
-            <h3 className="font-semibold text-foreground">{member.name}</h3>
+            <h3 className="text-foreground font-semibold">{member.name}</h3>
             <p className="text-muted-foreground text-xs">
               {member.role} {member.status === "Active" ? "- Online" : "- Offline"}
             </p>
@@ -161,7 +161,7 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
             <div key={group.date}>
               {/* Date Header */}
               <div className="mb-4 flex items-center justify-center">
-                <span className="rounded-full bg-muted px-3 py-1 text-muted-foreground text-xs">
+                <span className="bg-muted text-muted-foreground rounded-full px-3 py-1 text-xs">
                   {formatDateHeader(group.date)}
                 </span>
               </div>
@@ -174,14 +174,14 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
                       <div
                         className={`group max-w-[75%] rounded-2xl px-4 py-2 ${
                           isSent
-                            ? "rounded-br-md bg-primary text-primary-foreground"
-                            : "rounded-bl-md bg-muted text-foreground"
+                            ? "bg-primary text-primary-foreground rounded-br-md"
+                            : "bg-muted text-foreground rounded-bl-md"
                         }`}
                       >
                         <p className="text-sm leading-relaxed">{message.content}</p>
                         <div
                           className={`mt-1 flex items-center gap-1 text-[10px] ${
-                            isSent ? "justify-end text-primary-foreground/70" : "text-muted-foreground"
+                            isSent ? "text-primary-foreground/70 justify-end" : "text-muted-foreground"
                           }`}
                         >
                           <span>{formatTime(message.timestamp)}</span>
@@ -202,7 +202,7 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
       <div className="border-t p-4">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0">
-            <Paperclip className="h-4 w-4 text-muted-foreground" />
+            <Paperclip className="text-muted-foreground h-4 w-4" />
             <span className="sr-only">Attach file</span>
           </Button>
           <div className="relative flex-1">
@@ -214,8 +214,8 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
               placeholder="Type a message..."
               className="pr-10"
             />
-            <Button variant="ghost" size="icon" className="-translate-y-1/2 absolute top-1/2 right-1 h-7 w-7">
-              <Smile className="h-4 w-4 text-muted-foreground" />
+            <Button variant="ghost" size="icon" className="absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2">
+              <Smile className="text-muted-foreground h-4 w-4" />
               <span className="sr-only">Add emoji</span>
             </Button>
           </div>
