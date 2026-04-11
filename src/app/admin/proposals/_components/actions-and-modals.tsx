@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
 "use client";
 
 import { Check, GraduationCap, Search, UserCheck, XCircle } from "lucide-react";
@@ -56,7 +57,7 @@ export function ActionsAndModals() {
            ASSIGN EVALUATOR DIALOG
          ═══════════════════════════════════════════════ */}
       <Dialog open={showAssign} onOpenChange={setShowAssign}>
-        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[480px]">
+        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-120">
           <DialogHeader className="border-b border-slate-100 px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-blue-100 p-2 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
@@ -78,7 +79,7 @@ export function ActionsAndModals() {
             </div>
           </DialogHeader>
 
-          <div className="flex max-h-[320px] flex-col gap-1.5 overflow-y-auto px-4 py-4">
+          <div className="flex max-h-80 flex-col gap-1.5 overflow-y-auto px-4 py-4">
             {filteredEvals.map((ev) => {
               const on = pickedEvalIds.includes(ev.id);
               return (
@@ -130,7 +131,7 @@ export function ActionsAndModals() {
            ASSIGN ADVISOR DIALOG
          ═══════════════════════════════════════════════ */}
       <Dialog open={showAssignAdvisor} onOpenChange={setShowAssignAdvisor}>
-        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[480px]">
+        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-120">
           <DialogHeader className="border-b border-slate-100 px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-violet-100 p-2 text-violet-600 dark:bg-violet-900/40 dark:text-violet-400">
@@ -152,7 +153,7 @@ export function ActionsAndModals() {
             </div>
           </DialogHeader>
 
-          <div className="flex max-h-[320px] flex-col gap-1.5 overflow-y-auto px-4 py-4">
+          <div className="flex max-h-80 flex-col gap-1.5 overflow-y-auto px-4 py-4">
             {filteredAdvisors.map((ad) => {
               const on = pickedAdvisorIds.includes(ad.id);
               return (
@@ -204,7 +205,7 @@ export function ActionsAndModals() {
            APPROVE (timeline) — confirm dialog
          ═══════════════════════════════════════════════ */}
       <Dialog open={showTimelineApprove} onOpenChange={setShowTimelineApprove}>
-        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[460px]">
+        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-115">
           <DialogHeader className="border-b border-slate-100 px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-emerald-100 p-2 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400">
@@ -235,7 +236,7 @@ export function ActionsAndModals() {
               <Textarea
                 id="timeline-approve-note"
                 placeholder="e.g. Budget and methodology are satisfactory at this stage."
-                className="min-h-[100px] resize-none rounded-lg bg-white text-sm focus-visible:ring-emerald-400 dark:bg-slate-950"
+                className="min-h-25 resize-none rounded-lg bg-white text-sm focus-visible:ring-emerald-400 dark:bg-slate-950"
                 value={timelineApproveNote}
                 onChange={(e) => setTimelineApproveNote(e.target.value)}
               />
@@ -262,7 +263,7 @@ export function ActionsAndModals() {
            REJECT (timeline) — same pattern as Return for Revision
          ═══════════════════════════════════════════════ */}
       <Dialog open={showTimelineReject} onOpenChange={setShowTimelineReject}>
-        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[460px]">
+        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-115">
           <DialogHeader className="border-b border-slate-100 px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-rose-100 p-2 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400">
@@ -292,7 +293,7 @@ export function ActionsAndModals() {
               <Textarea
                 id="timeline-reject-comment"
                 placeholder="Be specific: which criteria failed, what evidence is missing, and what would be required to reconsider."
-                className="min-h-[140px] resize-none rounded-lg bg-white text-sm focus-visible:ring-rose-400 dark:bg-slate-950"
+                className="min-h-35 resize-none rounded-lg bg-white text-sm focus-visible:ring-rose-400 dark:bg-slate-950"
                 value={timelineRejectComment}
                 onChange={(e) => setTimelineRejectComment(e.target.value)}
               />
