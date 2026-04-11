@@ -132,8 +132,8 @@ const MenuBar = ({
         </div>
       </div>
 
-      <div className="flex items-center justify-between px-4 py-2">
-        <div className="no-scrollbar flex items-center gap-1 overflow-x-auto">
+      <div className="flex w-full min-w-0 items-center justify-between overflow-hidden px-4 py-2">
+        <div className="no-scrollbar flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
           {/* History Group */}
           <div className="mr-2 flex items-center gap-0.5">
             <Button
@@ -523,7 +523,7 @@ export default function DocumentEditor({ initialContent, workspaceId, projectId 
     editorProps: {
       attributes: {
         class:
-          "prose prose-lg dark:prose-invert focus:outline-none max-w-[850px] mx-auto p-12 lg:p-24 min-h-screen selection:bg-primary/20",
+          "prose prose-lg dark:prose-invert focus:outline-none max-w-[850px] mx-auto p-4 sm:p-12 lg:p-24 min-h-screen selection:bg-primary/20",
       },
     },
     onUpdate: ({ editor }) => {
@@ -582,8 +582,8 @@ export default function DocumentEditor({ initialContent, workspaceId, projectId 
     <div className="anim-in fade-in bg-background flex h-full flex-col overflow-hidden duration-700">
       <MenuBar editor={editor} onAddImage={addImage} onSetLink={setLink} projectId={projectId} />
 
-      <div className="project-editor-container custom-scrollbar flex-1 overflow-y-auto scroll-smooth">
-        <EditorContent editor={editor} />
+      <div className="project-editor-container custom-scrollbar flex w-full min-w-0 flex-1 flex-col items-stretch justify-stretch overflow-y-auto scroll-smooth">
+        <EditorContent editor={editor} className="w-full flex-1" />
       </div>
 
       {editor && (

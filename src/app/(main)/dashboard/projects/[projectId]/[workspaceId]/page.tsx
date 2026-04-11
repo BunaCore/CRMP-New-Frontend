@@ -3,24 +3,16 @@
 import { notFound, useParams } from "next/navigation";
 
 import { mockProjects } from "@/data/projects";
-import { cn } from "@/lib/utils";
 
 import { ChatPanel } from "../../_components/workspace/chat-panel";
 import { MainView } from "../../_components/workspace/main-view";
-import { useWorkspace, WorkspaceProvider } from "../../_components/workspace/workspace-context";
+import { WorkspaceProvider } from "../../_components/workspace/workspace-context";
 
 function WorkspaceContent({ project, workspaceId }: { project: { id: string }; workspaceId: string }) {
-  const { isChatOpen } = useWorkspace();
-
   return (
     <div className="group bg-background relative mx-2 mb-2 flex h-[calc(100vh-(--spacing(12)))] overflow-hidden rounded-2xl border shadow-inner">
       {/* Main Content - Takes full width or shifts for sidebar */}
-      <main
-        className={cn(
-          "flex h-full flex-1 flex-col transition-all duration-500 ease-in-out",
-          isChatOpen ? "mr-0" : "mr-0",
-        )}
-      >
+      <main className="flex h-full min-w-0 flex-1 flex-col transition-all duration-500 ease-in-out">
         <MainView workspaceId={workspaceId} projectId={project.id} />
       </main>
 

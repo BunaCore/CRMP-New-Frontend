@@ -292,7 +292,7 @@ export function TeamManagement() {
           // Show typing after a delay
           setTimeout(
             () => {
-              setTypingUsers([partnerId!]);
+              setTypingUsers([partnerId]);
 
               // Send reply after typing
               setTimeout(
@@ -303,12 +303,12 @@ export function TeamManagement() {
                   const reply: GroupChatMessage = {
                     id: `msg-${Date.now()}`,
                     roomId: selectedRoom.id,
-                    senderId: partnerId!,
+                    senderId: partnerId,
                     senderName: partner.name,
                     content: replyMessage,
                     timestamp: new Date().toISOString(),
                     isRead: true,
-                    readBy: [partnerId!, CURRENT_USER_ID],
+                    readBy: [partnerId, CURRENT_USER_ID],
                   };
 
                   setGroupMessages((prev) => ({
