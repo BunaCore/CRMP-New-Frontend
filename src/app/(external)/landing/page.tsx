@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
+/** biome-ignore-all lint/performance/noImgElement: <explanation> */
 import Link from "next/link";
 
 import { BadgeCheck, Globe, LineChart, Mail, Network, Share2, Shield, Star } from "lucide-react";
@@ -17,7 +19,7 @@ export default function LandingPage() {
         </Link>
 
         <nav className="hidden items-center space-x-8 md:flex">
-          <Link href="#" className="border-b-[2px] border-[#eab308] pb-1 text-[14px] font-bold text-[#1b2b5a]">
+          <Link href="#" className="border-b-2 border-[#eab308] pb-1 text-[14px] font-bold text-[#1b2b5a]">
             Research
           </Link>
           <Link href="#" className="pb-1 text-[14px] text-slate-500 transition-colors hover:text-slate-900">
@@ -54,7 +56,7 @@ export default function LandingPage() {
             <span className="mt-1 font-serif text-[#9e7622] italic">Through Collaboration</span>
           </h1>
 
-          <p className="mb-8 max-w-[440px] text-[1rem] leading-[1.6] font-light text-slate-600">
+          <p className="mb-8 max-w-110 text-[1rem] leading-[1.6] font-light text-slate-600">
             The unified digital ecosystem for Adama Science and Technology University researchers, bridging discipline
             gaps with AI-powered matching and integrated workflow management.
           </p>
@@ -75,17 +77,17 @@ export default function LandingPage() {
         {/* Right Column Area - Visuals */}
         <div className="relative mt-10 flex justify-center lg:mt-0 lg:justify-end">
           {/* Decorative Star Icon on Top Right */}
-          <div className="absolute -top-3 right-2 z-20 flex h-14 w-14 items-center justify-center rounded-[12px] border-[3px] border-[#fafbfc] bg-[#fadd96] shadow-lg lg:-right-1">
+          <div className="absolute -top-3 right-2 z-20 flex h-14 w-14 items-center justify-center rounded-2xl border-[3px] border-[#fafbfc] bg-[#fadd96] shadow-lg lg:-right-1">
             <Star className="h-5 w-5 text-[#9e7622]" strokeWidth={2} />
           </div>
 
-          <div className="relative aspect-[4/5] w-full max-w-[400px] overflow-hidden rounded-[20px] bg-slate-100 shadow-2xl">
+          <div className="relative aspect-4/5 w-full max-w-100 overflow-hidden rounded-4xl bg-slate-100 shadow-2xl">
             <img
               src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80"
               alt="Researchers collaborating in a modern facility"
               className="absolute inset-0 h-full w-full object-cover"
             />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+            <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
 
             {/* Overlay Active Projects Card */}
             <div className="absolute right-4 bottom-4 left-4">
@@ -95,13 +97,13 @@ export default function LandingPage() {
                     <BadgeCheck className="h-6 w-6 text-[#9e7622]" strokeWidth={2} />
                   </div>
                   <div className="w-full flex-1 overflow-hidden">
-                    <p className="mb-0.5 text-[8px] font-bold tracking-[0.1em] text-slate-500 uppercase">
+                    <p className="mb-0.5 text-[8px] font-bold tracking-widest text-slate-500 uppercase">
                       Active Projects
                     </p>
                     <p className="mb-2 truncate font-serif text-[17px] leading-tight text-[#0a1930]">
                       Quantum Computing <br /> Synergy
                     </p>
-                    <div className="flex h-[2px] w-full overflow-hidden bg-slate-100">
+                    <div className="flex h-0.5 w-full overflow-hidden bg-slate-100">
                       <div className="h-full w-[85%] bg-[#0a1930]" />
                     </div>
                   </div>
@@ -125,7 +127,7 @@ export default function LandingPage() {
               </p>
             </div>
             <div className="pb-2">
-              <span className="border-b-[2px] border-[#a07a10] pb-1 text-[10px] font-bold tracking-[0.2em] text-[#a07a10] uppercase">
+              <span className="border-b-2 border-[#a07a10] pb-1 text-[10px] font-bold tracking-[0.2em] text-[#a07a10] uppercase">
                 INNOVATION CORE
               </span>
             </div>
@@ -134,7 +136,7 @@ export default function LandingPage() {
           {/* Bento Grid */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:gap-8">
             {/* Researcher Matching - Spans 2 Cols */}
-            <Card className="relative min-h-[340px] overflow-hidden rounded-2xl border-none bg-white p-0 shadow-sm md:col-span-2">
+            <Card className="relative min-h-85 overflow-hidden rounded-2xl border-none bg-white p-0 shadow-sm md:col-span-2">
               <div className="flex h-full flex-col md:flex-row">
                 <div className="flex flex-col justify-center p-8 md:w-1/2 lg:p-10">
                   <div className="mt-1 mb-5">
@@ -146,9 +148,9 @@ export default function LandingPage() {
                     collaborators across departments.
                   </p>
                 </div>
-                <div className="relative flex min-h-[260px] items-center justify-center bg-white p-6 md:w-1/2">
+                <div className="relative flex min-h-65 items-center justify-center bg-white p-6 md:w-1/2">
                   <div
-                    className="relative aspect-square w-full max-w-[280px] overflow-hidden rounded-xl bg-[#0A1128] shadow-xl"
+                    className="relative aspect-square w-full max-w-70 overflow-hidden rounded-xl bg-[#0A1128] shadow-xl"
                     style={{
                       transform: "perspective(1000px) rotateY(-12deg) rotateX(4deg)",
                       transformStyle: "preserve-3d",
@@ -159,14 +161,14 @@ export default function LandingPage() {
                       alt="Network Visualization"
                       className="h-full w-full object-cover opacity-70 mix-blend-screen"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-tr from-[#0a1930] to-transparent opacity-80 mix-blend-multiply" />
+                    <div className="absolute inset-0 bg-linear-to-tr from-[#0a1930] to-transparent opacity-80 mix-blend-multiply" />
                   </div>
                 </div>
               </div>
             </Card>
 
             {/* Expertise Visualization */}
-            <Card className="flex min-h-[340px] flex-col justify-center rounded-2xl border-none bg-[#07132a] p-8 text-white shadow-sm lg:p-10">
+            <Card className="flex min-h-85 flex-col justify-center rounded-2xl border-none bg-[#07132a] p-8 text-white shadow-sm lg:p-10">
               <div className="mb-5">
                 <LineChart className="h-8 w-8 text-[#fcd34d]" strokeWidth={2} />
               </div>
@@ -178,7 +180,7 @@ export default function LandingPage() {
             </Card>
 
             {/* Authorship Verification */}
-            <Card className="flex min-h-[200px] flex-col justify-center rounded-2xl border-none bg-[#e4e9ec] p-8 shadow-sm lg:p-10">
+            <Card className="flex min-h-50 flex-col justify-center rounded-2xl border-none bg-[#e4e9ec] p-8 shadow-sm lg:p-10">
               <div className="mb-4">
                 <Shield className="h-7 w-7 text-[#0a1930]" strokeWidth={2} />
               </div>
@@ -189,7 +191,7 @@ export default function LandingPage() {
             </Card>
 
             {/* Version Control - Spans 2 Cols */}
-            <Card className="flex min-h-[200px] flex-col justify-center rounded-2xl border-none bg-white p-8 shadow-sm md:col-span-2 lg:p-10">
+            <Card className="flex min-h-50 flex-col justify-center rounded-2xl border-none bg-white p-8 shadow-sm md:col-span-2 lg:p-10">
               <div className="flex h-full w-full flex-col items-center justify-between gap-6 md:flex-row">
                 <div>
                   <h3 className="mb-2 font-serif text-[1.25rem] text-[#0a1930]">Version Control</h3>
@@ -198,13 +200,13 @@ export default function LandingPage() {
                   </p>
                 </div>
                 <div className="flex -space-x-2 md:pr-4">
-                  <div className="z-10 flex h-9 w-9 items-center justify-center rounded-full border-[2px] border-white bg-[#e2e8f0] text-[9px] font-bold text-[#334155] shadow-sm">
+                  <div className="z-10 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-[#e2e8f0] text-[9px] font-bold text-[#334155] shadow-sm">
                     DR
                   </div>
-                  <div className="z-20 flex h-9 w-9 items-center justify-center rounded-full border-[2px] border-white bg-[#cbd5e1] text-[9px] font-bold text-[#334155] shadow-sm">
+                  <div className="z-20 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-[#cbd5e1] text-[9px] font-bold text-[#334155] shadow-sm">
                     AK
                   </div>
-                  <div className="z-30 flex h-9 w-9 items-center justify-center rounded-full border-[2px] border-white bg-[#8c6716] text-[9px] font-bold text-white shadow-sm">
+                  <div className="z-30 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-[#8c6716] text-[9px] font-bold text-white shadow-sm">
                     +12
                   </div>
                 </div>
@@ -229,7 +231,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 gap-10 md:grid-cols-3 lg:gap-14">
             {/* 01 Proposal Phase */}
             <div className="flex flex-col">
-              <div className="group relative mb-6 aspect-[4/3] overflow-hidden rounded-lg bg-slate-50 shadow-sm">
+              <div className="group relative mb-6 aspect-4/3 overflow-hidden rounded-lg bg-slate-50 shadow-sm">
                 <img
                   src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80"
                   alt="Proposal Phase"
@@ -250,7 +252,7 @@ export default function LandingPage() {
 
             {/* 02 Execution Phase */}
             <div className="flex flex-col">
-              <div className="group relative mb-6 aspect-[4/3] overflow-hidden rounded-lg bg-slate-50 shadow-sm">
+              <div className="group relative mb-6 aspect-4/3 overflow-hidden rounded-lg bg-slate-50 shadow-sm">
                 <img
                   src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80"
                   alt="Execution Phase"
@@ -273,7 +275,7 @@ export default function LandingPage() {
 
             {/* 03 Review Phase */}
             <div className="flex flex-col">
-              <div className="group relative mb-6 aspect-[4/3] overflow-hidden rounded-lg bg-slate-50 shadow-sm">
+              <div className="group relative mb-6 aspect-4/3 overflow-hidden rounded-lg bg-slate-50 shadow-sm">
                 <img
                   src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80"
                   alt="Review Phase"
@@ -299,7 +301,7 @@ export default function LandingPage() {
       <section className="bg-white px-6 py-20 lg:px-12">
         <div className="container mx-auto xl:max-w-6xl">
           <Card className="relative flex flex-col items-center justify-between gap-10 overflow-hidden rounded-[32px] border-none bg-[#031c44] px-10 py-16 text-center shadow-xl lg:flex-row lg:px-16 lg:py-20 lg:text-left">
-            <div className="pointer-events-none absolute top-0 right-0 -mt-32 -mr-32 h-[400px] w-[400px] rounded-full bg-blue-500/5" />
+            <div className="pointer-events-none absolute top-0 right-0 -mt-32 -mr-32 h-100 w-100 rounded-full bg-blue-500/5" />
 
             <div className="relative z-10 max-w-xl">
               <h2 className="mb-4 font-serif text-[2.5rem] leading-[1.1] tracking-tight text-white md:text-[3.25rem]">
@@ -333,7 +335,7 @@ export default function LandingPage() {
           <div className="mb-16 grid grid-cols-1 gap-10 md:grid-cols-4">
             <div>
               <h3 className="mb-5 font-serif text-[17px] font-bold text-[#0a1930]">ASTU Research</h3>
-              <p className="max-w-[220px] text-[13px] leading-relaxed text-slate-500">
+              <p className="max-w-55 text-[13px] leading-relaxed text-slate-500">
                 The leading platform for scientific discovery and academic collaboration at Adama Science and Technology
                 University.
               </p>

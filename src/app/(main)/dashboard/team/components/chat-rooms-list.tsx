@@ -1,4 +1,5 @@
 /** biome-ignore-all assist/source/organizeImports: intentional suppression */
+/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
 "use client";
 
 import { Hash, MessageSquarePlus, Search, User } from "lucide-react";
