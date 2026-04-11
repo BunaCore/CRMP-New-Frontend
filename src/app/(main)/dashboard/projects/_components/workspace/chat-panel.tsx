@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { AtSign, Bell, Info, MessageSquare, Plus, PlusCircle, SendHorizontal, Share2, Smile } from "lucide-react";
+import { ArrowUp, Bell, Bot, Info, MessageSquare, Paperclip, Plus, Share2, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -39,7 +39,7 @@ export function ChatPanel() {
   };
 
   return (
-    <aside className="slide-in-from-right relative z-30 flex h-full w-95 shrink-0 animate-in flex-col overflow-hidden border-l bg-background duration-500 ease-in-out">
+    <aside className="slide-in-from-right relative z-30 flex h-full w-96 shrink-0 animate-in flex-col overflow-hidden border-l bg-background duration-500 ease-in-out">
       {/* Top Bar */}
       <div className="flex items-center justify-between border-b px-4 py-3">
         <Button
@@ -100,85 +100,104 @@ export function ChatPanel() {
               </div>
             ) : (
               <div className="flex flex-col gap-6">
-                {messages.map((m) => (
-                  <div
-                    key={m.id}
-                    className={cn(
-                      "flex max-w-[90%] flex-col gap-2",
-                      m.role === "user" ? "ml-auto items-end" : "mr-auto items-start",
-                    )}
-                  >
+                {messages.map((m) => {
+                  const isUser = m.role === "user";
+                  return (
                     <div
+                      key={m.id}
                       className={cn(
-                        "border px-4 py-3 text-sm leading-relaxed shadow-xs transition-shadow hover:shadow-md",
-                        m.role === "user"
-                          ? "rounded-4xl rounded-br-lg border-primary/20 bg-primary text-primary-foreground"
-                          : "rounded-4xl rounded-bl-lg border-border/50 bg-muted/40",
+                        "group flex w-full gap-3 transition-colors",
+                        isUser ? "flex-row-reverse" : "flex-row",
                       )}
                     >
-                      {m.content}
+                      <div
+                        className={cn(
+                          "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border shadow-sm",
+                          isUser
+                            ? "border-primary/20 bg-primary/10 text-primary"
+                            : "border-border bg-card text-foreground",
+                        )}
+                      >
+                        {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+                      </div>
+                      <div
+                        className={cn(
+                          "flex min-w-0 max-w-[85%] flex-col gap-1.5",
+                          isUser ? "items-end" : "items-start",
+                        )}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-foreground text-xs">{isUser ? "You" : "Assistant"}</span>
+                          <span className="font-medium text-[10px] text-muted-foreground/60 opacity-0 transition-opacity group-hover:opacity-100">
+                            {m.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          </span>
+                        </div>
+                        <div
+                          className={cn(
+                            "relative break-words rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm",
+                            isUser
+                              ? "rounded-tr-sm bg-primary text-primary-foreground"
+                              : "rounded-tl-sm border border-border bg-card text-card-foreground",
+                          )}
+                        >
+                          <div className="whitespace-pre-wrap">{m.content}</div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </ScrollArea>
 
           {/* Chat Input */}
-          <div className="p-6 pt-2">
-            <div className="group relative rounded-3xl border border-border/60 bg-muted/20 backdrop-blur-sm transition-all duration-300 focus-within:border-primary/40 focus-within:bg-background focus-within:ring-2 focus-within:ring-primary/20">
+          <div className="p-4 pt-0">
+            <div className="group relative flex w-full flex-col overflow-hidden rounded-2xl border border-border/80 bg-card/50 shadow-sm transition-colors focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/20">
               <textarea
                 rows={1}
-                className="min-h-14 w-full resize-none border-none bg-transparent px-5 py-4 text-sm leading-[1.6] transition-colors placeholder:font-medium placeholder:text-muted-foreground/40 placeholder:italic focus:ring-0"
-                placeholder="Untitled"
+                className="custom-scrollbar max-h-[200px] min-h-[44px] w-full resize-none border-none bg-transparent px-4 py-3 text-sm outline-none transition-all placeholder:text-muted-foreground/50"
+                placeholder="Message assistant..."
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  e.target.style.height = "inherit";
+                  e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`;
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
                     handleSend();
+                    setTimeout(() => {
+                      if (e.target instanceof HTMLTextAreaElement) {
+                        e.target.style.height = "inherit";
+                      }
+                    }, 0);
                   }
                 }}
               />
-
-              <div className="flex items-center justify-between px-4 pb-3">
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full text-muted-foreground transition-all hover:bg-primary/5 hover:text-primary"
-                  >
-                    <PlusCircle className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full text-muted-foreground transition-all hover:bg-primary/5 hover:text-primary"
-                  >
-                    <AtSign className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full text-muted-foreground transition-all hover:bg-primary/5 hover:text-primary"
-                  >
-                    <Smile className="h-4 w-4" />
+              <div className="flex items-center justify-between px-3 pb-3">
+                <div className="flex items-center gap-1 text-muted-foreground">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full transition-colors hover:bg-muted">
+                    <Paperclip className="h-4 w-4" />
                   </Button>
                 </div>
-
                 <Button
                   onClick={handleSend}
                   disabled={!input.trim()}
-                  size="sm"
-                  variant="ghost"
+                  size="icon"
                   className={cn(
-                    "h-8 w-8 rounded-full p-0 transition-all",
-                    input.trim() ? "text-primary hover:bg-primary/10" : "text-muted-foreground opacity-30",
+                    "h-8 w-8 rounded-full shadow-sm transition-all",
+                    input.trim()
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "bg-muted text-muted-foreground opacity-50",
                   )}
                 >
-                  <SendHorizontal className="h-4 w-4" />
+                  <ArrowUp className="h-4 w-4" />
                 </Button>
               </div>
+            </div>
+            <div className="mt-2 text-center font-medium text-[10px] text-muted-foreground/50">
+              Assistant is an AI and may occasionally be incorrect.
             </div>
           </div>
         </TabsContent>
