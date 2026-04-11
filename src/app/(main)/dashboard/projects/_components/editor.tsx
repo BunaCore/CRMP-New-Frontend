@@ -132,8 +132,8 @@ const MenuBar = ({
         </div>
       </div>
 
-      <div className="flex items-center justify-between px-4 py-2">
-        <div className="no-scrollbar flex items-center gap-1 overflow-x-auto">
+      <div className="flex w-full min-w-0 items-center justify-between overflow-hidden px-4 py-2">
+        <div className="no-scrollbar flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
           {/* History Group */}
           <div className="mr-2 flex items-center gap-0.5">
             <Button
@@ -421,9 +421,8 @@ const MenuBar = ({
           </div>
         </div>
 
-        {/* Right Info Section */}
-        <div className="ml-4 flex min-w-fit items-center gap-2 border-l pl-4">
-          <div className="font-bold text-[10px] text-muted-foreground/50 uppercase tracking-tighter">
+        <div className="ml-4 flex shrink-0 items-center gap-2 border-l pl-4">
+          <div className="hidden font-bold text-[10px] text-muted-foreground/50 uppercase tracking-tighter sm:block">
             {editor.storage.characterCount.words()} Words
           </div>
           <Button
@@ -523,7 +522,7 @@ export default function DocumentEditor({ initialContent, workspaceId, projectId 
     editorProps: {
       attributes: {
         class:
-          "prose prose-lg dark:prose-invert focus:outline-none max-w-[850px] mx-auto p-12 lg:p-24 min-h-screen selection:bg-primary/20",
+          "prose prose-lg dark:prose-invert focus:outline-none max-w-[850px] mx-auto p-4 sm:p-12 lg:p-24 min-h-screen selection:bg-primary/20",
       },
     },
     onUpdate: ({ editor }) => {
@@ -579,11 +578,11 @@ export default function DocumentEditor({ initialContent, workspaceId, projectId 
   };
 
   return (
-    <div className="anim-in fade-in flex h-full flex-col overflow-hidden bg-background duration-700">
+    <div className="anim-in fade-in flex h-full w-full min-w-0 flex-col overflow-hidden bg-background duration-700">
       <MenuBar editor={editor} onAddImage={addImage} onSetLink={setLink} projectId={projectId} />
 
-      <div className="project-editor-container custom-scrollbar flex-1 overflow-y-auto scroll-smooth">
-        <EditorContent editor={editor} />
+      <div className="project-editor-container custom-scrollbar flex w-full min-w-0 flex-1 flex-col items-stretch justify-stretch overflow-y-auto scroll-smooth">
+        <EditorContent editor={editor} className="w-full flex-1" />
       </div>
 
       {editor && (
