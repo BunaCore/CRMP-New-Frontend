@@ -1,6 +1,6 @@
-/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
-/** biome-ignore-all lint/correctness/noUnusedImports: <explanation> */
-/** biome-ignore-all assist/source/organizeImports: <explanation> */
+/** biome-ignore-all lint/nursery/useSortedClasses: class ordering managed manually */
+/** biome-ignore-all lint/correctness/noUnusedImports: imports used across the file */
+/** biome-ignore-all assist/source/organizeImports: import order managed manually */
 "use client";
 
 import {
@@ -288,7 +288,7 @@ export function TeamManagement() {
           // Show typing after a delay
           setTimeout(
             () => {
-              setTypingUsers([partnerId!]);
+              setTypingUsers([partnerId]);
 
               // Send reply after typing
               setTimeout(
@@ -299,12 +299,12 @@ export function TeamManagement() {
                   const reply: GroupChatMessage = {
                     id: `msg-${Date.now()}`,
                     roomId: selectedRoom.id,
-                    senderId: partnerId!,
+                    senderId: partnerId,
                     senderName: partner.name,
                     content: replyMessage,
                     timestamp: new Date().toISOString(),
                     isRead: true,
-                    readBy: [partnerId!, CURRENT_USER_ID],
+                    readBy: [partnerId, CURRENT_USER_ID],
                   };
 
                   setGroupMessages((prev) => ({

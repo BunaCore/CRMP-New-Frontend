@@ -1,5 +1,5 @@
-/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
-/** biome-ignore-all assist/source/organizeImports: <explanation> */
+/** biome-ignore-all lint/nursery/useSortedClasses: class ordering managed manually */
+/** biome-ignore-all assist/source/organizeImports: import order managed manually */
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

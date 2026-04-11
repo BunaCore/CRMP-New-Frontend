@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import { useRouter } from "next/navigation";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,16 +7,13 @@ import { mockProjects, type Project } from "@/data/projects";
 
 export default function ProjectsPage() {
   const router = useRouter();
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   // Only display Approved projects for this workflow
   const approvedProjects = mockProjects.filter((p) => p.status === "Approved");
 
   const handleProjectClick = (project: Project) => {
-    setSelectedProject(project);
+    router.push(`/dashboard/projects/${project.id}`);
   };
-
-  const closeDialog = () => setSelectedProject(null);
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 p-4 pt-0 md:p-8">

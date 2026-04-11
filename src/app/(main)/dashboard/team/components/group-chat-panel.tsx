@@ -1,7 +1,7 @@
-/** biome-ignore-all lint/complexity/noUselessFragments: <explanation> */
-/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <explanation> */
-/** biome-ignore-all assist/source/organizeImports: <explanation> */
-/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
+/** biome-ignore-all lint/complexity/noUselessFragments: fragments used for conditional multi-element rendering */
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: deps managed intentionally to avoid infinite loops */
+/** biome-ignore-all assist/source/organizeImports: import order managed manually */
+/** biome-ignore-all lint/nursery/useSortedClasses: class ordering managed manually */
 "use client";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -281,8 +281,8 @@ export function GroupChatPanel({
         {/* Messages Area */}
         <ScrollArea className="flex-1 p-4" ref={scrollRef}>
           <div className="space-y-6">
-            {groupedMessages.map((group, groupIdx) => (
-              <div key={groupIdx}>
+            {groupedMessages.map((group) => (
+              <div key={group.date}>
                 {/* Date Header */}
                 <div className="mb-4 flex items-center justify-center">
                   <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
