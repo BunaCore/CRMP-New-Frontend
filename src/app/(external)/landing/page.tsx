@@ -16,7 +16,6 @@ export default function LandingPage() {
           ASTU Research
         </Link>
 
-        {/* Navigation - Centered */}
         <nav className="hidden items-center space-x-8 md:flex">
           <Link href="#" className="border-b-[2px] border-[#eab308] pb-1 text-[14px] font-bold text-[#1b2b5a]">
             Research
