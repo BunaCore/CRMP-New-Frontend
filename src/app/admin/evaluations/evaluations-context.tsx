@@ -3,10 +3,11 @@
 import type React from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-import { ADVISORS, EVALUATORS } from "../proposals/_data/mock-proposals";
-import type { Evaluator } from "../proposals/types";
 import { getPendingApprovals } from "@/lib/api/proposals/queries";
 import type { PendingApproval } from "@/lib/api/proposals/types";
+
+import { ADVISORS, EVALUATORS } from "../proposals/_data/mock-proposals";
+import type { Evaluator } from "../proposals/types";
 import { DEMO_RUBRIC } from "./_data/mock-evaluations";
 import type { DrawerTab, EvalProjectRow, EvalProposalRow, MainTab, RubricItem } from "./types";
 

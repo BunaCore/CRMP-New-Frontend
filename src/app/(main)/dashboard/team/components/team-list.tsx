@@ -1,5 +1,5 @@
-/** biome-ignore-all assist/source/organizeImports: legacy code */
-/** biome-ignore-all lint/nursery/useSortedClasses: legacy code */
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
+/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
 "use client";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -102,7 +102,7 @@ export function TeamList({
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-            <SelectTrigger className="h-8 w-[100px] text-xs">
+            <SelectTrigger className="h-8 w-25 text-xs">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>

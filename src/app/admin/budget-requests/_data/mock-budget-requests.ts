@@ -12,7 +12,8 @@ export const MOCK_BUDGET_REQUESTS: BudgetRequest[] = [
     totalBudget: 92000,
     mode: "Phased",
     bankRoutingInfo: "College of Science — Ledger A-204 · Ref: PROJ-LV-001",
-    pgOfficerNote: "Approved for phased release. Phase 1 is initial equipment. Clearance required before each subsequent phase.",
+    pgOfficerNote:
+      "Approved for phased release. Phase 1 is initial equipment. Clearance required before each subsequent phase.",
     activePhasIndex: 1,
     phases: [
       {
@@ -92,7 +93,8 @@ export const MOCK_BUDGET_REQUESTS: BudgetRequest[] = [
     totalBudget: 220000,
     mode: "Phased",
     bankRoutingInfo: "Physics Dept. Research Account · Ref: PROJ-AT-004",
-    pgOfficerNote: "Phased. Clearance of prior spend required. Substantial cloud computing costs — verify invoices carefully.",
+    pgOfficerNote:
+      "Phased. Clearance of prior spend required. Substantial cloud computing costs — verify invoices carefully.",
     activePhasIndex: 1,
     phases: [
       {
@@ -144,7 +146,8 @@ export const MOCK_BUDGET_REQUESTS: BudgetRequest[] = [
     totalBudget: 310000,
     mode: "Phased",
     bankRoutingInfo: "Biomedical Research Trust Fund · Ref: PROJ-RM-005",
-    pgOfficerNote: "High-value grant. Phased release mandatory. Finance to verify all chemical procurement receipts before each release.",
+    pgOfficerNote:
+      "High-value grant. Phased release mandatory. Finance to verify all chemical procurement receipts before each release.",
     activePhasIndex: 0,
     phases: [
       {

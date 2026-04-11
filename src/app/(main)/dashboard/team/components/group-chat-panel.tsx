@@ -1,7 +1,7 @@
-/** biome-ignore-all lint/complexity/noUselessFragments: legacy code */
-/** biome-ignore-all lint/correctness/useExhaustiveDependencies: legacy code */
-/** biome-ignore-all assist/source/organizeImports: legacy code */
-/** biome-ignore-all lint/nursery/useSortedClasses: legacy code */
+/** biome-ignore-all lint/complexity/noUselessFragments: <explanation> */
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <explanation> */
+/** biome-ignore-all assist/source/organizeImports: <explanation> */
+/** biome-ignore-all lint/nursery/useSortedClasses: <explanation> */
 "use client";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -43,7 +43,10 @@ function getInitials(name: string) {
 
 function formatTime(timestamp: string) {
   const date = new Date(timestamp);
-  return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function formatDateHeader(timestamp: string) {
@@ -278,8 +281,8 @@ export function GroupChatPanel({
         {/* Messages Area */}
         <ScrollArea className="flex-1 p-4" ref={scrollRef}>
           <div className="space-y-6">
-            {groupedMessages.map((group, _groupIdx) => (
-              <div key={group.date}>
+            {groupedMessages.map((group, groupIdx) => (
+              <div key={groupIdx}>
                 {/* Date Header */}
                 <div className="mb-4 flex items-center justify-center">
                   <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">

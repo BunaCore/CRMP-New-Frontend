@@ -125,9 +125,7 @@ function WorkflowStepItem({ step, isLast }: { step: WorkflowStep; isLast: boolea
   return (
     <div className="relative flex gap-5">
       {/* Connector line */}
-      {!isLast && (
-        <div className="absolute top-6 bottom-[-2rem] left-[5px] w-px bg-slate-200 dark:bg-slate-800" />
-      )}
+      {!isLast && <div className="absolute top-6 bottom-[-2rem] left-[5px] w-px bg-slate-200 dark:bg-slate-800" />}
 
       {/* Status icon */}
       <div className="relative z-10 mt-1 flex h-3 w-3 shrink-0 items-center justify-center">
@@ -144,9 +142,7 @@ function WorkflowStepItem({ step, isLast }: { step: WorkflowStep; isLast: boolea
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-800 text-sm dark:text-slate-200">
-              {step.label}
-            </span>
+            <span className="font-semibold text-slate-800 text-sm dark:text-slate-200">{step.label}</span>
             <span className="rounded bg-slate-100 px-1.5 py-0.5 font-medium text-[10px] text-slate-500 uppercase tracking-wide dark:bg-slate-800 dark:text-slate-400">
               {step.role.replace(/_/g, " ")}
             </span>
@@ -283,16 +279,12 @@ function DefenceCard({ schedule }: { schedule: DefenceSchedule }) {
               <p className="font-bold text-[10px] text-amber-700 uppercase tracking-widest dark:text-amber-400">
                 Coordinator Note
               </p>
-              <p className="mt-1 text-amber-900 text-sm leading-relaxed dark:text-amber-200">
-                {schedule.note}
-              </p>
+              <p className="mt-1 text-amber-900 text-sm leading-relaxed dark:text-amber-200">{schedule.note}</p>
             </div>
           )}
 
           {/* Scheduled on */}
-          <p className="text-[11px] text-slate-400">
-            Scheduled on {formatProposalDate(schedule.createdAt)}
-          </p>
+          <p className="text-[11px] text-slate-400">Scheduled on {formatProposalDate(schedule.createdAt)}</p>
         </div>
       </CardContent>
     </Card>
@@ -382,16 +374,12 @@ export default function ProposalDetailsPage() {
   const hasDefence = defenceSchedules.length > 0;
   const latestDefence = hasDefence ? defenceSchedules[0] : null;
   const currentStep = workflowSteps.find((s) => s.isActive);
-  const progressPercent =
-    workflowSteps.length > 0
-      ? Math.round((currentStepOrder / workflowSteps.length) * 100)
-      : 0;
+  const progressPercent = workflowSteps.length > 0 ? Math.round((currentStepOrder / workflowSteps.length) * 100) : 0;
 
   // ─── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 lg:p-10">
-
       {/* Back navigation */}
       <div className="mb-2 flex items-center gap-2">
         <Link href="/dashboard/proposals">
@@ -457,13 +445,10 @@ export default function ProposalDetailsPage() {
               <div className="flex items-center justify-between text-slate-500 text-xs">
                 <span className="flex items-center gap-1">
                   <ChevronRight className="h-3.5 w-3.5 text-blue-500" />
-                  Step {proposal.workflow.currentStepOrder} of{" "}
-                  {proposal.workflow.steps.length}
+                  Step {proposal.workflow.currentStepOrder} of {proposal.workflow.steps.length}
                   {currentStep ? ` — ${currentStep.label}` : ""}
                 </span>
-                <span className="font-semibold text-blue-600 dark:text-blue-400">
-                  {progressPercent}%
-                </span>
+                <span className="font-semibold text-blue-600 dark:text-blue-400">{progressPercent}%</span>
               </div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                 <div
@@ -498,7 +483,6 @@ export default function ProposalDetailsPage() {
       {/* ── Tabs ──────────────────────────────────────────────────────────────── */}
       <Tabs defaultValue="overview" className="mt-2 w-full">
         <TabsList className="scrollbar-hide h-12 w-full flex-nowrap justify-start overflow-x-auto rounded-none border-slate-200 border-b bg-transparent p-0 dark:border-slate-800">
-
           {/* Overview */}
           <TabsTrigger
             value="overview"
@@ -543,20 +527,15 @@ export default function ProposalDetailsPage() {
         </TabsList>
 
         <div className="py-6">
-
           {/* ── Overview Tab ──────────────────────────────────────────────────── */}
           <TabsContent value="overview" className="mt-0 focus-visible:outline-none">
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-
               {/* Main content */}
               <div className="flex flex-col gap-6 lg:col-span-2">
-
                 {/* Proposal info summary */}
                 <Card className="overflow-hidden rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
                   <CardHeader className="border-slate-100 border-b bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
-                    <CardTitle className="text-lg text-slate-800 dark:text-slate-200">
-                      Proposal Information
-                    </CardTitle>
+                    <CardTitle className="text-lg text-slate-800 dark:text-slate-200">Proposal Information</CardTitle>
                   </CardHeader>
                   <CardContent className="grid grid-cols-2 gap-x-6 gap-y-4 p-6 text-sm sm:grid-cols-3">
                     {[
@@ -574,12 +553,8 @@ export default function ProposalDetailsPage() {
                       },
                     ].map(({ label, value }) => (
                       <div key={label} className="flex flex-col gap-1">
-                        <span className="font-medium text-slate-500 text-xs uppercase tracking-wider">
-                          {label}
-                        </span>
-                        <span className="font-semibold text-slate-800 dark:text-slate-200">
-                          {value}
-                        </span>
+                        <span className="font-medium text-slate-500 text-xs uppercase tracking-wider">{label}</span>
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">{value}</span>
                       </div>
                     ))}
                   </CardContent>
@@ -590,12 +565,10 @@ export default function ProposalDetailsPage() {
                   <div className="flex items-start gap-4 rounded-xl border border-amber-200 bg-amber-50/70 p-5 dark:border-amber-900/50 dark:bg-amber-950/30">
                     <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
                     <div className="flex-1">
-                      <p className="font-semibold text-amber-900 text-sm dark:text-amber-300">
-                        Revisions Required
-                      </p>
+                      <p className="font-semibold text-amber-900 text-sm dark:text-amber-300">Revisions Required</p>
                       <p className="mt-1 text-amber-800 text-sm leading-relaxed dark:text-amber-400">
-                        Your proposal requires revisions based on evaluator feedback. Please review
-                        the comments tab and update your submission.
+                        Your proposal requires revisions based on evaluator feedback. Please review the comments tab and
+                        update your submission.
                       </p>
                     </div>
                   </div>
@@ -604,7 +577,6 @@ export default function ProposalDetailsPage() {
 
               {/* Sidebar */}
               <div className="flex flex-col gap-6">
-
                 {/* Principal Investigator */}
                 <Card className="rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
                   <CardHeader className="pb-3">
@@ -656,9 +628,7 @@ export default function ProposalDetailsPage() {
                                     {getNameInitials(a.name)}
                                   </AvatarFallback>
                                 </Avatar>
-                                <span className="text-slate-700 text-sm dark:text-slate-300">
-                                  {a.name}
-                                </span>
+                                <span className="text-slate-700 text-sm dark:text-slate-300">{a.name}</span>
                               </div>
                             ))}
                           </div>
@@ -678,9 +648,7 @@ export default function ProposalDetailsPage() {
                                     {getNameInitials(m.name)}
                                   </AvatarFallback>
                                 </Avatar>
-                                <span className="text-slate-700 text-sm dark:text-slate-300">
-                                  {m.name}
-                                </span>
+                                <span className="text-slate-700 text-sm dark:text-slate-300">{m.name}</span>
                               </div>
                             ))}
                           </div>
@@ -700,9 +668,7 @@ export default function ProposalDetailsPage() {
                                     {getNameInitials(e.name)}
                                   </AvatarFallback>
                                 </Avatar>
-                                <span className="text-slate-700 text-sm dark:text-slate-300">
-                                  {e.name}
-                                </span>
+                                <span className="text-slate-700 text-sm dark:text-slate-300">{e.name}</span>
                               </div>
                             ))}
                           </div>
@@ -720,9 +686,7 @@ export default function ProposalDetailsPage() {
             <Card className="overflow-hidden rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
               <CardHeader className="border-slate-100 border-b bg-slate-50/30 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg text-slate-800 dark:text-slate-200">
-                    Reviewer Comments
-                  </CardTitle>
+                  <CardTitle className="text-lg text-slate-800 dark:text-slate-200">Reviewer Comments</CardTitle>
                   <div className="flex items-center gap-2 text-slate-500 text-xs">
                     <span>
                       {proposal.comments.length} comment
@@ -743,9 +707,7 @@ export default function ProposalDetailsPage() {
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
                       <MessageSquare className="h-6 w-6 text-slate-400 dark:text-slate-500" />
                     </div>
-                    <p className="font-medium text-slate-700 text-sm dark:text-slate-300">
-                      No comments yet
-                    </p>
+                    <p className="font-medium text-slate-700 text-sm dark:text-slate-300">No comments yet</p>
                     <p className="max-w-xs text-slate-400 text-xs">
                       Comments from reviewers and evaluators will appear here.
                     </p>
@@ -767,26 +729,16 @@ export default function ProposalDetailsPage() {
               <div className="lg:col-span-2">
                 <Card className="overflow-hidden rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
                   <CardHeader className="border-slate-100 border-b bg-slate-50/30 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
-                    <CardTitle className="text-lg text-slate-800 dark:text-slate-200">
-                      Approval Workflow
-                    </CardTitle>
-                    <CardDescription>
-                      Real-time status of every review step for this proposal.
-                    </CardDescription>
+                    <CardTitle className="text-lg text-slate-800 dark:text-slate-200">Approval Workflow</CardTitle>
+                    <CardDescription>Real-time status of every review step for this proposal.</CardDescription>
                   </CardHeader>
                   <CardContent className="pt-6">
                     {workflowSteps.length === 0 ? (
-                      <p className="py-8 text-center text-slate-400 text-sm">
-                        No workflow steps configured.
-                      </p>
+                      <p className="py-8 text-center text-slate-400 text-sm">No workflow steps configured.</p>
                     ) : (
                       <div>
                         {workflowSteps.map((step, i) => (
-                          <WorkflowStepItem
-                            key={step.stepOrder}
-                            step={step}
-                            isLast={i === workflowSteps.length - 1}
-                          />
+                          <WorkflowStepItem key={step.stepOrder} step={step} isLast={i === workflowSteps.length - 1} />
                         ))}
                       </div>
                     )}
@@ -798,20 +750,15 @@ export default function ProposalDetailsPage() {
               <div className="flex flex-col gap-4">
                 <Card className="rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-base text-slate-800 dark:text-slate-200">
-                      Progress Summary
-                    </CardTitle>
+                    <CardTitle className="text-base text-slate-800 dark:text-slate-200">Progress Summary</CardTitle>
                   </CardHeader>
                   <CardContent className="flex flex-col gap-4">
                     <div>
                       <div className="mb-1.5 flex justify-between text-slate-500 text-xs">
                         <span>
-                          Step {proposal.workflow.currentStepOrder} of{" "}
-                          {proposal.workflow.steps.length}
+                          Step {proposal.workflow.currentStepOrder} of {proposal.workflow.steps.length}
                         </span>
-                        <span className="font-semibold text-blue-600 dark:text-blue-400">
-                          {progressPercent}%
-                        </span>
+                        <span className="font-semibold text-blue-600 dark:text-blue-400">{progressPercent}%</span>
                       </div>
                       <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                         <div
@@ -827,26 +774,22 @@ export default function ProposalDetailsPage() {
                       {[
                         {
                           label: "Completed",
-                          count: workflowSteps.filter((s) => s.status === "Accepted")
-                            .length,
+                          count: workflowSteps.filter((s) => s.status === "Accepted").length,
                           color: "text-emerald-600 dark:text-emerald-400",
                         },
                         {
                           label: "Pending",
-                          count: workflowSteps.filter((s) => s.status === "Pending")
-                            .length,
+                          count: workflowSteps.filter((s) => s.status === "Pending").length,
                           color: "text-slate-500",
                         },
                         {
                           label: "Requires Revision",
-                          count: workflowSteps.filter((s) => s.status === "Revision")
-                            .length,
+                          count: workflowSteps.filter((s) => s.status === "Revision").length,
                           color: "text-amber-600 dark:text-amber-400",
                         },
                         {
                           label: "Rejected",
-                          count: workflowSteps.filter((s) => s.status === "Rejected")
-                            .length,
+                          count: workflowSteps.filter((s) => s.status === "Rejected").length,
                           color: "text-red-600 dark:text-red-400",
                         },
                       ].map(({ label, count, color }) => (
@@ -880,8 +823,7 @@ export default function ProposalDetailsPage() {
                       </CardTitle>
                       <CardDescription>
                         {defenceSchedules.length} appointment
-                        {defenceSchedules.length !== 1 ? "s" : ""} scheduled for this
-                        proposal.
+                        {defenceSchedules.length !== 1 ? "s" : ""} scheduled for this proposal.
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="p-0">
@@ -889,9 +831,7 @@ export default function ProposalDetailsPage() {
                         <div
                           key={schedule.id}
                           className={`flex flex-col gap-2 px-6 py-4 ${
-                            i < defenceSchedules.length - 1
-                              ? "border-slate-100 border-b dark:border-slate-800"
-                              : ""
+                            i < defenceSchedules.length - 1 ? "border-slate-100 border-b dark:border-slate-800" : ""
                           }`}
                         >
                           <div className="flex flex-wrap items-start justify-between gap-2">

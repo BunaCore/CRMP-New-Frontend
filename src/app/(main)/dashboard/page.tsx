@@ -206,7 +206,8 @@ export default function DashboardPage() {
             {roleLabel} Dashboard
           </h1>
           <p className="mt-1.5 font-medium text-slate-500 text-sm dark:text-slate-400">
-            Welcome back{user?.name ? `, ${user.name}` : ""}. Here&apos;s an overview of your research projects and team.
+            Welcome back{user?.name ? `, ${user.name}` : ""}. Here&apos;s an overview of your research projects and
+            team.
           </p>
         </div>
         <Button className="w-full rounded-full border-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 font-medium text-white shadow transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-md sm:w-auto">

@@ -10,9 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { PendingApproval } from "@/lib/api/proposals/types";
 
 import { useProposals } from "../proposals-context";
-import type { PendingApproval } from "@/lib/api/proposals/types";
 
 export const STATUS_CFG: Record<string, { className: string; icon: React.ReactNode }> = {
   Draft: {
@@ -114,10 +114,11 @@ export function ProposalsTable() {
               >
                 {t.label}
                 <span
-                  className={`ml-1.5 rounded-full px-1.5 py-0.5 font-bold text-[10px] ${tab === t.value
-                    ? "bg-blue-600 text-white"
-                    : "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-400"
-                    }`}
+                  className={`ml-1.5 rounded-full px-1.5 py-0.5 font-bold text-[10px] ${
+                    tab === t.value
+                      ? "bg-blue-600 text-white"
+                      : "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-400"
+                  }`}
                 >
                   {t.count}
                 </span>
@@ -214,20 +215,26 @@ export function ProposalsTable() {
                         </TableCell>
                         <TableCell className="py-4">
                           <div className="flex flex-col gap-1.5">
-                            <Badge variant="outline" className={`w-fit font-semibold text-[9px] uppercase tracking-wider ${p.evaluatorAssigned ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-400" : "border-slate-200 text-slate-500"}`}>
+                            <Badge
+                              variant="outline"
+                              className={`w-fit font-semibold text-[9px] uppercase tracking-wider ${p.evaluatorAssigned ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-400" : "border-slate-200 text-slate-500"}`}
+                            >
                               Eval: {p.evaluatorAssigned ? "Assigned" : "Pending"}
                             </Badge>
-                            <Badge variant="outline" className={`w-fit font-semibold text-[9px] uppercase tracking-wider ${p.advisorAssigned ? "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-900 dark:bg-violet-950 dark:text-violet-400" : "border-slate-200 text-slate-500"}`}>
+                            <Badge
+                              variant="outline"
+                              className={`w-fit font-semibold text-[9px] uppercase tracking-wider ${p.advisorAssigned ? "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-900 dark:bg-violet-950 dark:text-violet-400" : "border-slate-200 text-slate-500"}`}
+                            >
                               Adv: {p.advisorAssigned ? "Assigned" : "Pending"}
                             </Badge>
                           </div>
                         </TableCell>
                         <TableCell className="py-4">
                           <div className="flex flex-col gap-1.5">
-                            <span className="font-bold text-[12px] text-slate-700 uppercase">
-                              {p.proposalProgram}
-                            </span>
-                            <Badge className={`w-fit font-bold text-[9px] shadow-none ${p.isFunded ? "bg-amber-100 text-amber-800 hover:bg-amber-100" : "bg-slate-100 text-slate-600 hover:bg-slate-100"}`}>
+                            <span className="font-bold text-[12px] text-slate-700 uppercase">{p.proposalProgram}</span>
+                            <Badge
+                              className={`w-fit font-bold text-[9px] shadow-none ${p.isFunded ? "bg-amber-100 text-amber-800 hover:bg-amber-100" : "bg-slate-100 text-slate-600 hover:bg-slate-100"}`}
+                            >
                               {p.isFunded ? "FUNDED" : "UNFUNDED"}
                             </Badge>
                           </div>

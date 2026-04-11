@@ -1,7 +1,8 @@
 "use client";
 
 import type React from "react";
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+
 import { getPendingApprovals } from "@/lib/api/proposals/queries";
 import type { PendingApproval } from "@/lib/api/proposals/types";
 
