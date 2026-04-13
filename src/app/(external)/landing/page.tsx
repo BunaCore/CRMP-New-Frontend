@@ -16,9 +16,7 @@ export const metadata = {
 export default function LandingPage() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#fafbfc] font-sans">
-      {/* Header */}
       <header className="container mx-auto flex h-20 items-center justify-between px-6 lg:px-12 xl:max-w-6xl">
-        {/* Logo */}
         <Link href="/" className="font-serif text-[24px] tracking-tight text-[#1b2b5a] italic">
           ASTU Research
         </Link>
