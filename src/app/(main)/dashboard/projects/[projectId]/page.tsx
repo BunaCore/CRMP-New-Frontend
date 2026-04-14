@@ -1,15 +1,18 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { useParams, useRouter } from "next/navigation";
 
 import { format } from "date-fns";
-import { ArrowLeft, ChevronRight, FileText, Layout, Plus, User } from "lucide-react";
+import { ArrowLeft, ChevronRight, FileText, Layout, Loader2, Plus, User } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { mockProjects } from "@/data/projects";
+import { fetchProjects } from "@/lib/api/editor/queries";
+import type { ProjectIdentity } from "@/types/editor";
 
 import { useWorkspace, WorkspaceProvider } from "../_components/workspace/workspace-context";
 
@@ -17,24 +20,27 @@ function ProjectWorkspacesContent() {
   const params = useParams();
   const router = useRouter();
   const projectId = params.projectId as string;
-  const { allWorkspaces, createWorkspace } = useWorkspace();
+  const [project, setProject] = useState<ProjectIdentity | null>(null);
+  const { workspaces, loading, createWorkspace } = useWorkspace();
 
-  const project = mockProjects.find((p) => p.id === projectId);
+  useEffect(() => {
+    fetchProjects().then((projects) => {
+      const found = projects.find((p) => p.projectId === projectId);
+      setProject(found || null);
+    });
+  }, [projectId]);
 
-  // Filtering workspaces for this project from the persisted state
-  const workspaces = allWorkspaces.filter((ws) => ws.projectId === projectId);
-
-  if (!project) {
+  if (loading || !project) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-muted-foreground">Project not found.</p>
+        <Loader2 className="h-10 w-10 animate-spin text-primary/20" />
       </div>
     );
   }
 
-  const handleCreateWorkspace = () => {
+  const handleCreateWorkspace = async () => {
     const newTitle = `Workspace ${workspaces.length + 1}`;
-    const newId = createWorkspace(projectId, newTitle);
+    const newId = await createWorkspace(projectId, newTitle);
     router.push(`/dashboard/projects/${projectId}/${newId}`);
   };
 
@@ -53,7 +59,7 @@ function ProjectWorkspacesContent() {
           </Button>
           <div className="h-8 w-px bg-border/60" />
           <div className="flex flex-col">
-            <h1 className="font-extrabold text-3xl tracking-tight">{project.name}</h1>
+            <h1 className="font-extrabold text-3xl tracking-tight">{project.projectTitle}</h1>
             <p className="mt-1 flex items-center gap-2 font-medium text-muted-foreground text-sm uppercase tracking-wider">
               <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
               Workspaces Management
@@ -112,7 +118,7 @@ function ProjectWorkspacesContent() {
                         <FileText className="h-5 w-5" />
                       </div>
                       <span className="inline-block font-semibold text-base transition-transform group-hover:translate-x-1">
-                        {ws.title}
+                        {ws.name}
                       </span>
                     </div>
                   </TableCell>
@@ -121,24 +127,19 @@ function ProjectWorkspacesContent() {
                       <div className="flex h-7 w-7 items-center justify-center rounded-full border border-border bg-secondary">
                         <User className="h-4 w-4 text-muted-foreground" />
                       </div>
-                      <span className="font-medium text-sm">{ws.manager}</span>
+                      <span className="font-medium text-sm">{ws.createdBy.split("-")[0]}</span>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {ws.tasks?.map((task, i) => (
-                        <Badge
-                          key={`${ws.id}-task-${i}`}
-                          variant="outline"
-                          className="bg-background/50 font-bold text-[10px] uppercase tracking-tighter"
-                        >
-                          {task}
-                        </Badge>
-                      ))}
-                    </div>
+                    <Badge
+                      variant="outline"
+                      className="bg-background/50 font-bold text-[10px] uppercase tracking-tighter"
+                    >
+                      Workspace
+                    </Badge>
                   </TableCell>
                   <TableCell className="font-medium text-muted-foreground text-sm">
-                    {format(new Date(ws.updatedAt), "MMM d, yyyy")}
+                    {format(new Date(ws.createdAt), "MMM d, yyyy")}
                   </TableCell>
                   <TableCell className="pr-8 text-right">
                     <Button

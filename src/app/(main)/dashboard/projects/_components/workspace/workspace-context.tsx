@@ -1,8 +1,12 @@
 "use client";
 
-import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from "react";
 
-import { mockWorkspaces, type Workspace } from "@/data/workspaces";
+import { useParams } from "next/navigation";
+
+import { createWorkspace as apiCreateWorkspace } from "@/lib/api/editor/mutations";
+import { fetchWorkspaces } from "@/lib/api/editor/queries";
+import type { WorkspaceInfo } from "@/types/editor";
 
 export type ViewType = "editor" | "file-viewer";
 
@@ -14,6 +18,7 @@ export interface FileData {
 }
 
 interface WorkspaceContextProps {
+  // View state
   activeView: ViewType;
   setActiveView: (view: ViewType) => void;
   activeFile: FileData | null;
@@ -23,37 +28,45 @@ interface WorkspaceContextProps {
   isChatOpen: boolean;
   setIsChatOpen: (open: boolean) => void;
   toggleChat: () => void;
-  workspaceTitle: string;
-  setWorkspaceTitle: (title: string) => void;
-  workspaceContent: string;
-  setWorkspaceContent: (content: string) => void;
-  saveWorkspace: (id: string, title: string, content: string) => void;
-  loadWorkspace: (id: string) => void;
-  createWorkspace: (projectId: string, title: string) => string;
-  allWorkspaces: Workspace[];
+
+  // Real data state
+  workspaces: WorkspaceInfo[];
+  loading: boolean;
+  createWorkspace: (projectId: string, name: string) => Promise<string>;
+  refreshWorkspaces: () => Promise<void>;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextProps | undefined>(undefined);
 
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
+  const { projectId } = useParams() as { projectId: string };
+
+  // View & UI state
   const [activeView, setActiveView] = useState<ViewType>("editor");
   const [activeFile, setActiveFile] = useState<FileData | null>(null);
   const [files, setFiles] = useState<FileData[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(true);
-  const [workspaceTitle, setWorkspaceTitle] = useState("");
-  const [workspaceContent, setWorkspaceContent] = useState("");
-  const [allWorkspaces, setAllWorkspaces] = useState<Workspace[]>([]);
 
-  // Initialize with mock data or localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("crmp_workspaces");
-    if (saved) {
-      setAllWorkspaces(JSON.parse(saved));
-    } else {
-      setAllWorkspaces(mockWorkspaces);
-      localStorage.setItem("crmp_workspaces", JSON.stringify(mockWorkspaces));
+  // Real backend state
+  const [workspaces, setWorkspaces] = useState<WorkspaceInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const refreshWorkspaces = useCallback(async () => {
+    if (!projectId) return;
+    setLoading(true);
+    try {
+      const data = await fetchWorkspaces(projectId);
+      setWorkspaces(data);
+    } catch (error) {
+      console.error("Failed to fetch workspaces", error);
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  }, [projectId]);
+
+  useEffect(() => {
+    refreshWorkspaces();
+  }, [refreshWorkspaces]);
 
   const addFile = (file: FileData) => {
     setFiles((prev) => [...prev, file]);
@@ -63,53 +76,10 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     setIsChatOpen((prev) => !prev);
   };
 
-  const saveWorkspace = (id: string, title: string, content: string) => {
-    setAllWorkspaces((prev) => {
-      // If workspace doesn't exist in the list (e.g. newly created on the fly), add it
-      const exists = prev.some((ws) => ws.id === id);
-      let updated: Workspace[];
-
-      if (exists) {
-        updated = prev.map((ws) =>
-          ws.id === id ? { ...ws, title, content, updatedAt: new Date().toISOString() } : ws,
-        );
-      } else {
-        // Find project from current projectId (might need to pass it or infer)
-        // For simplicity, we assume we only save existing ones or we've pre-created them
-        updated = prev;
-      }
-
-      localStorage.setItem("crmp_workspaces", JSON.stringify(updated));
-      return updated;
-    });
-  };
-
-  const createWorkspace = (projectId: string, title: string) => {
-    const newWs: Workspace = {
-      id: `ws-${Date.now()}`,
-      projectId,
-      title,
-      manager: "Current User", // Mock user
-      content: "",
-      tasks: [],
-      updatedAt: new Date().toISOString(),
-    };
-
-    setAllWorkspaces((prev) => {
-      const updated = [...prev, newWs];
-      localStorage.setItem("crmp_workspaces", JSON.stringify(updated));
-      return updated;
-    });
-
+  const createWorkspace = async (projectId: string, name: string) => {
+    const newWs = await apiCreateWorkspace(projectId, { name });
+    setWorkspaces((prev) => [...prev, newWs]);
     return newWs.id;
-  };
-
-  const loadWorkspace = (id: string) => {
-    const ws = allWorkspaces.find((w) => w.id === id);
-    if (ws) {
-      setWorkspaceTitle(ws.title);
-      setWorkspaceContent(ws.content);
-    }
   };
 
   return (
@@ -124,14 +94,10 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         isChatOpen,
         setIsChatOpen,
         toggleChat,
-        workspaceTitle,
-        setWorkspaceTitle,
-        workspaceContent,
-        setWorkspaceContent,
-        saveWorkspace,
-        loadWorkspace,
+        workspaces,
+        loading,
         createWorkspace,
-        allWorkspaces,
+        refreshWorkspaces,
       }}
     >
       {children}
