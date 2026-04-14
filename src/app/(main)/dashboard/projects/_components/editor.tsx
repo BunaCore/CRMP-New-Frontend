@@ -1,652 +1,285 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+// ============================================================
+// DocumentEditor — Compositional root
+//
+// Responsibilities:
+//   - Own the TipTap useEditor instance
+//   - Use stable module-level extensions (never recreated)
+//   - Hydrate from backend exactly once per workspaceId
+//   - Wire all callbacks to the useDocumentEditor hook
+//   - Compose: Toolbar → Canvas → BubbleMenu → FloatingMenu
+//
+// This component is intentionally thin. All state/API logic
+// lives in useDocumentEditor. All UI sub-components are in
+// /editor/ subdirectory.
+// ============================================================
 
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import BubbleMenuExtension from "@tiptap/extension-bubble-menu";
-import CharacterCount from "@tiptap/extension-character-count";
-import Color from "@tiptap/extension-color";
-import FloatingMenuExtension from "@tiptap/extension-floating-menu";
-import Highlight from "@tiptap/extension-highlight";
-import Image from "@tiptap/extension-image";
-import Link from "@tiptap/extension-link";
-import Placeholder from "@tiptap/extension-placeholder";
-import Subscript from "@tiptap/extension-subscript";
-import Superscript from "@tiptap/extension-superscript";
-import { Table } from "@tiptap/extension-table";
-import { TableCell } from "@tiptap/extension-table-cell";
-import { TableHeader } from "@tiptap/extension-table-header";
-import { TableRow } from "@tiptap/extension-table-row";
-import TaskItem from "@tiptap/extension-task-item";
-import TaskList from "@tiptap/extension-task-list";
-import TextAlign from "@tiptap/extension-text-align";
-import { TextStyle } from "@tiptap/extension-text-style";
-import Typography from "@tiptap/extension-typography";
-import Underline from "@tiptap/extension-underline";
-import { type Editor, EditorContent, useEditor } from "@tiptap/react";
-import { BubbleMenu, FloatingMenu } from "@tiptap/react/menus";
-import StarterKit from "@tiptap/starter-kit";
-import {
-  AlignCenter,
-  AlignJustify,
-  AlignLeft,
-  AlignRight,
-  ArrowLeft,
-  Bold,
-  CheckSquare,
-  Download,
-  FileDown,
-  Heading1,
-  Heading2,
-  Highlighter,
-  History,
-  Image as ImageIcon,
-  Italic,
-  Link as LinkIcon,
-  List,
-  ListOrdered,
-  Minus,
-  MoreVertical,
-  Palette,
-  PanelRight,
-  PanelRightClose,
-  Plus,
-  Redo,
-  Strikethrough,
-  Table as TableIcon,
-  Trash2,
-  Type,
-  Underline as UnderlineIcon,
-  Undo,
-} from "lucide-react";
+import { EditorContent, useEditor } from "@tiptap/react";
+import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Separator } from "@/components/ui/separator";
+import { useDocumentEditor } from "@/hooks/useDocumentEditor";
 import { cn } from "@/lib/utils";
 
-import { useWorkspace } from "./workspace/workspace-context";
+import { EditorBubbleMenu } from "./editor/editor-bubble-menu";
+import { EditorFloatingMenu } from "./editor/editor-floating-menu";
+import { EditorShell } from "./editor/editor-shell";
+import { EditorToolbar } from "./editor/editor-toolbar";
+import { EDITOR_EXTENSIONS } from "./editor/extensions";
+import { ImportMarkdownModal } from "./editor/import-markdown-modal";
 import "./editor.css";
 
-interface EditorProps {
-  initialContent: string;
+// ─── Props ────────────────────────────────────────────────────
+
+interface DocumentEditorProps {
   workspaceId: string;
   projectId: string;
 }
 
-const MenuBar = ({
-  editor,
-  onAddImage,
-  onSetLink,
-  projectId,
-}: {
-  editor: Editor | null;
-  onAddImage: () => void;
-  onSetLink: () => void;
-  projectId: string;
-}) => {
-  const router = useRouter();
-  const { toggleChat, isChatOpen, workspaceTitle, setWorkspaceTitle } = useWorkspace();
+// ─── Component ────────────────────────────────────────────────
 
-  if (!editor) return null;
+export default function DocumentEditor({ workspaceId, projectId }: DocumentEditorProps) {
+  // ── 1. API/state hook ────────────────────────────────────────
+  const doc = useDocumentEditor(projectId, workspaceId);
+  const [isImportOpen, setIsImportOpen] = useState(false);
 
-  return (
-    <div className="sticky top-0 z-20 flex flex-col border-b bg-background/50 backdrop-blur-md">
-      {/* Navigation & Title Bar Section */}
-      <div className="flex items-center justify-between border-b bg-muted/5 px-4 py-1.5">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 rounded-full"
-            onClick={() => router.push(`/dashboard/projects/${projectId}`)}
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
+  // ── 2. Refs ──────────────────────────────────────────────────
+  //
+  // titleRef: always holds the current title, read inside onUpdate
+  //   closure without causing the closure to go stale.
+  const titleRef = useRef(doc.title);
+  useEffect(() => {
+    titleRef.current = doc.title;
+  }, [doc.title]);
 
-          <div className="h-4 w-px bg-border" />
+  // hydratedRef: gate that ensures setContent fires exactly once
+  //   per workspaceId (not on every render where loadStatus changes).
+  const hydratedRef = useRef(false);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Must reset when workspace changes on soft-navigation
+  useEffect(() => {
+    hydratedRef.current = false;
+  }, [workspaceId]);
 
-          <div className="flex items-center gap-2 text-muted-foreground/60">
-            <input
-              type="text"
-              value={workspaceTitle}
-              onChange={(e) => setWorkspaceTitle(e.target.value)}
-              placeholder="Untitled Workspace"
-              className="min-w-75 border-none bg-transparent font-bold text-[11px] text-foreground outline-none transition-all placeholder:font-normal placeholder:italic focus:ring-0"
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="font-black text-[9px] text-muted-foreground/30 uppercase tracking-[0.2em]">
-            Editing Mode
-          </span>
-        </div>
-      </div>
-
-      <div className="flex w-full min-w-0 items-center justify-between overflow-hidden px-4 py-2">
-        <div className="no-scrollbar flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
-          {/* History Group */}
-          <div className="mr-2 flex items-center gap-0.5">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => editor.chain().focus().undo().run()}
-              disabled={!editor.can().undo()}
-              className="h-8 w-8 p-0"
-            >
-              <Undo className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => editor.chain().focus().redo().run()}
-              disabled={!editor.can().redo()}
-              className="h-8 w-8 p-0"
-            >
-              <Redo className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <Separator orientation="vertical" className="mr-2 h-4" />
-
-          {/* Typography Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 min-w-25 justify-between gap-2 px-2 font-medium text-xs">
-                {editor.isActive("heading", { level: 1 })
-                  ? "Heading 1"
-                  : editor.isActive("heading", { level: 2 })
-                    ? "Heading 2"
-                    : editor.isActive("heading", { level: 3 })
-                      ? "Heading 3"
-                      : "Normal Text"}
-                <Type className="h-3 w-3 opacity-50" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              <DropdownMenuItem onClick={() => editor.chain().focus().setParagraph().run()}>
-                Normal Text
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-                className="font-bold text-lg"
-              >
-                Heading 1
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                className="font-semibold text-base"
-              >
-                Heading 2
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-                className="font-medium text-sm"
-              >
-                Heading 3
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Separator orientation="vertical" className="mx-2 h-4" />
-
-          {/* Basic Formatting */}
-          <div className="flex items-center gap-0.5">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => editor.chain().focus().toggleBold().run()}
-              className={cn("h-8 w-8 p-0", editor.isActive("bold") && "bg-primary/10 text-primary")}
-            >
-              <Bold className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => editor.chain().focus().toggleItalic().run()}
-              className={cn("h-8 w-8 p-0", editor.isActive("italic") && "bg-primary/10 text-primary")}
-            >
-              <Italic className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => editor.chain().focus().toggleUnderline().run()}
-              className={cn("h-8 w-8 p-0", editor.isActive("underline") && "bg-primary/10 text-primary")}
-            >
-              <UnderlineIcon className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => editor.chain().focus().toggleStrike().run()}
-              className={cn("h-8 w-8 p-0", editor.isActive("strike") && "bg-primary/10 text-primary")}
-            >
-              <Strikethrough className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <Separator orientation="vertical" className="mx-2 h-4" />
-
-          {/* Colors */}
-          <div className="flex items-center gap-0.5">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <Palette className="h-4 w-4" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-40 p-2">
-                <div className="grid grid-cols-5 gap-1">
-                  {["#000000", "#ef4444", "#3b82f6", "#10b981", "#f59e0b"].map((color) => (
-                    <button
-                      type="button"
-                      key={color}
-                      className="h-6 w-6 rounded-md border border-border"
-                      style={{ backgroundColor: color }}
-                      onClick={() => editor.chain().focus().setColor(color).run()}
-                    />
-                  ))}
-                  <button
-                    type="button"
-                    className="col-span-5 mt-1 rounded py-1 font-bold text-[10px] uppercase hover:bg-muted"
-                    onClick={() => editor.chain().focus().unsetColor().run()}
-                  >
-                    Reset Color
-                  </button>
-                </div>
-              </PopoverContent>
-            </Popover>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => editor.chain().focus().toggleHighlight().run()}
-              className={cn("h-8 w-8 p-0", editor.isActive("highlight") && "bg-primary/10 text-primary")}
-            >
-              <Highlighter className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <Separator orientation="vertical" className="mx-2 h-4" />
-
-          {/* Alignment Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                {editor.isActive({ textAlign: "center" }) ? (
-                  <AlignCenter className="h-4 w-4" />
-                ) : editor.isActive({ textAlign: "right" }) ? (
-                  <AlignRight className="h-4 w-4" />
-                ) : editor.isActive({ textAlign: "justify" }) ? (
-                  <AlignJustify className="h-4 w-4" />
-                ) : (
-                  <AlignLeft className="h-4 w-4" />
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="min-w-[37.5px]">
-              <DropdownMenuItem onClick={() => editor.chain().focus().setTextAlign("left").run()} className="gap-2">
-                <AlignLeft className="h-4 w-4" /> Align Left
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => editor.chain().focus().setTextAlign("center").run()} className="gap-2">
-                <AlignCenter className="h-4 w-4" /> Align Center
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => editor.chain().focus().setTextAlign("right").run()} className="gap-2">
-                <AlignRight className="h-4 w-4" /> Align Right
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => editor.chain().focus().setTextAlign("justify").run()} className="gap-2">
-                <AlignJustify className="h-4 w-4" /> Align Justify
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Separator orientation="vertical" className="mx-2 h-4" />
-
-          {/* Lists Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                {editor.isActive("orderedList") ? (
-                  <ListOrdered className="h-4 w-4" />
-                ) : editor.isActive("taskList") ? (
-                  <CheckSquare className="h-4 w-4" />
-                ) : (
-                  <List className="h-4 w-4" />
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="min-w-[37.5px]">
-              <DropdownMenuItem onClick={() => editor.chain().focus().toggleBulletList().run()} className="gap-2">
-                <List className="h-4 w-4" /> Bullet List
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => editor.chain().focus().toggleOrderedList().run()} className="gap-2">
-                <ListOrdered className="h-4 w-4" /> Ordered List
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => editor.chain().focus().toggleTaskList().run()} className="gap-2">
-                <CheckSquare className="h-4 w-4" /> Task List
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Separator orientation="vertical" className="mx-2 h-4" />
-
-          {/* Table Control */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn("h-8 w-8 p-0", editor.isActive("table") && "bg-primary/10 text-primary")}
-              >
-                <TableIcon className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem
-                onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
-              >
-                Insert Table
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => editor.chain().focus().addColumnAfter().run()}
-                disabled={!editor.isActive("table")}
-              >
-                Add Column
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => editor.chain().focus().addRowAfter().run()}
-                disabled={!editor.isActive("table")}
-              >
-                Add Row
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => editor.chain().focus().deleteColumn().run()}
-                disabled={!editor.isActive("table")}
-                className="text-destructive"
-              >
-                Delete Column
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => editor.chain().focus().deleteRow().run()}
-                disabled={!editor.isActive("table")}
-                className="text-destructive"
-              >
-                Delete Row
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => editor.chain().focus().deleteTable().run()}
-                disabled={!editor.isActive("table")}
-                className="text-destructive"
-              >
-                Delete Table
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Separator orientation="vertical" className="mx-2 h-4" />
-
-          {/* Insertions */}
-          <div className="flex items-center gap-0.5">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onSetLink}
-              className={cn("h-8 w-8 p-0", editor.isActive("link") && "bg-primary/10 text-primary")}
-            >
-              <LinkIcon className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={onAddImage} className="h-8 w-8 p-0">
-              <ImageIcon className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => editor.chain().focus().setHorizontalRule().run()}
-              className="h-8 w-8 p-0"
-            >
-              <Minus className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-
-        <div className="ml-4 flex shrink-0 items-center gap-2 border-l pl-4">
-          <div className="hidden font-bold text-[10px] text-muted-foreground/50 uppercase tracking-tighter sm:block">
-            {editor.storage.characterCount.words()} Words
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn("h-8 w-8 rounded-full transition-all", isChatOpen && "bg-primary/10 text-primary")}
-            onClick={toggleChat}
-          >
-            {isChatOpen ? <PanelRightClose className="h-4 w-4" /> : <PanelRight className="h-4 w-4" />}
-          </Button>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem className="gap-2">
-                <History className="h-4 w-4" /> Version History
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="gap-2">
-                <FileDown className="h-4 w-4" /> Export as PDF
-              </DropdownMenuItem>
-              <DropdownMenuItem className="gap-2">
-                <Download className="h-4 w-4" /> Export as Word
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive">
-                <Trash2 className="h-4 w-4" /> Delete Workspace
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default function DocumentEditor({ initialContent, workspaceId, projectId }: EditorProps) {
-  const { saveWorkspace, workspaceTitle, allWorkspaces, setWorkspaceTitle } = useWorkspace();
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
+  // ── 3. TipTap editor instance ────────────────────────────────
+  //
+  // EXTENSIONS come from module-level constants — never recreated.
+  // Recreating extensions would destroy/rebuild the ProseMirror
+  // schema, losing selection state and causing visible reflow.
   const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [1, 2, 3],
-        },
-      }),
-      Underline,
-      Typography,
-      TextStyle,
-      Color,
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: "text-primary underline cursor-pointer",
-        },
-      }),
-      Image.configure({
-        HTMLAttributes: {
-          class: "rounded-lg border shadow-lg mx-auto max-w-full",
-        },
-      }),
-      Highlight.configure({ multicolor: true }),
-      BubbleMenuExtension,
-      FloatingMenuExtension,
-      Subscript,
-      Superscript,
-      TaskList,
-      TaskItem.configure({
-        nested: true,
-      }),
-      Table.configure({
-        resizable: true,
-      }),
-      TableRow,
-      TableHeader,
-      TableCell,
-      CharacterCount,
-      Placeholder.configure({
-        placeholder: ({ node }) => {
-          if (node.type.name === "heading") {
-            return "Give it a title...";
-          }
-          return "Type '/' for commands or start writing...";
-        },
-      }),
-    ],
-    content: initialContent,
-    immediatelyRender: false,
+    extensions: EDITOR_EXTENSIONS,
+    content: null, // Hydrated in useEffect below
+    immediatelyRender: false, // Avoids SSR hydration mismatch
     editorProps: {
       attributes: {
-        class:
-          "prose prose-lg dark:prose-invert focus:outline-none max-w-[850px] mx-auto p-4 sm:p-12 lg:p-24 min-h-screen selection:bg-primary/20",
+        class: cn(
+          "prose prose-lg dark:prose-invert",
+          "focus:outline-none",
+          "max-w-[860px] mx-auto",
+          "p-4 sm:p-12 lg:p-20",
+          "min-h-screen",
+          "selection:bg-primary/20",
+        ),
+        spellcheck: "true",
       },
     },
     onUpdate: ({ editor }) => {
-      const html = editor.getHTML();
-
-      // Debounced autosave
-      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-      saveTimeoutRef.current = setTimeout(() => {
-        saveWorkspace(workspaceId, workspaceTitle, html);
-      }, 1000);
+      // JSON is the source of truth — never getHTML()
+      // titleRef.current is always fresh (avoids stale closure)
+      const json = editor.getJSON();
+      const words = (editor.storage.characterCount as { words: () => number }).words();
+      doc.setWordCount(words);
+      doc.scheduleAutosave(json, titleRef.current);
     },
   });
 
-  // Autosave when title/editor changes
+  // ── 4. Hydrate editor exactly once after API load ────────────
   useEffect(() => {
-    if (!editor) return;
-    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    saveTimeoutRef.current = setTimeout(() => {
-      saveWorkspace(workspaceId, workspaceTitle, editor.getHTML());
-    }, 1000);
-  }, [workspaceTitle, workspaceId, editor, saveWorkspace]);
+    if (!editor || hydratedRef.current) return;
+    if (doc.loadStatus !== "loaded") return;
 
-  // Load content on mount
+    const initialContent = doc.getInitialContent();
+    if (!initialContent) return;
+
+    hydratedRef.current = true;
+    // { emitUpdate: false } = do NOT emit onUpdate (prevents phantom autosave on load)
+    editor.commands.setContent(initialContent, { emitUpdate: false });
+    editor.commands.focus("end");
+  }, [doc.loadStatus, editor, doc]);
+
+  // ── 5. Keyboard shortcuts ────────────────────────────────────
+
+  // Ctrl+S — immediate save (bypasses debounce)
   useEffect(() => {
-    if (!editor) return;
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        if (editor) void doc.saveNow(editor.getJSON(), titleRef.current);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [editor, doc]);
 
-    // Find content from allWorkspaces instead of just relying on context state which might be empty
-    const ws = allWorkspaces.find((w) => w.id === workspaceId);
-    if (ws) {
-      setWorkspaceTitle(ws.title);
-      editor.commands.setContent(ws.content);
-    }
-  }, [workspaceId, editor, allWorkspaces, setWorkspaceTitle]);
+  // Visibility change & BeforeUnload — flush/warn before tab closes
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (editor && doc.isDirty) {
+        void doc.saveNow(editor.getJSON(), titleRef.current);
+      }
+    };
 
-  const addImage = () => {
-    if (!editor) return;
-    const url = window.prompt("URL");
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
-    }
-  };
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (doc.isDirty) {
+        e.preventDefault();
+        e.returnValue = ""; // Standard way to trigger browser "Leave site?" prompt
+      }
+    };
 
-  const setLink = () => {
+    window.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [editor, doc]);
+
+  // ── 6. Insert helpers ────────────────────────────────────────
+
+  const handleAddImage = useCallback(() => {
     if (!editor) return;
-    const previousUrl = editor.getAttributes("link").href;
-    const url = window.prompt("URL", previousUrl);
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64Str = e.target?.result as string;
+        // @ts-expect-error - tiptap-extension-resize-image adds setImage but may not merge types into ChainedCommands
+        editor.chain().focus().setImage({ src: base64Str }).run();
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }, [editor]);
+
+  const handleSetLink = useCallback(() => {
+    if (!editor) return;
+    const previous = editor.getAttributes("link").href as string | undefined;
+    const url = window.prompt("Link URL", previous ?? "");
     if (url === null) return;
     if (url === "") {
       editor.chain().focus().extendMarkRange("link").unsetLink().run();
       return;
     }
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
-  };
+  }, [editor]);
+
+  // ── 7. Title change handler ──────────────────────────────────
+
+  const handleTitleChange = useCallback(
+    (newTitle: string) => {
+      titleRef.current = newTitle;
+      doc.updateTitle(newTitle);
+      if (!editor) return;
+      doc.scheduleAutosave(editor.getJSON(), newTitle);
+    },
+    [editor, doc],
+  );
+
+  // ── 8. Restore handler ───────────────────────────────────────
+
+  const handleRestoreVersion = useCallback(
+    async (versionId: string) => {
+      const restored = await doc.restoreNamedVersion(versionId);
+      if (editor && restored) {
+        // { emitUpdate: false } = suppress onUpdate → no phantom autosave over restored content
+        editor.commands.setContent(restored.document.content, { emitUpdate: false });
+        editor.commands.focus("end");
+      }
+    },
+    [editor, doc],
+  );
+
+  // ── 9. Import / Export Handlers ──────────────────────────────
+
+  const handleImportText = useCallback(
+    async (text: string) => {
+      if (!editor) return;
+      // 1. Create safety snapshot of current document
+      await doc.createNamedVersion("Pre-import snapshot");
+      // 2. Parse markdown to JSON via backend
+      const result = await doc.importFromMarkdown(text);
+      // 3. Replace editor content (suppress autosave)
+      editor.commands.setContent(result, { emitUpdate: false });
+      // 4. Reset dirty state and autosave queue
+      doc.saveNow(result, titleRef.current);
+    },
+    [editor, doc],
+  );
+
+  const handleExport = useCallback(
+    (format: "pdf" | "markdown") => {
+      const promise = doc.exportAs(format, titleRef.current);
+
+      toast.promise(promise, {
+        loading: `Preparing ${format.toUpperCase()} export...`,
+        success: `Downloaded ${titleRef.current}.${format === "pdf" ? "pdf" : "md"}`,
+        error: `Failed to export as ${format.toUpperCase()}`,
+      });
+    },
+    [doc],
+  );
+
+  // ── 10. Render ────────────────────────────────────────────────
 
   return (
-    <div className="anim-in fade-in flex h-full w-full min-w-0 flex-col overflow-hidden bg-background duration-700">
-      <MenuBar editor={editor} onAddImage={addImage} onSetLink={setLink} projectId={projectId} />
+    <EditorShell
+      workspaceId={workspaceId}
+      loadStatus={doc.loadStatus}
+      isVersionPanelOpen={doc.isVersionPanelOpen}
+      versions={doc.versions}
+      onRetry={() => window.location.reload()}
+      onCloseVersionPanel={() => doc.setVersionPanelOpen(false)}
+      onRestoreVersion={handleRestoreVersion}
+      onCreateSnapshot={async () => {
+        await doc.createNamedVersion();
+      }}
+    >
+      {/* Toolbar — memoized, only re-renders on editor transaction */}
+      <EditorToolbar
+        editor={editor}
+        projectId={projectId}
+        title={doc.title}
+        onTitleChange={handleTitleChange}
+        onAddImage={handleAddImage}
+        onSetLink={handleSetLink}
+        onToggleVersionPanel={doc.toggleVersionPanel}
+        onImportMarkdownClick={() => setIsImportOpen(true)}
+        onExportPdf={() => handleExport("pdf")}
+        onExportMarkdown={() => handleExport("markdown")}
+      />
 
-      <div className="project-editor-container custom-scrollbar flex w-full min-w-0 flex-1 flex-col items-stretch justify-stretch overflow-y-auto scroll-smooth">
+      {/* Scrollable editor canvas */}
+      <div className="project-editor-container custom-scrollbar flex w-full min-w-0 flex-1 flex-col overflow-y-auto scroll-smooth">
         <EditorContent editor={editor} className="w-full flex-1" />
       </div>
 
+      {/* Context menus (only rendered when editor is ready) */}
       {editor && (
-        <BubbleMenu
-          editor={editor}
-          className="fade-in zoom-in-95 flex animate-in items-center gap-0.5 rounded-full border bg-card p-1 shadow-2xl duration-200"
-        >
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn("h-7 w-7 rounded-full p-0", editor.isActive("bold") && "text-primary")}
-            onClick={() => editor.chain().focus().toggleBold().run()}
-          >
-            <Bold className="h-3.5 w-3.5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn("h-7 w-7 rounded-full p-0", editor.isActive("italic") && "text-primary")}
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-          >
-            <Italic className="h-3.5 w-3.5" />
-          </Button>
-          <Separator orientation="vertical" className="mx-1 h-4" />
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn("h-7 w-7 rounded-full p-0", editor.isActive("highlight") && "text-primary")}
-            onClick={() => editor.chain().focus().toggleHighlight().run()}
-          >
-            <Highlighter className="h-3.5 w-3.5" />
-          </Button>
-          <Button variant="ghost" size="sm" className="h-7 w-7 rounded-full p-0" onClick={setLink}>
-            <LinkIcon className="h-3.5 w-3.5" />
-          </Button>
-        </BubbleMenu>
+        <>
+          <EditorBubbleMenu editor={editor} onSetLink={handleSetLink} />
+          <EditorFloatingMenu editor={editor} onAddImage={handleAddImage} />
+        </>
       )}
 
-      {editor && (
-        <FloatingMenu
-          editor={editor}
-          className="slide-in-from-left-4 flex animate-in items-center gap-1 rounded-xl border border-primary/10 bg-card p-1 shadow-lg duration-300"
-        >
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 rounded-lg p-0 hover:bg-primary/5"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          >
-            <Heading1 className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 rounded-lg p-0 hover:bg-primary/5"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          >
-            <Heading2 className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="sm" className="h-8 w-8 rounded-lg p-0 hover:bg-primary/5" onClick={addImage}>
-            <Plus className="h-4 w-4" />
-          </Button>
-        </FloatingMenu>
-      )}
-    </div>
+      {/* Modals */}
+      <ImportMarkdownModal isOpen={isImportOpen} onClose={() => setIsImportOpen(false)} onImport={handleImportText} />
+    </EditorShell>
   );
 }

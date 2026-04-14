@@ -8,6 +8,7 @@ import {
   Lora,
   Merriweather,
   Noto_Sans,
+  Noto_Sans_Ethiopic,
   Noto_Serif,
   Nunito_Sans,
   Outfit,
@@ -28,6 +29,11 @@ const inter = Inter({
 const notoSans = Noto_Sans({
   subsets: ["latin"],
   variable: "--font-noto-sans",
+});
+
+const notoSansEthiopic = Noto_Sans_Ethiopic({
+  subsets: ["ethiopic"],
+  variable: "--font-noto-sans-ethiopic",
 });
 
 const roboto = Roboto({
@@ -119,6 +125,10 @@ export const fontRegistry = {
   notoSans: {
     label: "Noto Sans",
     font: notoSans,
+  },
+  notoSansEthiopic: {
+    label: "Noto Sans Ethiopic",
+    font: notoSansEthiopic,
   },
   nunitoSans: {
     label: "Nunito Sans",
