@@ -99,6 +99,73 @@ export interface Workflow {
   steps: WorkflowStep[];
 }
 
+export type StepType = "APPROVAL" | "VOTE" | "FORM";
+
+export type StepStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED" | "REJECTED";
+
+export interface FormField {
+  name: string;
+  type: string;
+  multiple?: boolean;
+  required?: boolean;
+}
+
+export interface ApprovalTimelineStep {
+  id: string;
+  stepOrder: number;
+  stepLabel: string;
+  stepType: StepType;
+  approverRole: string;
+  status: StepStatus | WorkflowStepStatus | string;
+  isActive: boolean;
+  isFinal: boolean;
+  canAct: boolean;
+  // biome-ignore lint/suspicious/noExplicitAny: API design constraint
+  userAction: any | null;
+  decision?: {
+    // biome-ignore lint/suspicious/noExplicitAny: API design constraint
+    value: any | null;
+    by?: string;
+    at?: string;
+    comment?: string;
+  };
+  vote?: {
+    threshold: number;
+    strategy: string;
+    counts: {
+      approved: number;
+      rejected: number;
+      total: number;
+    };
+    votes: string[];
+  };
+  form?: {
+    schema: {
+      fields: FormField[];
+    };
+    // biome-ignore lint/suspicious/noExplicitAny: API design constraint
+    submission: {
+      submittedBy: string;
+      submittedAt: string;
+      values: Record<string, any>;
+    } | null;
+  };
+  approverUserId?: string;
+}
+
+export interface ApprovalTimelineResponse {
+  proposalId: string;
+  currentStepOrder: number;
+  steps: ApprovalTimelineStep[];
+}
+
+export interface SubmitStepActionPayload {
+  decision?: "Accepted" | "Rejected" | "Needs_Revision";
+  // biome-ignore lint/suspicious/noExplicitAny: Form inputs have dynamic structures
+  input?: Record<string, any>;
+  comment?: string;
+}
+
 export interface ProposalComment {
   id: string;
   commentText: string;

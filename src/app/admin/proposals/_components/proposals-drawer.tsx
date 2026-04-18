@@ -33,11 +33,13 @@ import {
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { submitStepAction } from "@/lib/api/proposals/mutations";
 import { getAdminProposalDetails } from "@/lib/api/proposals/queries";
 import type { AdminProposalDetail } from "@/lib/api/proposals/types";
 
 import { useProposals } from "../proposals-context";
 import { STATUS_CFG } from "./proposals-table";
+import { TimelineTab } from "./timeline-tab";
 
 export function ProposalsDrawer() {
   const {
@@ -71,6 +73,26 @@ export function ProposalsDrawer() {
       setDetails(null);
     }
   }, [selected]);
+
+  const onConfirmApprove = async () => {
+    if (!selected) return;
+    try {
+      await submitStepAction(selected.id, { decision: "Accepted", comment: timelineApproveNote });
+      handleTimelineApproveSubmit();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const onConfirmReject = async () => {
+    if (!selected || timelineRejectComment.trim().length < 10) return;
+    try {
+      await submitStepAction(selected.id, { decision: "Rejected", comment: timelineRejectComment });
+      handleTimelineRejectSubmit();
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <Sheet open={!!selected} onOpenChange={(o) => !o && closeDrawer()}>
@@ -369,135 +391,7 @@ export function ProposalsDrawer() {
               )}
 
               {/* ── TAB: APPROVE (timeline) ── */}
-              {drawerTab === "approve" && (
-                <div className="flex flex-col gap-6">
-                  <div className="flex flex-col gap-1 rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-4 dark:border-slate-800 dark:from-slate-900/50 dark:to-slate-950">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600/10 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400">
-                        <Sparkles className="h-4 w-4" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-slate-900 text-sm dark:text-slate-100">Approval chain</h4>
-                        <p className="font-medium text-[11px] text-slate-500 dark:text-slate-400">
-                          Completed steps show prior approvals. Your step is where you approve or reject. Later steps
-                          stay inactive.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="relative">
-                    <div
-                      className="absolute top-3 bottom-3 left-[19px] w-px bg-gradient-to-b from-emerald-200 via-blue-200 to-slate-200 dark:from-emerald-900/40 dark:via-blue-900/40 dark:to-slate-800"
-                      aria-hidden
-                    />
-
-                    <ul className="relative flex flex-col gap-4">
-                      {details.workflow.steps.map((step, _idx) => {
-                        const isCompleted = step.status === "Accepted";
-                        const isCurrent = step.isActive;
-                        const isUpcoming = step.status === "Pending" && !step.isActive;
-
-                        return (
-                          <li key={`${step.stepOrder}-${step.role}`} className="relative flex gap-4 pl-1">
-                            <div
-                              className={`relative z-[1] mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 shadow-sm transition-colors ${
-                                isCompleted
-                                  ? "border-emerald-200 bg-emerald-500 text-white dark:border-emerald-800 dark:bg-emerald-600"
-                                  : isCurrent
-                                    ? "border-blue-300 bg-blue-600 text-white ring-4 ring-blue-500/20 dark:border-blue-500 dark:bg-blue-600 dark:ring-blue-500/25"
-                                    : "border-slate-200 bg-slate-100 text-slate-400 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-500"
-                              }`}
-                            >
-                              {isCompleted && <Check className="h-4 w-4 stroke-[3]" />}
-                              {isCurrent && <Clock className="h-4 w-4" />}
-                              {isUpcoming && <Circle className="h-4 w-4" />}
-                            </div>
-
-                            <div
-                              className={`min-w-0 flex-1 rounded-2xl border p-4 transition-all ${
-                                isCompleted
-                                  ? "border-emerald-100 bg-emerald-50/40 dark:border-emerald-900/25 dark:bg-emerald-950/20"
-                                  : isCurrent
-                                    ? "border-blue-200 bg-gradient-to-br from-blue-50/90 to-white shadow-md dark:border-blue-900/40 dark:from-blue-950/30 dark:to-slate-950"
-                                    : "border-slate-100 bg-slate-50/40 opacity-60 dark:border-slate-800 dark:bg-slate-900/20"
-                              }`}
-                            >
-                              <div className="flex flex-wrap items-start justify-between gap-2">
-                                <div>
-                                  <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider dark:text-slate-500">
-                                    Step {step.stepOrder} · {step.role}
-                                  </p>
-                                  <p className="mt-0.5 font-semibold text-slate-900 text-sm dark:text-slate-100">
-                                    {isCurrent ? "You" : step.approverUserId || "Assigned Approver"}
-                                  </p>
-                                  {isCompleted && (
-                                    <p className="mt-1 flex items-center gap-1 font-medium text-[11px] text-emerald-700 dark:text-emerald-400">
-                                      <CheckCircle className="h-3 w-3 shrink-0" />
-                                      Approved
-                                    </p>
-                                  )}
-                                  {isUpcoming && (
-                                    <p className="mt-1 font-medium text-[11px] text-slate-400 italic dark:text-slate-500">
-                                      Awaiting earlier approvals
-                                    </p>
-                                  )}
-                                </div>
-                                {isCompleted && (
-                                  <Badge className="shrink-0 border-0 bg-emerald-100 font-bold text-[10px] text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
-                                    Done
-                                  </Badge>
-                                )}
-                                {isCurrent && (
-                                  <Badge className="shrink-0 border-0 bg-blue-100 font-bold text-[10px] text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
-                                    Your turn
-                                  </Badge>
-                                )}
-                              </div>
-
-                              {isCurrent && (
-                                <Can
-                                  permission="PROJECT_APPROVE"
-                                  fallback={
-                                    <div className="mt-4 flex rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800/80 dark:bg-slate-900/20">
-                                      <p className="font-medium text-slate-500 text-xs italic">
-                                        Awaiting authorized personnel. You do not have permission to approve or reject
-                                        this proposal step.
-                                      </p>
-                                    </div>
-                                  }
-                                >
-                                  <div className="mt-4 flex flex-wrap gap-2 border-slate-100 border-t pt-4 dark:border-slate-800/80">
-                                    <Button
-                                      type="button"
-                                      size="sm"
-                                      className="h-9 min-w-[120px] flex-1 bg-emerald-600 font-semibold text-white shadow-sm hover:bg-emerald-700"
-                                      onClick={() => setShowTimelineApprove(true)}
-                                    >
-                                      <Check className="mr-1.5 h-4 w-4" />
-                                      Approve
-                                    </Button>
-                                    <Button
-                                      type="button"
-                                      size="sm"
-                                      variant="outline"
-                                      className="h-9 min-w-[120px] flex-1 border-rose-200 font-semibold text-rose-700 hover:bg-rose-50 dark:border-rose-900/50 dark:text-rose-400 dark:hover:bg-rose-950/40"
-                                      onClick={() => setShowTimelineReject(true)}
-                                    >
-                                      <AlertTriangle className="mr-1.5 h-4 w-4" />
-                                      Reject
-                                    </Button>
-                                  </div>
-                                </Can>
-                              )}
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                </div>
-              )}
+              {drawerTab === "approve" && <TimelineTab proposalId={selected.id} />}
             </div>
           </>
         )}
@@ -546,7 +440,7 @@ export function ProposalsDrawer() {
             <Button
               size="sm"
               className="h-9 flex-1 bg-emerald-600 font-semibold text-white hover:bg-emerald-700"
-              onClick={handleTimelineApproveSubmit}
+              onClick={onConfirmApprove}
             >
               <Check className="mr-1.5 h-4 w-4" />
               Confirm approval
@@ -599,7 +493,7 @@ export function ProposalsDrawer() {
               size="sm"
               className="h-9 flex-1 bg-rose-600 font-semibold text-white hover:bg-rose-700"
               disabled={timelineRejectComment.trim().length < 10}
-              onClick={handleTimelineRejectSubmit}
+              onClick={onConfirmReject}
             >
               <XCircle className="mr-1.5 h-4 w-4" /> Confirm rejection
             </Button>
