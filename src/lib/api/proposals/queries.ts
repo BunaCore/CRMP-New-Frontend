@@ -10,6 +10,7 @@
 import type {
   AdminProposalDetail,
   Advisor,
+  ApprovalTimelineResponse,
   DefenceSchedule,
   Evaluator,
   GetEvaluationsResponse,
@@ -90,7 +91,7 @@ export async function getMyProposals(): Promise<ResearcherProposal[]> {
  */
 export async function getAdminProposalDetails(proposalId: string): Promise<AdminProposalDetail> {
   const { apiClient } = await import("@/lib/api/client");
-  const response = await apiClient.get<AdminProposalDetail>(`/proposals/admin/${proposalId}`);
+  const response = await apiClient.get<AdminProposalDetail>(`/proposals/${proposalId}`);
   return response.data;
 }
 
@@ -132,5 +133,15 @@ export async function getProposalMembers(proposalId: string): Promise<ProposalMe
 export async function getPendingApprovals(): Promise<PendingApproval[]> {
   const { apiClient } = await import("@/lib/api/client");
   const response = await apiClient.get<PendingApproval[]>("/proposals/pending-approvals");
+  return response.data;
+}
+
+/**
+ * Fetch the approval timeline view for a proposal.
+ * GET /proposals/:id/approval-timeline
+ */
+export async function getApprovalTimeline(proposalId: string): Promise<ApprovalTimelineResponse> {
+  const { apiClient } = await import("@/lib/api/client");
+  const response = await apiClient.get<ApprovalTimelineResponse>(`/proposals/${proposalId}/approval-timeline`);
   return response.data;
 }

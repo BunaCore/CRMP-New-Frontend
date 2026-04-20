@@ -7,6 +7,7 @@ import type {
   CreateProposalPayload,
   CreateProposalResponse,
   SubmitEvaluationScoresPayload,
+  SubmitStepActionPayload,
 } from "@/lib/api/proposals/types";
 
 /**
@@ -103,4 +104,13 @@ export async function submitProposal(proposalId: string): Promise<CreateProposal
 export async function submitEvaluationScores(proposalId: string, data: SubmitEvaluationScoresPayload): Promise<void> {
   const { apiClient } = await import("@/lib/api/client");
   await apiClient.post(`/proposals/${proposalId}/evaluations`, data);
+}
+
+/**
+ * Submit an action to a proposal step (e.g. approve, reject, form submit).
+ * POST /proposals/:id/action
+ */
+export async function submitStepAction(proposalId: string, payload: SubmitStepActionPayload): Promise<void> {
+  const { apiClient } = await import("@/lib/api/client");
+  await apiClient.post(`/proposals/${proposalId}/action`, payload);
 }
