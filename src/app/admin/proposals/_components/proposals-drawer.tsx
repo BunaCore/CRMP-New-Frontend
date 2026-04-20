@@ -153,7 +153,7 @@ export function ProposalsDrawer() {
                   {details.title}
                 </SheetTitle>
                 <SheetDescription className="font-medium text-slate-500 text-xs leading-relaxed">
-                  {details.department.name} · Date {details.createdAt.split("T")[0]} · Budget{" "}
+                  {details.department?.name} · Date {details.createdAt.split("T")[0]} · Budget{" "}
                   {new Intl.NumberFormat("en-US", {
                     style: "currency",
                     currency: "USD",
