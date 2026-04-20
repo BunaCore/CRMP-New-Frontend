@@ -17,19 +17,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import type { ChatRoom, GroupChatMessage, TeamMember } from "@/lib/team-data";
+import { useGetChatById, useGetMessages } from "@/lib/api/chat/chat.queries";
+import type { Message } from "@/lib/api/chat/types";
+import { useChatStore } from "@/stores/chat-store";
 import { Check, CheckCheck, Hash, Info, MoreVertical, Paperclip, Send, Settings, Smile, Users } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface GroupChatPanelProps {
-  room: ChatRoom;
-  messages: GroupChatMessage[];
-  members: TeamMember[];
+  chatId: string;
   currentUserId: string;
-  typingUsers: string[];
-  onSendMessage: (content: string) => void;
-  onViewRoomInfo: () => void;
-  onViewProfile?: (memberId: string) => void;
 }
 
 function getInitials(name: string) {
@@ -90,30 +86,30 @@ const roleColors: Record<string, string> = {
   "Postdoctoral Fellow": "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
 };
 
-export function GroupChatPanel({
-  room,
-  messages,
-  members,
-  currentUserId,
-  typingUsers,
-  onSendMessage,
-  onViewRoomInfo,
-  onViewProfile,
-}: GroupChatPanelProps) {
+export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
   const [inputValue, setInputValue] = useState("");
   const [showMembers, setShowMembers] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Get member map for quick lookups
-  const memberMap = new Map(members.map((m) => [m.id, m]));
-  const roomMembers = room.memberIds.map((id) => memberMap.get(id)).filter(Boolean) as TeamMember[];
-  const onlineMembers = roomMembers.filter((m) => m.isOnline);
-  const typingMemberNames = typingUsers.map((id) => memberMap.get(id)?.name.split(" ")[0]).filter(Boolean);
+  const { data: room, isLoading: isLoadingRoom } = useGetChatById(chatId);
+  const { data: messagesPages, fetchNextPage, hasNextPage } = useGetMessages(chatId);
+  const messages = messagesPages?.pages.flatMap((page) => page.messages) || [];
 
-  // For direct messages, get the other participant
-  const isDirectMessage = room.type === "direct";
-  const dmPartner = isDirectMessage ? memberMap.get(room.memberIds.find((id) => id !== currentUserId) || "") : null;
+  const typingState = useChatStore((s) => s.typingState[chatId]);
+
+  const typingUsers = Object.keys(typingState ?? {});
+  const presenceMap = useChatStore((s) => s.presenceMap);
+  const appendMessage = useChatStore((s) => s.appendMessage);
+
+  const roomMembers = room?.members || [];
+  const onlineMembers = roomMembers.filter((m) => presenceMap[m.id] === "online");
+  const typingMemberNames = typingUsers
+    .map((id) => roomMembers.find((m) => m.id === id)?.name.split(" ")[0])
+    .filter(Boolean);
+
+  const isDirectMessage = room?.type === "dm";
+  const dmPartner = isDirectMessage ? roomMembers.find((m) => m.id !== currentUserId) : null;
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -123,11 +119,18 @@ export function GroupChatPanel({
 
   useEffect(() => {
     inputRef.current?.focus();
-  }, [room.id]);
+  }, [chatId]);
 
   const handleSend = () => {
     if (inputValue.trim()) {
-      onSendMessage(inputValue.trim());
+      // Stub integration as requested
+      appendMessage(chatId, {
+        id: `mock-${Date.now()}`,
+        chatId: chatId,
+        content: inputValue.trim(),
+        createdAt: new Date().toISOString(),
+        sender: { id: currentUserId, name: "Betelhem Tekle", avatar: null },
+      });
       setInputValue("");
     }
   };
@@ -140,17 +143,21 @@ export function GroupChatPanel({
   };
 
   // Group messages by date
-  const groupedMessages: { date: string; messages: GroupChatMessage[] }[] = [];
+  const groupedMessages: { date: string; messages: Message[] }[] = [];
   let currentDate = "";
   messages.forEach((msg) => {
-    const msgDate = new Date(msg.timestamp).toDateString();
+    const msgDate = new Date(msg.createdAt).toDateString();
     if (msgDate !== currentDate) {
       currentDate = msgDate;
-      groupedMessages.push({ date: msg.timestamp, messages: [msg] });
+      groupedMessages.push({ date: msg.createdAt, messages: [msg] });
     } else {
       groupedMessages[groupedMessages.length - 1].messages.push(msg);
     }
   });
+
+  if (isLoadingRoom || !room) {
+    return <div className="flex h-full items-center justify-center text-muted-foreground">Loading chat...</div>;
+  }
 
   return (
     <div className="flex h-full flex-col bg-card">
@@ -163,22 +170,21 @@ export function GroupChatPanel({
                 <Avatar className="h-10 w-10">
                   <AvatarFallback className="bg-primary/10 text-primary">{getInitials(dmPartner.name)}</AvatarFallback>
                 </Avatar>
-                {dmPartner.isOnline && (
+                {presenceMap[dmPartner.id] === "online" && (
                   <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card bg-emerald-500" />
                 )}
               </div>
               <div>
-                <h3 className="font-semibold text-foreground">{dmPartner.name}</h3>
+                <h3 className="font-semibold text-foreground">{dmPartner?.name || "Direct Message"}</h3>
                 <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${roleColors[dmPartner.role] || ""}`}>
-                    {dmPartner.role}
+                  <Badge
+                    variant="secondary"
+                    className="text-[10px] px-1.5 py-0 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                  >
+                    Team Member
                   </Badge>
                   <span className="text-xs text-muted-foreground">
-                    {dmPartner.isOnline
-                      ? "Online"
-                      : dmPartner.lastSeen
-                        ? getRelativeTime(dmPartner.lastSeen)
-                        : "Offline"}
+                    {presenceMap[dmPartner?.id || ""] === "online" ? "Online" : "Offline"}
                   </span>
                 </div>
               </div>
@@ -217,7 +223,7 @@ export function GroupChatPanel({
                       </TooltipTrigger>
                       <TooltipContent>
                         <p className="font-medium">{member.name}</p>
-                        <p className="text-xs text-muted-foreground">{member.role}</p>
+                        <p className="text-xs text-muted-foreground">Team Member</p>
                       </TooltipContent>
                     </Tooltip>
                   ))}
@@ -245,30 +251,16 @@ export function GroupChatPanel({
             <DropdownMenuContent align="end">
               {isDirectMessage && dmPartner ? (
                 <>
-                  <DropdownMenuItem onClick={() => onViewProfile?.(dmPartner.id)}>
+                  <DropdownMenuItem onClick={() => alert("Profile API not connected")}>
                     <Info className="mr-2 h-4 w-4" />
                     View Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-destructive">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Block User
                   </DropdownMenuItem>
                 </>
               ) : (
                 <>
-                  <DropdownMenuItem onClick={onViewRoomInfo}>
+                  <DropdownMenuItem onClick={() => alert("Room API not connected")}>
                     <Info className="mr-2 h-4 w-4" />
-                    Room Details
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setShowMembers(true)}>
-                    <Users className="mr-2 h-4 w-4" />
-                    View Members ({roomMembers.length})
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Room Settings
+                    Room Info
                   </DropdownMenuItem>
                 </>
               )}
@@ -278,46 +270,43 @@ export function GroupChatPanel({
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Messages Area */}
         <ScrollArea className="flex-1 p-4" ref={scrollRef}>
           <div className="space-y-6">
             {groupedMessages.map((group) => (
               <div key={group.date}>
-                {/* Date Header */}
                 <div className="mb-4 flex items-center justify-center">
                   <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
                     {formatDateHeader(group.date)}
                   </span>
                 </div>
-                {/* Messages */}
                 <div className="space-y-4">
-                  {group.messages.map((message, msgIdx) => {
-                    const isSent = message.senderId === currentUserId;
-                    const sender = memberMap.get(message.senderId);
-                    const showAvatar = msgIdx === 0 || group.messages[msgIdx - 1].senderId !== message.senderId;
+                  {group.messages.map((msg, index) => {
+                    const isMe = msg.sender.id === currentUserId;
+                    const showAvatar =
+                      index === group.messages.length - 1 || group.messages[index + 1].sender.id !== msg.sender.id;
 
                     return (
-                      <div key={message.id} className={`flex gap-3 ${isSent ? "flex-row-reverse" : ""}`}>
+                      <div key={msg.id} className={`flex gap-3 ${isMe ? "flex-row-reverse" : ""}`}>
                         {/* Avatar */}
-                        <div className="w-8 shrink-0">
-                          {showAvatar && !isSent && sender && (
+                        <div className="w-8 shrink-0 flex flex-col justify-end">
+                          {showAvatar && !isMe && (
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <div className="relative">
                                     <Avatar className="h-8 w-8">
                                       <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                                        {getInitials(sender.name)}
+                                        {getInitials(msg.sender.name)}
                                       </AvatarFallback>
                                     </Avatar>
-                                    {sender.isOnline && (
+                                    {presenceMap[msg.sender.id] === "online" && (
                                       <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-card bg-emerald-500" />
                                     )}
                                   </div>
                                 </TooltipTrigger>
                                 <TooltipContent side="left">
-                                  <p className="font-medium">{sender.name}</p>
-                                  <p className="text-xs text-muted-foreground">{sender.role}</p>
+                                  <p className="font-medium">{msg.sender.name}</p>
+                                  <p className="text-xs text-muted-foreground">Team Member</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -325,67 +314,34 @@ export function GroupChatPanel({
                         </div>
 
                         {/* Message Content */}
-                        <div className={`max-w-[70%] ${isSent ? "items-end" : "items-start"}`}>
-                          {showAvatar && !isSent && sender && (
+                        <div className={`max-w-[70%] flex flex-col ${isMe ? "items-end" : "items-start"}`}>
+                          {showAvatar && !isMe && (
                             <div className="mb-1 flex items-center gap-2">
-                              <span className="text-sm font-medium text-foreground">{sender.name}</span>
+                              <span className="text-sm font-medium text-foreground">{msg.sender.name}</span>
                               <Badge
                                 variant="secondary"
-                                className={`text-[10px] px-1.5 py-0 ${roleColors[sender.role] || ""}`}
+                                className="text-[10px] px-1.5 py-0 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
                               >
-                                {sender.role
-                                  .split(" ")
-                                  .map((w) => w[0])
-                                  .join("")}
+                                Team Member
                               </Badge>
-                              <span className="text-[10px] text-muted-foreground">
-                                {getRelativeTime(message.timestamp)}
-                              </span>
                             </div>
                           )}
                           <div
                             className={`rounded-2xl px-4 py-2 ${
-                              isSent
+                              isMe
                                 ? "bg-primary text-primary-foreground rounded-br-md"
                                 : "bg-muted text-foreground rounded-bl-md"
                             }`}
                           >
-                            <p className="text-sm leading-relaxed">{message.content}</p>
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                           </div>
                           <div
-                            className={`mt-1 flex items-center gap-1 text-[10px] ${
-                              isSent ? "justify-end" : ""
-                            } text-muted-foreground`}
+                            className={`mt-1 flex items-center gap-1 text-[10px] text-muted-foreground ${
+                              isMe ? "justify-end" : ""
+                            }`}
                           >
-                            <span>{formatTime(message.timestamp)}</span>
-                            {isSent && (
-                              <>
-                                {message.readBy.length > 1 ? (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <span className="flex items-center gap-0.5">
-                                          <CheckCheck className="h-3 w-3 text-primary" />
-                                          <span className="text-primary">{message.readBy.length - 1}</span>
-                                        </span>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p className="text-xs">
-                                          Read by{" "}
-                                          {message.readBy
-                                            .filter((id) => id !== currentUserId)
-                                            .map((id) => memberMap.get(id)?.name.split(" ")[0])
-                                            .filter(Boolean)
-                                            .join(", ")}
-                                        </p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
-                                ) : (
-                                  <Check className="h-3 w-3" />
-                                )}
-                              </>
-                            )}
+                            <span>{formatTime(msg.createdAt)}</span>
+                            {/* Read receipts simulation conditionally omitted per strict instructions to fallback without data mapping overhead */}
                           </div>
                         </div>
                       </div>
@@ -440,20 +396,20 @@ export function GroupChatPanel({
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-xs font-medium">{member.name}</p>
-                        <p className="truncate text-[10px] text-muted-foreground">{member.role}</p>
+                        <p className="truncate text-[10px] text-muted-foreground">Team Member</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
                 {/* Offline Members */}
-                {roomMembers.filter((m) => !m.isOnline).length > 0 && (
+                {roomMembers.filter((m) => presenceMap[m.id] !== "online").length > 0 && (
                   <div>
                     <p className="mb-2 px-2 text-xs font-medium text-muted-foreground uppercase">
-                      Offline - {roomMembers.filter((m) => !m.isOnline).length}
+                      Offline - {roomMembers.filter((m) => presenceMap[m.id] !== "online").length}
                     </p>
                     {roomMembers
-                      .filter((m) => !m.isOnline)
+                      .filter((m) => presenceMap[m.id] !== "online")
                       .map((member) => (
                         <div
                           key={member.id}
@@ -466,9 +422,7 @@ export function GroupChatPanel({
                           </Avatar>
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-xs font-medium">{member.name}</p>
-                            <p className="truncate text-[10px] text-muted-foreground">
-                              {member.lastSeen ? getRelativeTime(member.lastSeen) : "Offline"}
-                            </p>
+                            <p className="truncate text-[10px] text-muted-foreground">Offline</p>
                           </div>
                         </div>
                       ))}
