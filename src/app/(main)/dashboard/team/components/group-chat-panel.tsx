@@ -20,6 +20,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useGetChatById, useGetMessages } from "@/lib/api/chat/chat.queries";
 import type { Message } from "@/lib/api/chat/types";
 import { useChatStore } from "@/stores/chat-store";
+import { emitGetInitialPresence, emitSendMessage, emitTyping } from "@/lib/socket/emitter";
 import { Check, CheckCheck, Hash, Info, MoreVertical, Paperclip, Send, Settings, Smile, Users } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -91,6 +92,7 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
   const [showMembers, setShowMembers] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: room, isLoading: isLoadingRoom } = useGetChatById(chatId);
   const { data: messagesPages, fetchNextPage, hasNextPage } = useGetMessages(chatId);
@@ -100,7 +102,6 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
 
   const typingUsers = Object.keys(typingState ?? {});
   const presenceMap = useChatStore((s) => s.presenceMap);
-  const appendMessage = useChatStore((s) => s.appendMessage);
 
   const roomMembers = room?.members || [];
   const onlineMembers = roomMembers.filter((m) => presenceMap[m.id] === "online");
@@ -112,27 +113,38 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
   const dmPartner = isDirectMessage ? roomMembers.find((m) => m.id !== currentUserId) : null;
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
-
-  useEffect(() => {
     inputRef.current?.focus();
+    // Request initial presence whenever the chat changes
+    emitGetInitialPresence();
   }, [chatId]);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+
+    // Emit typing started
+    emitTyping({ chatId, isTyping: true });
+
+    // Clear previous timer and restart 3s expiry
+    if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+    typingTimerRef.current = setTimeout(() => {
+      emitTyping({ chatId, isTyping: false });
+    }, 3000);
+  };
+
   const handleSend = () => {
-    if (inputValue.trim()) {
-      // Stub integration as requested
-      appendMessage(chatId, {
-        id: `mock-${Date.now()}`,
-        chatId: chatId,
-        content: inputValue.trim(),
-        createdAt: new Date().toISOString(),
-        sender: { id: currentUserId, name: "Betelhem Tekle", avatar: null },
-      });
-      setInputValue("");
-    }
+    const content = inputValue.trim();
+    if (!content) return;
+
+    const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    // Emit via socket — backend will echo back with real id replacing tempId
+    emitSendMessage({ chatId, content, tempId });
+
+    // Stop typing indicator immediately
+    emitTyping({ chatId, isTyping: false });
+    if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+
+    setInputValue("");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -271,7 +283,7 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
 
       <div className="flex flex-1 overflow-hidden">
         <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-          <div className="space-y-6">
+          <div className="flex flex-col-reverse gap-6">
             {groupedMessages.map((group) => (
               <div key={group.date}>
                 <div className="mb-4 flex items-center justify-center">
@@ -279,11 +291,11 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
                     {formatDateHeader(group.date)}
                   </span>
                 </div>
-                <div className="space-y-4">
-                  {group.messages.map((msg, index) => {
+                <div className="flex flex-col-reverse gap-4">
+                  {[...group.messages].map((msg, index, arr) => {
                     const isMe = msg.sender.id === currentUserId;
-                    const showAvatar =
-                      index === group.messages.length - 1 || group.messages[index + 1].sender.id !== msg.sender.id;
+                    // In reversed array, check the item before in DOM = next chronologically
+                    const showAvatar = index === 0 || arr[index - 1].sender.id !== msg.sender.id;
 
                     return (
                       <div key={msg.id} className={`flex gap-3 ${isMe ? "flex-row-reverse" : ""}`}>
@@ -445,7 +457,7 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
             <Input
               ref={inputRef}
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
+              onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               placeholder={
                 isDirectMessage && dmPartner

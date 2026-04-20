@@ -8,6 +8,7 @@ interface ChatState {
   // Actions
   setActiveChatId: (chatId: string | null) => void;
   setPresence: (userId: string, status: "online" | "offline") => void;
+  setAllPresence: (presenceMap: Record<string, "online" | "offline">) => void;
   setTyping: (chatId: string, userId: string) => void;
   clearTyping: (chatId: string, userId: string) => void;
 
@@ -28,6 +29,11 @@ export const useChatStore = create<ChatState>((set) => ({
         ...state.presenceMap,
         [userId]: status,
       },
+    })),
+
+  setAllPresence: (newPresenceMap) =>
+    set(() => ({
+      presenceMap: newPresenceMap,
     })),
 
   setTyping: (chatId, userId) =>
