@@ -11,7 +11,7 @@ import { useGetChats } from "@/lib/api/chat/chat.queries";
 import type { ChatSummary } from "@/lib/api/chat/types";
 import { useChatStore } from "@/stores/chat-store";
 import { formatDistanceToNow } from "date-fns";
-import { Hash, MessageSquarePlus, Search, User } from "lucide-react";
+import { Hash, MessageSquarePlus, Search } from "lucide-react";
 import { useState } from "react";
 
 interface ChatRoomsListProps {

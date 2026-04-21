@@ -11,7 +11,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -22,8 +21,10 @@ import type { Message } from "@/lib/api/chat/types";
 import { useChatStore } from "@/stores/chat-store";
 import { emitGetInitialPresence, emitSendMessage, emitTyping } from "@/lib/socket/emitter";
 import { useMarkAsRead } from "@/lib/socket/hooks/use-mark-as-read";
-import { Check, CheckCheck, Hash, Info, MoreVertical, Paperclip, Send, Settings, Smile, Users } from "lucide-react";
+import { ArrowDown, Hash, Info, MoreVertical, Paperclip, Send, Smile, Users } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useChatScroll } from "@/lib/hooks/use-chat-scroll";
+import { ChatMessageSkeleton } from "./skeletons/chat-message-skeleton";
 
 interface GroupChatPanelProps {
   chatId: string;
@@ -66,7 +67,7 @@ function formatDateHeader(timestamp: string) {
   });
 }
 
-function getRelativeTime(timestamp: string) {
+function _getRelativeTime(timestamp: string) {
   const now = new Date();
   const date = new Date(timestamp);
   const diffMs = now.getTime() - date.getTime();
@@ -80,7 +81,7 @@ function getRelativeTime(timestamp: string) {
   return `${diffDays}d ago`;
 }
 
-const roleColors: Record<string, string> = {
+const _roleColors: Record<string, string> = {
   "Principal Investigator": "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
   "Co-Investigator": "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
   "Research Assistant": "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
@@ -190,13 +191,36 @@ function ChatInput({ chatId, placeholder }: { chatId: string; placeholder: strin
 export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
   const [showMembers, setShowMembers] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  console.log("Group chat panel rerender");
+  const topRef = useRef<HTMLDivElement>(null);
 
   const { data: room, isLoading: isLoadingRoom } = useGetChatById(chatId);
-  const { data: messagesPages, fetchNextPage, hasNextPage } = useGetMessages(chatId);
+  const { data: messagesPages, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetMessages(chatId);
   const messages = useMemo(() => {
-    return messagesPages?.pages.flatMap((page) => page.messages) || [];
+    if (!messagesPages) return [];
+    return messagesPages.pages.flatMap((page) => page.messages).reverse();
   }, [messagesPages]);
+
+  const { isAtBottom, hasUnreadDownBelow, scrollToBottom, snapshotScrollBeforeFetch } = useChatScroll(
+    scrollRef,
+    messages.length,
+  );
+  console.log("isAtBottom", isAtBottom);
+  console.log("hasUnreadDownBelow", hasUnreadDownBelow);
+
+  // Intersection Observer for fetching older messages when topRef comes into view
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          snapshotScrollBeforeFetch();
+          fetchNextPage();
+        }
+      },
+      { root: scrollRef.current, rootMargin: "100px" },
+    );
+    if (topRef.current) observer.observe(topRef.current);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, snapshotScrollBeforeFetch]);
 
   // Handles: on chat open, on window focus → emit chat:markAsRead
   useMarkAsRead(chatId);
@@ -344,9 +368,11 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-          <div className="flex flex-col-reverse gap-6">
+      <div className="flex flex-1 overflow-hidden relative">
+        <ScrollArea className="flex-1 p-4" viewportRef={scrollRef}>
+          <div ref={topRef} className="h-1 w-full" />
+          {isFetchingNextPage && <ChatMessageSkeleton />}
+          <div className="flex flex-col gap-6">
             {groupedMessages.map((group) => (
               <div key={group.date}>
                 <div className="mb-4 flex items-center justify-center">
@@ -354,11 +380,10 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
                     {formatDateHeader(group.date)}
                   </span>
                 </div>
-                <div className="flex flex-col-reverse gap-4">
+                <div className="flex flex-col gap-4">
                   {[...group.messages].map((msg, index, arr) => {
                     const isMe = msg.sender.id === currentUserId;
-                    // In reversed array, check the item before in DOM = next chronologically
-                    const showAvatar = index === 0 || arr[index - 1].sender.id !== msg.sender.id;
+                    const showAvatar = index === arr.length - 1 || arr[index + 1].sender.id !== msg.sender.id;
 
                     return (
                       <div key={msg.id} className={`flex gap-3 ${isMe ? "flex-row-reverse" : ""}`}>
@@ -430,6 +455,22 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
             <TypingIndicator chatId={chatId} roomMembers={roomMembers} />
           </div>
         </ScrollArea>
+
+        {!isAtBottom && (
+          <Button
+            size="icon"
+            className="absolute bottom-6 right-6 rounded-full shadow-lg z-10 animate-in fade-in zoom-in w-10 h-10 bg-neutral-200/20 hover:bg-neutral-200/30 cursor-pointer"
+            onClick={() => scrollToBottom(true)}
+          >
+            <ArrowDown className="h-5 w-5 text-foreground" />
+            {hasUnreadDownBelow && (
+              <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive" />
+              </span>
+            )}
+          </Button>
+        )}
 
         {/* Members Sidebar */}
         {showMembers && (

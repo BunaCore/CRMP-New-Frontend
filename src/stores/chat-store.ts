@@ -1,5 +1,7 @@
 import { create } from "zustand";
 
+import type { Message } from "@/lib/api/chat/types";
+
 interface ChatState {
   activeChatId: string | null;
   presenceMap: Record<string, "online" | "offline">;
@@ -19,7 +21,7 @@ interface ChatState {
   incrementUnreadCount: (chatId: string) => void;
 
   // Stub for future socket action (would normally inject into queryClient)
-  appendMessage: (chatId: string, message: any) => void;
+  appendMessage: (chatId: string, message: Message) => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({

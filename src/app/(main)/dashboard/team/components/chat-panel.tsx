@@ -88,7 +88,7 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const _handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
