@@ -207,8 +207,8 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
             <Input
               ref={inputRef}
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
+              // onChange={(e) => setInputValue(e.target.value)}
+              // onKeyDown={handleKeyDown}
               placeholder="Type a message..."
               className="pr-10"
             />

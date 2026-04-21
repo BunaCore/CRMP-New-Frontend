@@ -89,7 +89,7 @@ export function ChatRoomsList({ onCreateRoom, onStartDirectMessage }: ChatRoomsL
             <TabsTrigger value="group" className="flex-1">
               Groups
             </TabsTrigger>
-            <TabsTrigger value="direct" className="flex-1">
+            <TabsTrigger value="dm" className="flex-1">
               Direct
             </TabsTrigger>
           </TabsList>

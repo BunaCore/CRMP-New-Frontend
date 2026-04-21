@@ -4,6 +4,7 @@ import { useChatStore } from "@/stores/chat-store";
 
 import type { ChatSummary, Message } from "../api/chat/types";
 import { socketManager } from "./socket";
+import { emitMarkAsRead } from "./utils/emit-mark-as-read";
 
 export function setupSocketListeners(queryClient: QueryClient) {
   const socket = socketManager.getSocket();
@@ -37,19 +38,15 @@ export function setupSocketListeners(queryClient: QueryClient) {
     const activeChatId = store.activeChatId;
     const { chatId } = newMessage;
 
-    // A) Always append to the Infinite Query cache if it exists
+    // A) Append to the Infinite Query cache
     const queryKey = ["messages", chatId];
-    // We update pages if it exists, otherwise it will just fetch cleanly on mount
     queryClient.setQueryData<any>(queryKey, (oldData: any) => {
       if (!oldData || !oldData.pages) return oldData;
 
       const newPages = [...oldData.pages];
-      // Insert into the newest page (usually the first one if we sort desc, or last if asc)
-      // Assuming pages[0].messages has the newest items (based on typical cursor mapping)
-      // We will place it at the front. If you sort differently, adjust this:
       const mutatedPage = { ...newPages[0] };
 
-      // If we used a tempId (optimistic update), we should replace it
+      // Replace optimistic temp message or prepend new
       if (newMessage.tempId) {
         const index = mutatedPage.messages.findIndex((m: Message) => m.id === newMessage.tempId);
         if (index !== -1) {
@@ -65,40 +62,39 @@ export function setupSocketListeners(queryClient: QueryClient) {
       return { ...oldData, pages: newPages };
     });
 
-    // B) Track Unread / Last Message in the chat sidebar list
-    const chatsQueryKey = ["chats"];
-    queryClient.setQueryData<ChatSummary[]>(chatsQueryKey, (oldChats) => {
+    // B) Update sidebar last message
+    queryClient.setQueryData<ChatSummary[]>(["chats"], (oldChats) => {
       if (!oldChats) return oldChats;
       return oldChats.map((chat) => {
         if (chat.id === chatId) {
-          return {
-            ...chat,
-            lastMessage: newMessage,
-            unreadCount: chatId === activeChatId ? chat.unreadCount : (chat.unreadCount || 0) + 1,
-          };
+          return { ...chat, lastMessage: newMessage };
         }
         return chat;
       });
     });
 
-    // C) If chat is active, optionally trigger mutation to mark as read here (TODO implementation)
+    // C) Read tracking — only emit if this is the active chat
+    if (chatId === activeChatId) {
+      // Reset unread and mark as read immediately
+      store.setUnreadCount(chatId, 0);
+      emitMarkAsRead(chatId, newMessage.id);
+    } else {
+      // Increment unread in Zustand (sidebar reads from Zustand for realtime)
+      store.incrementUnreadCount(chatId);
+    }
   });
 
-  // 4. Chat User Typing
-  socket.on("chat:typing", (data: { userId: string; chatId: string; isTyping: boolean }) => {
-    // The instructions specified using a 3s expiry in the store rather than tracking perfectly based on `false`
-    // The Zustand store action handles that safely
+  // 4. Chat User Typing — timestamp-based (store handles 3s expiry)
+  socket.on("chat:typing", (data: { userId: string; chatId: string }) => {
     useChatStore.getState().setTyping(data.chatId, data.userId);
   });
 
-  // 5. Chat Error handling (Reverting optimistic UI)
+  // 5. Chat Error handling
   socket.on("chat:error", (data: { message: string }) => {
-    // Depending on tempId passed, you would reverse the specific queryCache patch here
-    // For now we toast it to the system.
     console.error("Chat Error:", data.message);
   });
 
-  // 6. Authentication Error
+  // 6. Auth Error
   socket.on("auth:error", (data: { message: string }) => {
     console.error("Socket Auth Error:", data.message);
     socketManager.disconnect();

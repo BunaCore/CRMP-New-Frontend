@@ -21,8 +21,9 @@ import { useGetChatById, useGetMessages } from "@/lib/api/chat/chat.queries";
 import type { Message } from "@/lib/api/chat/types";
 import { useChatStore } from "@/stores/chat-store";
 import { emitGetInitialPresence, emitSendMessage, emitTyping } from "@/lib/socket/emitter";
+import { useMarkAsRead } from "@/lib/socket/hooks/use-mark-as-read";
 import { Check, CheckCheck, Hash, Info, MoreVertical, Paperclip, Send, Settings, Smile, Users } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface GroupChatPanelProps {
   chatId: string;
@@ -87,48 +88,55 @@ const roleColors: Record<string, string> = {
   "Postdoctoral Fellow": "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
 };
 
-export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
-  const [inputValue, setInputValue] = useState("");
-  const [showMembers, setShowMembers] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const { data: room, isLoading: isLoadingRoom } = useGetChatById(chatId);
-  const { data: messagesPages, fetchNextPage, hasNextPage } = useGetMessages(chatId);
-  const messages = messagesPages?.pages.flatMap((page) => page.messages) || [];
-
+function TypingIndicator({ chatId, roomMembers }: { chatId: string; roomMembers: any[] }) {
   const typingState = useChatStore((s) => s.typingState[chatId]);
-
-  const typingUsers = Object.keys(typingState ?? {});
-  const presenceMap = useChatStore((s) => s.presenceMap);
-
-  const roomMembers = room?.members || [];
-  const onlineMembers = roomMembers.filter((m) => presenceMap[m.id] === "online");
-  const typingMemberNames = typingUsers
-    .map((id) => roomMembers.find((m) => m.id === id)?.name.split(" ")[0])
-    .filter(Boolean);
-
-  const isDirectMessage = room?.type === "dm";
-  const dmPartner = isDirectMessage ? roomMembers.find((m) => m.id !== currentUserId) : null;
+  const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
-    inputRef.current?.focus();
-    // Request initial presence whenever the chat changes
-    emitGetInitialPresence();
-  }, [chatId]);
+    // Only run interval if there might be typing active
+    const hasTypers = Object.keys(typingState || {}).length > 0;
+    if (!hasTypers) return;
+
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, [typingState]);
+
+  const typingUsers = Object.entries(typingState ?? {})
+    .filter(([_, timestamp]) => now - timestamp < 3000)
+    .map(([id]) => id);
+
+  const typingMemberNames = typingUsers
+    .map((id) => roomMembers.find((m) => m.id === id)?.name?.split(" ")[0])
+    .filter(Boolean);
+
+  if (typingMemberNames.length === 0) return null;
+
+  return (
+    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <div className="flex gap-1">
+        <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50 [animation-delay:-0.3s]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50 [animation-delay:-0.15s]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50" />
+      </div>
+      <span>
+        {typingMemberNames.length === 1
+          ? `${typingMemberNames[0]} is typing...`
+          : typingMemberNames.length === 2
+            ? `${typingMemberNames.join(" and ")} are typing...`
+            : `${typingMemberNames.slice(0, 2).join(", ")} and ${typingMemberNames.length - 2} others are typing...`}
+      </span>
+    </div>
+  );
+}
+
+function ChatInput({ chatId, placeholder }: { chatId: string; placeholder: string }) {
+  const [inputValue, setInputValue] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
-
-    // Emit typing started
-    emitTyping({ chatId, isTyping: true });
-
-    // Clear previous timer and restart 3s expiry
-    if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
-    typingTimerRef.current = setTimeout(() => {
-      emitTyping({ chatId, isTyping: false });
-    }, 3000);
+    // Emit typing started (cooldown managed by Zustand/socket emitter)
+    emitTyping({ chatId });
   };
 
   const handleSend = () => {
@@ -136,13 +144,8 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
     if (!content) return;
 
     const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-
     // Emit via socket — backend will echo back with real id replacing tempId
     emitSendMessage({ chatId, content, tempId });
-
-    // Stop typing indicator immediately
-    emitTyping({ chatId, isTyping: false });
-    if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
 
     setInputValue("");
   };
@@ -154,18 +157,78 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
     }
   };
 
+  return (
+    <div className="border-t p-4">
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0">
+          <Paperclip className="h-4 w-4 text-muted-foreground" />
+          <span className="sr-only">Attach file</span>
+        </Button>
+        <div className="relative flex-1">
+          <Input
+            ref={inputRef}
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            className="pr-10"
+          />
+          <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2">
+            <Smile className="h-4 w-4 text-muted-foreground" />
+            <span className="sr-only">Add emoji</span>
+          </Button>
+        </div>
+        <Button onClick={handleSend} size="icon" className="h-9 w-9 shrink-0">
+          <Send className="h-4 w-4" />
+          <span className="sr-only">Send message</span>
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
+  const [showMembers, setShowMembers] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  console.log("Group chat panel rerender");
+
+  const { data: room, isLoading: isLoadingRoom } = useGetChatById(chatId);
+  const { data: messagesPages, fetchNextPage, hasNextPage } = useGetMessages(chatId);
+  const messages = useMemo(() => {
+    return messagesPages?.pages.flatMap((page) => page.messages) || [];
+  }, [messagesPages]);
+
+  // Handles: on chat open, on window focus → emit chat:markAsRead
+  useMarkAsRead(chatId);
+
+  const presenceMap = useChatStore((s) => s.presenceMap);
+
+  const roomMembers = room?.members || [];
+  const onlineMembers = roomMembers.filter((m) => presenceMap[m.id] === "online");
+
+  const isDirectMessage = room?.type === "dm";
+  const dmPartner = isDirectMessage ? roomMembers.find((m) => m.id !== currentUserId) : null;
+
+  useEffect(() => {
+    // Request initial presence whenever the chat changes
+    emitGetInitialPresence();
+  }, [chatId]);
+
   // Group messages by date
-  const groupedMessages: { date: string; messages: Message[] }[] = [];
-  let currentDate = "";
-  messages.forEach((msg) => {
-    const msgDate = new Date(msg.createdAt).toDateString();
-    if (msgDate !== currentDate) {
-      currentDate = msgDate;
-      groupedMessages.push({ date: msg.createdAt, messages: [msg] });
-    } else {
-      groupedMessages[groupedMessages.length - 1].messages.push(msg);
-    }
-  });
+  const groupedMessages = useMemo(() => {
+    const result: { date: string; messages: Message[] }[] = [];
+    let currentDate = "";
+    messages.forEach((msg) => {
+      const msgDate = new Date(msg.createdAt).toDateString();
+      if (msgDate !== currentDate) {
+        currentDate = msgDate;
+        result.push({ date: msg.createdAt, messages: [msg] });
+      } else {
+        result[result.length - 1].messages.push(msg);
+      }
+    });
+    return result;
+  }, [messages]);
 
   if (isLoadingRoom || !room) {
     return <div className="flex h-full items-center justify-center text-muted-foreground">Loading chat...</div>;
@@ -364,22 +427,7 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
             ))}
 
             {/* Typing Indicator */}
-            {typingMemberNames.length > 0 && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <div className="flex gap-1">
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50 [animation-delay:-0.3s]" />
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50 [animation-delay:-0.15s]" />
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50" />
-                </div>
-                <span>
-                  {typingMemberNames.length === 1
-                    ? `${typingMemberNames[0]} is typing...`
-                    : typingMemberNames.length === 2
-                      ? `${typingMemberNames.join(" and ")} are typing...`
-                      : `${typingMemberNames.slice(0, 2).join(", ")} and ${typingMemberNames.length - 2} others are typing...`}
-                </span>
-              </div>
-            )}
+            <TypingIndicator chatId={chatId} roomMembers={roomMembers} />
           </div>
         </ScrollArea>
 
@@ -447,36 +495,14 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
       </div>
 
       {/* Input Area */}
-      <div className="border-t p-4">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0">
-            <Paperclip className="h-4 w-4 text-muted-foreground" />
-            <span className="sr-only">Attach file</span>
-          </Button>
-          <div className="relative flex-1">
-            <Input
-              ref={inputRef}
-              value={inputValue}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              placeholder={
-                isDirectMessage && dmPartner
-                  ? `Message ${dmPartner.name.split(" ")[0]}...`
-                  : `Message #${room.name.toLowerCase().replace(/\s+/g, "-")}`
-              }
-              className="pr-10"
-            />
-            <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2">
-              <Smile className="h-4 w-4 text-muted-foreground" />
-              <span className="sr-only">Add emoji</span>
-            </Button>
-          </div>
-          <Button onClick={handleSend} size="icon" className="h-9 w-9 shrink-0">
-            <Send className="h-4 w-4" />
-            <span className="sr-only">Send message</span>
-          </Button>
-        </div>
-      </div>
+      <ChatInput
+        chatId={chatId}
+        placeholder={
+          isDirectMessage && dmPartner
+            ? `Message ${dmPartner.name.split(" ")[0]}...`
+            : `Message #${room.name.toLowerCase().replace(/\s+/g, "-")}`
+        }
+      />
     </div>
   );
 }

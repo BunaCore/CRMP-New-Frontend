@@ -1,3 +1,5 @@
+import { useChatStore } from "@/stores/chat-store";
+
 import { socketManager } from "./socket";
 
 export function emitSendMessage(payload: { chatId: string; content: string; tempId: string }) {
@@ -9,9 +11,13 @@ export function emitSendMessage(payload: { chatId: string; content: string; temp
   }
 }
 
-export function emitTyping(payload: { chatId: string; isTyping: boolean }) {
+// Per-chat typing debounce: emit immediately, then throttle subsequent fires
+export function emitTyping(payload: { chatId: string }) {
   const socket = socketManager.getSocket();
-  if (socket) {
+  if (!socket) return;
+
+  const shouldThrottle = useChatStore.getState().shouldThrottleTyping(payload.chatId);
+  if (!shouldThrottle) {
     socket.emit("chat:typing", payload);
   }
 }
