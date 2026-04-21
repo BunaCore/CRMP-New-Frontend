@@ -57,7 +57,7 @@ export function TimelineTab({ proposalId }: TimelineTabProps) {
     }
   };
 
-  const submitFormStep = async (stepId: string) => {
+  const submitFormStep = async (_stepId: string) => {
     setIsSubmittingForm(true);
     try {
       const input: Record<string, any> = {};
@@ -105,7 +105,7 @@ export function TimelineTab({ proposalId }: TimelineTabProps) {
         />
 
         <ul className="relative flex flex-col gap-4">
-          {isLoadingTimeline && <li className="pl-4 text-xs text-slate-500">Loading timeline...</li>}
+          {isLoadingTimeline && <li className="pl-4 text-slate-500 text-xs">Loading timeline...</li>}
           {!isLoadingTimeline &&
             timelineInfo?.steps?.map((step: ApprovalTimelineStep) => {
               const isCompleted = step.status === "COMPLETED" || step.status === "Accepted";
@@ -154,13 +154,13 @@ export function TimelineTab({ proposalId }: TimelineTabProps) {
                               <CheckCircle className="h-3 w-3 shrink-0" />
                               Completed {step.userAction ? `· ${step.userAction}` : ""}
                             </p>
-                            {step.decision && step.decision.comment && (
-                              <div className="mt-1 rounded border border-slate-100 bg-white p-2 text-xs text-slate-600 shadow-sm dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400">
+                            {step.decision?.comment && (
+                              <div className="mt-1 rounded border border-slate-100 bg-white p-2 text-slate-600 text-xs shadow-sm dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400">
                                 <span className="font-semibold text-slate-700 dark:text-slate-300">Comment: </span>
                                 {step.decision.comment}
                               </div>
                             )}
-                            {step.decision && step.decision.at && (
+                            {step.decision?.at && (
                               <p className="text-[10px] text-slate-400">
                                 Resolved at: {new Date(step.decision.at).toLocaleString()}
                               </p>
@@ -187,7 +187,7 @@ export function TimelineTab({ proposalId }: TimelineTabProps) {
 
                     {/* VOTE Statistics */}
                     {step.stepType === "VOTE" && step.vote && (
-                      <div className="mt-4 rounded-xl bg-white p-3 border border-slate-100 shadow-sm flex gap-4 text-xs font-medium dark:bg-slate-900/50 dark:border-slate-800/80">
+                      <div className="mt-4 flex gap-4 rounded-xl border border-slate-100 bg-white p-3 font-medium text-xs shadow-sm dark:border-slate-800/80 dark:bg-slate-900/50">
                         <div className="text-emerald-600 dark:text-emerald-400">
                           Approved: {step.vote.counts.approved}
                         </div>
@@ -206,7 +206,7 @@ export function TimelineTab({ proposalId }: TimelineTabProps) {
                             <div key={field.name} className="flex flex-col gap-1.5">
                               <Label className="font-semibold text-[12px] text-slate-700 dark:text-slate-300">
                                 {field.name.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
-                                {field.required && <span className="text-rose-500 ml-1">*</span>}
+                                {field.required && <span className="ml-1 text-rose-500">*</span>}
                               </Label>
 
                               {isCompleted && step.form?.submission ? (
@@ -218,7 +218,7 @@ export function TimelineTab({ proposalId }: TimelineTabProps) {
                                         type="button"
                                         onClick={() =>
                                           downloadFile(
-                                            step.form!.submission!.values[field.name],
+                                            step.form?.submission?.values[field.name],
                                             `${field.name}-Attachment`,
                                           )
                                         }
@@ -244,14 +244,14 @@ export function TimelineTab({ proposalId }: TimelineTabProps) {
                                     />
                                     <Label
                                       htmlFor={`file-${field.name}`}
-                                      className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-slate-300 bg-white p-4 font-medium text-[13px] text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:hover:bg-slate-900/50"
+                                      className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-300 border-dashed bg-white p-4 font-medium text-[13px] text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:hover:bg-slate-900/50"
                                     >
                                       <FileText className="h-4 w-4" />
                                       {formFiles[field.name]?.name || "Click to upload attachment"}
                                     </Label>
                                   </div>
                                 ) : (
-                                  <div className="text-xs text-slate-400 italic">
+                                  <div className="text-slate-400 text-xs italic">
                                     Unsupported field type: {field.type}
                                   </div>
                                 )
@@ -310,7 +310,7 @@ export function TimelineTab({ proposalId }: TimelineTabProps) {
                         {/* Type: VOTE */}
                         {step.stepType === "VOTE" && (
                           <div className="flex flex-col gap-2">
-                            <p className="text-[11px] text-slate-500 mb-1">
+                            <p className="mb-1 text-[11px] text-slate-500">
                               Cast your vote for this proposal. It requires {step.vote?.threshold} votes total.
                             </p>
                             <div className="flex flex-wrap gap-2">
@@ -340,7 +340,7 @@ export function TimelineTab({ proposalId }: TimelineTabProps) {
                     {/* APPROVAL Confirmations */}
                     {showTimelineApprove && step.isActive && (
                       <div className="mt-4 flex flex-col gap-3 rounded-xl border border-emerald-100 bg-emerald-50/50 p-3 dark:border-emerald-900/30 dark:bg-emerald-950/20">
-                        <Label className="text-xs text-emerald-800 dark:text-emerald-300">Comment (Optional)</Label>
+                        <Label className="text-emerald-800 text-xs dark:text-emerald-300">Comment (Optional)</Label>
                         <Textarea
                           value={timelineComment}
                           onChange={(e) => setTimelineComment(e.target.value)}
@@ -358,7 +358,7 @@ export function TimelineTab({ proposalId }: TimelineTabProps) {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="h-8 text-xs text-slate-600 hover:bg-emerald-100/50 dark:text-slate-400 dark:hover:bg-emerald-900/30"
+                            className="h-8 text-slate-600 text-xs hover:bg-emerald-100/50 dark:text-slate-400 dark:hover:bg-emerald-900/30"
                             onClick={() => setShowTimelineApprove(false)}
                           >
                             Cancel
@@ -369,7 +369,7 @@ export function TimelineTab({ proposalId }: TimelineTabProps) {
 
                     {showTimelineReject && step.isActive && (
                       <div className="mt-4 flex flex-col gap-3 rounded-xl border border-rose-100 bg-rose-50/50 p-3 dark:border-rose-900/30 dark:bg-rose-950/20">
-                        <Label className="text-xs text-rose-800 dark:text-rose-300">
+                        <Label className="text-rose-800 text-xs dark:text-rose-300">
                           Reason for Rejection <span className="text-rose-500">*</span>
                         </Label>
                         <Textarea
@@ -390,7 +390,7 @@ export function TimelineTab({ proposalId }: TimelineTabProps) {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="h-8 text-xs text-slate-600 hover:bg-rose-100/50 dark:text-slate-400 dark:hover:bg-rose-900/30"
+                            className="h-8 text-slate-600 text-xs hover:bg-rose-100/50 dark:text-slate-400 dark:hover:bg-rose-900/30"
                             onClick={() => setShowTimelineReject(false)}
                           >
                             Cancel

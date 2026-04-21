@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { APP_CONFIG } from "@/config/app-config";
 import { AuthInitializer } from "@/context/AuthInitializer";
+import { QueryProvider } from "@/context/QueryProvider";
 import { SessionProvider } from "@/context/SessionContext";
 import { fontVars } from "@/lib/fonts/registry";
 import { PREFERENCE_DEFAULTS } from "@/lib/preferences/preferences-config";
@@ -47,11 +48,13 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
             navbarStyle={navbar_style}
             font={font}
           >
-            <SessionProvider>
-              <AuthInitializer />
-              {children}
-              <Toaster />
-            </SessionProvider>
+            <QueryProvider>
+              <SessionProvider>
+                <AuthInitializer />
+                {children}
+                <Toaster />
+              </SessionProvider>
+            </QueryProvider>
           </PreferencesStoreProvider>
         </TooltipProvider>
       </body>
