@@ -15,11 +15,6 @@ const CURRENT_USER_ID = "2";
 export function TeamManagement() {
   const activeChatId = useChatStore((s) => s.activeChatId);
 
-  const handleCreateRoom = useCallback(() => {
-    // For demo, just show alert - in real app would open dialog
-    alert("Create new room feature - would open a dialog to create a new chat room");
-  }, []);
-
   const handleStartDirectMessage = useCallback((memberId: string) => {
     // Logic to be moved downstream using API
     alert(`Initiate direct message with user ${memberId} - Not fully implemented without members directory.`);
@@ -28,8 +23,8 @@ export function TeamManagement() {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Panel - Chat Rooms List */}
-      <div className="w-full shrink-0 sm:w-80 lg:w-96">
-        <ChatRoomsList onCreateRoom={handleCreateRoom} onStartDirectMessage={handleStartDirectMessage} />
+      <div className="w-full shrink-0 sm:w-80 lg:w-96 flex overflow-hidden">
+        <ChatRoomsList onStartDirectMessage={handleStartDirectMessage} />
       </div>
 
       {/* Right Panel - Chat Section (Group or Direct) */}

@@ -41,7 +41,11 @@ export function setupSocketListeners(queryClient: QueryClient) {
     // A) Append to the Infinite Query cache
     const queryKey = ["messages", chatId];
     queryClient.setQueryData<any>(queryKey, (oldData: any) => {
-      if (!oldData || !oldData.pages) return oldData;
+      if (!oldData || !oldData.pages)
+        return {
+          pages: [{ messages: [newMessage], nextCursor: null }],
+          pageParams: [null],
+        };
 
       const newPages = [...oldData.pages];
       const mutatedPage = { ...newPages[0] };

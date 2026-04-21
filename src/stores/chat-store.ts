@@ -10,7 +10,13 @@ interface ChatState {
   unreadCountByChatId: Record<string, number>;
   lastTypingEmitByChatId: Record<string, number>;
 
+  // Modal State
+  isCreateChatOpen: boolean;
+  createChatMode: "dm" | "group";
+
   // Actions
+  setIsCreateChatOpen: (isOpen: boolean) => void;
+  setCreateChatMode: (mode: "dm" | "group") => void;
   setActiveChatId: (chatId: string | null) => void;
   setPresence: (userId: string, status: "online" | "offline") => void;
   setAllPresence: (presenceMap: Record<string, "online" | "offline">) => void;
@@ -32,6 +38,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
   unreadCountByChatId: {},
   lastTypingEmitByChatId: {},
 
+  isCreateChatOpen: false,
+  createChatMode: "dm",
+
+  setIsCreateChatOpen: (isOpen) => set({ isCreateChatOpen: isOpen }),
+  setCreateChatMode: (mode) => set({ createChatMode: mode }),
   setActiveChatId: (chatId) => set({ activeChatId: chatId }),
 
   setPresence: (userId, status) =>

@@ -10,12 +10,18 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetChats } from "@/lib/api/chat/chat.queries";
 import type { ChatSummary } from "@/lib/api/chat/types";
 import { useChatStore } from "@/stores/chat-store";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { formatDistanceToNow } from "date-fns";
-import { Hash, MessageSquarePlus, Search } from "lucide-react";
+import { Hash, MessageSquarePlus, Search, UserPlus, Users } from "lucide-react";
 import { useState } from "react";
+import { CreateChatModal } from "./create-chat-modal";
 
 interface ChatRoomsListProps {
-  onCreateRoom: () => void;
   onStartDirectMessage: (memberId: string) => void;
 }
 
@@ -33,11 +39,13 @@ function formatRelativeTime(timestamp: string | undefined) {
   return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
 }
 
-export function ChatRoomsList({ onCreateRoom, onStartDirectMessage }: ChatRoomsListProps) {
+export function ChatRoomsList({ onStartDirectMessage }: ChatRoomsListProps) {
   const { data: rooms = [] } = useGetChats();
   const activeChatId = useChatStore((s) => s.activeChatId);
   const setActiveChatId = useChatStore((s) => s.setActiveChatId);
   const presenceMap = useChatStore((s) => s.presenceMap);
+  const setCreateChatMode = useChatStore((s) => s.setCreateChatMode);
+  const setIsCreateChatOpen = useChatStore((s) => s.setIsCreateChatOpen);
 
   const [searchQuery, onSearchChange] = useState("");
   const [filterType, onFilterTypeChange] = useState<string>("all");
@@ -63,12 +71,38 @@ export function ChatRoomsList({ onCreateRoom, onStartDirectMessage }: ChatRoomsL
               {Object.values(presenceMap).filter((v) => v === "online").length} members online
             </p>
           </div>
-          <Button size="icon" variant="outline" className="h-8 w-8" onClick={onCreateRoom}>
-            <MessageSquarePlus className="h-4 w-4" />
-            <span className="sr-only">Create room</span>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="icon" variant="outline" className="h-8 w-8">
+                <MessageSquarePlus className="h-4 w-4" />
+                <span className="sr-only">Create room</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => {
+                  setCreateChatMode("dm");
+                  setIsCreateChatOpen(true);
+                }}
+              >
+                <UserPlus className="mr-2 h-4 w-4" />
+                Direct Message
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setCreateChatMode("group");
+                  setIsCreateChatOpen(true);
+                }}
+              >
+                <Users className="mr-2 h-4 w-4" />
+                Group Chat
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
+
+      <CreateChatModal />
 
       {/* Search & Filter */}
       <div className="space-y-3 p-3">
@@ -97,7 +131,7 @@ export function ChatRoomsList({ onCreateRoom, onStartDirectMessage }: ChatRoomsL
       </div>
 
       {/* Room List */}
-      <ScrollArea className="flex-1">
+      <ScrollArea type="hover" className="flex-1 h-full">
         <div className="p-2">
           {filteredRooms.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
