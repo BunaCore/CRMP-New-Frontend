@@ -61,7 +61,6 @@ export default function LandingPage() {
           <div className="mx-auto max-w-3xl text-center">
             <div className="mb-8 inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 font-medium text-blue-600 text-sm dark:border-blue-800/50 dark:bg-blue-900/20 dark:text-blue-400">
               <span className="mr-2 flex h-2 w-2 animate-pulse rounded-full bg-blue-600" />
-              v2.2 Architecture Deployed
             </div>
 
             <h1 className="mb-8 font-extrabold text-5xl text-slate-900 leading-[1.1] tracking-tight sm:text-6xl md:text-7xl dark:text-white">

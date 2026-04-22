@@ -7,6 +7,20 @@
 @import "../styles/presets/soft-pop.css";
 @import "../styles/presets/tangerine.css";
 
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap");
+
+.font-serif {
+  font-family: "Noto Serif", serif;
+}
+
+.tonal-shift {
+  background: linear-gradient(180deg, #f7f9fb 0%, #eceef0 100%);
+}
+
+.dark .tonal-shift {
+  background: linear-gradient(180deg, #191c1e 0%, #2d3133 100%);
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
