@@ -15,7 +15,7 @@ export const metadata = {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#fafbfc] font-sans">
+    <div className="min-h-screen overflow-x-hidden bg-white font-sans">
       <header className="container mx-auto flex h-20 items-center justify-between px-6 lg:px-12 xl:max-w-6xl">
         <Link href="/" className="font-serif text-[#1b2b5a] text-[24px] italic tracking-tight">
           ASTU Research
@@ -118,7 +118,7 @@ export default function LandingPage() {
       </main>
 
       {/* The Digital Curator Section */}
-      <section className="bg-[#f0f2f5] py-20">
+      <section className="bg-white py-20">
         <div className="container mx-auto px-6 lg:px-12 xl:max-w-6xl">
           {/* Section Header */}
           <div className="mb-12 flex flex-col justify-between gap-8 md:flex-row md:items-end">
@@ -333,7 +333,7 @@ export default function LandingPage() {
       </div>
 
       {/* Footer Section */}
-      <footer className="border-slate-100 border-t bg-[#f8fafc] pt-20 pb-10">
+      <footer className="border-slate-100 border-t bg-white pt-20 pb-10">
         <div className="container mx-auto px-6 lg:px-12 xl:max-w-6xl">
           <div className="mb-16 grid grid-cols-1 gap-10 md:grid-cols-4">
             <div>
