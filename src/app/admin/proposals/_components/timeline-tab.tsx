@@ -60,6 +60,7 @@ export function TimelineTab({ proposalId }: TimelineTabProps) {
   const submitFormStep = async (_stepId: string) => {
     setIsSubmittingForm(true);
     try {
+      // biome-ignore lint/suspicious/noExplicitAny: API design constraint
       const input: Record<string, any> = {};
 
       for (const field in formFiles) {
