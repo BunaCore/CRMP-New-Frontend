@@ -143,10 +143,10 @@ export interface ApprovalTimelineStep {
     schema: {
       fields: FormField[];
     };
-    // biome-ignore lint/suspicious/noExplicitAny: API design constraint
     submission: {
       submittedBy: string;
       submittedAt: string;
+      // biome-ignore lint/suspicious/noExplicitAny: API design constraint
       values: Record<string, any>;
     } | null;
   };

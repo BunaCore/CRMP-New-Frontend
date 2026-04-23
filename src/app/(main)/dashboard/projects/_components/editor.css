@@ -83,11 +83,6 @@
   width: 4px;
 }
 
-.tiptap {
-  padding: 2rem;
-  min-height: 500px;
-}
-
 .tiptap:focus {
   outline: none;
 }
