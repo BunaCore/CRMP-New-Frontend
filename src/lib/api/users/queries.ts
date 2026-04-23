@@ -38,3 +38,25 @@ export function useGetUsersSelector(role?: string, q?: string, enabled = true) {
     enabled,
   });
 }
+
+/**
+ * Hook to search members (no role filter) with a debounced query.
+ */
+export function useSearchUsers(q: string, enabled = true) {
+  return useQuery({
+    queryKey: ["users", "selector", "all", q],
+    queryFn: () => getUsers(undefined, q),
+    enabled,
+  });
+}
+
+/**
+ * Hook to search advisors (role=FACULTY) with a debounced query.
+ */
+export function useSearchAdvisors(q: string, enabled = true) {
+  return useQuery({
+    queryKey: ["users", "selector", "FACULTY", q],
+    queryFn: () => getUsers("FACULTY", q),
+    enabled,
+  });
+}
