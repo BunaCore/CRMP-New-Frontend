@@ -5,7 +5,7 @@ import { ProposalProgram } from "@/lib/api/proposals/types";
 export const budgetItemSchema = z.object({
   id: z.string().optional(),
   title: z.string().optional(),
-  description: z.string().min(1, "Description is required"),
+  description: z.string().default(""),
   amount: z.coerce.number().min(0, "Amount must be a positive number"),
 });
 
@@ -37,12 +37,24 @@ export const createProposalSchema = z
     file: z.custom<File | null>((val) => val === null || val instanceof File).default(null),
   })
   .superRefine((data, ctx) => {
-    if (data.isFunded && data.budget.length === 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Please add at least one budget item if funded",
-        path: ["budget"],
-      });
+    if (data.isFunded) {
+      if (data.budget.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Please add at least one budget item if funded",
+          path: ["budget"],
+        });
+      }
+      // Validate each budget item has a description when funded
+      for (let i = 0; i < data.budget.length; i++) {
+        if (!data.budget[i].description || data.budget[i].description.trim() === "") {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Description is required",
+            path: ["budget", i, "description"],
+          });
+        }
+      }
     }
   });
 

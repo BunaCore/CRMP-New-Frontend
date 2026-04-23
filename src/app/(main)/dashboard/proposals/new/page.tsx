@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
 import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -108,10 +109,11 @@ export default function NewProposalPage() {
         budget: data.isFunded
           ? data.budget.map((b) => ({ description: b.title || b.description, amount: b.amount }))
           : [],
+        advisorUserId: data.advisor?.value,
         members: [
           { userId: user?.id || "", role: ProposalMemberRole.PI },
           ...data.members.map((m) => ({ userId: m.value, role: ProposalMemberRole.MEMBER })),
-          ...(data.advisor ? [{ userId: data.advisor.value, role: "ADVISOR" as unknown as ProposalMemberRole }] : []),
+          // ...(data.advisor ? [{ userId: data.advisor.value, role: "ADVISOR" as unknown as ProposalMemberRole }] : []),
         ],
       };
 
@@ -121,7 +123,9 @@ export default function NewProposalPage() {
       router.push("/dashboard/proposals");
     } catch (error) {
       console.error("Failed to submit proposal:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to submit proposal. Please try again.");
+      toast.error(
+        error instanceof AxiosError ? error.response?.data?.message : "Failed to submit proposal. Please try again.",
+      );
     }
   };
 
@@ -176,7 +180,15 @@ export default function NewProposalPage() {
                     type="button"
                     size="sm"
                     variant="outline"
-                    onClick={() => handleSubmit((data) => onSubmit(data, false))()}
+                    onClick={() =>
+                      handleSubmit(
+                        (data) => onSubmit(data, false),
+                        (errors) => {
+                          console.error("Validation errors:", errors);
+                          toast.error("Please fix validation errors before saving.");
+                        },
+                      )()
+                    }
                     disabled={isPending || isSubmitting}
                     className="h-9 px-6 font-semibold"
                   >
@@ -186,7 +198,15 @@ export default function NewProposalPage() {
                     type="button"
                     size="sm"
                     className="h-9 border-0 bg-blue-600 px-6 font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-50"
-                    onClick={() => handleSubmit((data) => onSubmit(data, true))()}
+                    onClick={() =>
+                      handleSubmit(
+                        (data) => onSubmit(data, true),
+                        (errors) => {
+                          console.error("Validation errors:", errors);
+                          toast.error("Please fix validation errors before submitting.");
+                        },
+                      )()
+                    }
                     disabled={isPending || isSubmitting}
                   >
                     {isPending || isSubmitting ? "Submitting..." : "Submit Proposal"}

@@ -204,8 +204,6 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
     scrollRef,
     messages.length,
   );
-  console.log("isAtBottom", isAtBottom);
-  console.log("hasUnreadDownBelow", hasUnreadDownBelow);
 
   // Intersection Observer for fetching older messages when topRef comes into view
   useEffect(() => {

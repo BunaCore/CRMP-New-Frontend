@@ -55,8 +55,8 @@ export function useSearchUsers(q: string, enabled = true) {
  */
 export function useSearchAdvisors(q: string, enabled = true) {
   return useQuery({
-    queryKey: ["users", "selector", "FACULTY", q],
-    queryFn: () => getUsers("FACULTY", q),
+    queryKey: ["users", "selector", q],
+    queryFn: () => getUsers(undefined, q),
     enabled,
   });
 }
