@@ -1,23 +1,8 @@
 "use client";
 
-// ============================================================
-// DocumentEditor — Compositional root
-//
-// Responsibilities:
-//   - Own the TipTap useEditor instance
-//   - Use stable module-level extensions (never recreated)
-//   - Hydrate from backend exactly once per workspaceId
-//   - Wire all callbacks to the useDocumentEditor hook
-//   - Compose: Toolbar → Canvas → BubbleMenu → FloatingMenu
-//
-// This component is intentionally thin. All state/API logic
-// lives in useDocumentEditor. All UI sub-components are in
-// /editor/ subdirectory.
-// ============================================================
-
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { EditorContent, useEditor } from "@tiptap/react";
+import { useEditor } from "@tiptap/react";
 import { toast } from "sonner";
 
 import { useDocumentEditor } from "@/hooks/useDocumentEditor";
@@ -29,6 +14,7 @@ import { EditorShell } from "./editor/editor-shell";
 import { EditorToolbar } from "./editor/editor-toolbar";
 import { EDITOR_EXTENSIONS } from "./editor/extensions";
 import { ImportMarkdownModal } from "./editor/import-markdown-modal";
+import { PagedEditorCanvas } from "./editor/paged-editor-canvas";
 import "./editor.css";
 
 // ─── Props ────────────────────────────────────────────────────
@@ -76,10 +62,10 @@ export default function DocumentEditor({ workspaceId, projectId }: DocumentEdito
         class: cn(
           "prose prose-lg dark:prose-invert",
           "focus:outline-none",
-          "max-w-[860px] mx-auto",
-          "p-4 sm:p-12 lg:p-20",
-          "min-h-screen",
+          "max-w-none w-full",
+          "min-h-0", // Changed from min-h-screen to allow proper scrolling
           "selection:bg-primary/20",
+          "editor-page-content", // Hook for pagination
         ),
         spellcheck: "true",
       },
@@ -265,9 +251,11 @@ export default function DocumentEditor({ workspaceId, projectId }: DocumentEdito
         onExportMarkdown={() => handleExport("markdown")}
       />
 
-      {/* Scrollable editor canvas */}
-      <div className="project-editor-container custom-scrollbar flex w-full min-w-0 flex-1 flex-col overflow-y-auto scroll-smooth">
-        <EditorContent editor={editor} className="w-full flex-1" />
+      {/* Scrollable editor canvas - takes remaining height */}
+      <div className="flex-1 overflow-hidden">
+        <div className="custom-scrollbar h-[calc(100vh-80px)] w-full overflow-y-auto scroll-smooth">
+          <PagedEditorCanvas editor={editor} />
+        </div>
       </div>
 
       {/* Context menus (only rendered when editor is ready) */}

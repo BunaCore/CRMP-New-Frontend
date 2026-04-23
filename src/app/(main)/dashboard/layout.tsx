@@ -19,7 +19,6 @@ import { AccountSwitcher } from "./_components/sidebar/account-switcher";
 import { LayoutControls } from "./_components/sidebar/layout-controls";
 import { SearchDialog } from "./_components/sidebar/search-dialog";
 import { ThemeSwitcher } from "./_components/sidebar/theme-switcher";
-
 export default async function Layout({ children }: Readonly<{ children: ReactNode }>) {
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
@@ -67,7 +66,7 @@ export default async function Layout({ children }: Readonly<{ children: ReactNod
               <Button asChild size="icon">
                 <Link
                   prefetch={false}
-                  href="https://github.com/arhamkhnz/next-shadcn-admin-dashboard"
+                  href="https://github.com/BunaCore/CRMP-New-Frontend"
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Open GitHub repository"
