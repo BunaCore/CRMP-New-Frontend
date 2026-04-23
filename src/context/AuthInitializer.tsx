@@ -18,6 +18,7 @@ import { useEffect } from "react";
 import Cookies from "js-cookie";
 
 import { getCurrentUser } from "@/lib/api/auth/queries";
+import { useSocketInitialization } from "@/lib/socket/use-socket";
 import { useAuthStore } from "@/stores/authStore";
 
 const COOKIE_TOKEN_KEY = "access_token";
@@ -26,6 +27,10 @@ const COOKIE_TTL_DAYS = 7;
 
 export function AuthInitializer() {
   const { login, logout, setLoading } = useAuthStore();
+  const token = useAuthStore((s) => s.access_token);
+
+  // Initialize socket connection whenever we have a valid token
+  useSocketInitialization(token);
 
   useEffect(() => {
     const initSession = async () => {

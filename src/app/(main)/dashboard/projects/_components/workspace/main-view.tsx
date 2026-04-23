@@ -13,10 +13,8 @@ export function MainView({ workspaceId, projectId }: { workspaceId: string; proj
 
   if (activeView === "editor") {
     return (
-      <div className="group relative flex h-full w-full min-w-0 flex-1 flex-col overflow-hidden bg-background">
-        <div className="w-full min-w-0 flex-1 overflow-hidden">
-          <DocumentEditor workspaceId={workspaceId} projectId={projectId} />
-        </div>
+      <div className="flex h-full w-full min-w-0 flex-col overflow-hidden">
+        <DocumentEditor workspaceId={workspaceId} projectId={projectId} />
       </div>
     );
   }

@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { notFound, useParams } from "next/navigation";
 
 // Mock import removed
@@ -9,6 +11,20 @@ import { MainView } from "../../_components/workspace/main-view";
 import { WorkspaceProvider } from "../../_components/workspace/workspace-context";
 
 function WorkspaceContent({ projectId, workspaceId }: { projectId: string; workspaceId: string }) {
+  // Hide the global dashboard header for the workspace editor
+  useEffect(() => {
+    // The layout header is typically the first header inside the sidebar inset
+    const header = document.querySelector("header.shrink-0") as HTMLElement | null;
+    if (header) {
+      header.style.display = "none";
+    }
+    return () => {
+      if (header) {
+        header.style.display = "";
+      }
+    };
+  }, []);
+
   return (
     <div className="group relative flex h-full min-h-0 w-full min-w-0 flex-1 overflow-hidden rounded-2xl border bg-background shadow-inner">
       {/* Main Content - Takes full width or shifts for sidebar */}

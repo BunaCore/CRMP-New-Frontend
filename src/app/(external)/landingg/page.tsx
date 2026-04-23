@@ -29,30 +29,28 @@ export default function LandingG() {
       {/* TopNavBar */}
       <nav className="fixed top-0 z-50 w-full border-slate-200/50 border-b bg-[#f7f9fb]/80 backdrop-blur-md transition-all duration-300 dark:border-slate-800/50 dark:bg-[#191c1e]/80">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3 md:px-10">
-          <div className="font-bold font-serif text-[#00113a] text-xl tracking-tight dark:text-blue-50">
-            ASTU Curator
-          </div>
+          <div className="font-bold text-[#00113a] text-xl tracking-tight dark:text-blue-50">ASTU Curator</div>
           <div className="hidden items-center gap-6 md:flex">
             <Link
-              className="border-[#00daf3] border-b-2 font-semibold font-serif text-[#00113a] text-sm tracking-tight transition-all duration-300 dark:text-[#00daf3]"
+              className="border-[#00daf3] border-b-2 font-semibold text-[#00113a] text-sm tracking-tight transition-all duration-300 dark:text-[#00daf3]"
               href="#"
             >
               Platform
             </Link>
             <Link
-              className="font-serif text-[#515f74] text-sm tracking-tight transition-all duration-300 hover:text-[#00113a] dark:text-slate-400 dark:hover:text-white"
+              className="text-[#515f74] text-sm tracking-tight transition-all duration-300 hover:text-[#00113a] dark:text-slate-400 dark:hover:text-white"
               href="#"
             >
               Pillars
             </Link>
             <Link
-              className="font-serif text-[#515f74] text-sm tracking-tight transition-all duration-300 hover:text-[#00113a] dark:text-slate-400 dark:hover:text-white"
+              className="text-[#515f74] text-sm tracking-tight transition-all duration-300 hover:text-[#00113a] dark:text-slate-400 dark:hover:text-white"
               href="#"
             >
               Impact
             </Link>
             <Link
-              className="font-serif text-[#515f74] text-sm tracking-tight transition-all duration-300 hover:text-[#00113a] dark:text-slate-400 dark:hover:text-white"
+              className="text-[#515f74] text-sm tracking-tight transition-all duration-300 hover:text-[#00113a] dark:text-slate-400 dark:hover:text-white"
               href="#"
             >
               Resources
@@ -141,7 +139,7 @@ export default function LandingG() {
             <span className="mb-3 font-bold text-[#00daf3] text-[10px] uppercase tracking-[0.2em]">
               Academic Lifecycle Management
             </span>
-            <h1 className="mb-4 font-bold font-serif text-3xl text-[#00113a] leading-tight [text-shadow:0_2px_10px_rgba(0,0,0,0.1)] md:text-5xl dark:text-blue-50">
+            <h1 className="mb-4 font-bold text-3xl text-[#00113a] leading-tight [text-shadow:0_2px_10px_rgba(0,0,0,0.1)] md:text-5xl dark:text-blue-50">
               Bridging Gaps, Building Excellence.
             </h1>
             <p className="mb-8 max-w-xl text-[#515f74] text-sm leading-relaxed md:text-base dark:text-slate-400">
@@ -184,7 +182,7 @@ export default function LandingG() {
                     Velocity
                   </div>
                 </div>
-                <div className="font-bold font-serif text-[#00113a] text-xl dark:text-blue-50">+42%</div>
+                <div className="font-bold text-[#00113a] text-xl dark:text-blue-50">+42%</div>
                 <div className="text-[#515f74] text-[9px] dark:text-slate-400">Institutional efficiency gain</div>
               </div>
             </div>
@@ -196,7 +194,7 @@ export default function LandingG() {
       <section className="bg-slate-50 px-6 py-16 transition-colors duration-300 md:px-10 dark:bg-slate-950">
         <div className="mx-auto max-w-6xl">
           <div className="mx-auto mb-10 max-w-2xl text-center">
-            <h2 className="mb-3 font-bold font-serif text-2xl text-[#00113a] md:text-3xl dark:text-blue-50">
+            <h2 className="mb-3 font-bold text-2xl text-[#00113a] md:text-3xl dark:text-blue-50">
               The Complexity We Solve
             </h2>
             <p className="text-[#515f74] text-sm md:text-base dark:text-slate-400">
@@ -207,9 +205,7 @@ export default function LandingG() {
             {/* Operational Fragmentation */}
             <div className="rounded-xl border border-slate-200 bg-[#ffffff] p-6 shadow-sm dark:border-slate-800 dark:bg-[#2d3133]">
               <Columns3 className="mb-4 h-8 w-8 text-[#00daf3]" />
-              <h3 className="mb-2 font-bold font-serif text-[#00113a] text-lg dark:text-[#dbe1ff]">
-                Operational Fragmentation
-              </h3>
+              <h3 className="mb-2 font-bold text-[#00113a] text-lg dark:text-[#dbe1ff]">Operational Fragmentation</h3>
               <p className="text-[#515f74] text-sm leading-relaxed dark:text-slate-400">
                 Siloed data and disconnected workflows that prevent a unified institutional view of research progress.
               </p>
@@ -217,7 +213,7 @@ export default function LandingG() {
             {/* Fiscal Delays */}
             <div className="rounded-xl border border-slate-200 bg-[#ffffff] p-6 shadow-sm dark:border-slate-800 dark:bg-[#2d3133]">
               <Clock className="mb-4 h-8 w-8 text-[#00daf3]" />
-              <h3 className="mb-2 font-bold font-serif text-[#00113a] text-lg dark:text-[#dbe1ff]">Fiscal Delays</h3>
+              <h3 className="mb-2 font-bold text-[#00113a] text-lg dark:text-[#dbe1ff]">Fiscal Delays</h3>
               <p className="text-[#515f74] text-sm leading-relaxed dark:text-slate-400">
                 Lengthy approval cycles and manual fund tracking that stall momentum and discourage investigators.
               </p>
@@ -225,9 +221,7 @@ export default function LandingG() {
             {/* Lost Memory */}
             <div className="rounded-xl border border-slate-200 bg-[#ffffff] p-6 shadow-sm dark:border-slate-800 dark:bg-[#2d3133]">
               <History className="mb-4 h-8 w-8 text-[#00daf3]" />
-              <h3 className="mb-2 font-bold font-serif text-[#00113a] text-lg dark:text-[#dbe1ff]">
-                Lost Institutional Memory
-              </h3>
+              <h3 className="mb-2 font-bold text-[#00113a] text-lg dark:text-[#dbe1ff]">Lost Institutional Memory</h3>
               <p className="text-[#515f74] text-sm leading-relaxed dark:text-slate-400">
                 Valuable insights and historical data lost in legacy systems, hindering future grant potential.
               </p>
@@ -239,7 +233,7 @@ export default function LandingG() {
       {/* Core Pillars Section */}
       <section className="border-slate-100 border-y bg-white px-6 py-12 md:px-10 dark:border-slate-800 dark:bg-slate-900">
         <div className="mx-auto max-w-6xl">
-          <h2 className="mb-10 text-center font-bold font-serif text-[#00113a] text-xl uppercase tracking-wide md:text-3xl dark:text-blue-50">
+          <h2 className="mb-10 text-center font-bold text-[#00113a] text-xl uppercase tracking-wide md:text-3xl dark:text-blue-50">
             Three Pillars of Innovation
           </h2>
           <div className="space-y-16">
@@ -260,7 +254,7 @@ export default function LandingG() {
                 <div className="mb-3 inline-flex items-center rounded bg-blue-100 px-2 py-0.5 font-bold text-[#00113a] text-[8px] tracking-widest dark:bg-blue-900/30 dark:text-blue-100">
                   PILLAR 01
                 </div>
-                <h3 className="mb-3 font-bold font-serif text-[#00113a] text-xl md:text-2xl dark:text-blue-100">
+                <h3 className="mb-3 font-bold text-[#00113a] text-xl md:text-2xl dark:text-blue-100">
                   Active Lifecycle Management
                 </h3>
                 <p className="mb-4 max-w-lg text-[#515f74] text-sm leading-relaxed dark:text-slate-400">
@@ -297,7 +291,7 @@ export default function LandingG() {
                 <div className="mb-3 inline-flex items-center rounded bg-blue-100 px-2 py-0.5 font-bold text-[#00113a] text-[8px] tracking-widest dark:bg-blue-900/30 dark:text-blue-100">
                   PILLAR 02
                 </div>
-                <h3 className="mb-3 text-right font-bold font-serif text-[#00113a] text-xl md:text-2xl lg:text-left dark:text-blue-100">
+                <h3 className="mb-3 text-right font-bold text-[#00113a] text-xl md:text-2xl lg:text-left dark:text-blue-100">
                   AI-Powered Matching
                 </h3>
                 <p className="mb-4 ml-auto max-w-lg text-right text-[#515f74] text-sm leading-relaxed lg:ml-0 lg:text-left dark:text-slate-400">
@@ -334,7 +328,7 @@ export default function LandingG() {
                 <div className="mb-3 inline-flex items-center rounded bg-blue-100 px-2 py-0.5 font-bold text-[#00113a] text-[8px] tracking-widest dark:bg-blue-900/30 dark:text-blue-100">
                   PILLAR 03
                 </div>
-                <h3 className="mb-3 font-bold font-serif text-[#00113a] text-xl md:text-2xl dark:text-blue-100">
+                <h3 className="mb-3 font-bold text-[#00113a] text-xl md:text-2xl dark:text-blue-100">
                   Automated Financial Governance
                 </h3>
                 <p className="mb-4 max-w-lg text-[#515f74] text-sm leading-relaxed dark:text-slate-400">
@@ -363,7 +357,7 @@ export default function LandingG() {
         <div className="relative z-10 mx-auto max-w-6xl">
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
             <div>
-              <h2 className="mb-5 font-bold font-serif text-2xl leading-tight md:text-4xl">
+              <h2 className="mb-5 font-bold text-2xl leading-tight md:text-4xl">
                 Measurable Impact on Institutional Performance
               </h2>
               <p className="mb-8 max-w-xl text-blue-200/70 text-sm md:text-base">
@@ -372,13 +366,13 @@ export default function LandingG() {
               </p>
               <div className="grid grid-cols-2 gap-6 md:gap-8">
                 <div>
-                  <div className="mb-1 font-bold font-serif text-4xl text-[#00daf3] md:text-5xl">30-50%</div>
+                  <div className="mb-1 font-bold text-4xl text-[#00daf3] md:text-5xl">30-50%</div>
                   <div className="font-medium text-[10px] text-blue-200/60 uppercase tracking-widest">
                     Productivity Gain
                   </div>
                 </div>
                 <div>
-                  <div className="mb-1 font-bold font-serif text-4xl text-[#00daf3] md:text-5xl">100%</div>
+                  <div className="mb-1 font-bold text-4xl text-[#00daf3] md:text-5xl">100%</div>
                   <div className="font-medium text-[10px] text-blue-200/60 uppercase tracking-widest">
                     Total Transparency
                   </div>
@@ -387,7 +381,7 @@ export default function LandingG() {
             </div>
             <div className="rounded-2xl bg-white/5 p-0.5 backdrop-blur-xl">
               <div className="rounded-[0.9rem] border border-white/10 bg-[#00113a]/40 p-6 md:p-10 dark:bg-slate-900/40">
-                <blockquote className="mb-6 font-serif text-lg italic leading-relaxed md:text-xl">
+                <blockquote className="mb-6 text-lg italic leading-relaxed md:text-xl">
                   &ldquo;The ASTU Curator has transformed our research office from a clearinghouse into a strategic
                   engine. We are now funding projects 40% faster than last year.&rdquo;
                 </blockquote>
@@ -426,7 +420,7 @@ export default function LandingG() {
               />
             </div>
             <div className="relative z-10">
-              <h2 className="mb-4 font-bold font-serif text-2xl text-[#00113a] md:text-4xl dark:text-blue-50">
+              <h2 className="mb-4 font-bold text-2xl text-[#00113a] md:text-4xl dark:text-blue-50">
                 Ready to transform your research?
               </h2>
               <p className="mx-auto mb-8 max-w-xl text-[#515f74] text-sm md:text-base dark:text-slate-400">
@@ -455,7 +449,7 @@ export default function LandingG() {
       <footer className="w-full border-slate-200 border-t bg-slate-50 px-6 py-12 transition-colors duration-300 md:px-10 dark:border-slate-800 dark:bg-slate-950">
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 md:grid-cols-4">
           <div className="col-span-1">
-            <div className="mb-4 font-bold font-serif text-[#00113a] text-base uppercase tracking-wider dark:text-blue-50">
+            <div className="mb-4 font-bold text-[#00113a] text-base uppercase tracking-wider dark:text-blue-50">
               ASTU Curator
             </div>
             <p className="text-slate-500 text-sm leading-relaxed dark:text-slate-400">

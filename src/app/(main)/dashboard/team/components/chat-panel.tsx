@@ -88,7 +88,7 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const _handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -207,8 +207,8 @@ export function ChatPanel({ member, messages, onSendMessage, onViewProfile, onRe
             <Input
               ref={inputRef}
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
+              // onChange={(e) => setInputValue(e.target.value)}
+              // onKeyDown={handleKeyDown}
               placeholder="Type a message..."
               className="pr-10"
             />
