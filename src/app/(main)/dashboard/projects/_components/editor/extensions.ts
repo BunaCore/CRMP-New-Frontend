@@ -37,6 +37,8 @@ import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
 import ImageResize from "tiptap-extension-resize-image";
 
+import { LineHeight } from "./line-height-extension";
+
 // ─── Extension registry ───────────────────────────────────────
 // Grouped by logical concern for readability.
 
@@ -68,6 +70,11 @@ export const EDITOR_EXTENSIONS = [
     defaultAlignment: "left",
   }),
 
+  // ── Line Height ───────────────────────────────────────────────
+  LineHeight.configure({
+    types: ["heading", "paragraph"],
+  }),
+
   // ── Links ────────────────────────────────────────────────────
   Link.configure({
     openOnClick: false, // Don't navigate on click in editor
@@ -97,10 +104,7 @@ export const EDITOR_EXTENSIONS = [
   }),
 
   // ── Tables ───────────────────────────────────────────────────
-  Table.configure({
-    resizable: true, // Drag column widths
-    HTMLAttributes: { class: "border-collapse table-auto w-full" },
-  }),
+  Table,
   TableRow,
   TableHeader,
   TableCell,
