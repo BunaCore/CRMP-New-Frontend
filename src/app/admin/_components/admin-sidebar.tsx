@@ -57,11 +57,6 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
         <NavMain items={dynamicNavItems} />
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenu>
-          <div className="w-full px-2 pb-2 text-center text-muted-foreground text-xs">
-            Logged in as: <span className="font-bold">{user?.roles[0] || "Unknown"}</span>
-          </div>
-        </SidebarMenu>
         {/* We can re-use the generic user menu component for Admin sidebar */}
         <NavUser
           user={{

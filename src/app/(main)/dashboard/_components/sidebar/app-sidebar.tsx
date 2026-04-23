@@ -118,7 +118,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         <SidebarSupportCard />
-        <NavUser user={rootUser} />
+        <NavUser
+          user={{
+            name: user?.name ?? rootUser.name,
+            email: user?.email ?? rootUser.email,
+            avatar: user?.avatarUrl ?? rootUser.avatar,
+          }}
+        />
       </SidebarFooter>
     </Sidebar>
   );
