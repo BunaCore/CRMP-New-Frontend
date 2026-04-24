@@ -241,6 +241,7 @@ These serve as the fallback; there is no separate default.css file. */
 
 html {
   overscroll-behavior: none;
+  scroll-behavior: smooth;
 }
 
 .disable-transitions * {

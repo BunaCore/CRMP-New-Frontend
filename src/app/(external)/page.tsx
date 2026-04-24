@@ -66,7 +66,7 @@ export default function LandingG() {
               >
                 <Link
                   className={`${i === 0 ? "border-[#00daf3] border-b-2 font-semibold text-[#00113a] dark:text-[#00daf3]" : "text-[#515f74] hover:text-[#00113a] dark:text-slate-400 dark:hover:text-white"} text-sm tracking-tight transition-all duration-300`}
-                  href="#"
+                  href={`#${item.toLowerCase()}`}
                 >
                   {item}
                 </Link>
@@ -163,7 +163,10 @@ export default function LandingG() {
       </motion.nav>
 
       {/* Hero Section */}
-      <section className="relative flex min-h-screen items-center overflow-hidden px-6 pt-32 pb-20 transition-colors duration-300 md:px-12 dark:bg-slate-900">
+      <section
+        id="platform"
+        className="relative flex min-h-screen items-center overflow-hidden px-6 pt-32 pb-20 transition-colors duration-300 md:px-12 dark:bg-slate-900 scroll-mt-24"
+      >
         <motion.div
           initial={{ opacity: 0, scale: 1.1 }}
           animate={{ opacity: 0.1, scale: 1 }}
@@ -341,7 +344,10 @@ export default function LandingG() {
       </section>
 
       {/* Core Pillars Section */}
-      <section className="border-slate-100 border-y bg-white px-6 py-12 md:px-10 dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
+      <section
+        id="pillars"
+        className="border-slate-100 border-y bg-white px-6 py-12 md:px-10 dark:border-slate-800 dark:bg-slate-900 overflow-hidden scroll-mt-24"
+      >
         <div className="mx-auto max-w-6xl">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -515,7 +521,10 @@ export default function LandingG() {
       </section>
 
       {/* Impact Section */}
-      <section className="relative overflow-hidden bg-[#00113a] px-6 py-20 text-white transition-colors duration-300 md:px-10 dark:bg-slate-950">
+      <section
+        id="impact"
+        className="relative overflow-hidden bg-[#00113a] px-6 py-20 text-white transition-colors duration-300 md:px-10 dark:bg-slate-950 scroll-mt-24"
+      >
         <motion.div
           animate={{ x: [0, 50, 0], opacity: [0.1, 0.15, 0.1] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
@@ -638,31 +647,40 @@ export default function LandingG() {
               >
                 Join the ecosystem that&apos;s redefining how knowledge is created and managed at ASTU.
               </motion.p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="button"
-                  className="rounded-lg bg-[#00113a] px-6 py-2.5 font-bold text-sm text-white shadow-md transition-all hover:bg-[#002244]"
-                >
-                  I am a Principal Investigator
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="button"
-                  className="rounded-lg border-2 border-[#00113a] px-6 py-2.5 font-bold text-[#00113a] text-sm transition-all hover:bg-[#00113a] hover:text-white dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400 dark:hover:text-slate-900"
-                >
-                  I am an Administrator
-                </motion.button>
-              </div>
+
+              <Link
+                href="/login"
+                className="rounded-lg px-4 py-1.5 font-medium text-[#00113a] text-sm transition-all hover:bg-slate-100 dark:text-[#dbe1ff] dark:hover:bg-slate-800"
+              >
+                <div className="flex flex-wrap justify-center gap-4">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    type="button"
+                    className="rounded-lg bg-[#00113a] px-6 py-2.5 font-bold text-sm text-white shadow-md transition-all hover:bg-[#002244]"
+                  >
+                    I am a Principal Investigator
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    type="button"
+                    className="rounded-lg border-2 border-[#00113a] px-6 py-2.5 font-bold text-[#00113a] text-sm transition-all hover:bg-[#00113a] hover:text-white dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400 dark:hover:text-slate-900"
+                  >
+                    I am an Administrator
+                  </motion.button>
+                </div>
+              </Link>
             </div>
           </motion.div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="w-full border-slate-200 border-t bg-slate-50 px-6 py-12 transition-colors duration-300 md:px-10 dark:border-slate-800 dark:bg-slate-950">
+      <footer
+        id="resources"
+        className="w-full border-slate-200 border-t bg-slate-50 px-6 py-12 transition-colors duration-300 md:px-10 dark:border-slate-800 dark:bg-slate-950 scroll-mt-24"
+      >
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 md:grid-cols-4">
           <div className="col-span-1">
             <div className="mb-4 font-bold text-[#00113a] text-base uppercase tracking-wider dark:text-blue-50">
