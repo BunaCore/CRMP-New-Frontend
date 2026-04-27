@@ -45,6 +45,15 @@ interface WorkspaceContextProps {
   loading: boolean;
   createWorkspace: (projectId: string, name: string) => Promise<string>;
   refreshWorkspaces: () => Promise<void>;
+  // AI Copilot state
+  aiMode: "local" | "cloud";
+  setAiMode: (mode: "local" | "cloud") => void;
+  selectedContext: string | null;
+  setSelectedContext: (text: string | null) => void;
+  prefillPrompt: string | null;
+  setPrefillPrompt: (prompt: string | null) => void;
+  autoSendTrigger: { prompt: string; context: string; timestamp: number } | null;
+  setAutoSendTrigger: (trigger: { prompt: string; context: string; timestamp: number } | null) => void;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextProps | undefined>(undefined);
@@ -57,6 +66,14 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [activeFile, setActiveFile] = useState<FileData | null>(null);
   const [files, setFiles] = useState<FileData[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(true);
+
+  // AI Copilot state
+  const [aiMode, setAiMode] = useState<"local" | "cloud">("cloud");
+  const [selectedContext, setSelectedContext] = useState<string | null>(null);
+  const [prefillPrompt, setPrefillPrompt] = useState<string | null>(null);
+  const [autoSendTrigger, setAutoSendTrigger] = useState<{ prompt: string; context: string; timestamp: number } | null>(
+    null,
+  );
 
   // Real backend state
   const [workspaces, setWorkspaces] = useState<WorkspaceInfo[]>([]);
@@ -126,6 +143,16 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         loading,
         createWorkspace,
         refreshWorkspaces,
+
+        // AI Copilot
+        aiMode,
+        setAiMode,
+        selectedContext,
+        setSelectedContext,
+        prefillPrompt,
+        setPrefillPrompt,
+        autoSendTrigger,
+        setAutoSendTrigger,
       }}
     >
       {children}

@@ -52,7 +52,7 @@ export default function LandingG() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3 md:px-10">
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="font-bold text-[#00113a] text-xl tracking-tight dark:text-blue-50 cursor-pointer"
+            className="cursor-pointer font-bold text-[#00113a] text-xl tracking-tight dark:text-blue-50"
           >
             ASTU Curator
           </motion.div>
@@ -328,7 +328,7 @@ export default function LandingG() {
                   y: -10,
                   boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02)",
                 }}
-                className="rounded-xl border border-slate-200 bg-[#ffffff] p-6 shadow-sm dark:border-slate-800 dark:bg-[#2d3133] transition-all"
+                className="rounded-xl border border-slate-200 bg-[#ffffff] p-6 shadow-sm transition-all dark:border-slate-800 dark:bg-[#2d3133]"
               >
                 <item.icon className="mb-4 h-8 w-8 text-[#00daf3]" />
                 <h3 className="mb-2 font-bold text-[#00113a] text-lg dark:text-[#dbe1ff]">{item.title}</h3>
@@ -340,7 +340,7 @@ export default function LandingG() {
       </section>
 
       {/* Core Pillars Section */}
-      <section className="border-slate-100 border-y bg-white px-6 py-12 md:px-10 dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
+      <section className="overflow-hidden border-slate-100 border-y bg-white px-6 py-12 md:px-10 dark:border-slate-800 dark:bg-slate-900">
         <div className="mx-auto max-w-6xl">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
