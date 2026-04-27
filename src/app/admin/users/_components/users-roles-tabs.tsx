@@ -7,7 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAdminUsers } from "../users-context";
 import { InviteUserModal } from "./invite-user-modal";
 import { RolesPermissionsPanel } from "./roles-permissions-panel";
-import { UserDetailsDrawer } from "./user-details-drawer";
 import { UsersTable } from "./users-table";
 
 export function UsersRolesTabs() {
@@ -34,7 +33,6 @@ export function UsersRolesTabs() {
           <RolesPermissionsPanel />
         </TabsContent>
       </Tabs>
-      <UserDetailsDrawer />
       <InviteUserModal />
     </>
   );

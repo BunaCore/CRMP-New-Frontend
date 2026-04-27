@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { MoreVertical, Search, UserPlus, Users } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -147,12 +149,15 @@ export function UsersTable() {
                               : user.email.slice(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="min-w-0 flex flex-col gap-0.5">
+                        <Link
+                          href={`/admin/users/${user.id}`}
+                          className="min-w-0 flex flex-col gap-0.5 hover:opacity-70 transition-opacity"
+                        >
                           <span className="truncate font-semibold text-[13px] text-slate-900 dark:text-slate-100">
                             {user.fullName || "Unnamed user"}
                           </span>
                           <span className="truncate text-[12px] text-slate-500">{user.email}</span>
-                        </div>
+                        </Link>
                       </div>
                     </TableCell>
                     <TableCell className="truncate py-4 text-[13px] text-slate-700 dark:text-slate-300">
@@ -184,7 +189,9 @@ export function UsersTable() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-40">
-                          <DropdownMenuItem onClick={() => setSelectedUserId(user.id)}>View details</DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link href={`/admin/users/${user.id}`}>View details</Link>
+                          </DropdownMenuItem>
                           <DropdownMenuItem disabled>Edit user</DropdownMenuItem>
                           <DropdownMenuItem disabled>Reset password</DropdownMenuItem>
                         </DropdownMenuContent>
