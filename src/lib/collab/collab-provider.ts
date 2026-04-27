@@ -29,7 +29,7 @@ function toWsUrl(httpUrl: string): string {
 
 // NEXT_PUBLIC_API_URL: shared with the REST client (e.g. http://localhost:3000).
 // The collab WS server lives on the SAME host:port under /collab/*.
-const COLLAB_WS_URL = toWsUrl(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000") + "/collab";
+const COLLAB_WS_URL = `${toWsUrl(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000")}/collab`;
 
 export interface CollabProviderOptions {
   workspaceId: string;

@@ -52,7 +52,7 @@ export default function LandingG() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3 md:px-10">
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="font-bold text-[#00113a] text-xl tracking-tight dark:text-blue-50 cursor-pointer"
+            className="cursor-pointer font-bold text-[#00113a] text-xl tracking-tight dark:text-blue-50"
           >
             ASTU Curator
           </motion.div>
@@ -165,7 +165,7 @@ export default function LandingG() {
       {/* Hero Section */}
       <section
         id="platform"
-        className="relative flex min-h-screen items-center overflow-hidden px-6 pt-32 pb-20 transition-colors duration-300 md:px-12 dark:bg-slate-900 scroll-mt-24"
+        className="relative flex min-h-screen scroll-mt-24 items-center overflow-hidden px-6 pt-32 pb-20 transition-colors duration-300 md:px-12 dark:bg-slate-900"
       >
         <motion.div
           initial={{ opacity: 0, scale: 1.1 }}
@@ -332,7 +332,7 @@ export default function LandingG() {
                   y: -10,
                   boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02)",
                 }}
-                className="rounded-xl border border-slate-200 bg-[#ffffff] p-6 shadow-sm dark:border-slate-800 dark:bg-[#2d3133] transition-all"
+                className="rounded-xl border border-slate-200 bg-[#ffffff] p-6 shadow-sm transition-all dark:border-slate-800 dark:bg-[#2d3133]"
               >
                 <item.icon className="mb-4 h-8 w-8 text-[#00daf3]" />
                 <h3 className="mb-2 font-bold text-[#00113a] text-lg dark:text-[#dbe1ff]">{item.title}</h3>
@@ -346,7 +346,7 @@ export default function LandingG() {
       {/* Core Pillars Section */}
       <section
         id="pillars"
-        className="border-slate-100 border-y bg-white px-6 py-12 md:px-10 dark:border-slate-800 dark:bg-slate-900 overflow-hidden scroll-mt-24"
+        className="scroll-mt-24 overflow-hidden border-slate-100 border-y bg-white px-6 py-12 md:px-10 dark:border-slate-800 dark:bg-slate-900"
       >
         <div className="mx-auto max-w-6xl">
           <motion.h2
@@ -523,7 +523,7 @@ export default function LandingG() {
       {/* Impact Section */}
       <section
         id="impact"
-        className="relative overflow-hidden bg-[#00113a] px-6 py-20 text-white transition-colors duration-300 md:px-10 dark:bg-slate-950 scroll-mt-24"
+        className="relative scroll-mt-24 overflow-hidden bg-[#00113a] px-6 py-20 text-white transition-colors duration-300 md:px-10 dark:bg-slate-950"
       >
         <motion.div
           animate={{ x: [0, 50, 0], opacity: [0.1, 0.15, 0.1] }}
@@ -679,7 +679,7 @@ export default function LandingG() {
       {/* Footer */}
       <footer
         id="resources"
-        className="w-full border-slate-200 border-t bg-slate-50 px-6 py-12 transition-colors duration-300 md:px-10 dark:border-slate-800 dark:bg-slate-950 scroll-mt-24"
+        className="w-full scroll-mt-24 border-slate-200 border-t bg-slate-50 px-6 py-12 transition-colors duration-300 md:px-10 dark:border-slate-800 dark:bg-slate-950"
       >
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 md:grid-cols-4">
           <div className="col-span-1">
