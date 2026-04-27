@@ -91,7 +91,7 @@ export function CreateChatModal() {
         <div className="space-y-4 py-4">
           {createChatMode === "group" && (
             <div className="space-y-2">
-              <label htmlFor="groupName" className="text-sm font-medium">
+              <label htmlFor="groupName" className="font-medium text-sm">
                 Group Name
               </label>
               <Input
@@ -105,18 +105,18 @@ export function CreateChatModal() {
           )}
 
           <div className="space-y-2">
-            <label htmlFor="searchMembers" className="text-sm font-medium">
+            <label htmlFor="searchMembers" className="font-medium text-sm">
               Search Members
             </label>
 
             {/* Visual Chips for selected users */}
             {createChatMode === "group" && selectedUsers.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-2 p-2 border rounded-md min-h-[42px]">
+              <div className="mb-2 flex min-h-[42px] flex-wrap gap-2 rounded-md border p-2">
                 {selectedUsers.map((user) => (
                   <Badge key={user.id} variant="secondary" className="flex items-center gap-1">
                     {user.name}
                     <X
-                      className="h-3 w-3 cursor-pointer ml-1 hover:text-destructive"
+                      className="ml-1 h-3 w-3 cursor-pointer hover:text-destructive"
                       onClick={() => handleSelectUser(user.id, user.name)}
                     />
                   </Badge>
@@ -125,7 +125,7 @@ export function CreateChatModal() {
             )}
 
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Type to search..."
                 className="pl-9"
@@ -136,7 +136,7 @@ export function CreateChatModal() {
             </div>
           </div>
 
-          <div className="max-h-64 overflow-y-auto rounded-md border p-2 space-y-1">
+          <div className="max-h-64 space-y-1 overflow-y-auto rounded-md border p-2">
             {isLoading && isSearchActive ? (
               <div className="flex items-center justify-center p-4">
                 <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -151,25 +151,25 @@ export function CreateChatModal() {
                       if (isPending) return;
                       handleSelectUser(user.value, user.label);
                     }}
-                    className={`flex items-center gap-3 rounded-lg p-2 cursor-pointer transition-colors ${
+                    className={`flex cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors ${
                       isSelected ? "bg-primary/20 text-primary" : "hover:bg-muted"
-                    } ${isPending ? "opacity-50 cursor-not-allowed" : ""}`}
+                    } ${isPending ? "cursor-not-allowed opacity-50" : ""}`}
                   >
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className={isSelected ? "bg-primary/20 text-primary" : ""}>
                         {user.label.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{user.label}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium text-sm">{user.label}</p>
                     </div>
                   </div>
                 );
               })
             ) : isSearchActive ? (
-              <p className="text-center text-sm text-muted-foreground p-4">No users found.</p>
+              <p className="p-4 text-center text-muted-foreground text-sm">No users found.</p>
             ) : (
-              <p className="text-center text-sm text-muted-foreground p-4">Type a name to search members.</p>
+              <p className="p-4 text-center text-muted-foreground text-sm">Type a name to search members.</p>
             )}
           </div>
         </div>

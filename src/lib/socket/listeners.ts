@@ -40,6 +40,7 @@ export function setupSocketListeners(queryClient: QueryClient) {
 
     // A) Append to the Infinite Query cache
     const queryKey = ["messages", chatId];
+    // biome-ignore lint/suspicious/noExplicitAny: react query typing mismatch
     queryClient.setQueryData<any>(queryKey, (oldData: any) => {
       if (!oldData || !oldData.pages)
         return {

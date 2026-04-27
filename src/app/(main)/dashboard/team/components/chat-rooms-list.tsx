@@ -21,9 +21,7 @@ import { Hash, MessageSquarePlus, Search, UserPlus, Users } from "lucide-react";
 import { useState } from "react";
 import { CreateChatModal } from "./create-chat-modal";
 
-interface ChatRoomsListProps {
-  onStartDirectMessage: (memberId: string) => void;
-}
+type ChatRoomsListProps = Record<string, never>;
 
 function getInitials(name: string) {
   return name
@@ -39,7 +37,7 @@ function formatRelativeTime(timestamp: string | undefined) {
   return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
 }
 
-export function ChatRoomsList({ onStartDirectMessage }: ChatRoomsListProps) {
+export function ChatRoomsList(_props: ChatRoomsListProps) {
   const { data: rooms = [] } = useGetChats();
   const activeChatId = useChatStore((s) => s.activeChatId);
   const setActiveChatId = useChatStore((s) => s.setActiveChatId);
@@ -131,7 +129,7 @@ export function ChatRoomsList({ onStartDirectMessage }: ChatRoomsListProps) {
       </div>
 
       {/* Room List */}
-      <ScrollArea type="hover" className="flex-1 h-full">
+      <ScrollArea type="hover" className="h-full flex-1">
         <div className="p-2">
           {filteredRooms.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
