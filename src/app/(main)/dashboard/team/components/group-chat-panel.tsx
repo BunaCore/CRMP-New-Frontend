@@ -89,7 +89,7 @@ const _roleColors: Record<string, string> = {
   "Postdoctoral Fellow": "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
 };
 
-function TypingIndicator({ chatId, roomMembers }: { chatId: string; roomMembers: any[] }) {
+function TypingIndicator({ chatId, roomMembers }: { chatId: string; roomMembers: { id: string; name?: string }[] }) {
   const typingState = useChatStore((s) => s.typingState[chatId]);
   const [now, setNow] = useState(Date.now());
 

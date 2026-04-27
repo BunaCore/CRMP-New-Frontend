@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 
 import { createWorkspace as apiCreateWorkspace } from "@/lib/api/editor/mutations";
 import { fetchWorkspaces } from "@/lib/api/editor/queries";
+import { fetchProjectMembers, type ProjectMember } from "@/lib/api/members/queries";
 import type { WorkspaceInfo } from "@/types/editor";
 
 export type ViewType = "editor" | "file-viewer";
@@ -18,6 +19,16 @@ export interface FileData {
 }
 
 interface WorkspaceContextProps {
+  // Project identity — available to all workspace children without prop drilling
+  projectId: string;
+
+  // Project membership — loaded once at the workspace boundary.
+  // This is the authoritative place for the project-scoped collab gate:
+  //   isSoloProject === true  → single-user mode, no collab
+  //   isSoloProject === false → team project, collab eligible
+  projectMembers: ProjectMember[];
+  isSoloProject: boolean;
+
   // View state
   activeView: ViewType;
   setActiveView: (view: ViewType) => void;
@@ -49,14 +60,23 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
   // Real backend state
   const [workspaces, setWorkspaces] = useState<WorkspaceInfo[]>([]);
+  const [projectMembers, setProjectMembers] = useState<ProjectMember[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refreshWorkspaces = useCallback(async () => {
     if (!projectId) return;
     setLoading(true);
     try {
-      const data = await fetchWorkspaces(projectId);
+      // Fetch workspaces and project members in parallel.
+      // Members are loaded here — at the project-scoped boundary — so any
+      // component in the workspace tree can read isSoloProject without
+      // making its own API call.
+      const [data, members] = await Promise.all([
+        fetchWorkspaces(projectId),
+        fetchProjectMembers(projectId).catch(() => [] as ProjectMember[]),
+      ]);
       setWorkspaces(data);
+      setProjectMembers(members);
     } catch (error) {
       console.error("Failed to fetch workspaces", error);
     } finally {
@@ -85,6 +105,14 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   return (
     <WorkspaceContext.Provider
       value={{
+        // Project identity — available to all children
+        projectId,
+        projectMembers,
+        // isSoloProject: the frontend's authoritative gate for collab eligibility.
+        // A project with 0 or 1 member does not qualify for collaborative editing.
+        // Note: members API may return [] on failure — treated safely as solo mode.
+        isSoloProject: projectMembers.length <= 1,
+
         activeView,
         setActiveView,
         activeFile,
