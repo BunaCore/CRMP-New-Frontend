@@ -22,7 +22,7 @@ export function AdminPermissionGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { user, isLoading } = useAuthStore();
 
-  const isPI = !isLoading && !!user && !hasPermission(user.permissions ?? [], "PROJECT_APPROVE");
+  const isPI = !isLoading && !!user && user.role?.includes("STUDENT");
 
   useEffect(() => {
     if (isLoading) return;
