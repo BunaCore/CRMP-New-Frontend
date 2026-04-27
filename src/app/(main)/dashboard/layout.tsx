@@ -63,17 +63,6 @@ export default async function Layout({ children }: Readonly<{ children: ReactNod
             <div className="flex items-center gap-2">
               <LayoutControls />
               <ThemeSwitcher />
-              <Button asChild size="icon">
-                <Link
-                  prefetch={false}
-                  href="https://github.com/BunaCore/CRMP-New-Frontend"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Open GitHub repository"
-                >
-                  <Github />
-                </Link>
-              </Button>
               <AccountSwitcher users={users} />
             </div>
           </div>
