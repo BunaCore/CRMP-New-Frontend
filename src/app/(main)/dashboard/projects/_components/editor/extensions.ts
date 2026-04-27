@@ -12,6 +12,12 @@
 //   the editor — losing selection, scroll position, and
 //   causing visible reflow. Module-level constants prevent
 //   this entirely. Only add .configure() calls here.
+//
+// Additional exports:
+//   STARTER_KIT_BASE_CONFIG — the StarterKit configure options.
+//     Used by collab-extensions to rebuild with history:false.
+//   NON_STARTER_EXTENSIONS  — all extensions except StarterKit.
+//     Used by collab-extensions to compose the collab array.
 // ============================================================
 
 import BubbleMenuExtension from "@tiptap/extension-bubble-menu";
@@ -39,17 +45,21 @@ import ImageResize from "tiptap-extension-resize-image";
 
 import { LineHeight } from "./line-height-extension";
 
-// ─── Extension registry ───────────────────────────────────────
-// Grouped by logical concern for readability.
+// ─── StarterKit configure options ────────────────────────────
+// Exported separately so collab-extensions can rebuild StarterKit
+// with { history: false } without duplicating config.
 
-export const EDITOR_EXTENSIONS = [
-  // ── Core document structure ──────────────────────────────────
-  StarterKit.configure({
-    heading: { levels: [1, 2, 3] },
-    // Disable codeBlock from StarterKit if you add a syntax-highlighted one later
-    // codeBlock: false,
-  }),
+export const STARTER_KIT_BASE_CONFIG = {
+  heading: { levels: [1, 2, 3] as (1 | 2 | 3)[] },
+  // history is enabled by default here (solo mode).
+  // Collab mode overrides this to false via STARTER_KIT_BASE_CONFIG spread.
+};
 
+// ─── Non-StarterKit extensions ────────────────────────────────
+// Everything except StarterKit — shared between solo and collab.
+// Collab mode adds this array after its own StarterKit + Collaboration.
+
+export const NON_STARTER_EXTENSIONS = [
   // ── Inline formatting ────────────────────────────────────────
   Underline,
   TextStyle, // Required by Color extension and FontFamily
@@ -60,8 +70,6 @@ export const EDITOR_EXTENSIONS = [
   Superscript, // Academic: exponents, citations
 
   // ── Smart typography ─────────────────────────────────────────
-  // Converts "..." → ellipsis, "--" → em dash, smart quotes, etc.
-  // Essential for professional document feel.
   Typography,
 
   // ── Alignment ────────────────────────────────────────────────
@@ -77,9 +85,9 @@ export const EDITOR_EXTENSIONS = [
 
   // ── Links ────────────────────────────────────────────────────
   Link.configure({
-    openOnClick: false, // Don't navigate on click in editor
-    autolink: true, // Auto-detect URLs as user types
-    linkOnPaste: true, // Detect links on paste
+    openOnClick: false,
+    autolink: true,
+    linkOnPaste: true,
     HTMLAttributes: {
       class: "text-primary underline cursor-pointer decoration-primary/40 hover:decoration-primary",
       rel: "noopener noreferrer",
@@ -90,7 +98,7 @@ export const EDITOR_EXTENSIONS = [
   // ── Media ────────────────────────────────────────────────────
   ImageResize.configure({
     // @ts-expect-error - allowBase64 exists but is missing from the extension types
-    allowBase64: true, // Store images directly in DB as Base64 strings
+    allowBase64: true,
     HTMLAttributes: {
       class: "rounded-xl border border-border shadow-md mx-auto max-w-full my-4",
     },
@@ -99,7 +107,7 @@ export const EDITOR_EXTENSIONS = [
   // ── Lists ────────────────────────────────────────────────────
   TaskList,
   TaskItem.configure({
-    nested: true, // Support checklist nesting
+    nested: true,
     HTMLAttributes: { class: "flex items-start gap-2" },
   }),
 
@@ -110,20 +118,24 @@ export const EDITOR_EXTENSIONS = [
   TableCell,
 
   // ── Utility ──────────────────────────────────────────────────
-  CharacterCount, // For word/char count in status bar
+  CharacterCount,
 
-  // ── BubbleMenu + FloatingMenu ProseMirror extensions ────────
-  // These power the React <BubbleMenu> and <FloatingMenu> wrappers.
+  // ── BubbleMenu + FloatingMenu ────────────────────────────────
   BubbleMenuExtension,
   FloatingMenuExtension,
 
   // ── Placeholder ──────────────────────────────────────────────
-  // Note: this IS a function, but defined once at module level.
   Placeholder.configure({
     placeholder: ({ node }) => {
       if (node.type.name === "heading") return "Heading…";
       return "Start writing, or type '/' for commands…";
     },
-    showOnlyCurrent: true, // Only show placeholder for the current node
+    showOnlyCurrent: true,
   }),
 ];
+
+// ─── Full extension registry (solo mode) ─────────────────────
+// This is the default extension array used when there is only
+// one project member (no realtime collaboration needed).
+
+export const EDITOR_EXTENSIONS = [StarterKit.configure(STARTER_KIT_BASE_CONFIG), ...NON_STARTER_EXTENSIONS];
