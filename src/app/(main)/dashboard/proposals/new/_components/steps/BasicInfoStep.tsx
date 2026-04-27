@@ -302,7 +302,7 @@ export function BasicInfoStep() {
         <Controller
           control={control}
           name="file"
-          render={({ field }) => (
+          render={() => (
             <>
               <input
                 type="file"

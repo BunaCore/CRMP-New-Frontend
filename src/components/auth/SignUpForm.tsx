@@ -67,21 +67,21 @@ export function SignUpForm() {
       <div className="space-y-2">
         <Label htmlFor="fullName">Full Name</Label>
         <Input id="fullName" placeholder="John Doe" disabled={isLoading} {...register("fullName")} />
-        {errors.fullName && <p className="text-sm text-red-500">{errors.fullName.message}</p>}
+        {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName.message}</p>}
       </div>
 
       {/* Email */}
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input id="email" type="email" placeholder="you@example.com" disabled={isLoading} {...register("email")} />
-        {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+        {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
       </div>
 
       {/* Password */}
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
         <Input id="password" type="password" disabled={isLoading} {...register("password")} />
-        {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
+        {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
       </div>
 
       {/* Role */}
@@ -97,7 +97,7 @@ export function SignUpForm() {
           <option value="UNDERGRADUATE">Undergraduate</option>
           <option value="POSTGRADUATE">Postgraduate</option>
         </select>
-        {errors.role && <p className="text-sm text-red-500">{errors.role.message}</p>}
+        {errors.role && <p className="text-red-500 text-sm">{errors.role.message}</p>}
       </div>
 
       {/* Submit */}
