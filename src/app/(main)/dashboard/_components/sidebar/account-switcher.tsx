@@ -67,7 +67,7 @@ export function AccountSwitcher({
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-semibold">{currentUser.name}</span>
-              <span className="truncate text-xs capitalize text-muted-foreground">{currentUser.role}</span>
+              <span className="truncate text-muted-foreground text-xs capitalize">{currentUser.role}</span>
             </div>
           </div>
         </DropdownMenuItem>

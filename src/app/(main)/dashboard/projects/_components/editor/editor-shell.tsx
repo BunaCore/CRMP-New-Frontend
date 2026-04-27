@@ -5,6 +5,13 @@
 // Container that renders loading / error / empty / editor states.
 // The actual TipTap EditorContent is slotted in via `children`.
 // This component owns NO fetch logic — it receives state as props.
+//
+// Loading gate:
+//   Shows <LoadingState> until BOTH conditions are true:
+//     1. loadStatus === "loaded"   (document fetched from API)
+//     2. collabIsReady === true    (collab provider resolved)
+//   This prevents the editor from mounting with the wrong
+//   extension set (solo vs collab) and avoids any visible flicker.
 // ============================================================
 
 import type { ReactNode } from "react";
@@ -26,6 +33,13 @@ interface EditorShellProps {
   loadStatus: LoadStatus;
   isVersionPanelOpen: boolean;
   versions: DocumentVersionSummary[];
+  /**
+   * Set to true once useCollabProvider has resolved (either solo or
+   * collab active). The shell holds the loading gate until both
+   * document load AND collab setup have completed, so the editor
+   * always mounts with the correct final extension set.
+   */
+  collabIsReady: boolean;
 
   // Callbacks
   onRetry: () => void;
@@ -78,6 +92,7 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
 export function EditorShell({
   workspaceId,
   loadStatus,
+  collabIsReady,
   isVersionPanelOpen,
   versions,
   onRetry,
@@ -86,6 +101,11 @@ export function EditorShell({
   onCreateSnapshot,
   children,
 }: EditorShellProps) {
+  // Hold the loading gate until BOTH the document AND the collab
+  // provider hook have resolved. This guarantees the editor always
+  // mounts with the correct final extension set (solo or collab).
+  const isStillLoading = loadStatus === "loading" || loadStatus === "idle" || !collabIsReady;
+
   return (
     <div className="relative flex h-full w-full min-w-0 flex-col overflow-hidden bg-background">
       {/* Main content area */}
@@ -98,12 +118,12 @@ export function EditorShell({
             isVersionPanelOpen && "mr-72", // shift left when version panel open
           )}
         >
-          {loadStatus === "loading" || loadStatus === "idle" ? (
+          {isStillLoading ? (
             <LoadingState />
           ) : loadStatus === "error" ? (
             <ErrorState onRetry={onRetry} />
           ) : (
-            // "loaded" — render TipTap slot
+            // "loaded" + collabIsReady — render TipTap slot
             children
           )}
         </div>
@@ -119,8 +139,8 @@ export function EditorShell({
         />
       </div>
 
-      {/* Status bar — always visible */}
-      {loadStatus === "loaded" && <EditorStatusBar />}
+      {/* Status bar — visible once fully loaded */}
+      {!isStillLoading && loadStatus === "loaded" && <EditorStatusBar />}
     </div>
   );
 }

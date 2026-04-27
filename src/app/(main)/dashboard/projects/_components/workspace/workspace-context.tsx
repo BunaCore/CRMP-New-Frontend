@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 
 import { createWorkspace as apiCreateWorkspace } from "@/lib/api/editor/mutations";
 import { fetchWorkspaces } from "@/lib/api/editor/queries";
+import { fetchProjectMembers, type ProjectMember } from "@/lib/api/members/queries";
 import type { WorkspaceInfo } from "@/types/editor";
 
 export type ViewType = "editor" | "file-viewer";
@@ -18,6 +19,16 @@ export interface FileData {
 }
 
 interface WorkspaceContextProps {
+  // Project identity — available to all workspace children without prop drilling
+  projectId: string;
+
+  // Project membership — loaded once at the workspace boundary.
+  // This is the authoritative place for the project-scoped collab gate:
+  //   isSoloProject === true  → single-user mode, no collab
+  //   isSoloProject === false → team project, collab eligible
+  projectMembers: ProjectMember[];
+  isSoloProject: boolean;
+
   // View state
   activeView: ViewType;
   setActiveView: (view: ViewType) => void;
@@ -34,6 +45,15 @@ interface WorkspaceContextProps {
   loading: boolean;
   createWorkspace: (projectId: string, name: string) => Promise<string>;
   refreshWorkspaces: () => Promise<void>;
+  // AI Copilot state
+  aiMode: "local" | "cloud";
+  setAiMode: (mode: "local" | "cloud") => void;
+  selectedContext: string | null;
+  setSelectedContext: (text: string | null) => void;
+  prefillPrompt: string | null;
+  setPrefillPrompt: (prompt: string | null) => void;
+  autoSendTrigger: { prompt: string; context: string; timestamp: number } | null;
+  setAutoSendTrigger: (trigger: { prompt: string; context: string; timestamp: number } | null) => void;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextProps | undefined>(undefined);
@@ -47,16 +67,33 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [files, setFiles] = useState<FileData[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(true);
 
+  // AI Copilot state
+  const [aiMode, setAiMode] = useState<"local" | "cloud">("cloud");
+  const [selectedContext, setSelectedContext] = useState<string | null>(null);
+  const [prefillPrompt, setPrefillPrompt] = useState<string | null>(null);
+  const [autoSendTrigger, setAutoSendTrigger] = useState<{ prompt: string; context: string; timestamp: number } | null>(
+    null,
+  );
+
   // Real backend state
   const [workspaces, setWorkspaces] = useState<WorkspaceInfo[]>([]);
+  const [projectMembers, setProjectMembers] = useState<ProjectMember[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refreshWorkspaces = useCallback(async () => {
     if (!projectId) return;
     setLoading(true);
     try {
-      const data = await fetchWorkspaces(projectId);
+      // Fetch workspaces and project members in parallel.
+      // Members are loaded here — at the project-scoped boundary — so any
+      // component in the workspace tree can read isSoloProject without
+      // making its own API call.
+      const [data, members] = await Promise.all([
+        fetchWorkspaces(projectId),
+        fetchProjectMembers(projectId).catch(() => [] as ProjectMember[]),
+      ]);
       setWorkspaces(data);
+      setProjectMembers(members);
     } catch (error) {
       console.error("Failed to fetch workspaces", error);
     } finally {
@@ -85,6 +122,14 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   return (
     <WorkspaceContext.Provider
       value={{
+        // Project identity — available to all children
+        projectId,
+        projectMembers,
+        // isSoloProject: the frontend's authoritative gate for collab eligibility.
+        // A project with 0 or 1 member does not qualify for collaborative editing.
+        // Note: members API may return [] on failure — treated safely as solo mode.
+        isSoloProject: projectMembers.length <= 1,
+
         activeView,
         setActiveView,
         activeFile,
@@ -98,6 +143,16 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         loading,
         createWorkspace,
         refreshWorkspaces,
+
+        // AI Copilot
+        aiMode,
+        setAiMode,
+        selectedContext,
+        setSelectedContext,
+        prefillPrompt,
+        setPrefillPrompt,
+        autoSendTrigger,
+        setAutoSendTrigger,
       }}
     >
       {children}

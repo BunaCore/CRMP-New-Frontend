@@ -199,6 +199,8 @@ interface TitleBarProps {
   onImportMarkdownClick: () => void;
   onExportPdf: () => void;
   onExportMarkdown: () => void;
+  /** Optional slot rendered between the title and the action buttons. */
+  rightSlot?: React.ReactNode;
 }
 
 function TitleBar({
@@ -209,6 +211,7 @@ function TitleBar({
   onImportMarkdownClick,
   onExportPdf,
   onExportMarkdown,
+  rightSlot,
 }: TitleBarProps) {
   const router = useRouter();
   const { toggleChat, isChatOpen } = useWorkspace();
@@ -244,8 +247,11 @@ function TitleBar({
         />
       </div>
 
-      {/* Right: status label + chat + more */}
+      {/* Right: collab bar + status label + chat + more */}
       <div className="flex shrink-0 items-center gap-2">
+        {/* Collab awareness bar — only visible in team projects */}
+        {rightSlot}
+
         <span className="hidden font-black text-[9px] text-muted-foreground/25 uppercase tracking-[0.2em] sm:block">
           Editing
         </span>
@@ -842,6 +848,9 @@ export interface EditorToolbarProps {
   onImportMarkdownClick: () => void;
   onExportPdf: () => void;
   onExportMarkdown: () => void;
+  /** Optional slot — rendered in the title bar's right section.
+   *  Used to inject <CollabAwarenessBar /> without coupling the toolbar to collab. */
+  rightSlot?: React.ReactNode;
 }
 
 export const EditorToolbar = memo(function EditorToolbar({
@@ -855,6 +864,7 @@ export const EditorToolbar = memo(function EditorToolbar({
   onImportMarkdownClick,
   onExportPdf,
   onExportMarkdown,
+  rightSlot,
 }: EditorToolbarProps) {
   if (!editor) return null;
 
@@ -868,6 +878,7 @@ export const EditorToolbar = memo(function EditorToolbar({
         onImportMarkdownClick={onImportMarkdownClick}
         onExportPdf={onExportPdf}
         onExportMarkdown={onExportMarkdown}
+        rightSlot={rightSlot}
       />
       <FormattingBar editor={editor} onAddImage={onAddImage} onSetLink={onSetLink} />
     </div>
