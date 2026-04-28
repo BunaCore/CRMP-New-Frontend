@@ -35,6 +35,7 @@ export interface CreateProposalPayload {
   durationMonths: number; // >= 1
   budget: BudgetItem[];
   members: ProposalMember[];
+  fileId?: string; // UUID of uploaded file
 }
 
 /**
@@ -203,6 +204,15 @@ export interface ResearcherProposal {
   workflow: Workflow;
   comments: ProposalComment[];
   defenceSchedules: DefenceSchedule[];
+  file?: {
+    id: string;
+    name: string;
+    mimeType: string;
+    size: number;
+    url: string;
+    visibility: string;
+    expiresIn?: number;
+  };
   createdAt: string; // ISO date
 }
 
@@ -280,6 +290,15 @@ export interface AdminProposalDetail {
   workflow: Workflow;
   comments: ProposalComment[];
   defenceSchedules: DefenceSchedule[];
+  file?: {
+    id: string;
+    name: string;
+    mimeType: string;
+    size: number;
+    url: string;
+    visibility: string;
+    expiresIn?: number;
+  };
   createdAt: string;
 }
 

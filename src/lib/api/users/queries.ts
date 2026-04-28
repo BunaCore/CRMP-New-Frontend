@@ -5,7 +5,10 @@
 
 import { useQuery } from "@tanstack/react-query";
 
+import { apiClient } from "@/lib/api/client";
 import type { UserOption } from "@/lib/api/proposals/types";
+
+import type { UserDetails, UsersListResponse, UsersQueryParams } from "./types";
 
 /**
  * Fetch users for selector dropdown.
@@ -19,6 +22,40 @@ export async function getUsers(role?: string, q?: string): Promise<UserOption[]>
   if (q) params.q = q;
   const response = await apiClient.get<UserOption[]>("/users/selector", { params });
   return response.data;
+}
+
+/**
+ * Fetch users list (admin use-case).
+ * GET /users/?limit=&search=&sortBy=&sortDir=&page=
+ */
+export async function getUsersList(params: UsersQueryParams): Promise<UsersListResponse> {
+  const response = await apiClient.get<UsersListResponse>("/users", { params });
+  return response.data;
+}
+
+/**
+ * Fetch user details by id (admin use-case).
+ * GET /users/:id
+ */
+export async function getUserById(userId: string): Promise<UserDetails> {
+  const response = await apiClient.get<UserDetails>(`/users/${userId}`);
+  return response.data;
+}
+
+export function useGetUsersList(params: UsersQueryParams, enabled = true) {
+  return useQuery({
+    queryKey: ["users", "list", params],
+    queryFn: () => getUsersList(params),
+    enabled,
+  });
+}
+
+export function useGetUserById(userId: string | null, enabled = true) {
+  return useQuery({
+    queryKey: ["users", "byId", userId],
+    queryFn: () => getUserById(userId as string),
+    enabled: enabled && !!userId,
+  });
 }
 
 /**
