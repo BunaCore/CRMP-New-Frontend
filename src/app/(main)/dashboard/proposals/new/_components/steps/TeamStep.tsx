@@ -67,7 +67,7 @@ export function TeamStep() {
   };
 
   return (
-    <div className="fade-in slide-in-from-right-4 mt-4 grid min-h-[400px] animate-in grid-cols-1 gap-8 divide-slate-100 rounded-lg border border-slate-100 bg-slate-50/30 duration-500 lg:grid-cols-2 lg:divide-x dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900/10">
+    <div className="fade-in slide-in-from-right-4 mt-4 grid min-h-[400px] animate-in grid-cols-1 gap-8 rounded-2xl border border-slate-200/60 bg-white/70 shadow-[0_10px_30px_rgba(0,0,0,0.06)] backdrop-blur-md transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.10)] lg:grid-cols-2 lg:divide-x lg:divide-slate-200/60 dark:border-slate-800/60 dark:bg-slate-950/40 dark:lg:divide-slate-800/60">
       {/* Members (Left) */}
       <div className="flex flex-col gap-4 p-4 lg:p-6 lg:pr-8">
         <div>
@@ -88,45 +88,42 @@ export function TeamStep() {
 
         <div className="flex flex-col gap-2 overflow-y-auto pr-1">
           {/* Search results — only when searching */}
-          {isMemberSearchActive && (
-            <>
-              {loadingMembers ? (
-                <div className="flex items-center justify-center p-6">
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                </div>
-              ) : memberResults.length === 0 ? (
-                <div className="p-4 text-center text-slate-500 text-xs italic">No exact matches found.</div>
-              ) : (
-                memberResults.map((member) => {
-                  const isSelected = selectedTeam.some((m) => m.value === member.value);
-                  return (
-                    <button
-                      type="button"
-                      key={member.value}
-                      onClick={() => handleToggleTeam(member.value, member.label)}
-                      className={`flex cursor-pointer items-center gap-3 rounded-lg border p-2.5 transition-colors ${
-                        isSelected
-                          ? "border-blue-400 bg-blue-50/50 shadow-sm dark:bg-blue-900/20"
-                          : "border-slate-200 bg-white hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:hover:bg-slate-900"
-                      }`}
-                    >
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className="font-bold text-[10px]">
-                          {member.label?.substring(0, 2).toUpperCase() || "?"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex min-w-0 flex-1 flex-col">
-                        <span className="truncate font-semibold text-[13px] text-slate-900 leading-tight dark:text-slate-100">
-                          {member.label}
-                        </span>
-                      </div>
-                      {isSelected && <CheckCircle2 className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-500" />}
-                    </button>
-                  );
-                })
-              )}
-            </>
-          )}
+          {isMemberSearchActive &&
+            (loadingMembers ? (
+              <div className="flex items-center justify-center p-6">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : memberResults.length === 0 ? (
+              <div className="p-4 text-center text-slate-500 text-xs italic">No exact matches found.</div>
+            ) : (
+              memberResults.map((member) => {
+                const isSelected = selectedTeam.some((m) => m.value === member.value);
+                return (
+                  <button
+                    type="button"
+                    key={member.value}
+                    onClick={() => handleToggleTeam(member.value, member.label)}
+                    className={`flex cursor-pointer items-center gap-3 rounded-lg border p-2.5 transition-colors ${
+                      isSelected
+                        ? "border-blue-400 bg-blue-50/50 shadow-sm dark:bg-blue-900/20"
+                        : "border-slate-200 bg-white hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:hover:bg-slate-900"
+                    }`}
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="font-bold text-[10px]">
+                        {member.label?.substring(0, 2).toUpperCase() || "?"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex min-w-0 flex-1 flex-col">
+                      <span className="truncate font-semibold text-[13px] text-slate-900 leading-tight dark:text-slate-100">
+                        {member.label}
+                      </span>
+                    </div>
+                    {isSelected && <CheckCircle2 className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-500" />}
+                  </button>
+                );
+              })
+            ))}
 
           {/* Prompt when not searching and no members selected */}
           {!isMemberSearchActive && selectedTeam.length === 0 && (

@@ -32,7 +32,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
   );
 
   const { user } = useSession();
-  const variant = isSynced ? sidebarVariant : props.variant;
+  const variant = "floating";
   const collapsible = isSynced ? sidebarCollapsible : props.collapsible;
 
   // Permission-driven sidebar filtering (no role-based gating).
@@ -43,10 +43,10 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link prefetch={false} href="/admin">
-                <Command />
-                <span className="font-semibold text-base">{APP_CONFIG.name} - Admin Space</span>
+            <SidebarMenuButton size="lg" asChild className="hover:bg-transparent active:bg-transparent">
+              <Link prefetch={false} href="/admin" className="flex w-full items-center justify-center gap-2">
+                <Command className="size-8 text-blue-600" />
+                <span className="font-bold text-2xl">{APP_CONFIG.name} - Admin Space</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

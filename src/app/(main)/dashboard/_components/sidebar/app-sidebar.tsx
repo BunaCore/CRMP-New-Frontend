@@ -76,7 +76,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   );
 
   const { user, isLoading } = useSession();
-  const variant = isSynced ? sidebarVariant : props.variant;
+  const variant = "floating";
   const collapsible = isSynced ? sidebarCollapsible : props.collapsible;
 
   const filteredNavGroups = isLoading
@@ -102,10 +102,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link prefetch={false} href="/dashboard">
-                <Command />
-                <span className="font-semibold text-base">{APP_CONFIG.name}</span>
+            <SidebarMenuButton size="lg" asChild className="hover:bg-transparent active:bg-transparent">
+              <Link prefetch={false} href="/dashboard" className="flex w-full items-center justify-center gap-2">
+                <Command className="size-8 text-blue-600" />
+                <span className="font-bold text-2xl">{APP_CONFIG.name}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

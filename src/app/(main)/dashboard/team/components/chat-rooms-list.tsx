@@ -131,7 +131,7 @@ export function ChatRoomsList({ onStartDirectMessage }: ChatRoomsListProps) {
       </div>
 
       {/* Room List */}
-      <ScrollArea type="hover" className="flex-1 h-full">
+      <ScrollArea type="hover" className="h-full flex-1">
         <div className="p-2">
           {filteredRooms.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">

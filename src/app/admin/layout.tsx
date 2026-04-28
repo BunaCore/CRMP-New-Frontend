@@ -13,10 +13,10 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
+    <SidebarProvider defaultOpen={defaultOpen} className="bg-muted/30">
       <AdminSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4 lg:px-6">
+        <header className="m-4 flex h-16 shrink-0 items-center justify-between gap-2 rounded-full border bg-background px-4 shadow-sm lg:px-6">
           <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
             <h1 className="font-semibold text-lg tracking-tight">Admin Console</h1>
@@ -25,7 +25,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
             <ThemeSwitcher />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+        <div className="mx-4 mb-4 flex flex-1 flex-col gap-4 overflow-hidden rounded-lg border bg-background p-4 shadow-sm">
           <AdminPermissionGuard>{children}</AdminPermissionGuard>
         </div>
       </SidebarInset>

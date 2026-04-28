@@ -4,6 +4,7 @@ import * as React from "react";
 
 import Link from "next/link";
 
+import { motion } from "framer-motion";
 import {
   AlertCircle,
   Clock,
@@ -150,15 +151,17 @@ export default function ProposalsPage() {
       {/* Header Section */}
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-semibold text-3xl text-slate-900 tracking-tight dark:text-slate-100">My Proposals</h1>
-          <p className="mt-1 text-slate-500 text-sm dark:text-slate-400">
+          <h1 className="font-extrabold text-3xl text-slate-900 tracking-tight sm:text-4xl dark:text-slate-100">
+            My Proposals
+          </h1>
+          <p className="mt-1 text-slate-500 text-sm md:text-base dark:text-slate-400">
             Track and manage all your research proposals in one place.
           </p>
         </div>
-
         <Link href="/dashboard/proposals/new" className="w-full sm:w-auto">
-          <Button className="w-full rounded-full border-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 font-medium text-white shadow transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-md">
-            <Plus className="mr-2 h-4 w-4" /> New Proposal
+          <Button className="group w-full rounded-full border-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 font-medium text-white shadow transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-md">
+            <Plus className="mr-2 h-4 w-4 transition-transform duration-300 group-hover:rotate-90" />
+            New Proposal
           </Button>
         </Link>
       </div>
@@ -193,11 +196,12 @@ export default function ProposalsPage() {
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
-                    className="rounded-md px-4 data-[state=active]:shadow-sm"
+                    className="rounded-md px-4 font-medium text-slate-500 transition-all hover:text-slate-900 data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm dark:hover:text-slate-100"
                   >
                     {tab.label}
+
                     {!loading && tabCounts[tab.value] > 0 && (
-                      <span className="ml-1.5 rounded-full bg-slate-200 px-1.5 py-0.5 font-semibold text-[10px] text-slate-600 leading-none data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700 dark:bg-slate-700 dark:text-slate-400">
+                      <span className="ml-1.5 rounded-full bg-slate-200 px-1.5 py-0.5 font-semibold text-[10px] text-slate-600 leading-none data-[state=active]:bg-white/20 data-[state=active]:text-white dark:bg-slate-700 dark:text-slate-400">
                         {tabCounts[tab.value]}
                       </span>
                     )}
@@ -260,8 +264,13 @@ export default function ProposalsPage() {
                     {!loading &&
                       filteredProposals.length > 0 &&
                       filteredProposals.map((proposal) => (
-                        <TableRow
+                        <motion.tr
                           key={proposal.id}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 8 }}
+                          transition={{ duration: 0.25 }}
+                          whileHover={{ scale: 1.01 }}
                           className="border-slate-100 transition-colors hover:bg-slate-50/50 dark:border-slate-800/50 dark:hover:bg-slate-800/20"
                         >
                           {/* ID */}
@@ -298,8 +307,8 @@ export default function ProposalsPage() {
                               <span className="text-slate-700 text-sm dark:text-slate-300">
                                 {formatProposalDate(proposal.createdAt)}
                               </span>
-                              <span className="flex items-center gap-1 text-slate-500 text-xs">
-                                <Clock className="h-3 w-3" />
+                              <span className="flex items-center gap-1 text-emerald-600 text-xs">
+                                <Clock className="h-3 w-3 text-emerald-600" />
                                 {formatRelativeDate(proposal.createdAt)}
                               </span>
                             </div>
@@ -348,7 +357,7 @@ export default function ProposalsPage() {
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
-                        </TableRow>
+                        </motion.tr>
                       ))}
 
                     {/* ── Empty state (no data after fetch) ── */}
