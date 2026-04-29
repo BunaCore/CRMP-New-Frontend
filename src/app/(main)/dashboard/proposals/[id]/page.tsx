@@ -22,7 +22,6 @@ import {
   MapPin,
   MessageSquare,
   RefreshCw,
-  Send,
   Shield,
   User,
   Users,
@@ -39,13 +38,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { downloadFile } from "@/lib/api/files/queries";
 import { useGetProposalById } from "@/lib/api/proposals/queries";
-import type {
-  DefenceSchedule,
-  ProposalComment,
-  ResearcherProposal,
-  WorkflowStep,
-  WorkflowStepStatus,
-} from "@/lib/api/proposals/types";
+import type { DefenceSchedule, ProposalComment, WorkflowStep, WorkflowStepStatus } from "@/lib/api/proposals/types";
 import {
   formatProposalDate,
   formatRelativeDate,
@@ -310,7 +303,7 @@ export default function ProposalDetailsPage() {
     try {
       await downloadFile(proposal.file.id, proposal.file.name);
       toast.success("Download started...");
-    } catch (err) {
+    } catch (_err) {
       toast.error("Failed to download file. Please try again.");
     } finally {
       setIsDownloading(false);

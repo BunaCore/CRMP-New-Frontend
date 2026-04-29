@@ -35,10 +35,10 @@ export function RolesPermissionsPanel() {
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-[280px_1fr]">
       <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
-        <h3 className="font-bold text-sm text-slate-700 uppercase tracking-wider dark:text-slate-300">Roles</h3>
+        <h3 className="font-bold text-slate-700 text-sm uppercase tracking-wider dark:text-slate-300">Roles</h3>
         <div className="mt-3 space-y-2">
           {isRolesLoading ? (
-            <div className="rounded-lg border border-dashed border-slate-300 p-3 text-slate-500 text-sm dark:border-slate-700">
+            <div className="rounded-lg border border-slate-300 border-dashed p-3 text-slate-500 text-sm dark:border-slate-700">
               Loading roles...
             </div>
           ) : (
@@ -98,7 +98,7 @@ export function RolesPermissionsPanel() {
 
       <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="font-bold text-sm text-slate-700 uppercase tracking-wider dark:text-slate-300">Permissions</h3>
+          <h3 className="font-bold text-slate-700 text-sm uppercase tracking-wider dark:text-slate-300">Permissions</h3>
           <Button
             className="bg-emerald-600 hover:bg-emerald-700"
             disabled={!hasRolePermissionChanges || isSaving}
@@ -119,7 +119,7 @@ export function RolesPermissionsPanel() {
         </div>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {isPermissionsLoading ? (
-            <div className="col-span-full rounded-lg border border-dashed border-slate-300 p-3 text-slate-500 text-sm dark:border-slate-700">
+            <div className="col-span-full rounded-lg border border-slate-300 border-dashed p-3 text-slate-500 text-sm dark:border-slate-700">
               Loading permissions...
             </div>
           ) : (

@@ -7,6 +7,7 @@ export function UsersTableSkeleton() {
   return (
     <TableBody className="[&_tr]:h-[60px]">
       {Array.from({ length: 5 }).map((_, idx) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: skeleton items are static
         <TableRow key={`users-skeleton-${idx}`}>
           <TableCell className="pl-5">
             <Skeleton className="h-4 w-24" />
