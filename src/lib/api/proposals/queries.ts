@@ -51,11 +51,45 @@ function normalizeProposal(raw: any): ResearcherProposal {
     workflow: (raw?.workflow ?? { currentStepOrder: 0, steps: [] }) as Workflow,
     comments: Array.isArray(raw?.comments) ? (raw.comments as ProposalComment[]) : [],
     defenceSchedules: Array.isArray(raw?.defenceSchedules) ? (raw.defenceSchedules as DefenceSchedule[]) : [],
+    file: raw?.file
+      ? {
+          id: raw.file.id,
+          name: raw.file.name,
+          mimeType: raw.file.mimeType,
+          size: raw.file.size,
+          url: raw.file.url,
+          visibility: raw.file.visibility,
+          expiresIn: raw.file.expiresIn,
+        }
+      : undefined,
     createdAt: raw?.createdAt ?? "",
   };
 }
 
 // ─── Queries ───────────────────────────────────────────────────────────────────
+
+import { useQuery } from "@tanstack/react-query";
+
+/**
+ * Fetch a specific proposal by ID.
+ * GET /proposals/:id
+ */
+export async function getProposalById(proposalId: string): Promise<ResearcherProposal> {
+  const { apiClient } = await import("@/lib/api/client");
+  const response = await apiClient.get<any>(`/proposals/${proposalId}`);
+  return normalizeProposal(response.data);
+}
+
+/**
+ * React Query hook to fetch a proposal by ID.
+ */
+export function useGetProposalById(proposalId: string | null, enabled = true) {
+  return useQuery({
+    queryKey: ["proposals", "byId", proposalId],
+    queryFn: () => getProposalById(proposalId as string),
+    enabled: enabled && !!proposalId,
+  });
+}
 
 /**
  * Fetch all proposals related to the currently authenticated researcher.

@@ -16,6 +16,7 @@ import {
   Clock,
   Download,
   Edit,
+  File as FileIcon,
   FileText,
   Loader2,
   MapPin,
@@ -27,6 +28,7 @@ import {
   Users,
   XCircle,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +37,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getMyProposals } from "@/lib/api/proposals/queries";
+import { downloadFile } from "@/lib/api/files/queries";
+import { useGetProposalById } from "@/lib/api/proposals/queries";
 import type {
   DefenceSchedule,
   ProposalComment,
@@ -297,37 +300,26 @@ export default function ProposalDetailsPage() {
   const params = useParams();
   const proposalId = params?.id as string;
 
-  const [proposal, setProposal] = React.useState<ResearcherProposal | null>(null);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const { data: proposal, isLoading, error, refetch } = useGetProposalById(proposalId);
+  const [isDownloading, setIsDownloading] = React.useState(false);
 
-  // ─── Fetch ─────────────────────────────────────────────────────────────────
+  const handleDownload = async () => {
+    if (!proposal?.file?.id) return;
 
-  const fetchProposal = React.useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    setIsDownloading(true);
     try {
-      const all = await getMyProposals();
-      const found = all.find((p) => p.id === proposalId);
-      if (!found) {
-        setError("Proposal not found or you do not have access to it.");
-      } else {
-        setProposal(found);
-      }
-    } catch {
-      setError("Failed to load proposal details. Please try again.");
+      await downloadFile(proposal.file.id, proposal.file.name);
+      toast.success("Download started...");
+    } catch (err) {
+      toast.error("Failed to download file. Please try again.");
     } finally {
-      setLoading(false);
+      setIsDownloading(false);
     }
-  }, [proposalId]);
-
-  React.useEffect(() => {
-    fetchProposal();
-  }, [fetchProposal]);
+  };
 
   // ─── Loading ────────────────────────────────────────────────────────────────
 
-  if (loading) return <PageSkeleton />;
+  if (isLoading) return <PageSkeleton />;
 
   // ─── Error / Not found ──────────────────────────────────────────────────────
 
@@ -346,14 +338,16 @@ export default function ProposalDetailsPage() {
         <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-red-200 bg-red-50 p-12 text-center dark:border-red-900/50 dark:bg-red-950/20">
           <AlertCircle className="h-10 w-10 text-red-400" />
           <div>
-            <p className="font-semibold text-red-800 dark:text-red-300">{error ?? "Not found"}</p>
+            <p className="font-semibold text-red-800 dark:text-red-300">
+              {error instanceof Error ? error.message : "Proposal not found"}
+            </p>
             <p className="mt-1 text-red-600 text-sm dark:text-red-400">
               The proposal may have been removed or you may not have permission to view it.
             </p>
           </div>
           <Button
             size="sm"
-            onClick={fetchProposal}
+            onClick={() => refetch()}
             className="rounded-full border-0 bg-red-600 px-5 text-white hover:bg-red-700"
           >
             <RefreshCw className="mr-2 h-3.5 w-3.5" /> Retry
@@ -462,9 +456,21 @@ export default function ProposalDetailsPage() {
 
         {/* Action buttons */}
         <div className="flex w-full items-center gap-3 md:w-auto">
-          <Button variant="outline" className="flex-1 rounded-full font-medium md:flex-auto">
-            <Download className="mr-2 h-4 w-4" /> Export PDF
-          </Button>
+          {proposal.file && (
+            <Button
+              variant="outline"
+              className="flex-1 rounded-full font-medium md:flex-auto"
+              onClick={handleDownload}
+              disabled={isDownloading}
+            >
+              {isDownloading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="mr-2 h-4 w-4" />
+              )}
+              Download Attachment
+            </Button>
+          )}
           {(proposal.status === "Draft" || proposal.status === "Revision") && (
             <Link href={`/dashboard/proposals/${proposal.id}/edit`}>
               <Button className="flex-1 rounded-full border-0 bg-blue-600 font-medium text-white shadow-sm hover:bg-blue-700 md:flex-auto">
@@ -472,18 +478,12 @@ export default function ProposalDetailsPage() {
               </Button>
             </Link>
           )}
-          {proposal.status === "Draft" && (
-            <Button className="flex-1 rounded-full border-0 bg-emerald-600 font-medium text-white shadow-sm hover:bg-emerald-700 md:flex-auto">
-              <Send className="mr-2 h-4 w-4" /> Submit
-            </Button>
-          )}
         </div>
       </div>
 
       {/* ── Tabs ──────────────────────────────────────────────────────────────── */}
       <Tabs defaultValue="overview" className="mt-2 w-full">
         <TabsList className="scrollbar-hide h-12 w-full flex-nowrap justify-start overflow-x-auto rounded-none border-slate-200 border-b bg-transparent p-0 dark:border-slate-800">
-          {/* Overview */}
           <TabsTrigger
             value="overview"
             className="rounded-none border-transparent border-b-2 px-6 py-3 font-medium text-slate-500 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-700 data-[state=active]:shadow-none dark:data-[state=active]:text-blue-400"
@@ -491,7 +491,6 @@ export default function ProposalDetailsPage() {
             <FileText className="mr-2 h-4 w-4" /> Overview
           </TabsTrigger>
 
-          {/* Feedback */}
           <TabsTrigger
             value="feedback"
             className="rounded-none border-transparent border-b-2 px-6 py-3 font-medium text-slate-500 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-700 data-[state=active]:shadow-none dark:data-[state=active]:text-blue-400"
@@ -504,7 +503,6 @@ export default function ProposalDetailsPage() {
             )}
           </TabsTrigger>
 
-          {/* Workflow */}
           <TabsTrigger
             value="workflow"
             className="rounded-none border-transparent border-b-2 px-6 py-3 font-medium text-slate-500 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-700 data-[state=active]:shadow-none dark:data-[state=active]:text-blue-400"
@@ -512,7 +510,6 @@ export default function ProposalDetailsPage() {
             <Loader2 className="mr-2 h-4 w-4" /> Workflow
           </TabsTrigger>
 
-          {/* Defence — only when scheduled */}
           {hasDefence && (
             <TabsTrigger
               value="defence"
@@ -527,12 +524,9 @@ export default function ProposalDetailsPage() {
         </TabsList>
 
         <div className="py-6">
-          {/* ── Overview Tab ──────────────────────────────────────────────────── */}
           <TabsContent value="overview" className="mt-0 focus-visible:outline-none">
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-              {/* Main content */}
               <div className="flex flex-col gap-6 lg:col-span-2">
-                {/* Proposal info summary */}
                 <Card className="overflow-hidden rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
                   <CardHeader className="border-slate-100 border-b bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
                     <CardTitle className="text-lg text-slate-800 dark:text-slate-200">Proposal Information</CardTitle>
@@ -560,7 +554,39 @@ export default function ProposalDetailsPage() {
                   </CardContent>
                 </Card>
 
-                {/* Action call-out for Revision status */}
+                {/* Attached File Card */}
+                {proposal.file && (
+                  <Card className="overflow-hidden rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
+                    <CardHeader className="border-slate-100 border-b bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
+                      <CardTitle className="text-lg text-slate-800 dark:text-slate-200">Attached Documents</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 dark:border-slate-800">
+                        <div className="flex items-center gap-4">
+                          <div className="flex h-10 w-10 items-center justify-center rounded bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                            <FileIcon className="h-6 w-6" />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-slate-800 text-sm dark:text-slate-200">
+                              {proposal.file.name}
+                            </p>
+                            <p className="text-slate-500 text-xs">
+                              {(proposal.file.size / 1024).toFixed(1)} KB • {proposal.file.mimeType}
+                            </p>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={handleDownload} disabled={isDownloading}>
+                          {isDownloading ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Download className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
                 {proposal.status === "Revision" && (
                   <div className="flex items-start gap-4 rounded-xl border border-amber-200 bg-amber-50/70 p-5 dark:border-amber-900/50 dark:bg-amber-950/30">
                     <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
@@ -575,9 +601,7 @@ export default function ProposalDetailsPage() {
                 )}
               </div>
 
-              {/* Sidebar */}
               <div className="flex flex-col gap-6">
-                {/* Principal Investigator */}
                 <Card className="rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center gap-2 text-base text-slate-800 dark:text-slate-200">
@@ -604,7 +628,6 @@ export default function ProposalDetailsPage() {
                   </CardContent>
                 </Card>
 
-                {/* Team & Advisors */}
                 {((proposal.advisors ?? []).length > 0 ||
                   (proposal.team ?? []).length > 0 ||
                   (proposal.evaluators ?? []).length > 0) && (
@@ -681,7 +704,6 @@ export default function ProposalDetailsPage() {
             </div>
           </TabsContent>
 
-          {/* ── Feedback / Comments Tab ────────────────────────────────────────── */}
           <TabsContent value="feedback" className="mt-0 focus-visible:outline-none">
             <Card className="overflow-hidden rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
               <CardHeader className="border-slate-100 border-b bg-slate-50/30 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
@@ -700,7 +722,6 @@ export default function ProposalDetailsPage() {
                   </div>
                 </div>
               </CardHeader>
-
               <CardContent className="p-6">
                 {comments.length === 0 ? (
                   <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
@@ -723,7 +744,6 @@ export default function ProposalDetailsPage() {
             </Card>
           </TabsContent>
 
-          {/* ── Workflow Tab ───────────────────────────────────────────────────── */}
           <TabsContent value="workflow" className="mt-0 focus-visible:outline-none">
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
               <div className="lg:col-span-2">
@@ -746,7 +766,6 @@ export default function ProposalDetailsPage() {
                 </Card>
               </div>
 
-              {/* Workflow summary sidebar */}
               <div className="flex flex-col gap-4">
                 <Card className="rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
                   <CardHeader className="pb-3">
@@ -767,9 +786,7 @@ export default function ProposalDetailsPage() {
                         />
                       </div>
                     </div>
-
                     <Separator className="dark:bg-slate-800" />
-
                     <div className="flex flex-col gap-2 text-sm">
                       {[
                         {
@@ -805,64 +822,10 @@ export default function ProposalDetailsPage() {
             </div>
           </TabsContent>
 
-          {/* ── Defence Tab (conditional) ──────────────────────────────────────── */}
           {hasDefence && latestDefence && (
             <TabsContent value="defence" className="mt-0 focus-visible:outline-none">
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                {/* Defence schedule card */}
-                <div className="lg:col-span-1">
-                  <DefenceCard schedule={latestDefence} />
-                </div>
-
-                {/* All schedules if multiple */}
-                <div className="flex flex-col gap-6 lg:col-span-2">
-                  <Card className="rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
-                    <CardHeader className="border-slate-100 border-b bg-slate-50/30 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
-                      <CardTitle className="text-lg text-slate-800 dark:text-slate-200">
-                        All Defence Appointments
-                      </CardTitle>
-                      <CardDescription>
-                        {defenceSchedules.length} appointment
-                        {defenceSchedules.length !== 1 ? "s" : ""} scheduled for this proposal.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="p-0">
-                      {defenceSchedules.map((schedule, i) => (
-                        <div
-                          key={schedule.id}
-                          className={`flex flex-col gap-2 px-6 py-4 ${
-                            i < defenceSchedules.length - 1 ? "border-slate-100 border-b dark:border-slate-800" : ""
-                          }`}
-                        >
-                          <div className="flex flex-wrap items-start justify-between gap-2">
-                            <div className="flex flex-col gap-1">
-                              <p className="font-semibold text-slate-800 text-sm dark:text-slate-200">
-                                {formatProposalDate(schedule.defenceDate)}
-                              </p>
-                              <span className="flex items-center gap-1.5 text-slate-500 text-xs">
-                                <MapPin className="h-3 w-3" />
-                                {schedule.location}
-                              </span>
-                            </div>
-                            {i === 0 && (
-                              <Badge className="rounded-sm border-0 bg-amber-100 px-2 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400">
-                                Latest
-                              </Badge>
-                            )}
-                          </div>
-                          {schedule.note && (
-                            <p className="rounded-lg border border-slate-100 bg-slate-50 p-3 text-slate-600 text-xs leading-relaxed dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
-                              {schedule.note}
-                            </p>
-                          )}
-                          <p className="text-[11px] text-slate-400">
-                            Scheduled {formatRelativeDate(schedule.createdAt)}
-                          </p>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                </div>
+              <div className="mx-auto max-w-2xl">
+                <DefenceCard schedule={latestDefence} />
               </div>
             </TabsContent>
           )}

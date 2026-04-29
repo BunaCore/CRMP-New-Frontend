@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { performFullUpload } from "@/lib/api/files/mutations";
 import { createProposal } from "@/lib/api/proposals/mutations";
 import type { CreateProposalPayload, CreateProposalResponse } from "@/lib/api/proposals/types";
 
@@ -24,7 +25,27 @@ export function useCreateProposal(options?: UseCreateProposalOptions) {
       file: File | null;
       submit: boolean;
     }) => {
-      const response = await createProposal(payload, file, { submit });
+      let finalFileId = payload.fileId;
+
+      // 1. Handle file upload if a file is provided
+      if (file) {
+        try {
+          finalFileId = await performFullUpload(file, "PROPOSAL_DOCUMENT");
+        } catch (uploadError) {
+          console.error("File upload failed:", uploadError);
+          throw new Error("Failed to upload attachment. Please try again.");
+        }
+      }
+
+      // 2. Submit the proposal with the fileId
+      const response = await createProposal(
+        {
+          ...payload,
+          fileId: finalFileId,
+        },
+        { submit },
+      );
+
       if (response.submissionError) {
         throw new Error(response.submissionError);
       }
