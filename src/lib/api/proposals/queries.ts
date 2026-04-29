@@ -53,14 +53,14 @@ function normalizeProposal(raw: any): ResearcherProposal {
     defenceSchedules: Array.isArray(raw?.defenceSchedules) ? (raw.defenceSchedules as DefenceSchedule[]) : [],
     file: raw?.file
       ? {
-          id: raw.file.id,
-          name: raw.file.name,
-          mimeType: raw.file.mimeType,
-          size: raw.file.size,
-          url: raw.file.url,
-          visibility: raw.file.visibility,
-          expiresIn: raw.file.expiresIn,
-        }
+        id: raw.file.id,
+        name: raw.file.name,
+        mimeType: raw.file.mimeType,
+        size: raw.file.size,
+        url: raw.file.url,
+        visibility: raw.file.visibility,
+        expiresIn: raw.file.expiresIn,
+      }
       : undefined,
     createdAt: raw?.createdAt ?? "",
   };
@@ -76,7 +76,6 @@ import { useQuery } from "@tanstack/react-query";
  */
 export async function getProposalById(proposalId: string): Promise<ResearcherProposal> {
   const { apiClient } = await import("@/lib/api/client");
-  // biome-ignore lint/suspicious/noExplicitAny: raw API response normalized via normalizeProposal
   const response = await apiClient.get<any>(`/proposals/${proposalId}`);
   return normalizeProposal(response.data);
 }
