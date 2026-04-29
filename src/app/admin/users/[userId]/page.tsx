@@ -1,7 +1,5 @@
 "use client";
 
-import * as React from "react";
-
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -33,7 +31,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetUserById } from "@/lib/api/users/queries";
@@ -56,7 +53,7 @@ function PageSkeleton() {
         </div>
       </div>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           <Skeleton className="h-64 rounded-xl" />
           <Skeleton className="h-48 rounded-xl" />
         </div>
@@ -161,7 +158,7 @@ export default function UserDetailsPage() {
                 </Badge>
               )}
             </div>
-            <p className="flex items-center gap-2 text-slate-500 font-medium">
+            <p className="flex items-center gap-2 font-medium text-slate-500">
               <Mail className="h-4 w-4" /> {user.email}
             </p>
           </div>
@@ -225,11 +222,11 @@ export default function UserDetailsPage() {
           {/* --- Overview Tab --- */}
           <TabsContent value="overview" className="mt-0 outline-none">
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-              <div className="lg:col-span-2 space-y-8">
+              <div className="space-y-8 lg:col-span-2">
                 {/* Contact Information */}
                 <Card className="overflow-hidden border-slate-200/60 shadow-none dark:border-slate-800/60">
                   <CardHeader className="border-slate-100 border-b bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/20">
-                    <CardTitle className="text-lg font-bold">Contact Details</CardTitle>
+                    <CardTitle className="font-bold text-lg">Contact Details</CardTitle>
                   </CardHeader>
                   <CardContent className="grid grid-cols-1 gap-8 p-6 md:grid-cols-2">
                     <div className="space-y-4">
@@ -266,20 +263,20 @@ export default function UserDetailsPage() {
                 {/* Account Activity / Metadata */}
                 <Card className="overflow-hidden border-slate-200/60 shadow-none dark:border-slate-800/60">
                   <CardHeader className="border-slate-100 border-b bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/20">
-                    <CardTitle className="text-lg font-bold">Account Overview</CardTitle>
+                    <CardTitle className="font-bold text-lg">Account Overview</CardTitle>
                   </CardHeader>
                   <CardContent className="p-6">
                     <div className="grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4">
                       <div className="space-y-1">
-                        <p className="text-[11px] font-bold text-slate-400 uppercase">Joined On</p>
-                        <p className="text-sm font-semibold flex items-center gap-1.5">
+                        <p className="font-bold text-[11px] text-slate-400 uppercase">Joined On</p>
+                        <p className="flex items-center gap-1.5 font-semibold text-sm">
                           <Calendar className="h-3.5 w-3.5 text-slate-400" />
                           {new Date(user.createdAt).toLocaleDateString()}
                         </p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[11px] font-bold text-slate-400 uppercase">User Type</p>
-                        <p className="text-sm font-semibold flex items-center gap-1.5">
+                        <p className="font-bold text-[11px] text-slate-400 uppercase">User Type</p>
+                        <p className="flex items-center gap-1.5 font-semibold text-sm">
                           {user.isExternal ? (
                             <>
                               <ExternalLink className="h-3.5 w-3.5 text-blue-500" /> External
@@ -292,17 +289,17 @@ export default function UserDetailsPage() {
                         </p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[11px] font-bold text-slate-400 uppercase">Status</p>
+                        <p className="font-bold text-[11px] text-slate-400 uppercase">Status</p>
                         <div className="flex items-center gap-2">
                           <span
                             className={`h-2 w-2 rounded-full ${user.accountStatus === "active" ? "bg-emerald-500" : "bg-amber-500"}`}
                           />
-                          <p className="text-sm font-semibold capitalize">{user.accountStatus}</p>
+                          <p className="font-semibold text-sm capitalize">{user.accountStatus}</p>
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[11px] font-bold text-slate-400 uppercase">Roles</p>
-                        <p className="text-sm font-semibold">{user.roles.length} Assigned</p>
+                        <p className="font-bold text-[11px] text-slate-400 uppercase">Roles</p>
+                        <p className="font-semibold text-sm">{user.roles.length} Assigned</p>
                       </div>
                     </div>
                   </CardContent>
@@ -313,7 +310,7 @@ export default function UserDetailsPage() {
               <div className="space-y-8">
                 <Card className="border-blue-100 bg-blue-50/30 shadow-none dark:border-blue-900/20 dark:bg-blue-950/10">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-bold flex items-center gap-2 text-blue-800 dark:text-blue-300">
+                    <CardTitle className="flex items-center gap-2 font-bold text-blue-800 text-sm dark:text-blue-300">
                       <ShieldCheck className="h-4 w-4" /> Quick Actions
                     </CardTitle>
                   </CardHeader>
@@ -336,12 +333,12 @@ export default function UserDetailsPage() {
                 {user.departmentCoordination?.isCoordinator && (
                   <Card className="border-emerald-100 bg-emerald-50/30 shadow-none dark:border-emerald-900/20 dark:bg-emerald-950/10">
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-bold flex items-center gap-2 text-emerald-800 dark:text-emerald-300">
+                      <CardTitle className="flex items-center gap-2 font-bold text-emerald-800 text-sm dark:text-emerald-300">
                         <BadgeCheck className="h-4 w-4" /> Coordinator Status
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-emerald-700 dark:text-emerald-400 leading-relaxed">
+                      <p className="text-emerald-700 text-sm leading-relaxed dark:text-emerald-400">
                         This user is a coordinator for <strong>{user.departmentCoordination.departments.length}</strong>{" "}
                         departments. They have specialized permissions to manage proposals within these departments.
                       </p>
@@ -358,7 +355,7 @@ export default function UserDetailsPage() {
               <CardHeader className="border-slate-100 border-b bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/20">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-lg font-bold">Assigned Access Roles</CardTitle>
+                    <CardTitle className="font-bold text-lg">Assigned Access Roles</CardTitle>
                     <CardDescription>Roles define what actions this user can perform in the system.</CardDescription>
                   </div>
                   <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
@@ -379,14 +376,14 @@ export default function UserDetailsPage() {
                         </div>
                         <div>
                           <p className="font-bold text-slate-900 dark:text-slate-100">{role.name}</p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-slate-500 text-xs">
                             Granted on {new Date(role.grantedAt).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
                       <Badge
                         variant="outline"
-                        className="bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50"
+                        className="border-emerald-100 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-400"
                       >
                         Active Permission
                       </Badge>
@@ -415,14 +412,14 @@ export default function UserDetailsPage() {
                       </div>
                     </CardHeader>
                     <CardContent className="p-5">
-                      <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-1">{dept.name}</h3>
-                      <p className="text-xs text-slate-500 mb-4 flex items-center gap-1">
+                      <h3 className="mb-1 font-bold text-slate-900 dark:text-slate-100">{dept.name}</h3>
+                      <p className="mb-4 flex items-center gap-1 text-slate-500 text-xs">
                         <Calendar className="h-3 w-3" /> Assigned since {new Date(dept.assignedAt).toLocaleDateString()}
                       </p>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="w-full text-xs font-semibold hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 dark:hover:bg-emerald-900/20"
+                        className="w-full font-semibold text-xs hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-900/20"
                       >
                         View Department Activity
                       </Button>
