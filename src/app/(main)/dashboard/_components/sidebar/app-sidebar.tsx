@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 
 import { CircleHelp, ClipboardList, Command, Database, File, Search, Settings } from "lucide-react";
@@ -29,43 +30,6 @@ import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
 import { SidebarSupportCard } from "./sidebar-support-card";
 
-const _data = {
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: CircleHelp,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: Search,
-    },
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: Database,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: ClipboardList,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: File,
-    },
-  ],
-};
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { sidebarVariant, sidebarCollapsible, isSynced } = usePreferencesStore(
     useShallow((s) => ({
@@ -76,7 +40,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   );
 
   const { user, isLoading } = useSession();
-  const variant = "floating";
+
+  // 🔥 shape behavior (keep this consistent system-wide)
+  const variant = isSynced ? "floating" : sidebarVariant;
   const collapsible = isSynced ? sidebarCollapsible : props.collapsible;
 
   const filteredNavGroups = isLoading
@@ -86,38 +52,48 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           ...group,
           items: group.items.filter((item) => {
             const required = DASHBOARD_SIDEBAR_PERMISSION_RULES[item.url];
-            // Unknown routes are treated as hidden (principle of least privilege).
+
             if (!required || required.length === 0) {
               return SIDEBAR_UNCONFIGURED_ROUTES_VISIBILITY === "visible";
             }
 
-            // Sidebar visibility uses OR semantics: show if the user has any required permission.
             return required.some((p) => hasPermission(user?.permissions ?? [], p));
           }),
         }))
         .filter((group) => group.items.length > 0);
 
   return (
-    <Sidebar {...props} variant={variant} collapsible={collapsible}>
-      <SidebarHeader>
+    <Sidebar
+      {...props}
+      variant={variant}
+      collapsible={collapsible}
+      className="border-r border-slate-200/50 dark:border-slate-800/50"
+    >
+      {/* HEADER */}
+      <SidebarHeader className="px-2 pt-3">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild className="hover:bg-transparent active:bg-transparent">
-              <Link prefetch={false} href="/dashboard" className="flex w-full items-center justify-center gap-2">
-                <Command className="size-8 text-blue-600" />
-                <span className="font-bold text-2xl">{APP_CONFIG.name}</span>
+              <Link prefetch={false} href="/dashboard" className="flex w-full items-center gap-2 px-2">
+                {/* cleaner logo version (your second style) */}
+                <Image src="/logo.png" alt="Logo" width={28} height={28} className="object-contain" />
+
+                <span className="font-semibold text-base tracking-tight">{APP_CONFIG.name}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
+
+      {/* CONTENT */}
+      <SidebarContent className="px-2">
         <NavMain items={filteredNavGroups} />
-        {/* <NavDocuments items={data.documents} /> */}
-        {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
-      <SidebarFooter>
+
+      {/* FOOTER */}
+      <SidebarFooter className="px-2 pb-3 space-y-2">
         <SidebarSupportCard />
+
         <NavUser
           user={{
             name: user?.name ?? rootUser.name,

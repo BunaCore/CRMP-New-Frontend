@@ -147,20 +147,20 @@ export default function ProposalsPage() {
   // ─── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 lg:p-10">
+    <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 lg:p-10 ">
       {/* Header Section */}
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-extrabold text-3xl text-slate-900 tracking-tight sm:text-4xl dark:text-slate-100">
+          <h1 className="font-extrabold text-lg text-slate-900 tracking-tight sm:text-2xl dark:text-slate-100">
             My Proposals
           </h1>
-          <p className="mt-1 text-slate-500 text-sm md:text-base dark:text-slate-400">
+          <p className="mt-1 text-slate-500 text-xs md:text-sm dark:text-slate-400">
             Track and manage all your research proposals in one place.
           </p>
         </div>
         <Link href="/dashboard/proposals/new" className="w-full sm:w-auto">
-          <Button className="group w-full rounded-full border-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 font-medium text-white shadow transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-md">
-            <Plus className="mr-2 h-4 w-4 transition-transform duration-300 group-hover:rotate-90" />
+          <Button className="group h-8 w-full rounded-full border-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-3 text-xs font-medium text-white shadow transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-sm">
+            <Plus className="mr-1 h-3 w-3 transition-transform duration-300 group-hover:rotate-90" />
             New Proposal
           </Button>
         </Link>
@@ -226,13 +226,6 @@ export default function ProposalsPage() {
                   className="w-full rounded-full border-slate-200 bg-white pl-9 shadow-sm dark:border-slate-800 dark:bg-slate-950"
                 />
               </div>
-              <Button
-                variant="outline"
-                size="icon"
-                className="shrink-0 rounded-full border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950"
-              >
-                <Filter className="h-4 w-4 text-slate-600" />
-              </Button>
             </div>
           </div>
 

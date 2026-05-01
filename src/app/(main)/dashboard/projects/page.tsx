@@ -49,7 +49,7 @@ export default function ProjectsPage() {
       >
         <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="font-black text-3xl text-slate-900 tracking-tighter sm:text-4xl dark:text-slate-100">
+            <h1 className="font-black text-lg text-slate-900 tracking-tighter md:text-2xl dark:text-slate-100">
               Projects
             </h1>
             <p className="mt-2 max-w-xl text-muted-foreground text-sm md:text-base">

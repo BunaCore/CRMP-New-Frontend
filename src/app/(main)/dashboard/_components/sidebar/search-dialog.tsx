@@ -47,12 +47,12 @@ export function SearchDialog() {
     <>
       <Button
         onClick={() => setOpen(true)}
-        variant="outline"
-        className="h-9 w-full justify-start rounded-full bg-muted/50 px-4 font-normal text-muted-foreground text-sm shadow-none sm:w-64"
+        variant="link"
+        className="px-0! font-normal text-muted-foreground hover:no-underline"
       >
-        <Search className="mr-2 h-4 w-4 shrink-0" />
-        Search...
-        <kbd className="ml-auto inline-flex h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-medium font-mono text-[10px] text-muted-foreground">
+        <Search data-icon="inline-start" />
+        Search
+        <kbd className="inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-medium text-[10px]">
           <span className="text-xs">⌘</span>J
         </kbd>
       </Button>
