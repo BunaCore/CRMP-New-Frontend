@@ -5,32 +5,32 @@ import { useEffect } from "react";
 
 import { useRouter } from "next/navigation";
 
-import { hasPermission } from "@/access-control/permission-gates";
-import NotFoundPage from "@/app/404";
 import { useAuthStore } from "@/stores/authStore";
 
+/**
+ * Dashboard space permission guard.
+ *
+ * Rule:
+ * - Any authenticated user can access /dashboard (students, researchers, etc.)
+ * - Unauthenticated users are redirected to /login.
+ *
+ * Granular per-section access within /dashboard is handled by
+ * individual <RequiresPermissions> / <Can> gates on each page.
+ */
 export function DashboardPermissionGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { user, isLoading } = useAuthStore();
 
-  const allowed = !isLoading && !!user && hasPermission(user.permissions ?? [], "PROJECT_CREATE");
+  // Any logged-in user is allowed into /dashboard.
+  const allowed = !isLoading && !!user;
 
   useEffect(() => {
     if (isLoading) return;
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-
     if (allowed) return;
 
-    // Show 404 UX first, then redirect.
-    const t = window.setTimeout(() => {
-      router.replace("/admin");
-    }, 200);
-
-    return () => window.clearTimeout(t);
-  }, [allowed, isLoading, router, user]);
+    // Unauthenticated — send to login.
+    router.replace("/login");
+  }, [allowed, isLoading, router]);
 
   if (isLoading) {
     return (
@@ -40,7 +40,7 @@ export function DashboardPermissionGuard({ children }: { children: ReactNode }) 
     );
   }
 
-  if (!allowed) return <NotFoundPage />;
+  if (!allowed) return null;
 
   return <>{children}</>;
 }

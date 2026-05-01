@@ -30,7 +30,7 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
 
   if (messages.length === 0) {
     return (
-      <ScrollArea className="flex-1 p-6">
+      <ScrollArea className="min-h-0 flex-1 p-6">
         <div className="flex h-full flex-col items-center justify-center space-y-4 pt-24 opacity-40">
           <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-muted/60">
             <MessageSquare className="h-8 w-8 text-muted-foreground" />
@@ -45,7 +45,7 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
   }
 
   return (
-    <ScrollArea className="flex-1 p-4">
+    <ScrollArea className="min-h-0 flex-1 p-4">
       <div className="flex flex-col gap-6 pb-4">
         {messages.map((m) => {
           const isUser = m.role === "user";
