@@ -4,22 +4,17 @@ import { useEffect, useState } from "react";
 
 import { format } from "date-fns";
 import {
-  AlertTriangle,
   Award,
   Banknote,
   CalendarDays,
-  Check,
-  CheckCircle,
   CheckCircle2,
   ChevronRight,
-  Circle,
   Clock,
   FileText,
   GraduationCap,
   Loader2,
   Send,
   ShieldCheck,
-  Sparkles,
   UserCheck,
   Users,
 } from "lucide-react";
@@ -43,7 +38,7 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 
 import { formatPeopleList } from "../../proposals/_components/proposals-table";
-import { getApprovalChain } from "../../proposals/_data/mock-proposals";
+import { TimelineTab } from "../../proposals/_components/timeline-tab";
 import { useEvaluations } from "../evaluations-context";
 import { STATUS_STYLES } from "./evaluations-tabs";
 
@@ -180,9 +175,6 @@ export function EvaluationDrawer() {
         ? `${activeProject.id} · ${activeProject.dept} · ${activeProject.lead}`
         : "";
 
-  const approvalId = drawerKind === "proposal" ? activeProposal?.id : activeProject?.id;
-  const approvalChain = approvalId ? getApprovalChain(approvalId) : [];
-
   return (
     <Sheet open={drawerOpen} onOpenChange={(o) => !o && closeDrawer()}>
       <SheetContent
@@ -217,12 +209,36 @@ export function EvaluationDrawer() {
 
               <div className="no-scrollbar mt-4 flex flex-nowrap items-center gap-1.5 overflow-x-auto rounded-xl bg-slate-100/80 p-1 dark:bg-slate-900/60">
                 {[
-                  { id: "overview" as const, label: "Overview", icon: FileText },
+                  {
+                    id: "overview" as const,
+                    label: "Overview",
+                    icon: FileText,
+                  },
                   { id: "team" as const, label: "Team", icon: Users },
-                  ...(canViewBudget ? [{ id: "budget" as const, label: "Budget", icon: Banknote }] : []),
+                  ...(canViewBudget
+                    ? [
+                        {
+                          id: "budget" as const,
+                          label: "Budget",
+                          icon: Banknote,
+                        },
+                      ]
+                    : []),
                   { id: "scores" as const, label: "Scores", icon: Award },
-                  ...(canScheduleDefence ? [{ id: "defence" as const, label: "Defence", icon: CalendarDays }] : []),
-                  { id: "review" as const, label: "Approve", icon: ShieldCheck },
+                  ...(canScheduleDefence
+                    ? [
+                        {
+                          id: "defence" as const,
+                          label: "Defence",
+                          icon: CalendarDays,
+                        },
+                      ]
+                    : []),
+                  {
+                    id: "review" as const,
+                    label: "Approve",
+                    icon: ShieldCheck,
+                  },
                 ].map((t) => (
                   <button
                     key={t.id}
@@ -536,7 +552,10 @@ export function EvaluationDrawer() {
                   {!scoresLoading && filteredApiRubrics.length > 0 && (
                     <div className="flex flex-col gap-3">
                       {filteredApiRubrics.map((row, i) => {
-                        const draft = draftScores[row.id] ?? { score: 0, feedback: "" };
+                        const draft = draftScores[row.id] ?? {
+                          score: 0,
+                          feedback: "",
+                        };
                         const pct = row.maxPoints > 0 ? (draft.score / row.maxPoints) * 100 : 0;
                         return (
                           <div
@@ -591,7 +610,10 @@ export function EvaluationDrawer() {
                                     if (Number.isNaN(v)) return;
                                     setDraftScores((prev) => ({
                                       ...prev,
-                                      [row.id]: { ...prev[row.id], score: Math.min(row.maxPoints, Math.max(0, v)) },
+                                      [row.id]: {
+                                        ...prev[row.id],
+                                        score: Math.min(row.maxPoints, Math.max(0, v)),
+                                      },
                                     }));
                                   }}
                                 />
@@ -607,7 +629,10 @@ export function EvaluationDrawer() {
                                   onChange={(e) =>
                                     setDraftScores((prev) => ({
                                       ...prev,
-                                      [row.id]: { ...prev[row.id], feedback: e.target.value },
+                                      [row.id]: {
+                                        ...prev[row.id],
+                                        feedback: e.target.value,
+                                      },
                                     }))
                                   }
                                 />
@@ -673,7 +698,12 @@ export function EvaluationDrawer() {
                                   if (Number.isNaN(v)) return;
                                   setRubric((prev) =>
                                     prev.map((r, idx) =>
-                                      idx === i ? { ...r, score: Math.min(r.max, Math.max(0, v)) } : r,
+                                      idx === i
+                                        ? {
+                                            ...r,
+                                            score: Math.min(r.max, Math.max(0, v)),
+                                          }
+                                        : r,
                                     ),
                                   );
                                 }}
@@ -835,148 +865,23 @@ export function EvaluationDrawer() {
               {/* ── TAB: REVIEW ── */}
               {drawerTab === "review" && (
                 <div className="flex flex-col gap-6">
-                  <div className="flex flex-col gap-1 rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-4 dark:border-slate-800 dark:from-slate-900/50 dark:to-slate-950">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600/10 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400">
-                        <Sparkles className="h-4 w-4" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-slate-900 text-sm dark:text-slate-100">Approval chain</h4>
-                        <p className="font-medium text-[11px] text-slate-500 dark:text-slate-400">
-                          Completed steps show prior approvals. Your step is where you approve or reject. Later steps
-                          stay inactive.
-                        </p>
+                  {drawerKind === "proposal" && activeProposal ? (
+                    <TimelineTab proposalId={activeProposal.id} />
+                  ) : (
+                    <div className="flex flex-col gap-1 rounded-2xl border border-slate-200/80 bg-yellow-50/50 p-4 dark:border-slate-800 dark:from-yellow-950/30 dark:to-slate-950">
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-yellow-600/10 text-yellow-600 dark:bg-yellow-500/15 dark:text-yellow-400">
+                          <Clock className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-slate-900 text-sm dark:text-slate-100">Timeline</h4>
+                          <p className="font-medium text-[11px] text-slate-500 dark:text-slate-400">
+                            Project timeline integration coming soon.
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="relative">
-                    <div
-                      className="absolute top-3 bottom-3 left-[19px] w-px bg-gradient-to-b from-emerald-200 via-indigo-200 to-slate-200 dark:from-emerald-900/40 dark:via-indigo-900/40 dark:to-slate-800"
-                      aria-hidden
-                    />
-
-                    <ul className="relative flex flex-col gap-4">
-                      {approvalChain.map((step, idx) => {
-                        const isCompleted = step.state === "completed" || (step.state === "current" && isEvalApproved);
-                        const isCurrent = step.state === "current" && !isEvalApproved && !isEvalRejected;
-                        const isUpcoming = step.state === "upcoming";
-                        const isRejectedHere = step.state === "current" && isEvalRejected;
-
-                        return (
-                          <li key={step.id} className="relative flex gap-4 pl-1">
-                            <div
-                              className={`relative z-[1] mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 shadow-sm transition-colors ${
-                                isCompleted
-                                  ? "border-emerald-200 bg-emerald-500 text-white dark:border-emerald-800 dark:bg-emerald-600"
-                                  : isRejectedHere
-                                    ? "border-rose-200 bg-rose-500 text-white dark:border-rose-800 dark:bg-rose-600"
-                                    : isCurrent
-                                      ? "border-indigo-300 bg-indigo-600 text-white ring-4 ring-indigo-500/20 dark:border-indigo-500 dark:bg-indigo-600 dark:ring-indigo-500/25"
-                                      : "border-slate-200 bg-slate-100 text-slate-400 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-500"
-                              }`}
-                            >
-                              {isCompleted && <Check className="h-4 w-4 stroke-[3]" />}
-                              {isRejectedHere && <AlertTriangle className="h-4 w-4 stroke-[3]" />}
-                              {isCurrent && <Clock className="h-4 w-4" />}
-                              {isUpcoming && <Circle className="h-4 w-4" />}
-                            </div>
-
-                            <div
-                              className={`min-w-0 flex-1 rounded-2xl border p-4 transition-all ${
-                                isCompleted
-                                  ? "border-emerald-100 bg-emerald-50/40 dark:border-emerald-900/25 dark:bg-emerald-950/20"
-                                  : isRejectedHere
-                                    ? "border-rose-100 bg-rose-50/40 dark:border-rose-900/25 dark:bg-rose-950/20"
-                                    : isCurrent
-                                      ? "border-indigo-200 bg-gradient-to-br from-indigo-50/90 to-white shadow-md dark:border-indigo-900/40 dark:from-indigo-950/30 dark:to-slate-950"
-                                      : "border-slate-100 bg-slate-50/40 opacity-60 dark:border-slate-800 dark:bg-slate-900/20"
-                              }`}
-                            >
-                              <div className="flex flex-wrap items-start justify-between gap-2">
-                                <div>
-                                  <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider dark:text-slate-500">
-                                    Step {idx + 1} · {step.role}
-                                  </p>
-                                  <p className="mt-0.5 font-semibold text-slate-900 text-sm dark:text-slate-100">
-                                    {step.state === "current" ? "You" : step.approverName}
-                                  </p>
-                                  {isCompleted && (step.approvedAt || isEvalApproved) && (
-                                    <p className="mt-1 flex items-center gap-1 font-medium text-[11px] text-emerald-700 dark:text-emerald-400">
-                                      <CheckCircle className="h-3 w-3 shrink-0" />
-                                      Approved · {step.approvedAt || "Just now"}
-                                    </p>
-                                  )}
-                                  {isRejectedHere && (
-                                    <p className="mt-1 flex items-center gap-1 font-medium text-[11px] text-rose-700 dark:text-rose-400">
-                                      <AlertTriangle className="h-3 w-3 shrink-0" />
-                                      Rejected · Just now
-                                    </p>
-                                  )}
-                                  {isUpcoming && (
-                                    <p className="mt-1 font-medium text-[11px] text-slate-400 italic dark:text-slate-500">
-                                      Awaiting earlier approvals
-                                    </p>
-                                  )}
-                                </div>
-                                {isCompleted && (
-                                  <Badge className="shrink-0 border-0 bg-emerald-100 font-bold text-[10px] text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
-                                    Done
-                                  </Badge>
-                                )}
-                                {isRejectedHere && (
-                                  <Badge className="shrink-0 border-0 bg-rose-100 font-bold text-[10px] text-rose-800 dark:bg-rose-900/40 dark:text-rose-300">
-                                    Rejected
-                                  </Badge>
-                                )}
-                                {isCurrent && (
-                                  <Badge className="shrink-0 border-0 bg-indigo-100 font-bold text-[10px] text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300">
-                                    Your turn
-                                  </Badge>
-                                )}
-                              </div>
-
-                              {isCurrent && (
-                                <Can
-                                  permission="PROJECT_APPROVE"
-                                  fallback={
-                                    <div className="mt-4 flex rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800/80 dark:bg-slate-900/20">
-                                      <p className="font-medium text-slate-500 text-xs italic">
-                                        Awaiting authorized personnel. You do not have permission to approve or reject
-                                        this evaluation step.
-                                      </p>
-                                    </div>
-                                  }
-                                >
-                                  <div className="mt-4 flex flex-wrap gap-2 border-slate-100 border-t pt-4 dark:border-slate-800/80">
-                                    <Button
-                                      type="button"
-                                      size="sm"
-                                      className="h-9 min-w-[120px] flex-1 bg-emerald-600 font-semibold text-white shadow-sm hover:bg-emerald-700"
-                                      onClick={() => setShowApproveDialog(true)}
-                                    >
-                                      <Check className="mr-1.5 h-4 w-4" />
-                                      Approve
-                                    </Button>
-                                    <Button
-                                      type="button"
-                                      size="sm"
-                                      variant="outline"
-                                      className="h-9 min-w-[120px] flex-1 border-rose-200 font-semibold text-rose-700 hover:bg-rose-50 dark:border-rose-900/50 dark:text-rose-400 dark:hover:bg-rose-950/40"
-                                      onClick={() => setShowTimelineReject(true)}
-                                    >
-                                      <AlertTriangle className="mr-1.5 h-4 w-4" />
-                                      Reject
-                                    </Button>
-                                  </div>
-                                </Can>
-                              )}
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
+                  )}
                 </div>
               )}
             </div>
