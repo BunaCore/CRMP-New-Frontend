@@ -20,7 +20,7 @@ import type {
   ProposalDepartment,
   ProposalListItem,
   ProposalListQueryParams,
-  ProposalMemberEntry,
+  ProposalMemberWithUser,
   ProposalStatus,
   ResearcherProposal,
   TeamMember,
@@ -157,16 +157,16 @@ export async function fetchProposalEvaluations(proposalId: string): Promise<GetE
 }
 
 /**
- * Fetch members of a specific proposal.
- * GET /proposals/members/:proposalId
+ * Fetch all members of a specific proposal with full user details and role info.
+ * GET /proposals/:id/all-members
  *
  * @param proposalId - The ID of the proposal to fetch members for.
- * @returns Array of ProposalMemberEntry.
+ * @returns Array of ProposalMemberWithUser with full member details.
  * @throws AxiosError on network or server failure.
  */
-export async function getProposalMembers(proposalId: string): Promise<ProposalMemberEntry[]> {
+export async function getProposalMembers(proposalId: string): Promise<ProposalMemberWithUser[]> {
   const { apiClient } = await import("@/lib/api/client");
-  const response = await apiClient.get<ProposalMemberEntry[]>(`/proposals/members/${proposalId}`);
+  const response = await apiClient.get<ProposalMemberWithUser[]>(`/proposals/${proposalId}/all-members`);
   return response.data;
 }
 
@@ -222,4 +222,15 @@ export async function getApprovalTimeline(proposalId: string): Promise<ApprovalT
   const { apiClient } = await import("@/lib/api/client");
   const response = await apiClient.get<ApprovalTimelineResponse>(`/proposals/${proposalId}/approval-timeline`);
   return response.data;
+}
+
+/**
+ * React Query hook for fetching proposal members with full user details.
+ */
+export function useGetProposalMembers(proposalId: string | null, enabled = true) {
+  return useQuery({
+    queryKey: ["proposals", "members", proposalId],
+    queryFn: () => getProposalMembers(proposalId as string),
+    enabled: enabled && !!proposalId,
+  });
 }

@@ -383,3 +383,20 @@ export interface ProposalMemberEntry {
   userId: string;
   role: "PI" | "MEMBER" | string;
 }
+
+export interface ProposalMemberUser {
+  id: string;
+  fullName: string;
+  email: string;
+  department: string | null;
+  isExternal: boolean;
+}
+
+export interface ProposalMemberWithUser {
+  id: string;
+  proposalId: string;
+  userId: string;
+  role: string;
+  addedAt: string;
+  user: ProposalMemberUser;
+}

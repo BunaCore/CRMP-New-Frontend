@@ -3,10 +3,16 @@
 import type React from "react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+import { useDebounce } from "@/hooks/use-debounce";
+import { assignEvaluators } from "@/lib/api/proposals/mutations";
 import { getPendingApprovals, useProposalsListQuery } from "@/lib/api/proposals/queries";
 import type { PendingApproval, ProposalListItem } from "@/lib/api/proposals/types";
+import { useSearchUsers } from "@/lib/api/users/queries";
 
-import { ADVISORS, EVALUATORS } from "../proposals/_data/mock-proposals";
+import { ADVISORS } from "../proposals/_data/mock-proposals";
 import type { Evaluator } from "../proposals/types";
 import { DEMO_RUBRIC } from "./_data/mock-evaluations";
 import type { DrawerTab, EvalProjectRow, EvalProposalRow, MainTab, RubricItem } from "./types";
@@ -96,6 +102,7 @@ interface EvaluationsContextValue {
   filteredAdvisors: Evaluator[];
   evalSearch: string;
   setEvalSearch: React.Dispatch<React.SetStateAction<string>>;
+  isAssigningEvaluators: boolean;
   advisorSearch: string;
   setAdvisorSearch: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -131,6 +138,7 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
   const [showAssign, setShowAssign] = useState(false);
   const [evalSearch, setEvalSearch] = useState("");
   const [pickedEvalIds, setPickedEvalIds] = useState<string[]>([]);
+  const debouncedEvalSearch = useDebounce(evalSearch, 300);
 
   const [showAssignAdvisor, setShowAssignAdvisor] = useState(false);
   const [advisorSearch, setAdvisorSearch] = useState("");
@@ -138,6 +146,7 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
 
   const [showTimelineReject, setShowTimelineReject] = useState(false);
   const [timelineRejectComment, setTimelineRejectComment] = useState("");
+  const queryClient = useQueryClient();
 
   const selectionKey =
     drawerKind === "proposal" && activeProposal
@@ -165,6 +174,8 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
       dept: proposal.department?.name || "N/A",
       stage: proposal.status.replace(/_/g, " "),
       budget: `$${proposal.budget?.toLocaleString() || 0}`,
+      program: proposal.program || "—",
+      teamCount: proposal.teamCount || 0,
     };
   }, []);
 
@@ -181,6 +192,8 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
           dept: p.currentApproverRole,
           stage: p.stepLabel,
           budget: "—", // Budget not in PendingApproval — fetched in drawer
+          program: p.proposalProgram || "—",
+          teamCount: 0, // Not available in PendingApproval
         }));
         setApiProposals(mapped);
       })
@@ -206,9 +219,56 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
   // Projects: no dedicated backend endpoint yet — keep empty until connected
   const filteredProjects: EvalProjectRow[] = [];
 
-  const filteredEvals = EVALUATORS.filter((e) =>
-    (e.name + e.specialty).toLowerCase().includes(evalSearch.toLowerCase()),
-  );
+  const evalUsersQuery = useSearchUsers(debouncedEvalSearch, showAssign);
+
+  const filteredEvals = useMemo<Evaluator[]>(() => {
+    const users = evalUsersQuery.data ?? [];
+    return users.map((u, idx) => {
+      const id = u.id || u.value;
+      const name = u.name || u.label || "Unknown user";
+      const initials =
+        name
+          .split(" ")
+          .filter(Boolean)
+          .slice(0, 2)
+          .map((part) => part[0]?.toUpperCase() ?? "")
+          .join("") || "US";
+
+      const palette = [
+        "bg-blue-100 text-blue-700",
+        "bg-indigo-100 text-indigo-700",
+        "bg-emerald-100 text-emerald-700",
+        "bg-violet-100 text-violet-700",
+      ];
+
+      return {
+        id,
+        name,
+        avatar: initials,
+        color: palette[idx % palette.length],
+        specialty: u.email || "Evaluator",
+        assigned: 0,
+      };
+    });
+  }, [evalUsersQuery.data]);
+
+  const { mutate: assignEvaluatorsMutate, isPending: isAssigningEvaluators } = useMutation({
+    mutationFn: ({ proposalId, userIds }: { proposalId: string; userIds: string[] }) =>
+      assignEvaluators(proposalId, userIds),
+    onSuccess: () => {
+      toast.success("Evaluators assigned successfully");
+      setShowAssign(false);
+      setEvalSearch("");
+      setPickedEvalIds([]);
+      queryClient.invalidateQueries({
+        queryKey: ["proposals", "pending-approvals"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["proposals", "list"] });
+    },
+    onError: () => {
+      toast.error("Failed to assign evaluators");
+    },
+  });
 
   const filteredAdvisors = ADVISORS.filter((a) =>
     (a.name + a.specialty).toLowerCase().includes(advisorSearch.toLowerCase()),
@@ -260,9 +320,11 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
   };
 
   const handleAssignConfirm = () => {
-    setShowAssign(false);
-    setEvalSearch("");
-    setPickedEvalIds([]);
+    if (!activeProposal?.id || pickedEvalIds.length === 0) return;
+    assignEvaluatorsMutate({
+      proposalId: activeProposal.id,
+      userIds: pickedEvalIds,
+    });
   };
 
   const handleAssignAdvisorConfirm = () => {
@@ -346,6 +408,7 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
         filteredAdvisors,
         evalSearch,
         setEvalSearch,
+        isAssigningEvaluators,
         advisorSearch,
         setAdvisorSearch,
       }}

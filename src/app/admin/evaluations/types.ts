@@ -25,6 +25,8 @@ export interface EvalProposalRow {
   dept: string;
   stage: string;
   budget: string;
+  program: string;
+  teamCount: number;
   budgetItems?: BudgetItem[];
 }
 

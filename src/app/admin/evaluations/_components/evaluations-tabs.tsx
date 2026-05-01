@@ -114,7 +114,9 @@ export function EvaluationsTabs() {
                     <TableRow>
                       <TableHead className="pl-5 font-semibold text-xs uppercase">Proposal</TableHead>
                       <TableHead className="font-semibold text-xs uppercase">PI</TableHead>
-                      <TableHead className="font-semibold text-xs uppercase">Stage</TableHead>
+                      <TableHead className="font-semibold text-xs uppercase">Status</TableHead>
+                      <TableHead className="font-semibold text-xs uppercase">Program</TableHead>
+                      <TableHead className="font-semibold text-xs uppercase">Team</TableHead>
                       <Can permission="BUDGET_VIEW">
                         <TableHead className="font-semibold text-xs uppercase">Budget</TableHead>
                       </Can>
@@ -148,6 +150,16 @@ export function EvaluationsTabs() {
                           <Badge variant="secondary" className="font-semibold text-[11px]">
                             {p.stage}
                           </Badge>
+                        </TableCell>
+                        <TableCell className="py-4">
+                          <span className="font-semibold text-[12px] text-slate-700 dark:text-slate-300">
+                            {p.program}
+                          </span>
+                        </TableCell>
+                        <TableCell className="py-4">
+                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 font-semibold text-[11px] text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                            {p.teamCount}
+                          </span>
                         </TableCell>
                         <Can permission="BUDGET_VIEW">
                           <TableCell className="py-4 font-semibold text-[13px] text-slate-700 dark:text-slate-300">

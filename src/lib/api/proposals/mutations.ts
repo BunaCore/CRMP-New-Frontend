@@ -76,3 +76,16 @@ export async function submitStepAction(proposalId: string, payload: SubmitStepAc
   const { apiClient } = await import("@/lib/api/client");
   await apiClient.post(`/proposals/${proposalId}/action`, payload);
 }
+
+/**
+ * Assign evaluators to a proposal.
+ * POST /proposals/:id/evaluator-assign
+ * @param proposalId - Proposal ID
+ * @param userIds - Array of user IDs to assign as evaluators
+ */
+export async function assignEvaluators(proposalId: string, userIds: string[]): Promise<void> {
+  const { apiClient } = await import("@/lib/api/client");
+  await apiClient.post(`/proposals/${proposalId}/evaluator-assign`, {
+    userIds,
+  });
+}
