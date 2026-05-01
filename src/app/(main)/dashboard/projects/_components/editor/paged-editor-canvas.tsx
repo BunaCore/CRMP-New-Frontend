@@ -38,7 +38,7 @@ export const PAGE_HEIGHT = 1123;
 export const PAGE_MARGIN_X = 96;
 
 /** Top and bottom text margin inside each page (≈ 1 in at 96 dpi). */
-export const PAGE_MARGIN_Y = 96;
+export const PAGE_MARGIN_Y = 64;
 
 /** Visible grey gap between consecutive page sheets. */
 export const PAGE_GAP = 24;
@@ -136,7 +136,7 @@ export function PagedEditorCanvas({ editor }: PagedEditorCanvasProps) {
       style={{
         width: "100%",
         minHeight: "100%",
-        paddingTop: 48,
+        paddingTop: 16,
         paddingBottom: 96,
         boxSizing: "border-box",
       }}

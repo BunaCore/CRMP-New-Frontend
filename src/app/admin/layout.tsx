@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 
 import { AdminPermissionGuard } from "@/access-control/AdminPermissionGuard";
 import { ThemeSwitcher } from "@/app/(main)/dashboard/_components/sidebar/theme-switcher";
+import { DashboardSwitcher } from "@/components/dashboard-switcher";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 import { AdminSidebar } from "./_components/admin-sidebar";
@@ -22,6 +23,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
             <h1 className="font-semibold text-lg tracking-tight">Admin Console</h1>
           </div>
           <div className="flex items-center gap-2">
+            <DashboardSwitcher />
             <ThemeSwitcher />
           </div>
         </header>
