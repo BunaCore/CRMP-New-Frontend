@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Command } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 
+// We reuse the existing generic Nav components from your main dash
 import { NavMain } from "@/app/(main)/dashboard/_components/sidebar/nav-main";
 import { NavUser } from "@/app/(main)/dashboard/_components/sidebar/nav-user";
 import {
@@ -31,47 +32,37 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
   );
 
   const { user } = useSession();
-
-  // keep smart syncing behavior (this was the important part from version 1)
-  const variant = isSynced ? "floating" : sidebarVariant;
+  const variant = isSynced ? sidebarVariant : props.variant;
   const collapsible = isSynced ? sidebarCollapsible : props.collapsible;
 
+  // Permission-driven sidebar filtering (no role-based gating).
   const dynamicNavItems = getAuthorizedAdminNavItems(user?.permissions ?? []);
 
   return (
-    <Sidebar
-      {...props}
-      variant={variant}
-      collapsible={collapsible}
-      className="border-r border-slate-200/50 dark:border-slate-800/50"
-    >
-      {/* HEADER */}
+    <Sidebar {...props} variant={variant} collapsible={collapsible}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild className="hover:bg-transparent active:bg-transparent">
-              <Link prefetch={false} href="/admin" className="flex w-full items-center gap-2 px-2">
-                <Command className="size-6 text-blue-600" />
-
-                <span className="font-semibold text-base tracking-tight">{APP_CONFIG.name} - Admin Space</span>
+            <SidebarMenuButton asChild>
+              <Link prefetch={false} href="/admin">
+                <Command />
+                <span className="font-semibold text-base">{APP_CONFIG.name} - Admin Space</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-
-      {/* CONTENT */}
-      <SidebarContent className="px-2">
+      <SidebarContent>
+        {/* Pass the fully computed and permitted items to the nav list */}
         <NavMain items={dynamicNavItems} />
       </SidebarContent>
-
-      {/* FOOTER */}
-      <SidebarFooter className="px-2">
+      <SidebarFooter>
+        {/* We can re-use the generic user menu component for Admin sidebar */}
         <NavUser
           user={{
             name: user?.name || "Guest",
             email: user?.email || "No email",
-            avatar: "",
+            avatar: "", // Add avatar field if available in user profile
           }}
         />
       </SidebarFooter>

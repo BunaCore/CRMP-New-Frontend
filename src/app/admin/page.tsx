@@ -54,6 +54,33 @@ const cardVariants = {
   show: { y: 0, opacity: 1 },
 };
 
+const projects = [
+  {
+    name: "AI Health Diagnostics",
+    status: "Active",
+    progress: 75,
+    team: 6,
+    badgeColor:
+      "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-medium border-blue-200/50 dark:border-blue-800/50",
+  },
+  {
+    name: "Quantum Computing Simulation",
+    status: "In Review",
+    progress: 40,
+    team: 4,
+    badgeColor:
+      "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 font-medium border-amber-200/50 dark:border-amber-800/50",
+  },
+  {
+    name: "Neural Interface Robotics",
+    status: "Delayed",
+    progress: 20,
+    team: 5,
+    badgeColor:
+      "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 font-medium border-red-200/50 dark:border-red-800/50",
+  },
+];
+
 export default function AdminDashboardPage() {
   return (
     <div className="z-0 flex min-h-screen w-full flex-1 flex-col bg-white p-2 md:p-3 lg:p-4 xl:p-6 dark:bg-slate-950/20">
@@ -310,18 +337,20 @@ export default function AdminDashboardPage() {
                 </TableHeader>
 
                 <TableBody>
-                  {[
-                    { name: "AI Medical Imaging", PI: "Dr. Vance", status: "Active" },
-                    { name: "Energy Grid Optimization", PI: "Prof. Stark", status: "Pending" },
-                    { name: "Quantum Research Model", PI: "Dr. Turing", status: "Review" },
-                  ].map((p) => (
+                  {projects.map((p) => (
                     <TableRow key={p.name} className="hover:bg-slate-50 dark:hover:bg-slate-900">
+                      {/* Project Name */}
                       <TableCell className="font-medium text-sm">{p.name}</TableCell>
 
-                      <TableCell className="text-sm text-slate-500">{p.PI}</TableCell>
+                      {/* PI (you don’t have this field yet) */}
+                      <TableCell className="text-sm text-slate-500">—</TableCell>
 
-                      <TableCell className="text-xs text-slate-500">{p.status}</TableCell>
+                      {/* Status with badge (better UI than plain text) */}
+                      <TableCell>
+                        <Badge className={`${p.badgeColor} text-[10px] px-2 py-0`}>{p.status}</Badge>
+                      </TableCell>
 
+                      {/* Actions */}
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>

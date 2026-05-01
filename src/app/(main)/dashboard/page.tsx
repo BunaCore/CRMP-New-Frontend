@@ -175,7 +175,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex flex-1 flex-col gap-2 pt-0.5">
+    <div className="flex flex-1 flex-col gap-4 pt-0.5">
       {/* Banner */}
       {SHOW_MOCK_APPOINTMENT && (
         <motion.div
@@ -215,7 +215,7 @@ export default function DashboardPage() {
         </motion.div>
       )}
       {/* Header Section */}
-      <div className="flex flex-col items-start justify-between gap-0.5 sm:flex-row sm:items-center">
+      <div className="flex flex-col items-start justify-between gap-1 sm:flex-row sm:items-center">
         <div>
           <h1 className="font-black text-xl tracking-tight text-slate-900 dark:text-slate-100">
             {roleLabel} <span>Dashboard</span>
@@ -234,7 +234,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-7 md:grid-cols-3">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
@@ -331,7 +331,7 @@ export default function DashboardPage() {
         </motion.div>
       </div>
 
-      <div className="grid gap-2 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-3">
         {/* LEFT */}
         <div className="flex flex-col gap-2 lg:col-span-2">
           <Card className="flex h-full flex-col overflow-hidden border-slate-200/50 bg-white shadow-none dark:border-slate-800/50 dark:bg-slate-950/50">
@@ -391,7 +391,7 @@ export default function DashboardPage() {
         </div>
 
         {/* RIGHT */}
-        <div className="flex flex-col gap-2 lg:col-span-1">
+        <div className="flex flex-col gap-5 lg:col-span-1">
           <Card className="border-slate-200/50 bg-white shadow-none dark:border-slate-800/50 dark:bg-slate-950/50">
             <CardHeader className="border-b border-slate-100  px-3 py-1.5 dark:border-slate-800/50">
               <div className="flex items-center justify-between">
@@ -413,13 +413,13 @@ export default function DashboardPage() {
 
                     <div className="flex flex-1 flex-col leading-tight">
                       <div className="flex justify-between">
-                        <p className="text-[11px] font-medium text-slate-800">{msg.sender}</p>
-                        <span className="text-[8px] text-slate-400">{msg.time}</span>
+                        <p className="text-[11px] font-medium text-slate-800 dark:text-white">{msg.sender}</p>
+                        <span className="text-[8px] text-slate-400 dark:text-slate-200">{msg.time}</span>
                       </div>
 
-                      <p className="text-[9px] text-slate-500">{msg.role}</p>
+                      <p className="text-[9px] text-slate-500 dark:text-slate-400">{msg.role}</p>
 
-                      <p className="text-[10px] text-slate-600">{msg.message}</p>
+                      <p className="text-[10px] text-slate-600 dark:text-slate-500">{msg.message}</p>
                     </div>
                   </div>
                 ))}
