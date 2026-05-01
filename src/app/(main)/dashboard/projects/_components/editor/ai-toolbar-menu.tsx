@@ -27,19 +27,28 @@ export function AiToolbarMenu({ editor }: AiToolbarMenuProps) {
   const { setAutoSendTrigger, setIsChatOpen } = useWorkspace();
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleAiAction = (promptPrefix: string) => {
+  const handleAiAction = (promptPrefix: string, requestType: import("@/lib/ai/types").AiRequestType) => {
     const { from, to } = editor.state.selection;
     const selectedText = editor.state.doc.textBetween(from, to, " ");
 
-    if (selectedText) {
-      setAutoSendTrigger({
-        prompt: promptPrefix,
-        context: selectedText,
-        timestamp: Date.now(),
-      });
-      setIsChatOpen(true);
-      setIsExpanded(false); // Close the menu after action
+    const trimmedText = selectedText?.trim();
+
+    if (!trimmedText || trimmedText.length < 3) {
+      alert("Please select a valid sentence or passage first.");
+      setIsExpanded(false);
+      return;
     }
+
+    setAutoSendTrigger({
+      prompt: promptPrefix,
+      context: trimmedText,
+      timestamp: Date.now(),
+      requestType,
+      from,
+      to,
+    });
+    setIsChatOpen(true);
+    setIsExpanded(false); // Close the menu after action
   };
 
   if (!isExpanded) {
@@ -76,7 +85,7 @@ export function AiToolbarMenu({ editor }: AiToolbarMenuProps) {
         size="sm"
         className="h-7 w-7 rounded-lg p-0 text-blue-500 hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400"
         title="Summarize"
-        onClick={() => handleAiAction("Summarize this text")}
+        onClick={() => handleAiAction("Summarize this text", "SUMMARIZE_SELECTION")}
       >
         <FileText className="h-3.5 w-3.5" />
       </Button>
@@ -86,7 +95,7 @@ export function AiToolbarMenu({ editor }: AiToolbarMenuProps) {
         size="sm"
         className="h-7 w-7 rounded-lg p-0 text-green-500 hover:bg-green-500/10 hover:text-green-600 dark:hover:text-green-400"
         title="Explain"
-        onClick={() => handleAiAction("Explain this text")}
+        onClick={() => handleAiAction("Explain this text", "EXPLAIN_SELECTION")}
       >
         <HelpCircle className="h-3.5 w-3.5" />
       </Button>
@@ -96,7 +105,7 @@ export function AiToolbarMenu({ editor }: AiToolbarMenuProps) {
         size="sm"
         className="h-7 w-7 rounded-lg p-0 text-amber-500 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-400"
         title="Improve grammar"
-        onClick={() => handleAiAction("Improve the grammar of this text")}
+        onClick={() => handleAiAction("Improve the grammar of this text", "GRAMMAR_FIX")}
       >
         <PenTool className="h-3.5 w-3.5" />
       </Button>
@@ -106,7 +115,7 @@ export function AiToolbarMenu({ editor }: AiToolbarMenuProps) {
         size="sm"
         className="h-7 w-7 rounded-lg p-0 text-purple-500 hover:bg-purple-500/10 hover:text-purple-600 dark:hover:text-purple-400"
         title="Suggest outline"
-        onClick={() => handleAiAction("Suggest an outline based on this text")}
+        onClick={() => handleAiAction("Suggest an outline based on this text", "OUTLINE_SUGGESTION")}
       >
         <List className="h-3.5 w-3.5" />
       </Button>
@@ -116,7 +125,7 @@ export function AiToolbarMenu({ editor }: AiToolbarMenuProps) {
         size="sm"
         className="h-7 w-7 rounded-lg p-0 text-pink-500 hover:bg-pink-500/10 hover:text-pink-600 dark:hover:text-pink-400"
         title="Generate caption"
-        onClick={() => handleAiAction("Generate a caption for this text")}
+        onClick={() => handleAiAction("Generate a caption for this text", "CAPTION_GENERATION")}
       >
         <WrapText className="h-3.5 w-3.5" />
       </Button>
@@ -126,7 +135,7 @@ export function AiToolbarMenu({ editor }: AiToolbarMenuProps) {
         size="sm"
         className="h-7 w-7 rounded-lg p-0 text-indigo-500 hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400"
         title="Find experts"
-        onClick={() => handleAiAction("Recommend collaborators for this topic")}
+        onClick={() => handleAiAction("Recommend collaborators for this topic", "COLLABORATOR_RECOMMENDATION")}
       >
         <Users className="h-3.5 w-3.5" />
       </Button>
@@ -136,7 +145,7 @@ export function AiToolbarMenu({ editor }: AiToolbarMenuProps) {
         size="sm"
         className="h-7 w-7 rounded-lg p-0 text-rose-500 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400"
         title="Generate diagram"
-        onClick={() => handleAiAction("Insert an image diagram representing this text")}
+        onClick={() => handleAiAction("Insert an image diagram representing this text", "INSERT_DIAGRAM")}
       >
         <ImageIcon className="h-3.5 w-3.5" />
       </Button>

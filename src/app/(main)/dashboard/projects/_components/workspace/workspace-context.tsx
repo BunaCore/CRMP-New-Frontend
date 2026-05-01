@@ -4,6 +4,8 @@ import { createContext, type ReactNode, useCallback, useContext, useEffect, useS
 
 import { useParams } from "next/navigation";
 
+import { getPersistedAiMode, persistAiMode } from "@/lib/ai/model-config";
+import type { AiMode } from "@/lib/ai/types";
 import { createWorkspace as apiCreateWorkspace } from "@/lib/api/editor/mutations";
 import { fetchWorkspaces } from "@/lib/api/editor/queries";
 import { fetchProjectMembers, type ProjectMember } from "@/lib/api/members/queries";
@@ -42,18 +44,36 @@ interface WorkspaceContextProps {
 
   // Real data state
   workspaces: WorkspaceInfo[];
+  /** Name of the currently active workspace — passed as AI request context */
+  workspaceName: string;
   loading: boolean;
   createWorkspace: (projectId: string, name: string) => Promise<string>;
   refreshWorkspaces: () => Promise<void>;
   // AI Copilot state
-  aiMode: "local" | "cloud";
-  setAiMode: (mode: "local" | "cloud") => void;
+  aiMode: AiMode;
+  setAiMode: (mode: AiMode) => void;
   selectedContext: string | null;
   setSelectedContext: (text: string | null) => void;
   prefillPrompt: string | null;
   setPrefillPrompt: (prompt: string | null) => void;
-  autoSendTrigger: { prompt: string; context: string; timestamp: number } | null;
-  setAutoSendTrigger: (trigger: { prompt: string; context: string; timestamp: number } | null) => void;
+  autoSendTrigger: {
+    prompt: string;
+    context: string;
+    timestamp: number;
+    requestType?: import("@/lib/ai/types").AiRequestType;
+    from?: number;
+    to?: number;
+  } | null;
+  setAutoSendTrigger: (
+    trigger: {
+      prompt: string;
+      context: string;
+      timestamp: number;
+      requestType?: import("@/lib/ai/types").AiRequestType;
+      from?: number;
+      to?: number;
+    } | null,
+  ) => void;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextProps | undefined>(undefined);
@@ -68,12 +88,23 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [isChatOpen, setIsChatOpen] = useState(true);
 
   // AI Copilot state
-  const [aiMode, setAiMode] = useState<"local" | "cloud">("cloud");
+  const [aiMode, setAiMode] = useState<AiMode>(getPersistedAiMode);
   const [selectedContext, setSelectedContext] = useState<string | null>(null);
   const [prefillPrompt, setPrefillPrompt] = useState<string | null>(null);
-  const [autoSendTrigger, setAutoSendTrigger] = useState<{ prompt: string; context: string; timestamp: number } | null>(
-    null,
-  );
+  const [autoSendTrigger, setAutoSendTrigger] = useState<{
+    prompt: string;
+    context: string;
+    timestamp: number;
+    requestType?: import("@/lib/ai/types").AiRequestType;
+    from?: number;
+    to?: number;
+  } | null>(null);
+
+  // Persist mode changes so they survive navigation
+  const handleSetAiMode = useCallback((mode: AiMode) => {
+    setAiMode(mode);
+    persistAiMode(mode);
+  }, []);
 
   // Real backend state
   const [workspaces, setWorkspaces] = useState<WorkspaceInfo[]>([]);
@@ -140,13 +171,14 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         setIsChatOpen,
         toggleChat,
         workspaces,
+        workspaceName: workspaces[0]?.name ?? "",
         loading,
         createWorkspace,
         refreshWorkspaces,
 
         // AI Copilot
         aiMode,
-        setAiMode,
+        setAiMode: handleSetAiMode,
         selectedContext,
         setSelectedContext,
         prefillPrompt,

@@ -124,6 +124,31 @@ export function PagedEditorCanvas({ editor }: PagedEditorCanvasProps) {
     return () => window.removeEventListener("resize", recalc);
   }, [recalc]);
 
+  // ── AI Action Application ───────────────────────────────────────────────────
+  useEffect(() => {
+    if (!editor) return;
+
+    const handleAiAction = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const action = customEvent.detail;
+      if (!action) return;
+
+      if (action.type === "replace" && action.from !== undefined && action.to !== undefined && action.content) {
+        editor
+          .chain()
+          .focus()
+          .setTextSelection({ from: action.from, to: action.to })
+          .insertContent(action.content)
+          .run();
+      } else if (action.type === "insert" && action.content) {
+        editor.chain().focus().insertContent(action.content).run();
+      }
+    };
+
+    window.addEventListener("apply-ai-action", handleAiAction as EventListener);
+    return () => window.removeEventListener("apply-ai-action", handleAiAction as EventListener);
+  }, [editor]);
+
   // ── Derived ────────────────────────────────────────────────────────────────
   /** Total pixel height of the page column (all sheets + all inter-page gaps). */
   const totalCanvasHeight = pageCount * PAGE_HEIGHT + Math.max(0, pageCount - 1) * PAGE_GAP;
