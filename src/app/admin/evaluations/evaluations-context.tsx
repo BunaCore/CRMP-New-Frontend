@@ -1,10 +1,10 @@
 "use client";
 
 import type React from "react";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-import { getPendingApprovals } from "@/lib/api/proposals/queries";
-import type { PendingApproval } from "@/lib/api/proposals/types";
+import { getPendingApprovals, useProposalsListQuery } from "@/lib/api/proposals/queries";
+import type { PendingApproval, ProposalListItem } from "@/lib/api/proposals/types";
 
 import { ADVISORS, EVALUATORS } from "../proposals/_data/mock-proposals";
 import type { Evaluator } from "../proposals/types";
@@ -14,12 +14,18 @@ import type { DrawerTab, EvalProjectRow, EvalProposalRow, MainTab, RubricItem } 
 export function rubricTotals(items: RubricItem[]) {
   const earned = items.reduce((s, r) => s + r.score, 0);
   const max = items.reduce((s, r) => s + r.max, 0);
-  return { earned, max, pct: max > 0 ? Math.round((earned / max) * 1000) / 10 : 0 };
+  return {
+    earned,
+    max,
+    pct: max > 0 ? Math.round((earned / max) * 1000) / 10 : 0,
+  };
 }
 
 interface EvaluationsContextValue {
   mainTab: MainTab;
   setMainTab: React.Dispatch<React.SetStateAction<MainTab>>;
+  proposalScope: "assigned" | "all";
+  setProposalScope: React.Dispatch<React.SetStateAction<"assigned" | "all">>;
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   drawerOpen: boolean;
@@ -98,6 +104,7 @@ const EvaluationsContext = createContext<EvaluationsContextValue | undefined>(un
 
 export function EvaluationsProvider({ children }: { children: React.ReactNode }) {
   const [mainTab, setMainTab] = useState<MainTab>("proposals");
+  const [proposalScope, setProposalScope] = useState<"assigned" | "all">("assigned");
   const [search, setSearch] = useState("");
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -146,6 +153,20 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
   // ── Real API: proposals table data ───────────────────────────────────────────
   const [apiProposals, setApiProposals] = useState<EvalProposalRow[]>([]);
   const [isLoadingProposals, setIsLoadingProposals] = useState(true);
+  const allProposalsQuery = useProposalsListQuery({}, mainTab === "proposals" && proposalScope === "all");
+
+  const mapAllProposalRow = useCallback((proposal: ProposalListItem): EvalProposalRow => {
+    return {
+      id: proposal.id,
+      title: proposal.title,
+      pi: proposal.pi.name,
+      piAvatar: proposal.pi.name.slice(0, 2).toUpperCase(),
+      piColor: "bg-indigo-100 text-indigo-700",
+      dept: proposal.department?.name || "N/A",
+      stage: proposal.status.replace(/_/g, " "),
+      budget: `$${proposal.budget?.toLocaleString() || 0}`,
+    };
+  }, []);
 
   useEffect(() => {
     setIsLoadingProposals(true);
@@ -173,6 +194,15 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
   const filteredProposals = apiProposals.filter((p) =>
     (p.title + p.pi + p.id + p.dept).toLowerCase().includes(search.toLowerCase()),
   );
+  const allProposalRows = useMemo(
+    () =>
+      (allProposalsQuery.data ?? [])
+        .map(mapAllProposalRow)
+        .filter((p) => (p.title + p.pi + p.id + p.dept + p.stage).toLowerCase().includes(search.toLowerCase())),
+    [allProposalsQuery.data, search, mapAllProposalRow],
+  );
+  const visibleProposals = proposalScope === "all" ? allProposalRows : filteredProposals;
+  const loadingVisibleProposals = proposalScope === "all" ? allProposalsQuery.isLoading : isLoadingProposals;
   // Projects: no dedicated backend endpoint yet — keep empty until connected
   const filteredProjects: EvalProjectRow[] = [];
 
@@ -255,6 +285,8 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
       value={{
         mainTab,
         setMainTab,
+        proposalScope,
+        setProposalScope,
         search,
         setSearch,
         drawerOpen,
@@ -284,8 +316,8 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
         selectionKey,
         isEvalApproved,
         isEvalRejected,
-        isLoadingProposals,
-        filteredProposals,
+        isLoadingProposals: loadingVisibleProposals,
+        filteredProposals: visibleProposals,
         filteredProjects,
         openDrawerProposal,
         openDrawerProject,

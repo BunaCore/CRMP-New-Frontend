@@ -18,6 +18,8 @@ import type {
   PiMember,
   ProposalComment,
   ProposalDepartment,
+  ProposalListItem,
+  ProposalListQueryParams,
   ProposalMemberEntry,
   ProposalStatus,
   ResearcherProposal,
@@ -69,6 +71,17 @@ function normalizeProposal(raw: any): ResearcherProposal {
 // ─── Queries ───────────────────────────────────────────────────────────────────
 
 import { useQuery } from "@tanstack/react-query";
+
+function buildProposalQueryString(params: ProposalListQueryParams = {}): string {
+  const searchParams = new URLSearchParams();
+
+  if (params.program) searchParams.set("program", params.program);
+  if (params.search?.trim()) searchParams.set("search", params.search.trim());
+  if (params.status) searchParams.set("status", params.status);
+
+  const query = searchParams.toString();
+  return query ? `?${query}` : "";
+}
 
 /**
  * Fetch a specific proposal by ID.
@@ -168,6 +181,37 @@ export async function getPendingApprovals(): Promise<PendingApproval[]> {
   const { apiClient } = await import("@/lib/api/client");
   const response = await apiClient.get<PendingApproval[]>("/proposals/pending-approvals");
   return response.data;
+}
+
+/**
+ * React Query hook for pending approvals on the admin dashboard.
+ */
+export function usePendingApprovalsQuery() {
+  return useQuery({
+    queryKey: ["proposals", "pending-approvals"],
+    queryFn: getPendingApprovals,
+  });
+}
+
+/**
+ * Fetch the proposals related to the currently authenticated privileged user.
+ * GET /proposals?program=UG&search=text&status=Approved
+ */
+export async function getProposalsList(params: ProposalListQueryParams = {}): Promise<ProposalListItem[]> {
+  const { apiClient } = await import("@/lib/api/client");
+  const response = await apiClient.get<ProposalListItem[]>(`/proposals${buildProposalQueryString(params)}`);
+  return response.data;
+}
+
+/**
+ * React Query hook for the admin proposals tab.
+ */
+export function useProposalsListQuery(params: ProposalListQueryParams = {}, enabled = true) {
+  return useQuery({
+    queryKey: ["proposals", "list", params.program ?? "all", params.status ?? "all", params.search ?? ""],
+    queryFn: () => getProposalsList(params),
+    enabled,
+  });
 }
 
 /**

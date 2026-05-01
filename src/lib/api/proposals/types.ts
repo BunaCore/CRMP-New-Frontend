@@ -237,6 +237,43 @@ export interface ProposalResponse {
   updatedAt: string;
 }
 
+export type ProposalListStatus = "Draft" | "Under_Review" | "Approved" | "Rejected";
+
+export interface ProposalListDepartment {
+  id: string;
+  name: string;
+  code: string;
+}
+
+export interface ProposalListPerson {
+  id: string;
+  name: string;
+}
+
+export interface ProposalListItem {
+  id: string;
+  title: string;
+  abstract: string;
+  program: ProposalProgram;
+  pi: ProposalListPerson;
+  advisors: ProposalListPerson[];
+  evaluators: ProposalListPerson[];
+  teamCount: number;
+  department: ProposalListDepartment;
+  submittedDate: string;
+  status: ProposalListStatus;
+  budget: number;
+  isFunded: boolean;
+  degreeLevel: string;
+  researchArea: string;
+}
+
+export interface ProposalListQueryParams {
+  program?: ProposalProgram;
+  search?: string;
+  status?: ProposalListStatus;
+}
+
 // ─── Dropdown/Selector types ───────────────────────────────────────────────────
 
 export interface DepartmentOption {

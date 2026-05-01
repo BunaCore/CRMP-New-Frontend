@@ -73,7 +73,10 @@ export function ProposalsDrawer() {
   const onConfirmApprove = async () => {
     if (!selected) return;
     try {
-      await submitStepAction(selected.id, { decision: "Accepted", comment: timelineApproveNote });
+      await submitStepAction(selected.id, {
+        decision: "Accepted",
+        comment: timelineApproveNote,
+      });
       handleTimelineApproveSubmit();
     } catch (e) {
       console.error(e);
@@ -83,7 +86,10 @@ export function ProposalsDrawer() {
   const onConfirmReject = async () => {
     if (!selected || timelineRejectComment.trim().length < 10) return;
     try {
-      await submitStepAction(selected.id, { decision: "Rejected", comment: timelineRejectComment });
+      await submitStepAction(selected.id, {
+        decision: "Rejected",
+        comment: timelineRejectComment,
+      });
       handleTimelineRejectSubmit();
     } catch (e) {
       console.error(e);
@@ -186,7 +192,7 @@ export function ProposalsDrawer() {
               {/* ── TAB: DETAILS ── */}
               {drawerTab === "details" && (
                 <>
-                  {selected.currentStatus === "Revision" && (
+                  {"currentStatus" in selected && selected.currentStatus === "Revision" && (
                     <div className="flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-900/30 dark:bg-rose-900/10">
                       <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600 dark:text-rose-400" />
                       <div>
@@ -370,12 +376,10 @@ export function ProposalsDrawer() {
                             <tr>
                               <td className="px-4 py-3 font-bold text-slate-900 dark:text-slate-100">Total</td>
                               <td className="px-4 py-3 text-right font-bold text-blue-600 dark:text-blue-400">
-                                {details.budget?.items?.reduce((acc, curr) => acc + curr.amount, 0)
-                                  ? new Intl.NumberFormat("en-US", {
-                                      minimumFractionDigits: 2,
-                                      maximumFractionDigits: 2,
-                                    }).format(details.budget?.items?.reduce((acc, curr) => acc + curr.amount, 0))
-                                  : selected.budget.reduce((acc, curr) => acc + curr.amount, 0)}
+                                {new Intl.NumberFormat("en-US", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }).format(details.budget.total)}
                               </td>
                             </tr>
                           </tfoot>
