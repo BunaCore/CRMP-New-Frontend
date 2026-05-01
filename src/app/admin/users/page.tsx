@@ -10,7 +10,11 @@ import { UsersProvider } from "./users-context";
 export default function AdminUsersPage() {
   return (
     <UsersProvider>
-      <RequiresPermissions permissions={["USER_VIEW", "ADMIN_EDIT"]} mode="any" fallback="notFoundOrRedirect">
+      <RequiresPermissions
+        permissions={["USER_VIEW", "ADMIN_EDIT", "USER_PROVISION"]}
+        mode="any"
+        fallback="notFoundOrRedirect"
+      >
         <div className="flex flex-1 flex-col gap-5 p-4 md:p-6 lg:p-8">
           <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
             <div>

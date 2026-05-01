@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { MoreVertical, Search, UserPlus, Users } from "lucide-react";
 
+import { Can } from "@/access-control/permission-gates";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,6 @@ export function UsersTable() {
     totalItems,
     pagedUsers,
     isUsersLoading,
-    setSelectedUserId,
     setInviteOpen,
   } = useAdminUsers();
 
@@ -100,10 +100,12 @@ export function UsersTable() {
               <SelectItem value="invited">Invited</SelectItem>
             </SelectContent>
           </Select>
-          <Button className="h-9 bg-blue-600 font-semibold hover:bg-blue-700" onClick={() => setInviteOpen(true)}>
-            <UserPlus className="mr-1.5 h-4 w-4" />
-            Invite User
-          </Button>
+          <Can permission="USER_PROVISION">
+            <Button className="h-9 bg-blue-600 font-semibold hover:bg-blue-700" onClick={() => setInviteOpen(true)}>
+              <UserPlus className="mr-1.5 h-4 w-4" />
+              Invite User
+            </Button>
+          </Can>
         </div>
       </div>
 
@@ -151,7 +153,7 @@ export function UsersTable() {
                         </Avatar>
                         <Link
                           href={`/admin/users/${user.id}`}
-                          className="min-w-0 flex flex-col gap-0.5 hover:opacity-70 transition-opacity"
+                          className="flex min-w-0 flex-col gap-0.5 transition-opacity hover:opacity-70"
                         >
                           <span className="truncate font-semibold text-[13px] text-slate-900 dark:text-slate-100">
                             {user.fullName || "Unnamed user"}
