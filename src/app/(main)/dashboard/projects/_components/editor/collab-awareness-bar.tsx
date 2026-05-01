@@ -9,12 +9,15 @@
 // Zero impact on solo-mode renders (returns null).
 // ============================================================
 
-import { Loader2, Users, Wifi, WifiOff } from "lucide-react";
+import { ClipboardList, Loader2, Users, Wifi, WifiOff } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { type CollabConnectionStatus, useCollabStore } from "@/stores/collabStore";
+
+import { TaskManagerModal } from "./task-manager-modal";
 
 // ─── Connection badge ─────────────────────────────────────────
 
@@ -151,10 +154,23 @@ export function CollabAwarenessBar() {
 
       {/* Peer count label */}
       {status === "connected" && (
-        <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-          <Users className="h-2.5 w-2.5" />
-          {peerCount + 1} {peerCount + 1 === 1 ? "editor" : "editors"}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="flex items-center gap-1 border-r pr-2 text-[10px] text-muted-foreground">
+            <Users className="h-2.5 w-2.5" />
+            {peerCount + 1} {peerCount + 1 === 1 ? "editor" : "editors"}
+          </span>
+
+          <TaskManagerModal>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 rounded-full transition-colors hover:bg-primary/10 hover:text-primary"
+              title="Task Management"
+            >
+              <ClipboardList className="h-3.5 w-3.5" />
+            </Button>
+          </TaskManagerModal>
+        </div>
       )}
     </section>
   );

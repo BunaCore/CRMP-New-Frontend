@@ -5,7 +5,6 @@ import { useEffect } from "react";
 
 import { useRouter } from "next/navigation";
 
-import { hasPermission } from "@/access-control/permission-gates";
 import NotFoundPage from "@/app/404";
 import { useAuthStore } from "@/stores/authStore";
 
