@@ -26,7 +26,7 @@ export function WorkspaceDetailsTab() {
   };
 
   return (
-    <ScrollArea className="flex-1">
+    <ScrollArea className="min-h-0 flex-1">
       <div className="flex flex-col gap-6 p-5">
         {/* Document Header & AI Summary */}
         <div className="space-y-4">

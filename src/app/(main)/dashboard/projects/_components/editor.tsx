@@ -287,8 +287,8 @@ export default function DocumentEditor({ workspaceId, projectId }: DocumentEdito
       />
 
       {/* Scrollable editor canvas */}
-      <div className="flex-1 overflow-hidden">
-        <div className="custom-scrollbar h-[calc(100vh-80px)] w-full overflow-y-auto scroll-smooth">
+      <div className="relative flex-1 overflow-hidden">
+        <div className="custom-scrollbar absolute inset-0 w-full overflow-y-auto scroll-smooth">
           <PagedEditorCanvas editor={editor} />
         </div>
       </div>

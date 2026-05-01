@@ -43,7 +43,7 @@ export function RagMessageList({ messages, isThinking, isEmpty }: RagMessageList
 
   if (isEmpty) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center bg-slate-50/50 p-8 text-center dark:bg-zinc-950/50">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center bg-slate-50/50 p-8 text-center dark:bg-zinc-950/50">
         <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-primary/10 shadow-inner dark:bg-primary/20">
           <Library className="h-10 w-10 text-primary opacity-80" />
         </div>
@@ -56,7 +56,7 @@ export function RagMessageList({ messages, isThinking, isEmpty }: RagMessageList
   }
 
   return (
-    <ScrollArea className="flex-1 px-4 py-6" viewportRef={scrollRef}>
+    <ScrollArea className="min-h-0 flex-1 px-4 py-6" viewportRef={scrollRef}>
       <div className="flex flex-col gap-6 pb-4">
         {messages.map((message) => (
           <div

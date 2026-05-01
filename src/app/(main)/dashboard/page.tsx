@@ -1,7 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import Link from "next/link";
+
+import { useQuery } from "@tanstack/react-query";
+import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, isFuture } from "date-fns";
 import {
   ArrowRight,
   CalendarDays,
@@ -30,6 +34,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useSession } from "@/context/SessionContext";
+import { getMyProposals } from "@/lib/api/proposals/queries";
 
 export default function DashboardPage() {
   const [showRSVPModal, setShowRSVPModal] = useState(false);
@@ -98,7 +103,7 @@ export default function DashboardPage() {
   ];
 
   // Mock data for recent activity
-  const activities = [
+  const _activities = [
     {
       title: "Evaluation submitted",
       desc: "Dr. Smith submitted eval for AI Health Diagnostics.",
@@ -160,39 +165,103 @@ export default function DashboardPage() {
     },
   ];
 
-  // ─── MOCK FEATURE TOGGLE ─────────────────────────
-  // Set to false to hide the scheduled defence alerts
-  const SHOW_MOCK_APPOINTMENT = true;
+  // Fetch user's proposals using React Query
+  const { data: userProposals, isLoading: _isLoadingProposals } = useQuery({
+    queryKey: ["dashboard_proposals"],
+    queryFn: getMyProposals,
+  });
 
-  const mockAppointment = {
-    title: "Quantum Computing Simulation",
-    date: "14 Mar 2025",
-    time: "10:00 AM (EAT)",
-    venue: "Main Campus — Senate Hall",
-    message:
-      "Please ensure your presentation is strictly 15 minutes. The evaluation committee has already reviewed your abstract.",
-  };
+  // Find the single closest upcoming defence
+  const upcomingDefence = useMemo(() => {
+    if (!userProposals) return null;
+
+    const allDefences = userProposals.flatMap((p) =>
+      (p.defenceSchedules || []).map((d) => ({
+        ...d,
+        proposalTitle: p.title,
+        proposalId: p.id,
+      })),
+    );
+
+    // Filter only future defences and sort by closest date
+    const futureDefences = allDefences
+      .filter((d) => isFuture(new Date(d.defenceDate)))
+      .sort((a, b) => new Date(a.defenceDate).getTime() - new Date(b.defenceDate).getTime());
+
+    return futureDefences[0] || null;
+  }, [userProposals]);
+
+  const [timeLeft, setTimeLeft] = useState<{ d: number; h: number; m: number; s: number } | null>(null);
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (!upcomingDefence) {
+      setTimeLeft(null);
+      return;
+    }
+
+    const targetDate = new Date(upcomingDefence.defenceDate);
+
+    const updateTimer = () => {
+      const now = new Date();
+      if (!isFuture(targetDate)) {
+        setTimeLeft(null);
+        return;
+      }
+
+      const d = differenceInDays(targetDate, now);
+      const h = differenceInHours(targetDate, now) % 24;
+      const m = differenceInMinutes(targetDate, now) % 60;
+      const s = differenceInSeconds(targetDate, now) % 60;
+
+      setTimeLeft({ d, h, m, s });
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [upcomingDefence]);
+
+  // Determine urgency level (amber vs red)
+  const isUrgent = timeLeft !== null && timeLeft.d === 0 && timeLeft.h < 24; // Less than 24 hours
+  const alertColor = isUrgent
+    ? "border-red-200/80 bg-gradient-to-r from-red-50 to-red-100/50 dark:border-red-900/50 dark:from-red-950/40 dark:to-red-900/20"
+    : "border-amber-200/80 bg-gradient-to-r from-amber-50 to-amber-100/50 dark:border-amber-900/50 dark:from-amber-950/40 dark:to-amber-900/20";
+
+  const textTitleColor = isUrgent ? "text-red-900 dark:text-red-200" : "text-amber-900 dark:text-amber-200";
+  const textDescColor = isUrgent ? "text-red-700 dark:text-red-400" : "text-amber-700 dark:text-amber-400";
+  const iconBgColor = isUrgent ? "bg-red-500" : "bg-amber-500";
+  const buttonColor = isUrgent
+    ? "bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-500"
+    : "bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-500";
 
   return (
     <div className="flex flex-1 flex-col gap-8">
-      {/* Option 1: Global Banner for Actionable Notifications */}
-      {SHOW_MOCK_APPOINTMENT && (
-        <div className="flex flex-col items-center gap-4 rounded-xl border border-amber-200/80 bg-gradient-to-r from-amber-50 to-amber-100/50 p-4 shadow-sm sm:flex-row dark:border-amber-900/50 dark:from-amber-950/40 dark:to-amber-900/20">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500 text-white shadow-sm">
+      {/* Dynamic Defence Alert Notification */}
+      {upcomingDefence && timeLeft !== null && (
+        <div
+          className={`flex flex-col items-center gap-4 rounded-xl border p-4 shadow-sm transition-colors duration-500 sm:flex-row ${alertColor}`}
+        >
+          <div
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white shadow-sm transition-colors duration-500 ${iconBgColor}`}
+          >
             <CalendarDays className="h-5 w-5" />
           </div>
           <div className="flex-1 text-center sm:text-left">
-            <h3 className="font-bold text-amber-900 text-sm dark:text-amber-200">
-              Action Required: Upcoming Proposal Defence
+            <h3 className={`font-bold text-sm transition-colors duration-500 ${textTitleColor}`}>
+              {isUrgent ? "CRITICAL: " : "Action Required: "} Upcoming Proposal Defence
             </h3>
-            <p className="mt-0.5 text-amber-700 text-sm dark:text-amber-400">
-              Your defence for <strong className="font-bold">{mockAppointment.title}</strong> is scheduled for{" "}
-              {mockAppointment.date} at {mockAppointment.time}.
+            <p className={`mt-0.5 text-sm transition-colors duration-500 ${textDescColor}`}>
+              Your defence for <strong className="font-bold">{upcomingDefence.proposalTitle}</strong> is coming up in{" "}
+              <span className="rounded bg-white/50 px-1.5 py-0.5 font-bold font-mono tracking-tight dark:bg-black/20">
+                {timeLeft.d}d {timeLeft.h.toString().padStart(2, "0")}h {timeLeft.m.toString().padStart(2, "0")}m{" "}
+                {timeLeft.s.toString().padStart(2, "0")}s
+              </span>
             </p>
           </div>
           <Button
             onClick={() => setShowRSVPModal(true)}
-            className="w-full bg-amber-600 font-semibold text-white shadow-sm hover:bg-amber-700 sm:w-auto dark:bg-amber-600 dark:hover:bg-amber-500"
+            className={`w-full font-semibold text-white shadow-sm transition-colors duration-500 sm:w-auto ${buttonColor}`}
           >
             View Details & RSVP
           </Button>
@@ -210,9 +279,11 @@ export default function DashboardPage() {
             team.
           </p>
         </div>
-        <Button className="w-full rounded-full border-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 font-medium text-white shadow transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-md sm:w-auto">
-          <Plus className="mr-2 h-4 w-4" /> New Project
-        </Button>
+        <Link href="/dashboard/proposals/new" passHref legacyBehavior>
+          <Button className="w-full rounded-full border-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 font-medium text-white shadow transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-md sm:w-auto">
+            <Plus className="mr-2 h-4 w-4" /> New Project
+          </Button>
+        </Link>
       </div>
 
       {/* Summary Cards - Horizontal Scrolling on Mobile */}
@@ -380,45 +451,6 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Activity Feed */}
-          <Card className="flex-1 rounded-xl border-slate-200/50 bg-white shadow-none dark:border-slate-800/50 dark:bg-slate-950/50">
-            <CardHeader className="border-slate-100 border-b bg-slate-50/30 pb-4 dark:border-slate-800/50 dark:bg-slate-900/10">
-              <CardTitle className="font-semibold text-lg text-slate-800 tracking-tight dark:text-slate-200">
-                Activity Feed
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="px-6 pt-6">
-              <div className="space-y-6">
-                {activities.map((act, i) => (
-                  <div key={`${act.title}-${act.time}`} className="group relative flex items-start gap-4">
-                    {/* Timeline Line */}
-                    {i !== activities.length - 1 && (
-                      <div className="absolute top-10 bottom-[-24px] left-[15px] w-px bg-slate-100 transition-colors dark:bg-slate-800" />
-                    )}
-
-                    <div className="relative z-10 flex items-center justify-center">
-                      <div
-                        className={`flex h-8 w-8 items-center justify-center rounded-full ring-4 ring-white dark:ring-slate-950 ${act.color}`}
-                      >
-                        <act.icon className="h-3.5 w-3.5" />
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-1 pb-1">
-                      <p className="font-semibold text-slate-800 text-sm leading-none dark:text-slate-200">
-                        {act.title}
-                      </p>
-                      <p className="mt-1 text-[13px] text-slate-500 leading-relaxed">{act.desc}</p>
-                      <p className="mt-1.5 font-semibold text-[10px] text-slate-400 uppercase tracking-wider">
-                        {act.time}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
 
@@ -437,21 +469,26 @@ export default function DashboardPage() {
           <div className="my-4 flex flex-col gap-4">
             <div className="flex flex-col gap-1 rounded-lg border bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
               <p className="font-bold text-[11px] text-slate-500 uppercase tracking-wider">Proposal</p>
-              <p className="font-semibold text-slate-900 dark:text-slate-100">{mockAppointment.title}</p>
+              <p className="font-semibold text-slate-900 dark:text-slate-100">{upcomingDefence?.proposalTitle}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1 rounded-lg border bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/50">
                 <p className="flex items-center gap-1.5 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
-                  <CalendarDays className="h-3.5 w-3.5" /> Date
+                  <CalendarDays className="h-3.5 w-3.5" /> Date & Time
                 </p>
-                <p className="font-semibold text-slate-900 dark:text-slate-100">{mockAppointment.date}</p>
-              </div>
-              <div className="flex flex-col gap-1 rounded-lg border bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/50">
-                <p className="flex items-center gap-1.5 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
-                  <Clock className="h-3.5 w-3.5" /> Time
+                <p className="font-semibold text-slate-900 dark:text-slate-100">
+                  {upcomingDefence
+                    ? new Date(upcomingDefence.defenceDate).toLocaleString(undefined, {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })
+                    : "—"}
                 </p>
-                <p className="font-semibold text-slate-900 dark:text-slate-100">{mockAppointment.time}</p>
               </div>
             </div>
 
@@ -459,17 +496,19 @@ export default function DashboardPage() {
               <p className="flex items-center gap-1.5 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
                 <MapPin className="h-3.5 w-3.5" /> Location / Link
               </p>
-              <p className="font-semibold text-slate-900 dark:text-slate-100">{mockAppointment.venue}</p>
+              <p className="font-semibold text-slate-900 dark:text-slate-100">{upcomingDefence?.location}</p>
             </div>
 
-            <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-4 dark:border-indigo-900/30 dark:bg-indigo-900/10">
-              <p className="flex items-center gap-1.5 font-bold text-[11px] text-indigo-600 uppercase tracking-wider dark:text-indigo-400">
-                <MessageSquare className="h-3.5 w-3.5" /> Message from Admin
-              </p>
-              <p className="mt-2 text-indigo-900 text-sm leading-relaxed dark:text-indigo-200">
-                {mockAppointment.message}
-              </p>
-            </div>
+            {upcomingDefence?.note && (
+              <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-4 dark:border-indigo-900/30 dark:bg-indigo-900/10">
+                <p className="flex items-center gap-1.5 font-bold text-[11px] text-indigo-600 uppercase tracking-wider dark:text-indigo-400">
+                  <MessageSquare className="h-3.5 w-3.5" /> Message from Admin
+                </p>
+                <p className="mt-2 text-indigo-900 text-sm leading-relaxed dark:text-indigo-200">
+                  {upcomingDefence.note}
+                </p>
+              </div>
+            )}
           </div>
 
           <DialogFooter className="flex-col sm:flex-row sm:space-x-2">
