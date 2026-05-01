@@ -19,7 +19,7 @@ export function TeamManagement() {
     <div className="flex h-screen overflow-hidden">
       {/* Left Panel - Chat Rooms List */}
       <div className="w-full shrink-0 sm:w-80 lg:w-96 flex overflow-hidden">
-        <ChatRoomsList />
+        <ChatRoomsList currentUserId={CURRENT_USER_ID} />
       </div>
 
       {/* Right Panel - Chat Section (Group or Direct) */}

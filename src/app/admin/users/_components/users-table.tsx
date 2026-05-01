@@ -42,7 +42,6 @@ export function UsersTable() {
     totalItems,
     pagedUsers,
     isUsersLoading,
-    setSelectedUserId,
     setInviteOpen,
   } = useAdminUsers();
 
@@ -151,7 +150,7 @@ export function UsersTable() {
                         </Avatar>
                         <Link
                           href={`/admin/users/${user.id}`}
-                          className="min-w-0 flex flex-col gap-0.5 hover:opacity-70 transition-opacity"
+                          className="flex min-w-0 flex-col gap-0.5 transition-opacity hover:opacity-70"
                         >
                           <span className="truncate font-semibold text-[13px] text-slate-900 dark:text-slate-100">
                             {user.fullName || "Unnamed user"}
