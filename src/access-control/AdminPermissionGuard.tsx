@@ -5,7 +5,6 @@ import { useEffect } from "react";
 
 import { useRouter } from "next/navigation";
 
-import { hasPermission } from "@/access-control/permission-gates";
 import NotFoundPage from "@/app/404";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -24,7 +23,7 @@ export function AdminPermissionGuard({ children }: { children: ReactNode }) {
   // A user is an admin if they have either ADMIN_VIEW or ADMIN_EDIT permission.
   // The backend now provides a convenient `canAccessAdmin` flag based on these permissions.
   const isAdmin =
-    !isLoading && !!user && (user.canAccessAdmin === true || hasPermission(user.permissions ?? [], "ADMIN_EDIT"));
+    !isLoading && !!user && (user.canAccessAdmin === true || (user.permissions ?? []).includes("ADMIN_EDIT"));
 
   useEffect(() => {
     if (isLoading) return;
