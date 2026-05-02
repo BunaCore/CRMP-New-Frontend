@@ -109,11 +109,11 @@ export function EditorShell({
   return (
     <div className="relative flex h-full w-full min-w-0 flex-col overflow-hidden bg-background">
       {/* Main content area */}
-      <div className="relative flex min-h-0 flex-1 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pb-8">
         {/* Editor content slot */}
         <div
           className={cn(
-            "flex min-h-0 flex-1 flex-col overflow-hidden",
+            "flex h-full flex-col overflow-hidden",
             "transition-all duration-300 ease-in-out",
             isVersionPanelOpen && "mr-72", // shift left when version panel open
           )}
@@ -129,18 +129,24 @@ export function EditorShell({
         </div>
 
         {/* Version history slide-over */}
-        <VersionHistoryPanel
-          isOpen={isVersionPanelOpen}
-          versions={versions}
-          workspaceId={workspaceId}
-          onClose={onCloseVersionPanel}
-          onRestore={onRestoreVersion}
-          onCreateSnapshot={onCreateSnapshot}
-        />
+        <div className="absolute top-0 right-0 bottom-0 z-30">
+          <VersionHistoryPanel
+            isOpen={isVersionPanelOpen}
+            versions={versions}
+            workspaceId={workspaceId}
+            onClose={onCloseVersionPanel}
+            onRestore={onRestoreVersion}
+            onCreateSnapshot={onCreateSnapshot}
+          />
+        </div>
       </div>
 
       {/* Status bar — visible once fully loaded */}
-      {!isStillLoading && loadStatus === "loaded" && <EditorStatusBar />}
+      {!isStillLoading && loadStatus === "loaded" && (
+        <div className="absolute right-0 bottom-0 left-0 z-40 h-8">
+          <EditorStatusBar />
+        </div>
+      )}
     </div>
   );
 }

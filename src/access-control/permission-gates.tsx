@@ -38,6 +38,7 @@ export type Permission =
   | "TEAM_VIEW"
   | "TEAM_MANAGE"
   | "USER_VIEW"
+  | "USER_PROVISION"
   | "EVALUATOR_ASSIGN"
   | "ADVISOR_ASSIGN"
   | "COORDINATOR_PROPOSALS_VIEW"
@@ -73,6 +74,7 @@ const CANONICAL_PERMISSIONS: Permission[] = [
   "TEAM_VIEW",
   "TEAM_MANAGE",
   "USER_VIEW",
+  "USER_PROVISION",
   "EVALUATOR_ASSIGN",
   "ADVISOR_ASSIGN",
   "COORDINATOR_PROPOSALS_VIEW",
@@ -99,24 +101,33 @@ const CANONICAL_PERMISSIONS: Permission[] = [
  * Extend this map as soon as you confirm the exact backend strings.
  */
 const PERMISSION_ALIASES: Partial<Record<Permission, string[]>> = {
-  PROJECT_CREATE: ["create_proposal"],
-  PROJECT_SUBMIT: ["submit_for_review"],
-  TEAM_MANAGE: ["manage_team"],
+  PROJECT_CREATE: ["create_proposal", "proposal:create"],
+  PROJECT_SUBMIT: ["submit_for_review", "proposal:submit"],
+  PROJECT_VIEW: ["proposal:read"],
+  PROJECT_UPDATE: ["proposal:update"],
+  PROJECT_DELETE: ["proposal:delete"],
+  PROJECT_REQUEST_REVISION: ["proposal:request_revision"],
+
+  TEAM_MANAGE: ["manage_team", "proposal:manage_members"],
   TEAM_VIEW: ["team_view", "view_team"],
 
-  PROJECT_REVIEW: ["review_proposal"],
-  PROJECT_APPROVE: ["approve_proposal", "approve"],
-  PROJECT_REJECT: ["reject_proposal", "reject"],
+  PROJECT_REVIEW: ["review_proposal", "evaluation:read", "evaluation:submit"],
+  PROJECT_APPROVE: ["approve_proposal", "approve", "proposal:approve"],
+  PROJECT_REJECT: ["reject_proposal", "reject", "proposal:reject"],
 
-  USER_VIEW: ["manage_users", "user_view", "view_users"],
-  EVALUATOR_ASSIGN: ["assign_evaluator"],
+  USER_VIEW: ["manage_users", "user_view", "view_users", "user:read"],
+  USER_PROVISION: ["user:provision"],
+  EVALUATOR_ASSIGN: ["assign_evaluator", "proposal:assign_evaluator", "evaluation:assign"],
+  ADVISOR_ASSIGN: ["proposal:assign_advisor"],
 
-  BUDGET_VIEW: ["view_budget"],
-  BUDGET_APPROVE: ["approve_budget", "release_funds"],
+  BUDGET_VIEW: ["view_budget", "budget:view"],
+  BUDGET_APPROVE: ["approve_budget", "release_funds", "budget:manage"],
   BUDGET_REJECT: ["reject_budget"],
 
-  ADMIN_VIEW: ["admin_view"],
-  ADMIN_EDIT: ["admin_edit"],
+  ADMIN_VIEW: ["admin_view", "admin:view"],
+  ADMIN_EDIT: ["admin_edit", "system:config"],
+
+  DEFENCE_SCHEDULE: ["defence:schedule"],
 };
 
 function normalizePermission(input: unknown): Permission | null {

@@ -92,7 +92,8 @@ function buildProposalQueryString(params: ProposalListQueryParams = {}): string 
  */
 export async function getProposalById(proposalId: string): Promise<ResearcherProposal> {
   const { apiClient } = await import("@/lib/api/client");
-  const response = await apiClient.get<ResearcherProposal>(`/proposals/${proposalId}`);
+  // biome-ignore lint/suspicious/noExplicitAny: raw API response normalized via normalizeProposal
+  const response = await apiClient.get<any>(`/proposals/${proposalId}`);
   return normalizeProposal(response.data);
 }
 

@@ -11,7 +11,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { hasPermission } from "@/access-control/permission-gates";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -69,12 +68,12 @@ export function SignInForm() {
         description: `Signed in as ${response.user.fullName} (${response.user.roles})`,
       });
 
-      // Route dynamically based on user role (if no explicit redirect exists)
+      // Route dynamically based on user admin access (if no explicit redirect exists)
       if (redirect) {
         router.push(redirect);
       } else {
-        const canCreateProjects = hasPermission(response.user.permissions ?? [], "PROJECT_CREATE");
-        router.push(canCreateProjects ? "/dashboard" : "/admin");
+        // Default to /admin for those with admin access, otherwise go to /dashboard
+        router.push(response.user.canAccessAdmin ? "/admin" : "/dashboard");
       }
     } catch (_error) {
       toast.error("Sign In Failed", {

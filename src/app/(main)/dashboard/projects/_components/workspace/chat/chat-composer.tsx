@@ -101,7 +101,7 @@ export function ChatComposer({ onSend, onClear, isSending }: ChatComposerProps) 
           ref={textareaRef}
           rows={1}
           className="custom-scrollbar max-h-[200px] min-h-[44px] w-full resize-none border-none bg-transparent px-4 py-3 text-sm outline-none transition-all placeholder:text-muted-foreground/50"
-          placeholder={selectedContext ? "Ask about selected text..." : "Ask Copilot..."}
+          placeholder={selectedContext ? "Ask about selected text..." : "Ask CRMP..."}
           value={input}
           onChange={(e) => {
             setInput(e.target.value);
