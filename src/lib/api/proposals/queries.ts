@@ -39,8 +39,11 @@ function normalizeProposal(raw: any): ResearcherProposal {
   return {
     id: raw?.id ?? "",
     title: raw?.title ?? "Untitled Proposal",
+    abstract: raw?.abstract ?? "",
+    researchArea: raw?.researchArea ?? "",
     type: raw?.type ?? "—",
     status: (raw?.status ?? "Draft") as ProposalStatus,
+    isEditable: Boolean(raw?.isEditable),
     department: (raw?.department ?? {
       id: "",
       name: "—",

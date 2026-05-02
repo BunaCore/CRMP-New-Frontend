@@ -184,7 +184,21 @@ export interface DefenceSchedule {
   createdAt: string; // ISO date
 }
 
-export type ProposalStatus = "Draft" | "Under_Review" | "Revision" | "Accepted" | "Rejected" | "Pending";
+export type ProposalStatus =
+  | "Draft"
+  | "Under_Review"
+  | "Revision"
+  | "Needs_Revision"
+  | "Accepted"
+  | "Rejected"
+  | "Pending";
+
+export interface UpdateProposalPayload {
+  fileId?: string;
+  title?: string;
+  abstract?: string;
+  researchArea?: string;
+}
 
 /**
  * Full rich proposal returned by GET /proposals/detail.
@@ -194,8 +208,11 @@ export type ProposalStatus = "Draft" | "Under_Review" | "Revision" | "Accepted" 
 export interface ResearcherProposal {
   id: string; // UUID
   title: string;
+  abstract?: string;
+  researchArea?: string;
   type: string; // e.g. "PG" | "UG" | "GENERAL"
   status: ProposalStatus;
+  isEditable?: boolean; // true when rejected and can be resubmitted
   department: ProposalDepartment;
   pi: PiMember;
   advisors: Advisor[];
@@ -313,6 +330,9 @@ export interface PendingApproval {
 export interface AdminProposalDetail {
   id: string;
   title: string;
+  abstract?: string;
+  researchArea?: string;
+  isEditable?: boolean;
   type: string;
   status: ProposalStatus | string;
   budget: {

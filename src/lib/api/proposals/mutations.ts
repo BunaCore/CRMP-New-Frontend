@@ -8,6 +8,7 @@ import type {
   CreateProposalResponse,
   SubmitEvaluationScoresPayload,
   SubmitStepActionPayload,
+  UpdateProposalPayload,
 } from "@/lib/api/proposals/types";
 
 /**
@@ -40,7 +41,7 @@ export async function createProposal(
  */
 export async function updateProposal(
   proposalId: string,
-  payload: Partial<CreateProposalPayload>,
+  payload: UpdateProposalPayload,
 ): Promise<CreateProposalResponse> {
   const { apiClient } = await import("@/lib/api/client");
   const response = await apiClient.patch<CreateProposalResponse>(`/proposals/${proposalId}`, payload);

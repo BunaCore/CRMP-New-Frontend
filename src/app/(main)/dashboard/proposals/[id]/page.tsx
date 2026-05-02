@@ -33,10 +33,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { downloadFile } from "@/lib/api/files/queries";
+import { submitProposal, updateProposal } from "@/lib/api/proposals/mutations";
 import { useGetProposalById } from "@/lib/api/proposals/queries";
 import type { DefenceSchedule, ProposalComment, WorkflowStep, WorkflowStepStatus } from "@/lib/api/proposals/types";
 import {
@@ -121,7 +124,7 @@ function WorkflowStepItem({ step, isLast }: { step: WorkflowStep; isLast: boolea
   return (
     <div className="relative flex gap-5">
       {/* Connector line */}
-      {!isLast && <div className="absolute top-6 bottom-[-2rem] left-[5px] w-px bg-slate-200 dark:bg-slate-800" />}
+      {!isLast && <div className="absolute top-6 -bottom-8 left-1.25 w-px bg-slate-200 dark:bg-slate-800" />}
 
       {/* Status icon */}
       <div className="relative z-10 mt-1 flex h-3 w-3 shrink-0 items-center justify-center">
@@ -239,7 +242,7 @@ function DefenceCard({ schedule }: { schedule: DefenceSchedule }) {
   }).format(defenceDate);
 
   return (
-    <Card className="rounded-xl border-amber-200/50 bg-gradient-to-b from-amber-50 to-white shadow-md dark:border-amber-900/50 dark:from-amber-950/40 dark:to-slate-950">
+    <Card className="rounded-xl border-amber-200/50 bg-linear-to-b from-amber-50 to-white shadow-md dark:border-amber-900/50 dark:from-amber-950/40 dark:to-slate-950">
       <CardHeader className="border-amber-100/50 border-b bg-amber-500/10 pb-4 dark:border-amber-900/20 dark:bg-amber-500/5">
         <CardTitle className="flex items-center gap-2 text-amber-900 text-lg dark:text-amber-400">
           <Calendar className="h-5 w-5" />
@@ -295,6 +298,20 @@ export default function ProposalDetailsPage() {
 
   const { data: proposal, isLoading, error, refetch } = useGetProposalById(proposalId);
   const [isDownloading, setIsDownloading] = React.useState(false);
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [isSaving, setIsSaving] = React.useState(false);
+  const [isResubmitting, setIsResubmitting] = React.useState(false);
+  const [editTitle, setEditTitle] = React.useState("");
+  const [editAbstract, setEditAbstract] = React.useState("");
+  const [editResearchArea, setEditResearchArea] = React.useState("");
+
+  React.useEffect(() => {
+    if (!proposal) return;
+    setEditTitle(proposal.title ?? "");
+    setEditAbstract(proposal.abstract ?? "");
+    setEditResearchArea(proposal.researchArea ?? "");
+    setIsEditing(false);
+  }, [proposal]);
 
   const handleDownload = async () => {
     if (!proposal?.file?.id) return;
@@ -307,6 +324,44 @@ export default function ProposalDetailsPage() {
       toast.error("Failed to download file. Please try again.");
     } finally {
       setIsDownloading(false);
+    }
+  };
+
+  const handleSaveEditableFields = async () => {
+    if (!proposal) return;
+    if (!editTitle.trim()) {
+      toast.error("Title is required.");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await updateProposal(proposal.id, {
+        title: editTitle.trim(),
+        abstract: editAbstract.trim() || undefined,
+        researchArea: editResearchArea.trim() || undefined,
+      });
+      toast.success("Proposal changes saved.");
+      setIsEditing(false);
+      await refetch();
+    } catch {
+      toast.error("Failed to save proposal changes.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleResubmitProposal = async () => {
+    if (!proposal) return;
+    setIsResubmitting(true);
+    try {
+      await submitProposal(proposal.id);
+      toast.success("Proposal resubmitted for review.");
+      await refetch();
+    } catch {
+      toast.error("Failed to resubmit proposal.");
+    } finally {
+      setIsResubmitting(false);
     }
   };
 
@@ -439,7 +494,7 @@ export default function ProposalDetailsPage() {
               </div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-500"
+                  className="h-full rounded-full bg-linear-to-r from-blue-500 to-indigo-500 transition-all duration-500"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
@@ -464,13 +519,14 @@ export default function ProposalDetailsPage() {
               Download Attachment
             </Button>
           )}
-          {(proposal.status === "Draft" || proposal.status === "Revision") && (
-            <Link href={`/dashboard/proposals/${proposal.id}/edit`}>
-              <Button className="flex-1 rounded-full border-0 bg-blue-600 font-medium text-white shadow-sm hover:bg-blue-700 md:flex-auto">
-                <Edit className="mr-2 h-4 w-4" /> Edit Proposal
-              </Button>
-            </Link>
-          )}
+          {(proposal.status === "Draft" || proposal.status === "Revision" || proposal.status === "Needs_Revision") &&
+            !proposal.isEditable && (
+              <Link href={`/dashboard/proposals/${proposal.id}/edit`}>
+                <Button className="flex-1 rounded-full border-0 bg-blue-600 font-medium text-white shadow-sm hover:bg-blue-700 md:flex-auto">
+                  <Edit className="mr-2 h-4 w-4" /> Edit Proposal
+                </Button>
+              </Link>
+            )}
         </div>
       </div>
 
@@ -520,6 +576,120 @@ export default function ProposalDetailsPage() {
           <TabsContent value="overview" className="mt-0 focus-visible:outline-none">
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
               <div className="flex flex-col gap-6 lg:col-span-2">
+                {proposal.isEditable && (
+                  <Card className="overflow-hidden rounded-xl border-amber-200/70 shadow-none dark:border-amber-900/50">
+                    <CardHeader className="border-amber-100 border-b bg-amber-50/40 pb-4 dark:border-amber-900/30 dark:bg-amber-900/10">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <CardTitle className="text-lg text-amber-900 dark:text-amber-300">
+                            Revision Required
+                          </CardTitle>
+                          <CardDescription className="mt-1">
+                            Update the editable fields, save, then resubmit for review.
+                          </CardDescription>
+                        </div>
+                        {!isEditing ? (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="rounded-full"
+                            onClick={() => setIsEditing(true)}
+                          >
+                            <Edit className="mr-2 h-4 w-4" /> Edit Fields
+                          </Button>
+                        ) : null}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="flex flex-col gap-4 p-6">
+                      <div className="space-y-1">
+                        <p className="font-medium text-slate-500 text-xs uppercase tracking-wider">Title</p>
+                        {isEditing ? (
+                          <Input
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            className="h-10"
+                            disabled={isSaving}
+                          />
+                        ) : (
+                          <p className="font-semibold text-slate-800 text-sm dark:text-slate-200">{proposal.title}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-1">
+                        <p className="font-medium text-slate-500 text-xs uppercase tracking-wider">Research Area</p>
+                        {isEditing ? (
+                          <Input
+                            value={editResearchArea}
+                            onChange={(e) => setEditResearchArea(e.target.value)}
+                            className="h-10"
+                            disabled={isSaving}
+                          />
+                        ) : (
+                          <p className="font-semibold text-slate-800 text-sm dark:text-slate-200">
+                            {proposal.researchArea || "—"}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-1">
+                        <p className="font-medium text-slate-500 text-xs uppercase tracking-wider">Abstract</p>
+                        {isEditing ? (
+                          <Textarea
+                            value={editAbstract}
+                            onChange={(e) => setEditAbstract(e.target.value)}
+                            className="min-h-24"
+                            disabled={isSaving}
+                          />
+                        ) : (
+                          <p className="text-slate-700 text-sm leading-relaxed dark:text-slate-300">
+                            {proposal.abstract || "—"}
+                          </p>
+                        )}
+                      </div>
+
+                      {isEditing ? (
+                        <div className="mt-1 flex flex-wrap items-center gap-2">
+                          <Button
+                            type="button"
+                            onClick={handleSaveEditableFields}
+                            disabled={isSaving}
+                            className="rounded-full bg-blue-600 text-white hover:bg-blue-700"
+                          >
+                            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            Save Changes
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="rounded-full"
+                            disabled={isSaving}
+                            onClick={() => {
+                              setEditTitle(proposal.title ?? "");
+                              setEditAbstract(proposal.abstract ?? "");
+                              setEditResearchArea(proposal.researchArea ?? "");
+                              setIsEditing(false);
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="mt-1">
+                          <Button
+                            type="button"
+                            onClick={handleResubmitProposal}
+                            disabled={isResubmitting}
+                            className="rounded-full bg-blue-600 text-white hover:bg-blue-700"
+                          >
+                            {isResubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            Resubmit Proposal
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
                 <Card className="overflow-hidden rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
                   <CardHeader className="border-slate-100 border-b bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
                     <CardTitle className="text-lg text-slate-800 dark:text-slate-200">Proposal Information</CardTitle>
@@ -527,9 +697,18 @@ export default function ProposalDetailsPage() {
                   <CardContent className="grid grid-cols-2 gap-x-6 gap-y-4 p-6 text-sm sm:grid-cols-3">
                     {[
                       { label: "Type", value: proposal.type },
-                      { label: "Department", value: proposal.department?.name ?? "—" },
-                      { label: "Dept. Code", value: proposal.department?.code ?? "—" },
-                      { label: "Current Status", value: getStatusLabel(proposal.status) },
+                      {
+                        label: "Department",
+                        value: proposal.department?.name ?? "—",
+                      },
+                      {
+                        label: "Dept. Code",
+                        value: proposal.department?.code ?? "—",
+                      },
+                      {
+                        label: "Current Status",
+                        value: getStatusLabel(proposal.status),
+                      },
                       {
                         label: "Submitted",
                         value: formatProposalDate(proposal.createdAt),
@@ -774,7 +953,7 @@ export default function ProposalDetailsPage() {
                       </div>
                       <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
+                          className="h-full rounded-full bg-linear-to-r from-blue-500 to-indigo-500"
                           style={{ width: `${progressPercent}%` }}
                         />
                       </div>
