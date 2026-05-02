@@ -39,6 +39,10 @@ export interface UserProfile {
    * Account status (e.g., "active", "inactive", "suspended").
    */
   accountStatus?: string;
+  /**
+   * Boolean flag sent from the backend to determine if user can access admin dashboard
+   */
+  canAccessAdmin?: boolean;
 }
 
 // ─── Request Shapes ─────────────────────────────────────────
