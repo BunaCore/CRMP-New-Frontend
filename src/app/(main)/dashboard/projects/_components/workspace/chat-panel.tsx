@@ -10,11 +10,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAiChat } from "@/lib/ai/hooks/useAiChat";
 import { useAuthStore } from "@/stores/authStore";
 
+import { ActivityTab } from "./chat/activity-tab";
 import { ChatComposer } from "./chat/chat-composer";
 import { ChatMessageList } from "./chat/chat-message-list";
 import { RagTab } from "./chat/rag-tab";
 import { WorkspaceDetailsTab } from "./chat/workspace-details-tab";
-import { ActivityTab } from "./chat/activity-tab";
 import { useWorkspace } from "./workspace-context";
 
 export function ChatPanel() {

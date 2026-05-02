@@ -51,7 +51,7 @@ export function RagTab() {
           toast.error(`Failed to upload ${file.name}. Please check your connection.`);
         }
       }
-      
+
       if (uploadedFiles.length > 0) {
         setFiles((prev) => [...prev, ...uploadedFiles]);
         toast.success(`Successfully uploaded ${uploadedFiles.length} document(s)`);

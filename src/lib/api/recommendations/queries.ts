@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+
 import { getRecommendations } from "./api";
 
 export function useGetRecommendations(researcherId: number | null) {
