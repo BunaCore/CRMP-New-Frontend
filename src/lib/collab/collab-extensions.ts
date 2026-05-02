@@ -51,7 +51,6 @@ export function buildCollabExtensions(ydoc: Y.Doc) {
     // explicit StarterKit configuration needed.
     StarterKit.configure({
       ...STARTER_KIT_BASE_CONFIG,
-      history: false,
     }),
 
     // All other base extensions — identical to solo mode

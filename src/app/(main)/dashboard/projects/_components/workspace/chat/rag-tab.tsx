@@ -19,7 +19,7 @@ export function RagTab() {
   const handleUpload = async (newFiles: File[]) => {
     setIsUploading(true);
     try {
-      const uploadedFiles = [];
+      const uploadedFiles: UploadedFile[] = [];
       for (const file of newFiles) {
         try {
           const formData = new FormData();
