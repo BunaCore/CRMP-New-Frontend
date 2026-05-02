@@ -154,7 +154,6 @@ export function WorkspaceDetailsTab() {
             ) : projectMembers.length === 0 ? (
               <div className="py-4 text-center text-muted-foreground text-xs">No members found.</div>
             ) : (
-              // Actual Data from internal API
               projectMembers.map((member) => (
                 <div key={member.userId} className="group flex items-center justify-between">
                   <div className="flex items-center gap-3">

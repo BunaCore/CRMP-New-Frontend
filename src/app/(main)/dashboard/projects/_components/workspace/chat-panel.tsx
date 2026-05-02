@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAiChat } from "@/lib/ai/hooks/useAiChat";
 import { useAuthStore } from "@/stores/authStore";
 
+import { ActivityTab } from "./chat/activity-tab";
 import { ChatComposer } from "./chat/chat-composer";
 import { ChatMessageList } from "./chat/chat-message-list";
 import { RagTab } from "./chat/rag-tab";
@@ -139,9 +140,8 @@ export function ChatPanel() {
               </TabsContent>
 
               <TabsContent value="notifications" className="relative m-0 min-h-0 flex-1 border-none p-0">
-                <div className="absolute inset-0 flex flex-col items-center justify-center space-y-3 overflow-y-auto p-6 opacity-30">
-                  <Bell className="h-8 w-8" />
-                  <p className="font-medium text-sm">Clear for now</p>
+                <div className="absolute inset-0 flex flex-col overflow-hidden">
+                  <ActivityTab />
                 </div>
               </TabsContent>
             </Tabs>

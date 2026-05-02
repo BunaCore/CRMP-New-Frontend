@@ -9,7 +9,6 @@
 @import "../styles/presets/soft-pop.css";
 @import "../styles/presets/tangerine.css";
 
-
 .font-serif {
   font-family: "Noto Serif", serif;
 }
@@ -248,4 +247,3 @@ html {
 .disable-transitions * {
   transition: none !important;
 }
-

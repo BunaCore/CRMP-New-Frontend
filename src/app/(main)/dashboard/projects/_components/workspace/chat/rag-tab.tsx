@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { toast } from "sonner";
+
 import { RagComposer } from "./rag-composer";
 import { type RagMessage, RagMessageList } from "./rag-message-list";
 import { RagUploadPanel, type UploadedFile } from "./rag-upload-panel";
@@ -12,21 +14,51 @@ export function RagTab() {
   const [isUploading, setIsUploading] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
 
-  const handleUpload = (newFiles: File[]) => {
+  const mlApiUrl = process.env.NEXT_PUBLIC_ML_API_URL ?? "http://localhost:8000";
+
+  const handleUpload = async (newFiles: File[]) => {
     setIsUploading(true);
-    // Simulate upload delay
-    setTimeout(() => {
-      const mockUploaded = newFiles.map((file) => ({
-        id: Math.random().toString(36).substr(2, 9),
-        name: file.name,
-        type: file.type || "application/pdf",
-        size: file.size,
-        status: "ready" as const,
-        pages: Math.floor(Math.random() * 20) + 1,
-      }));
-      setFiles((prev) => [...prev, ...mockUploaded]);
+    try {
+      const uploadedFiles: UploadedFile[] = [];
+      for (const file of newFiles) {
+        try {
+          const formData = new FormData();
+          formData.append("file", file);
+
+          const res = await fetch(`${mlApiUrl}/rag/upload`, {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            toast.error(`Failed to upload ${file.name}: ${errorData.detail || "Upload failed"}`);
+            continue;
+          }
+
+          const data = await res.json();
+
+          uploadedFiles.push({
+            id: data.document_id,
+            name: data.filename,
+            type: file.type || "application/pdf",
+            size: file.size,
+            status: "ready" as const,
+            pages: data.num_chunks,
+          });
+        } catch (error) {
+          console.error(`Error uploading ${file.name}:`, error);
+          toast.error(`Failed to upload ${file.name}. Please check your connection.`);
+        }
+      }
+
+      if (uploadedFiles.length > 0) {
+        setFiles((prev) => [...prev, ...uploadedFiles]);
+        toast.success(`Successfully uploaded ${uploadedFiles.length} document(s)`);
+      }
+    } finally {
       setIsUploading(false);
-    }, 1500);
+    }
   };
 
   const handleRemoveFile = (id: string) => {
@@ -36,7 +68,7 @@ export function RagTab() {
     }
   };
 
-  const handleSend = (content: string) => {
+  const handleSend = async (content: string) => {
     if (files.length === 0) return;
 
     const userMessage: RagMessage = {
@@ -49,29 +81,43 @@ export function RagTab() {
     setMessages((prev) => [...prev, userMessage]);
     setIsThinking(true);
 
-    // Simulate RAG Assistant response
-    setTimeout(() => {
+    try {
+      const document_ids = files.map((f) => f.id);
+
+      const res = await fetch(`${mlApiUrl}/rag/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ document_ids, query: content }),
+      });
+
+      if (!res.ok) throw new Error("Chat request failed");
+
+      const data = await res.json();
+
       const assistantMessage: RagMessage = {
         id: Math.random().toString(36).substr(2, 9),
         role: "assistant",
-        content: `Based on the provided documents, here is what I found regarding "${content}". The research indicates significant overlap with your query, particularly in the methodology section.`,
+        content: data.answer,
         timestamp: new Date(),
-        sources: [
-          {
-            id: "s1",
-            fileId: files[0].id,
-            fileName: files[0].name,
-            page: 4,
-            excerpt:
-              "The methodology relies heavily on qualitative analysis, specifically focusing on user interaction metrics...",
-          },
-        ],
+        sources: data.sources,
       };
-      setMessages((prev) => [...prev, assistantMessage]);
-      setIsThinking(false);
-    }, 2000);
-  };
 
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error("Error in RAG chat:", error);
+      toast.error("Failed to get a response from the research assistant.");
+      const errorMessage: RagMessage = {
+        id: Math.random().toString(36).substr(2, 9),
+        role: "assistant",
+        content:
+          "Sorry, there was an error processing your request. Please ensure the ML service is running and try again.",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsThinking(false);
+    }
+  };
   const handleQuickAction = (action: string) => {
     handleSend(action);
   };
