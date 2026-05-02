@@ -14,41 +14,48 @@ export function RagTab() {
   const [isUploading, setIsUploading] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
 
-  const mlApiUrl = process.env.NEXT_PUBLIC_ML_API_URL || "http://localhost:8000";
+  const mlApiUrl = process.env.NEXT_PUBLIC_ML_API_URL ?? "http://localhost:8000";
 
   const handleUpload = async (newFiles: File[]) => {
     setIsUploading(true);
     try {
       const uploadedFiles = [];
       for (const file of newFiles) {
-        const formData = new FormData();
-        formData.append("file", file);
+        try {
+          const formData = new FormData();
+          formData.append("file", file);
 
-        const res = await fetch(`${mlApiUrl}/rag/upload`, {
-          method: "POST",
-          body: formData,
-        });
+          const res = await fetch(`${mlApiUrl}/rag/upload`, {
+            method: "POST",
+            body: formData,
+          });
 
-        if (!res.ok) throw new Error("Upload failed");
+          if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            toast.error(`Failed to upload ${file.name}: ${errorData.detail || "Upload failed"}`);
+            continue;
+          }
 
-        const data = await res.json();
+          const data = await res.json();
 
-        uploadedFiles.push({
-          id: data.document_id,
-          name: data.filename,
-          type: file.type || "application/pdf",
-          size: file.size,
-          status: "ready" as const,
-          pages: data.num_chunks, // approximation
-        });
+          uploadedFiles.push({
+            id: data.document_id,
+            name: data.filename,
+            type: file.type || "application/pdf",
+            size: file.size,
+            status: "ready" as const,
+            pages: data.num_chunks,
+          });
+        } catch (error) {
+          console.error(`Error uploading ${file.name}:`, error);
+          toast.error(`Failed to upload ${file.name}. Please check your connection.`);
+        }
       }
+      
       if (uploadedFiles.length > 0) {
         setFiles((prev) => [...prev, ...uploadedFiles]);
         toast.success(`Successfully uploaded ${uploadedFiles.length} document(s)`);
       }
-    } catch (error) {
-      console.error("Error uploading to RAG:", error);
-      toast.error("Failed to upload documents. Please ensure the ML service is running.");
     } finally {
       setIsUploading(false);
     }
