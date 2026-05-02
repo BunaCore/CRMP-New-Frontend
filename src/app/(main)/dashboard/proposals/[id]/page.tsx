@@ -38,6 +38,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { performFullUpload } from "@/lib/api/files/mutations";
 import { downloadFile } from "@/lib/api/files/queries";
 import { submitProposal, updateProposal } from "@/lib/api/proposals/mutations";
 import { useGetProposalById } from "@/lib/api/proposals/queries";
@@ -304,6 +305,7 @@ export default function ProposalDetailsPage() {
   const [editTitle, setEditTitle] = React.useState("");
   const [editAbstract, setEditAbstract] = React.useState("");
   const [editResearchArea, setEditResearchArea] = React.useState("");
+  const [editFile, setEditFile] = React.useState<File | null>(null);
 
   React.useEffect(() => {
     if (!proposal) return;
@@ -336,13 +338,24 @@ export default function ProposalDetailsPage() {
 
     setIsSaving(true);
     try {
+      let finalFileId = proposal.file?.id;
+      if (editFile) {
+        try {
+          finalFileId = await performFullUpload(editFile, "PROPOSAL_DOCUMENT");
+        } catch (_uploadError) {
+          toast.error("Failed to upload attachment. Please try again.");
+          return;
+        }
+      }
       await updateProposal(proposal.id, {
         title: editTitle.trim(),
         abstract: editAbstract.trim() || undefined,
         researchArea: editResearchArea.trim() || undefined,
+        fileId: finalFileId,
       });
       toast.success("Proposal changes saved.");
       setIsEditing(false);
+      setEditFile(null);
       await refetch();
     } catch {
       toast.error("Failed to save proposal changes.");
@@ -576,119 +589,158 @@ export default function ProposalDetailsPage() {
           <TabsContent value="overview" className="mt-0 focus-visible:outline-none">
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
               <div className="flex flex-col gap-6 lg:col-span-2">
-                {proposal.isEditable && (
-                  <Card className="overflow-hidden rounded-xl border-amber-200/70 shadow-none dark:border-amber-900/50">
-                    <CardHeader className="border-amber-100 border-b bg-amber-50/40 pb-4 dark:border-amber-900/30 dark:bg-amber-900/10">
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <CardTitle className="text-lg text-amber-900 dark:text-amber-300">
-                            Revision Required
-                          </CardTitle>
+                {/* Details Card - Always visible, edit mode when editable */}
+                <Card
+                  className={`overflow-hidden rounded-xl shadow-none ${
+                    proposal.isEditable
+                      ? "border-amber-200/70 dark:border-amber-900/50"
+                      : "border-slate-200/50 dark:border-slate-800/50"
+                  }`}
+                >
+                  <CardHeader
+                    className={`border-b pb-4 ${
+                      proposal.isEditable
+                        ? "border-amber-100 bg-amber-50/40 dark:border-amber-900/30 dark:bg-amber-900/10"
+                        : "border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/10"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <CardTitle
+                          className={`text-lg ${
+                            proposal.isEditable
+                              ? "text-amber-900 dark:text-amber-300"
+                              : "text-slate-800 dark:text-slate-200"
+                          }`}
+                        >
+                          {proposal.isEditable ? "Revision Required" : "Proposal Details"}
+                        </CardTitle>
+                        {proposal.isEditable && (
                           <CardDescription className="mt-1">
                             Update the editable fields, save, then resubmit for review.
                           </CardDescription>
-                        </div>
-                        {!isEditing ? (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            className="rounded-full"
-                            onClick={() => setIsEditing(true)}
-                          >
-                            <Edit className="mr-2 h-4 w-4" /> Edit Fields
-                          </Button>
-                        ) : null}
-                      </div>
-                    </CardHeader>
-                    <CardContent className="flex flex-col gap-4 p-6">
-                      <div className="space-y-1">
-                        <p className="font-medium text-slate-500 text-xs uppercase tracking-wider">Title</p>
-                        {isEditing ? (
-                          <Input
-                            value={editTitle}
-                            onChange={(e) => setEditTitle(e.target.value)}
-                            className="h-10"
-                            disabled={isSaving}
-                          />
-                        ) : (
-                          <p className="font-semibold text-slate-800 text-sm dark:text-slate-200">{proposal.title}</p>
                         )}
                       </div>
-
-                      <div className="space-y-1">
-                        <p className="font-medium text-slate-500 text-xs uppercase tracking-wider">Research Area</p>
-                        {isEditing ? (
-                          <Input
-                            value={editResearchArea}
-                            onChange={(e) => setEditResearchArea(e.target.value)}
-                            className="h-10"
-                            disabled={isSaving}
-                          />
-                        ) : (
-                          <p className="font-semibold text-slate-800 text-sm dark:text-slate-200">
-                            {proposal.researchArea || "—"}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="space-y-1">
-                        <p className="font-medium text-slate-500 text-xs uppercase tracking-wider">Abstract</p>
-                        {isEditing ? (
-                          <Textarea
-                            value={editAbstract}
-                            onChange={(e) => setEditAbstract(e.target.value)}
-                            className="min-h-24"
-                            disabled={isSaving}
-                          />
-                        ) : (
-                          <p className="text-slate-700 text-sm leading-relaxed dark:text-slate-300">
-                            {proposal.abstract || "—"}
-                          </p>
-                        )}
-                      </div>
-
-                      {isEditing ? (
-                        <div className="mt-1 flex flex-wrap items-center gap-2">
-                          <Button
-                            type="button"
-                            onClick={handleSaveEditableFields}
-                            disabled={isSaving}
-                            className="rounded-full bg-blue-600 text-white hover:bg-blue-700"
-                          >
-                            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            Save Changes
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            className="rounded-full"
-                            disabled={isSaving}
-                            onClick={() => {
-                              setEditTitle(proposal.title ?? "");
-                              setEditAbstract(proposal.abstract ?? "");
-                              setEditResearchArea(proposal.researchArea ?? "");
-                              setIsEditing(false);
-                            }}
-                          >
-                            Cancel
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="mt-1">
-                          <Button
-                            type="button"
-                            onClick={handleResubmitProposal}
-                            disabled={isResubmitting}
-                            className="rounded-full bg-blue-600 text-white hover:bg-blue-700"
-                          >
-                            {isResubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            Resubmit Proposal
-                          </Button>
-                        </div>
+                      {proposal.isEditable && !isEditing && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="rounded-full"
+                          onClick={() => setIsEditing(true)}
+                        >
+                          <Edit className="mr-2 h-4 w-4" /> Edit Fields
+                        </Button>
                       )}
-                    </CardContent>
-                  </Card>
-                )}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex flex-col gap-4 p-6">
+                    <div className="space-y-1">
+                      <p className="font-medium text-slate-500 text-xs uppercase tracking-wider">Title</p>
+                      {proposal.isEditable && isEditing ? (
+                        <Input
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          className="h-10"
+                          disabled={isSaving}
+                        />
+                      ) : (
+                        <p className="font-semibold text-slate-800 text-sm dark:text-slate-200">{proposal.title}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className="font-medium text-slate-500 text-xs uppercase tracking-wider">Research Area</p>
+                      {proposal.isEditable && isEditing ? (
+                        <Input
+                          value={editResearchArea}
+                          onChange={(e) => setEditResearchArea(e.target.value)}
+                          className="h-10"
+                          disabled={isSaving}
+                        />
+                      ) : (
+                        <p className="font-semibold text-slate-800 text-sm dark:text-slate-200">
+                          {proposal.researchArea || "—"}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className="font-medium text-slate-500 text-xs uppercase tracking-wider">Abstract</p>
+                      {proposal.isEditable && isEditing ? (
+                        <Textarea
+                          value={editAbstract}
+                          onChange={(e) => setEditAbstract(e.target.value)}
+                          className="min-h-24"
+                          disabled={isSaving}
+                        />
+                      ) : (
+                        <p className="text-slate-700 text-sm leading-relaxed dark:text-slate-300">
+                          {proposal.abstract || "—"}
+                        </p>
+                      )}
+                    </div>
+
+                    {proposal.isEditable && isEditing && (
+                      <div className="space-y-1">
+                        <p className="font-medium text-slate-500 text-xs uppercase tracking-wider">Attachment</p>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="file"
+                            onChange={(e) => setEditFile(e.target.files?.[0] || null)}
+                            disabled={isSaving}
+                            className="h-10"
+                          />
+                          {editFile && <span className="text-xs text-slate-500">{editFile.name}</span>}
+                        </div>
+                      </div>
+                    )}
+
+                    {proposal.isEditable && (
+                      <>
+                        {isEditing ? (
+                          <div className="mt-1 flex flex-wrap items-center gap-2">
+                            <Button
+                              type="button"
+                              onClick={handleSaveEditableFields}
+                              disabled={isSaving}
+                              className="rounded-full bg-blue-600 text-white hover:bg-blue-700"
+                            >
+                              {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                              Save Changes
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="rounded-full"
+                              disabled={isSaving}
+                              onClick={() => {
+                                setEditTitle(proposal.title ?? "");
+                                setEditAbstract(proposal.abstract ?? "");
+                                setEditResearchArea(proposal.researchArea ?? "");
+                                setEditFile(null);
+                                setIsEditing(false);
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="mt-1">
+                            <Button
+                              type="button"
+                              onClick={handleResubmitProposal}
+                              disabled={isResubmitting}
+                              className="rounded-full bg-blue-600 text-white hover:bg-blue-700"
+                            >
+                              {isResubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                              Resubmit Proposal
+                            </Button>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
 
                 <Card className="overflow-hidden rounded-xl border-slate-200/50 shadow-none dark:border-slate-800/50">
                   <CardHeader className="border-slate-100 border-b bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/10">
