@@ -1,52 +1,53 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Bell, Info, Library, Plus, Share2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAiChat } from "@/lib/ai/hooks/useAiChat";
+import { useAuthStore } from "@/stores/authStore";
 
 import { ChatComposer } from "./chat/chat-composer";
-import { ChatMessageList, type Message } from "./chat/chat-message-list";
+import { ChatMessageList } from "./chat/chat-message-list";
 import { RagTab } from "./chat/rag-tab";
 import { WorkspaceDetailsTab } from "./chat/workspace-details-tab";
 import { ActivityTab } from "./chat/activity-tab";
 import { useWorkspace } from "./workspace-context";
 
 export function ChatPanel() {
-  const { isChatOpen, autoSendTrigger, setAutoSendTrigger } = useWorkspace();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { isChatOpen, autoSendTrigger, setAutoSendTrigger, projectId, workspaceName, aiMode } = useWorkspace();
+  const user = useAuthStore((state) => state.user);
+
+  const { messages, status, sendMessage, sendToolbarAction, clearMessages } = useAiChat(aiMode, {
+    projectId,
+    workspaceId: "", // TODO: Get from editorStore or workspace active tab
+    workspaceName,
+    userRole: user?.roles?.[0] ?? "Member",
+  });
 
   // Automatically handle sending when triggered from the editor toolbar
   useEffect(() => {
     if (autoSendTrigger) {
-      const combinedMessage = `${autoSendTrigger.prompt}:\n\n> ${autoSendTrigger.context.replace(/\n/g, "\n> ")}`;
-
-      const newMessage: Message = {
-        id: Math.random().toString(36).substr(2, 9),
-        role: "user",
-        content: combinedMessage,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, newMessage]);
+      sendToolbarAction(
+        autoSendTrigger.prompt,
+        autoSendTrigger.context,
+        autoSendTrigger.requestType,
+        autoSendTrigger.from,
+        autoSendTrigger.to,
+      );
       setAutoSendTrigger(null);
     }
-  }, [autoSendTrigger, setAutoSendTrigger]);
+  }, [autoSendTrigger, setAutoSendTrigger, sendToolbarAction]);
 
   const handleSend = (content: string) => {
-    const newMessage: Message = {
-      id: Math.random().toString(36).substr(2, 9),
-      role: "user",
-      content,
-      timestamp: new Date(),
-    };
-    setMessages((prev) => [...prev, newMessage]);
+    sendMessage(content);
   };
 
   const handleClear = () => {
-    setMessages([]);
+    clearMessages();
   };
 
   return (
@@ -119,10 +120,10 @@ export function ChatPanel() {
               <TabsContent value="chat" className="relative m-0 min-h-0 flex-1 border-none p-0">
                 <div className="absolute inset-0 flex flex-col overflow-hidden">
                   {/* Middle Content - Message List */}
-                  <ChatMessageList messages={messages} />
+                  <ChatMessageList messages={messages} isLoading={status === "pending"} />
 
                   {/* Sticky Bottom Composer */}
-                  <ChatComposer onSend={handleSend} onClear={handleClear} />
+                  <ChatComposer onSend={handleSend} onClear={handleClear} isSending={status === "pending"} />
                 </div>
               </TabsContent>
 
