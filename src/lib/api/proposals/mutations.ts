@@ -8,6 +8,7 @@ import type {
   CreateProposalResponse,
   SubmitEvaluationScoresPayload,
   SubmitStepActionPayload,
+  UpdateProposalPayload,
 } from "@/lib/api/proposals/types";
 
 /**
@@ -40,7 +41,7 @@ export async function createProposal(
  */
 export async function updateProposal(
   proposalId: string,
-  payload: Partial<CreateProposalPayload>,
+  payload: UpdateProposalPayload,
 ): Promise<CreateProposalResponse> {
   const { apiClient } = await import("@/lib/api/client");
   const response = await apiClient.patch<CreateProposalResponse>(`/proposals/${proposalId}`, payload);
@@ -75,4 +76,17 @@ export async function submitEvaluationScores(proposalId: string, data: SubmitEva
 export async function submitStepAction(proposalId: string, payload: SubmitStepActionPayload): Promise<void> {
   const { apiClient } = await import("@/lib/api/client");
   await apiClient.post(`/proposals/${proposalId}/action`, payload);
+}
+
+/**
+ * Assign evaluators to a proposal.
+ * POST /proposals/:id/evaluator-assign
+ * @param proposalId - Proposal ID
+ * @param userIds - Array of user IDs to assign as evaluators
+ */
+export async function assignEvaluators(proposalId: string, userIds: string[]): Promise<void> {
+  const { apiClient } = await import("@/lib/api/client");
+  await apiClient.post(`/proposals/${proposalId}/evaluator-assign`, {
+    userIds,
+  });
 }

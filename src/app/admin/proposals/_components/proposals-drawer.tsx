@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { Can } from "@/access-control/permission-gates";
+import { EditableProposalView } from "@/app/(main)/proposals/_components/editable-proposal-view";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,7 +32,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { Textarea } from "@/components/ui/textarea";
 import { submitStepAction } from "@/lib/api/proposals/mutations";
 import { getAdminProposalDetails } from "@/lib/api/proposals/queries";
-import type { AdminProposalDetail } from "@/lib/api/proposals/types";
+import type { AdminProposalDetail, ResearcherProposal } from "@/lib/api/proposals/types";
 
 import { useProposals } from "../proposals-context";
 import { STATUS_CFG } from "./proposals-table";
@@ -73,7 +74,10 @@ export function ProposalsDrawer() {
   const onConfirmApprove = async () => {
     if (!selected) return;
     try {
-      await submitStepAction(selected.id, { decision: "Accepted", comment: timelineApproveNote });
+      await submitStepAction(selected.id, {
+        decision: "Accepted",
+        comment: timelineApproveNote,
+      });
       handleTimelineApproveSubmit();
     } catch (e) {
       console.error(e);
@@ -83,7 +87,10 @@ export function ProposalsDrawer() {
   const onConfirmReject = async () => {
     if (!selected || timelineRejectComment.trim().length < 10) return;
     try {
-      await submitStepAction(selected.id, { decision: "Rejected", comment: timelineRejectComment });
+      await submitStepAction(selected.id, {
+        decision: "Rejected",
+        comment: timelineRejectComment,
+      });
       handleTimelineRejectSubmit();
     } catch (e) {
       console.error(e);
@@ -93,7 +100,7 @@ export function ProposalsDrawer() {
   return (
     <Sheet open={!!selected} onOpenChange={(o) => !o && closeDrawer()}>
       <SheetContent
-        className="flex w-full flex-col overflow-hidden border-slate-200/80 border-l bg-white p-0 shadow-2xl sm:max-w-[800px] xl:max-w-[1000px] dark:border-slate-800 dark:bg-slate-950"
+        className="flex w-full flex-col overflow-hidden border-slate-200/80 border-l bg-white p-0 shadow-2xl sm:max-w-200 xl:max-w-250 dark:border-slate-800 dark:bg-slate-950"
         side="right"
       >
         {selected && isLoading && (
@@ -133,7 +140,7 @@ export function ProposalsDrawer() {
                   {details.advisors?.slice(0, 2).map((advisor) => (
                     <Badge
                       key={advisor.id}
-                      className="max-w-[140px] truncate border-0 bg-violet-100 font-bold text-[10px] text-violet-800 dark:bg-violet-900/35 dark:text-violet-300"
+                      className="max-w-35 truncate border-0 bg-violet-100 font-bold text-[10px] text-violet-800 dark:bg-violet-900/35 dark:text-violet-300"
                       title={advisor.name}
                     >
                       <GraduationCap className="h-3 w-3 shrink-0" /> {advisor.name}
@@ -186,7 +193,7 @@ export function ProposalsDrawer() {
               {/* ── TAB: DETAILS ── */}
               {drawerTab === "details" && (
                 <>
-                  {selected.currentStatus === "Revision" && (
+                  {"currentStatus" in selected && selected.currentStatus === "Revision" && (
                     <div className="flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-900/30 dark:bg-rose-900/10">
                       <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600 dark:text-rose-400" />
                       <div>
@@ -245,15 +252,40 @@ export function ProposalsDrawer() {
                   </div>
 
                   {/* Only show abstract if exists in backend details, else fallback to pending Approval abstract */}
-                  {selected.abstract && (
-                    <div>
-                      <h4 className="mb-2.5 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
-                        <FileText className="h-3.5 w-3.5" /> Abstract
-                      </h4>
-                      <p className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-[13px] text-slate-600 leading-relaxed dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
-                        {selected.abstract}
-                      </p>
-                    </div>
+                  {details.isEditable ? (
+                    <EditableProposalView
+                      proposal={{
+                        id: details.id,
+                        title: details.title,
+                        abstract: details.abstract ?? selected.abstract,
+                        researchArea: details.researchArea,
+                        type: details.type,
+                        status: details.status as any,
+                        isEditable: details.isEditable,
+                        department: details.department,
+                        pi: details.pi,
+                        advisors: details.advisors,
+                        evaluators: details.evaluators,
+                        team: details.team,
+                        workflow: details.workflow,
+                        comments: details.comments,
+                        defenceSchedules: details.defenceSchedules,
+                        file: details.file,
+                        createdAt: details.createdAt,
+                      }}
+                      onUpdate={(up: ResearcherProposal) => setDetails((d) => (d ? { ...d, ...up } : d))}
+                    />
+                  ) : (
+                    selected.abstract && (
+                      <div>
+                        <h4 className="mb-2.5 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                          <FileText className="h-3.5 w-3.5" /> Abstract
+                        </h4>
+                        <p className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-[13px] text-slate-600 leading-relaxed dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
+                          {selected.abstract}
+                        </p>
+                      </div>
+                    )
                   )}
                 </>
               )}
@@ -308,7 +340,7 @@ export function ProposalsDrawer() {
                       </div>
                       <div>
                         <h4 className="font-bold text-slate-900 text-sm dark:text-slate-100">Access Denied</h4>
-                        <p className="mt-1 max-w-[280px] text-slate-500 text-xs dark:text-slate-400">
+                        <p className="mt-1 max-w-70 text-slate-500 text-xs dark:text-slate-400">
                           You do not have the required permissions to view the financial breakdown of this proposal.
                         </p>
                       </div>
@@ -317,7 +349,7 @@ export function ProposalsDrawer() {
                 >
                   <div className="flex flex-col gap-6">
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <div className="flex flex-col justify-center rounded-xl border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm dark:border-slate-800 dark:from-slate-900/50 dark:to-slate-950">
+                      <div className="flex flex-col justify-center rounded-xl border border-slate-200/80 bg-linear-to-br from-slate-50 to-white p-4 shadow-sm dark:border-slate-800 dark:from-slate-900/50 dark:to-slate-950">
                         <p className="mb-1 flex items-center gap-1.5 font-bold text-[10px] text-slate-500 uppercase tracking-wider">
                           <Banknote className="h-3.5 w-3.5" /> Total Requested
                         </p>
@@ -370,12 +402,10 @@ export function ProposalsDrawer() {
                             <tr>
                               <td className="px-4 py-3 font-bold text-slate-900 dark:text-slate-100">Total</td>
                               <td className="px-4 py-3 text-right font-bold text-blue-600 dark:text-blue-400">
-                                {details.budget?.items?.reduce((acc, curr) => acc + curr.amount, 0)
-                                  ? new Intl.NumberFormat("en-US", {
-                                      minimumFractionDigits: 2,
-                                      maximumFractionDigits: 2,
-                                    }).format(details.budget?.items?.reduce((acc, curr) => acc + curr.amount, 0))
-                                  : selected.budget.reduce((acc, curr) => acc + curr.amount, 0)}
+                                {new Intl.NumberFormat("en-US", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }).format(details.budget.total)}
                               </td>
                             </tr>
                           </tfoot>
@@ -394,7 +424,7 @@ export function ProposalsDrawer() {
       </SheetContent>
 
       <Dialog open={showTimelineApprove} onOpenChange={setShowTimelineApprove}>
-        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[460px]">
+        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-115">
           <DialogHeader className="border-slate-100 border-b px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-emerald-100 p-2 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400">
@@ -423,7 +453,7 @@ export function ProposalsDrawer() {
               </Label>
               <Textarea
                 id="timeline-approve-note"
-                className="min-h-[100px] resize-none rounded-lg bg-white text-sm dark:bg-slate-950"
+                className="min-h-25 resize-none rounded-lg bg-white text-sm dark:bg-slate-950"
                 value={timelineApproveNote}
                 onChange={(e) => setTimelineApproveNote(e.target.value)}
               />
@@ -446,7 +476,7 @@ export function ProposalsDrawer() {
       </Dialog>
 
       <Dialog open={showTimelineReject} onOpenChange={setShowTimelineReject}>
-        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[460px]">
+        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-115">
           <DialogHeader className="border-slate-100 border-b px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-rose-100 p-2 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400">
@@ -474,7 +504,7 @@ export function ProposalsDrawer() {
               </Label>
               <Textarea
                 id="timeline-reject-comment"
-                className="min-h-[140px] resize-none rounded-lg bg-white text-sm dark:bg-slate-950"
+                className="min-h-35 resize-none rounded-lg bg-white text-sm dark:bg-slate-950"
                 value={timelineRejectComment}
                 onChange={(e) => setTimelineRejectComment(e.target.value)}
               />
