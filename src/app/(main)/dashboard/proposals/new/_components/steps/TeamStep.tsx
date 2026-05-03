@@ -16,7 +16,8 @@ import {
 } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
-import { useSearchAdvisors, useSearchUsers } from "@/lib/api/users/queries";
+import { useSearchMembersML } from "@/lib/api/recommendations/queries";
+import { useSearchAdvisors } from "@/lib/api/users/queries";
 import { useAuthStore } from "@/stores/authStore";
 
 import type { CreateProposalFormValues } from "../../schema/create-proposal";
@@ -24,11 +25,13 @@ import type { CreateProposalFormValues } from "../../schema/create-proposal";
 export function TeamStep() {
   const { watch, setValue } = useFormContext<CreateProposalFormValues>();
 
-  // Members search (debounced, backend-driven)
+  // Members search (debounced, ML semantic search)
   const [memberSearch, setMemberSearch] = useState("");
   const debouncedMemberSearch = useDebounce(memberSearch, 300);
   const isMemberSearchActive = debouncedMemberSearch.trim().length > 0;
-  const { data: memberResults = [], isLoading: loadingMembers } = useSearchUsers(
+
+  // Use ML search instead of simple keyword query
+  const { data: memberResults = [], isLoading: loadingMembers } = useSearchMembersML(
     debouncedMemberSearch,
     isMemberSearchActive,
   );
@@ -97,12 +100,16 @@ export function TeamStep() {
               <div className="p-4 text-center text-slate-500 text-xs italic">No exact matches found.</div>
             ) : (
               memberResults.map((member) => {
-                const isSelected = selectedTeam.some((m) => m.value === member.value);
+                // Map from Recommendation (id, name) to standard format
+                const memberValue = member.id || (member as any).value;
+                const memberLabel = member.name || (member as any).label;
+
+                const isSelected = selectedTeam.some((m) => m.value === memberValue);
                 return (
                   <button
                     type="button"
-                    key={member.value}
-                    onClick={() => handleToggleTeam(member.value, member.label)}
+                    key={memberValue}
+                    onClick={() => handleToggleTeam(memberValue, memberLabel)}
                     className={`flex cursor-pointer items-center gap-3 rounded-lg border p-2.5 transition-colors ${
                       isSelected
                         ? "border-blue-400 bg-blue-50/50 shadow-sm dark:bg-blue-900/20"
@@ -111,13 +118,18 @@ export function TeamStep() {
                   >
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="font-bold text-[10px]">
-                        {member.label?.substring(0, 2).toUpperCase() || "?"}
+                        {memberLabel?.substring(0, 2).toUpperCase() || "?"}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex min-w-0 flex-1 flex-col">
+                    <div className="flex min-w-0 flex-1 flex-col text-left">
                       <span className="truncate font-semibold text-[13px] text-slate-900 leading-tight dark:text-slate-100">
-                        {member.label}
+                        {memberLabel}
                       </span>
+                      {member.score && (
+                        <span className="text-[10px] text-blue-500 font-medium mt-0.5">
+                          {Math.round(member.score * 100)}% Match
+                        </span>
+                      )}
                     </div>
                     {isSelected && <CheckCircle2 className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-500" />}
                   </button>
