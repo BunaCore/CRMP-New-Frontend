@@ -36,6 +36,7 @@ export function ActionsAndModals() {
     pickedEvalIds,
     toggleEvalPick,
     handleAssignConfirm,
+    isAssigningEvaluators,
     showAssignAdvisor,
     setShowAssignAdvisor,
     advisorSearch,
@@ -128,6 +129,11 @@ export function ActionsAndModals() {
           </DialogHeader>
 
           <div className="flex max-h-[320px] flex-col gap-1.5 overflow-y-auto px-4 py-4">
+            {filteredEvals.length === 0 && (
+              <p className="rounded-lg border border-slate-200 border-dashed py-6 text-center text-slate-500 text-xs dark:border-slate-700 dark:text-slate-400">
+                No users found. Try a different search term.
+              </p>
+            )}
             {filteredEvals.map((ev) => {
               const on = pickedEvalIds.includes(ev.id);
               return (
@@ -172,7 +178,7 @@ export function ActionsAndModals() {
                     </span>
                     <span className="truncate font-medium text-[11px] text-slate-500">{ev.specialty}</span>
                   </div>
-                  <span className="shrink-0 font-bold text-[10px] text-slate-400">{ev.assigned} pool</span>
+                  <span className="shrink-0 font-bold text-[10px] text-slate-400">ID linked</span>
                 </button>
               );
             })}
@@ -186,11 +192,11 @@ export function ActionsAndModals() {
             <Button
               size="sm"
               className="h-9 flex-1 bg-blue-600 font-semibold text-white hover:bg-blue-700"
-              disabled={pickedEvalIds.length === 0}
+              disabled={pickedEvalIds.length === 0 || isAssigningEvaluators}
               onClick={handleAssignConfirm}
             >
               <UserCheck className="mr-1.5 h-4 w-4" />
-              Save evaluators
+              {isAssigningEvaluators ? "Saving..." : "Save evaluators"}
             </Button>
           </DialogFooter>
         </DialogContent>

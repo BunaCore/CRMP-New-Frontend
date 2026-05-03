@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 
+import Image from "next/image";
 import Link from "next/link";
 
 import type { Metadata } from "next";
@@ -20,21 +21,8 @@ export default function LoginPage() {
         <div className="absolute inset-0 z-0 bg-[url('/media/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
 
         <div className="relative z-10 mx-auto flex max-w-xl flex-col items-center justify-center text-center">
-          <div className="mb-6 inline-flex h-16 items-center justify-center rounded-2xl border border-blue-600/20 bg-blue-600/10 p-4 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
-            {/* Logo placeholder */}
-            <svg
-              className="h-8 w-8"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              viewBox="0 0 24 24"
-            >
-              <title>CRMP Logo</title>
-              <path d="M12 2L2 7l10 5 10-5-10-5Z" />
-              <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
-            </svg>
+          <div className="mb-6 inline-flex items-center justify-center">
+            <Image src="/logo.png" alt="CRMP Logo" width={64} height={64} className="object-contain" priority />
           </div>
           <h1 className="font-extrabold text-4xl text-slate-900 tracking-tight sm:text-5xl dark:text-white">
             {APP_CONFIG.meta.title || "CRMP"} Access Portal

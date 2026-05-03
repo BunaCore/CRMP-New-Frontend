@@ -47,6 +47,9 @@ export function BasicInfoStep() {
     isDeptSearchActive,
   );
 
+  // Local state to force immediate UI update for file upload
+  const [localFileName, setLocalFileName] = useState<string>("");
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
@@ -62,9 +65,12 @@ export function BasicInfoStep() {
         toast.error("Only PDF and DOCX files are allowed");
         return;
       }
-      setValue("file", selectedFile, { shouldValidate: true });
+      setValue("file", selectedFile, { shouldValidate: true, shouldDirty: true });
+      setLocalFileName(selectedFile.name);
     }
   };
+
+  const displayFileName = localFileName || file?.name;
 
   return (
     <div className="fade-in slide-in-from-right-4 mx-auto mt-4 flex max-w-4xl animate-in flex-col gap-6 duration-500">
@@ -279,7 +285,7 @@ export function BasicInfoStep() {
         <Controller
           control={control}
           name="file"
-          render={({ field }) => (
+          render={() => (
             <>
               <input
                 type="file"
@@ -301,10 +307,10 @@ export function BasicInfoStep() {
                   Upload full proposal layout
                 </p>
                 <p className="mt-0.5 text-balance text-slate-500 text-xs">PDF or DOCX (maximum 10MB)</p>
-                {file && (
+                {displayFileName && (
                   <div className="mt-4 flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50/50 px-3 py-1 text-blue-700 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-300">
                     <Check className="h-3.5 w-3.5" />
-                    <span className="max-w-[200px] truncate font-semibold text-xs">{file.name}</span>
+                    <span className="max-w-[200px] truncate font-semibold text-xs">{displayFileName}</span>
                   </div>
                 )}
               </label>

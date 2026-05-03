@@ -5,14 +5,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useEditor } from "@tiptap/react";
 import { toast } from "sonner";
 
+import { useCollabProvider } from "@/hooks/useCollabProvider";
 import { useDocumentEditor } from "@/hooks/useDocumentEditor";
 import { cn } from "@/lib/utils";
 
+import { CollabAwarenessBar } from "./editor/collab-awareness-bar";
 import { EditorBubbleMenu } from "./editor/editor-bubble-menu";
 import { EditorFloatingMenu } from "./editor/editor-floating-menu";
 import { EditorShell } from "./editor/editor-shell";
 import { EditorToolbar } from "./editor/editor-toolbar";
-import { EDITOR_EXTENSIONS } from "./editor/extensions";
 import { ImportMarkdownModal } from "./editor/import-markdown-modal";
 import { PagedEditorCanvas } from "./editor/paged-editor-canvas";
 import "./editor.css";
@@ -27,11 +28,17 @@ interface DocumentEditorProps {
 // ─── Component ────────────────────────────────────────────────
 
 export default function DocumentEditor({ workspaceId, projectId }: DocumentEditorProps) {
-  // ── 1. API/state hook ────────────────────────────────────────
+  // ── 1. Server state hook (save / load / version / import / export) ──
+  // Unchanged from solo mode — runs in all cases.
   const doc = useDocumentEditor(projectId, workspaceId);
   const [isImportOpen, setIsImportOpen] = useState(false);
 
-  // ── 2. Refs ──────────────────────────────────────────────────
+  // ── 2. Collab provider hook ──────────────────────────────────
+  // Reads isSoloProject from WorkspaceContext (loaded once there).
+  // Returns the correct extension array (collab or base) and isReady gate.
+  const collab = useCollabProvider(workspaceId);
+
+  // ── 3. Refs ──────────────────────────────────────────────────
   //
   // titleRef: always holds the current title, read inside onUpdate
   //   closure without causing the closure to go stale.
@@ -41,62 +48,86 @@ export default function DocumentEditor({ workspaceId, projectId }: DocumentEdito
   }, [doc.title]);
 
   // hydratedRef: gate that ensures setContent fires exactly once
-  //   per workspaceId (not on every render where loadStatus changes).
+  //   per workspaceId in solo mode. Collab mode bypasses this
+  //   (Y.js owns the content — setContent must NOT be called).
   const hydratedRef = useRef(false);
   // biome-ignore lint/correctness/useExhaustiveDependencies: Must reset when workspace changes on soft-navigation
   useEffect(() => {
     hydratedRef.current = false;
   }, [workspaceId]);
 
-  // ── 3. TipTap editor instance ────────────────────────────────
+  // ── 4. TipTap editor instance ────────────────────────────────
   //
-  // EXTENSIONS come from module-level constants — never recreated.
-  // Recreating extensions would destroy/rebuild the ProseMirror
-  // schema, losing selection state and causing visible reflow.
-  const editor = useEditor({
-    extensions: EDITOR_EXTENSIONS,
-    content: null, // Hydrated in useEffect below
-    immediatelyRender: false, // Avoids SSR hydration mismatch
-    editorProps: {
-      attributes: {
-        class: cn(
-          "prose prose-lg dark:prose-invert",
-          "focus:outline-none",
-          "max-w-none w-full",
-          "min-h-0", // Changed from min-h-screen to allow proper scrolling
-          "selection:bg-primary/20",
-          "editor-page-content", // Hook for pagination
-        ),
-        spellcheck: "true",
+  // `collab.extensions` is stable once `collab.isReady` is true.
+  // EditorShell holds the loading gate until both doc AND collab
+  // are ready, so by the time the editor is visible the extensions
+  // are already final — no recreation occurs after first render.
+  const editor = useEditor(
+    {
+      extensions: collab.extensions,
+      content: null, // Hydrated below (solo) or via Y.js (collab)
+      immediatelyRender: false,
+      editorProps: {
+        attributes: {
+          class: cn(
+            "prose prose-lg dark:prose-invert",
+            "focus:outline-none",
+            "max-w-none w-full",
+            "min-h-0",
+            "selection:bg-primary/20",
+            "editor-page-content",
+          ),
+          spellcheck: "true",
+        },
+      },
+      onUpdate: ({ editor, transaction }) => {
+        // Always update word count regardless of who made the change.
+        const words = (editor.storage.characterCount as { words: () => number }).words();
+        doc.setWordCount(words);
+
+        // In collab mode, Y.js tags inbound peer transactions with 'y-sync$'.
+        // Skip autosave for those — only the user who typed locally should
+        // trigger the debounced server save. This prevents N peers all
+        // writing to the server simultaneously on every remote change.
+        if (collab.isActive && transaction.getMeta("y-sync$")) return;
+
+        const json = editor.getJSON();
+        doc.scheduleAutosave(json, titleRef.current);
       },
     },
-    onUpdate: ({ editor }) => {
-      // JSON is the source of truth — never getHTML()
-      // titleRef.current is always fresh (avoids stale closure)
-      const json = editor.getJSON();
-      const words = (editor.storage.characterCount as { words: () => number }).words();
-      doc.setWordCount(words);
-      doc.scheduleAutosave(json, titleRef.current);
-    },
-  });
+    [collab.isActive],
+  );
 
-  // ── 4. Hydrate editor exactly once after API load ────────────
+  // ── 5. Hydrate editor after load (solo mode only) ────────────
+  //
+  // In collab mode: Y.js owns the content — setContent MUST NOT
+  // be called. The Y.Doc syncs the document automatically from the
+  // WebSocket provider without any manual hydration step.
+  //
+  // In solo mode: hydrate exactly once via setContent, same as before.
   useEffect(() => {
     if (!editor || hydratedRef.current) return;
     if (doc.loadStatus !== "loaded") return;
+    if (!collab.isReady) return; // wait for collab resolution
 
+    if (collab.isActive) {
+      // Collab mode: Y.js handles content — just focus and mark ready
+      hydratedRef.current = true;
+      editor.commands.focus("end");
+      return;
+    }
+
+    // Solo mode: manual one-time hydration
     const initialContent = doc.getInitialContent();
     if (!initialContent) return;
 
     hydratedRef.current = true;
-    // { emitUpdate: false } = do NOT emit onUpdate (prevents phantom autosave on load)
     editor.commands.setContent(initialContent, { emitUpdate: false });
     editor.commands.focus("end");
-  }, [doc.loadStatus, editor, doc]);
+  }, [doc.loadStatus, collab.isReady, collab.isActive, editor, doc]);
 
-  // ── 5. Keyboard shortcuts ────────────────────────────────────
+  // ── 6. Keyboard shortcuts ────────────────────────────────────
 
-  // Ctrl+S — immediate save (bypasses debounce)
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "s") {
@@ -108,9 +139,12 @@ export default function DocumentEditor({ workspaceId, projectId }: DocumentEdito
     return () => window.removeEventListener("keydown", handler);
   }, [editor, doc]);
 
-  // Visibility change & BeforeUnload — flush/warn before tab closes
   useEffect(() => {
     const handleVisibility = () => {
+      // In collab mode each peer independently autosaves their own changes.
+      // Skipping the visibility-save avoids duplicate writes when all peers
+      // switch tabs simultaneously (e.g., alt-tab during a meeting).
+      if (collab.isActive) return;
       if (editor && doc.isDirty) {
         void doc.saveNow(editor.getJSON(), titleRef.current);
       }
@@ -119,7 +153,7 @@ export default function DocumentEditor({ workspaceId, projectId }: DocumentEdito
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (doc.isDirty) {
         e.preventDefault();
-        e.returnValue = ""; // Standard way to trigger browser "Leave site?" prompt
+        e.returnValue = "";
       }
     };
 
@@ -130,9 +164,9 @@ export default function DocumentEditor({ workspaceId, projectId }: DocumentEdito
       window.removeEventListener("visibilitychange", handleVisibility);
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [editor, doc]);
+  }, [editor, doc, collab.isActive]);
 
-  // ── 6. Insert helpers ────────────────────────────────────────
+  // ── 7. Insert helpers ────────────────────────────────────────
 
   const handleAddImage = useCallback(() => {
     if (!editor) return;
@@ -166,7 +200,7 @@ export default function DocumentEditor({ workspaceId, projectId }: DocumentEdito
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   }, [editor]);
 
-  // ── 7. Title change handler ──────────────────────────────────
+  // ── 8. Title change handler ──────────────────────────────────
 
   const handleTitleChange = useCallback(
     (newTitle: string) => {
@@ -178,13 +212,15 @@ export default function DocumentEditor({ workspaceId, projectId }: DocumentEdito
     [editor, doc],
   );
 
-  // ── 8. Restore handler ───────────────────────────────────────
+  // ── 9. Restore handler ───────────────────────────────────────
 
   const handleRestoreVersion = useCallback(
     async (versionId: string) => {
       const restored = await doc.restoreNamedVersion(versionId);
       if (editor && restored) {
-        // { emitUpdate: false } = suppress onUpdate → no phantom autosave over restored content
+        // In collab mode: TipTap v3's Collaboration extension routes setContent
+        // through the Y.Doc, so this change propagates to all peers automatically.
+        // emitUpdate: false prevents a local autosave loop on the restoring peer.
         editor.commands.setContent(restored.document.content, { emitUpdate: false });
         editor.commands.focus("end");
       }
@@ -192,18 +228,16 @@ export default function DocumentEditor({ workspaceId, projectId }: DocumentEdito
     [editor, doc],
   );
 
-  // ── 9. Import / Export Handlers ──────────────────────────────
+  // ── 10. Import / Export handlers ─────────────────────────────
 
   const handleImportText = useCallback(
     async (text: string) => {
       if (!editor) return;
-      // 1. Create safety snapshot of current document
       await doc.createNamedVersion("Pre-import snapshot");
-      // 2. Parse markdown to JSON via backend
       const result = await doc.importFromMarkdown(text);
-      // 3. Replace editor content (suppress autosave)
+      // In collab mode: setContent routes through Y.Doc, peers see the import.
+      // emitUpdate: false prevents duplicate autosave on the importing peer.
       editor.commands.setContent(result, { emitUpdate: false });
-      // 4. Reset dirty state and autosave queue
       doc.saveNow(result, titleRef.current);
     },
     [editor, doc],
@@ -212,7 +246,6 @@ export default function DocumentEditor({ workspaceId, projectId }: DocumentEdito
   const handleExport = useCallback(
     (format: "pdf" | "markdown") => {
       const promise = doc.exportAs(format, titleRef.current);
-
       toast.promise(promise, {
         loading: `Preparing ${format.toUpperCase()} export...`,
         success: `Downloaded ${titleRef.current}.${format === "pdf" ? "pdf" : "md"}`,
@@ -222,12 +255,13 @@ export default function DocumentEditor({ workspaceId, projectId }: DocumentEdito
     [doc],
   );
 
-  // ── 10. Render ────────────────────────────────────────────────
+  // ── 11. Render ────────────────────────────────────────────────
 
   return (
     <EditorShell
       workspaceId={workspaceId}
       loadStatus={doc.loadStatus}
+      collabIsReady={collab.isReady}
       isVersionPanelOpen={doc.isVersionPanelOpen}
       versions={doc.versions}
       onRetry={() => window.location.reload()}
@@ -249,11 +283,12 @@ export default function DocumentEditor({ workspaceId, projectId }: DocumentEdito
         onImportMarkdownClick={() => setIsImportOpen(true)}
         onExportPdf={() => handleExport("pdf")}
         onExportMarkdown={() => handleExport("markdown")}
+        rightSlot={<CollabAwarenessBar />}
       />
 
-      {/* Scrollable editor canvas - takes remaining height */}
-      <div className="flex-1 overflow-hidden">
-        <div className="custom-scrollbar h-[calc(100vh-80px)] w-full overflow-y-auto scroll-smooth">
+      {/* Scrollable editor canvas */}
+      <div className="relative flex-1 overflow-hidden">
+        <div className="custom-scrollbar absolute inset-0 w-full overflow-y-auto scroll-smooth">
           <PagedEditorCanvas editor={editor} />
         </div>
       </div>

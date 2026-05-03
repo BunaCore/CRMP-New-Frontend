@@ -18,7 +18,7 @@ export function ReviewStep() {
   const departmentLabel = watch("departmentLabel");
 
   const calculateTotalBudget = () => {
-    return budgetRows.reduce((acc, row) => acc + (parseFloat(String(row.amount)) || 0), 0);
+    return budgetRows.reduce((acc, row) => acc + (parseFloat(String(row?.amount)) || 0), 0);
   };
 
   return (
@@ -55,8 +55,8 @@ export function ReviewStep() {
               <p className="font-medium text-slate-700 text-sm dark:text-slate-300">{departmentLabel || "—"}</p>
             </div>
             <div>
-              <p className="mb-0.5 font-medium text-slate-500 text-sm">Attachments</p>
-              <p className="font-medium text-slate-700 text-sm dark:text-slate-300">{file ? file.name : "None"}</p>
+              <p className="mb-0.5 font-medium text-slate-500 text-xs">Attachments</p>
+              <p className="font-medium text-slate-700 text-sm dark:text-slate-300">{file?.name || "None"}</p>
             </div>
           </div>
         </div>
@@ -117,6 +117,7 @@ export function ReviewStep() {
               <div>
                 <p className="mb-1 font-medium text-slate-500 text-sm">Total Funds Requested</p>
                 <p className="font-bold text-slate-900 text-xl dark:text-slate-100">
+                  Birr{" "}
                   {calculateTotalBudget().toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,

@@ -5,6 +5,13 @@
 // Container that renders loading / error / empty / editor states.
 // The actual TipTap EditorContent is slotted in via `children`.
 // This component owns NO fetch logic — it receives state as props.
+//
+// Loading gate:
+//   Shows <LoadingState> until BOTH conditions are true:
+//     1. loadStatus === "loaded"   (document fetched from API)
+//     2. collabIsReady === true    (collab provider resolved)
+//   This prevents the editor from mounting with the wrong
+//   extension set (solo vs collab) and avoids any visible flicker.
 // ============================================================
 
 import type { ReactNode } from "react";
@@ -26,6 +33,13 @@ interface EditorShellProps {
   loadStatus: LoadStatus;
   isVersionPanelOpen: boolean;
   versions: DocumentVersionSummary[];
+  /**
+   * Set to true once useCollabProvider has resolved (either solo or
+   * collab active). The shell holds the loading gate until both
+   * document load AND collab setup have completed, so the editor
+   * always mounts with the correct final extension set.
+   */
+  collabIsReady: boolean;
 
   // Callbacks
   onRetry: () => void;
@@ -78,6 +92,7 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
 export function EditorShell({
   workspaceId,
   loadStatus,
+  collabIsReady,
   isVersionPanelOpen,
   versions,
   onRetry,
@@ -86,41 +101,52 @@ export function EditorShell({
   onCreateSnapshot,
   children,
 }: EditorShellProps) {
+  // Hold the loading gate until BOTH the document AND the collab
+  // provider hook have resolved. This guarantees the editor always
+  // mounts with the correct final extension set (solo or collab).
+  const isStillLoading = loadStatus === "loading" || loadStatus === "idle" || !collabIsReady;
+
   return (
     <div className="relative flex h-full w-full min-w-0 flex-col overflow-hidden bg-background">
       {/* Main content area */}
-      <div className="relative flex min-h-0 flex-1 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pb-8">
         {/* Editor content slot */}
         <div
           className={cn(
-            "flex min-h-0 flex-1 flex-col overflow-hidden",
+            "flex h-full flex-col overflow-hidden",
             "transition-all duration-300 ease-in-out",
             isVersionPanelOpen && "mr-72", // shift left when version panel open
           )}
         >
-          {loadStatus === "loading" || loadStatus === "idle" ? (
+          {isStillLoading ? (
             <LoadingState />
           ) : loadStatus === "error" ? (
             <ErrorState onRetry={onRetry} />
           ) : (
-            // "loaded" — render TipTap slot
+            // "loaded" + collabIsReady — render TipTap slot
             children
           )}
         </div>
 
         {/* Version history slide-over */}
-        <VersionHistoryPanel
-          isOpen={isVersionPanelOpen}
-          versions={versions}
-          workspaceId={workspaceId}
-          onClose={onCloseVersionPanel}
-          onRestore={onRestoreVersion}
-          onCreateSnapshot={onCreateSnapshot}
-        />
+        <div className="absolute top-0 right-0 bottom-0 z-30">
+          <VersionHistoryPanel
+            isOpen={isVersionPanelOpen}
+            versions={versions}
+            workspaceId={workspaceId}
+            onClose={onCloseVersionPanel}
+            onRestore={onRestoreVersion}
+            onCreateSnapshot={onCreateSnapshot}
+          />
+        </div>
       </div>
 
-      {/* Status bar — always visible */}
-      {loadStatus === "loaded" && <EditorStatusBar />}
+      {/* Status bar — visible once fully loaded */}
+      {!isStillLoading && loadStatus === "loaded" && (
+        <div className="absolute right-0 bottom-0 left-0 z-40 h-8">
+          <EditorStatusBar />
+        </div>
+      )}
     </div>
   );
 }
