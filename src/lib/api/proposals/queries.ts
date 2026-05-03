@@ -18,7 +18,9 @@ import type {
   PiMember,
   ProposalComment,
   ProposalDepartment,
-  ProposalMemberEntry,
+  ProposalListItem,
+  ProposalListQueryParams,
+  ProposalMemberWithUser,
   ProposalStatus,
   ResearcherProposal,
   TeamMember,
@@ -37,8 +39,11 @@ function normalizeProposal(raw: any): ResearcherProposal {
   return {
     id: raw?.id ?? "",
     title: raw?.title ?? "Untitled Proposal",
+    abstract: raw?.abstract ?? "",
+    researchArea: raw?.researchArea ?? "",
     type: raw?.type ?? "—",
     status: (raw?.status ?? "Draft") as ProposalStatus,
+    isEditable: Boolean(raw?.isEditable),
     department: (raw?.department ?? {
       id: "",
       name: "—",
@@ -69,6 +74,17 @@ function normalizeProposal(raw: any): ResearcherProposal {
 // ─── Queries ───────────────────────────────────────────────────────────────────
 
 import { useQuery } from "@tanstack/react-query";
+
+function buildProposalQueryString(params: ProposalListQueryParams = {}): string {
+  const searchParams = new URLSearchParams();
+
+  if (params.program) searchParams.set("program", params.program);
+  if (params.search?.trim()) searchParams.set("search", params.search.trim());
+  if (params.status) searchParams.set("status", params.status);
+
+  const query = searchParams.toString();
+  return query ? `?${query}` : "";
+}
 
 /**
  * Fetch a specific proposal by ID.
@@ -145,16 +161,16 @@ export async function fetchProposalEvaluations(proposalId: string): Promise<GetE
 }
 
 /**
- * Fetch members of a specific proposal.
- * GET /proposals/members/:proposalId
+ * Fetch all members of a specific proposal with full user details and role info.
+ * GET /proposals/:id/all-members
  *
  * @param proposalId - The ID of the proposal to fetch members for.
- * @returns Array of ProposalMemberEntry.
+ * @returns Array of ProposalMemberWithUser with full member details.
  * @throws AxiosError on network or server failure.
  */
-export async function getProposalMembers(proposalId: string): Promise<ProposalMemberEntry[]> {
+export async function getProposalMembers(proposalId: string): Promise<ProposalMemberWithUser[]> {
   const { apiClient } = await import("@/lib/api/client");
-  const response = await apiClient.get<ProposalMemberEntry[]>(`/proposals/members/${proposalId}`);
+  const response = await apiClient.get<ProposalMemberWithUser[]>(`/proposals/${proposalId}/all-members`);
   return response.data;
 }
 
@@ -172,6 +188,37 @@ export async function getPendingApprovals(): Promise<PendingApproval[]> {
 }
 
 /**
+ * React Query hook for pending approvals on the admin dashboard.
+ */
+export function usePendingApprovalsQuery() {
+  return useQuery({
+    queryKey: ["proposals", "pending-approvals"],
+    queryFn: getPendingApprovals,
+  });
+}
+
+/**
+ * Fetch the proposals related to the currently authenticated privileged user.
+ * GET /proposals?program=UG&search=text&status=Approved
+ */
+export async function getProposalsList(params: ProposalListQueryParams = {}): Promise<ProposalListItem[]> {
+  const { apiClient } = await import("@/lib/api/client");
+  const response = await apiClient.get<ProposalListItem[]>(`/proposals${buildProposalQueryString(params)}`);
+  return response.data;
+}
+
+/**
+ * React Query hook for the admin proposals tab.
+ */
+export function useProposalsListQuery(params: ProposalListQueryParams = {}, enabled = true) {
+  return useQuery({
+    queryKey: ["proposals", "list", params.program ?? "all", params.status ?? "all", params.search ?? ""],
+    queryFn: () => getProposalsList(params),
+    enabled,
+  });
+}
+
+/**
  * Fetch the approval timeline view for a proposal.
  * GET /proposals/:id/approval-timeline
  */
@@ -179,4 +226,15 @@ export async function getApprovalTimeline(proposalId: string): Promise<ApprovalT
   const { apiClient } = await import("@/lib/api/client");
   const response = await apiClient.get<ApprovalTimelineResponse>(`/proposals/${proposalId}/approval-timeline`);
   return response.data;
+}
+
+/**
+ * React Query hook for fetching proposal members with full user details.
+ */
+export function useGetProposalMembers(proposalId: string | null, enabled = true) {
+  return useQuery({
+    queryKey: ["proposals", "members", proposalId],
+    queryFn: () => getProposalMembers(proposalId as string),
+    enabled: enabled && !!proposalId,
+  });
 }

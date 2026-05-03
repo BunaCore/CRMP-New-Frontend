@@ -38,21 +38,24 @@ export function BudgetStep() {
       {/* Financial Dashboard Header */}
       <div className="flex flex-col items-center justify-between gap-4 rounded-xl border border-slate-100 bg-slate-50/40 p-5 sm:flex-row dark:border-slate-800 dark:bg-slate-900/10">
         <div>
-          <h3 className="font-bold text-slate-800 text-sm tracking-tight dark:text-slate-100">
+          <h3 className="font-bold text-base text-slate-800 tracking-tight dark:text-slate-100">
             Project Financial Breakdown
           </h3>
-          <p className="mt-1 text-slate-500 text-xs">Itemize all estimated expenditures for this research.</p>
+          <p className="mt-1 text-slate-500 text-sm">Itemize all estimated expenditures for this research.</p>
         </div>
         <div className="flex items-center gap-6">
           <div className="hidden h-10 w-px bg-slate-200 sm:block dark:bg-slate-800" />
           <div className="text-right">
-            <p className="font-bold text-[10px] text-slate-400 uppercase tracking-widest">Initial Grant Estimate</p>
+            <p className="font-bold text-[10px] text-slate-400 text-sm uppercase tracking-widest">
+              Initial Grant Estimate
+            </p>
             <p className="font-bold text-2xl text-blue-600 dark:text-blue-400">
               Birr{" "}
               {calculateTotalBudget().toLocaleString(undefined, {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
-              })}
+              })}{" "}
+              Birr
             </p>
           </div>
         </div>

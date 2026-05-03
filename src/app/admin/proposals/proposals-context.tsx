@@ -1,23 +1,20 @@
 "use client";
 
 import type React from "react";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
-import { getPendingApprovals } from "@/lib/api/proposals/queries";
-import type { PendingApproval } from "@/lib/api/proposals/types";
+import type { PendingApproval, ProposalListItem } from "@/lib/api/proposals/types";
 
 import { ADVISORS, EVALUATORS } from "./_data/mock-proposals";
 import type { Evaluator } from "./types";
 
 interface ProposalsContextValue {
-  proposals: PendingApproval[];
-  isLoadingData: boolean;
   tab: string;
   setTab: React.Dispatch<React.SetStateAction<string>>;
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
-  selected: PendingApproval | null;
-  setSelected: React.Dispatch<React.SetStateAction<PendingApproval | null>>;
+  selected: PendingApproval | ProposalListItem | null;
+  setSelected: React.Dispatch<React.SetStateAction<PendingApproval | ProposalListItem | null>>;
   drawerTab: "details" | "team" | "approve" | "budget";
   setDrawerTab: React.Dispatch<React.SetStateAction<"details" | "team" | "approve" | "budget">>;
 
@@ -42,7 +39,7 @@ interface ProposalsContextValue {
   setTimelineRejectComment: React.Dispatch<React.SetStateAction<string>>;
 
   // Actions
-  openDrawer: (p: PendingApproval) => void;
+  openDrawer: (p: PendingApproval | ProposalListItem) => void;
   closeDrawer: () => void;
   toggleEvalPick: (id: string) => void;
   toggleAdvisorPick: (id: string) => void;
@@ -50,7 +47,6 @@ interface ProposalsContextValue {
   handleAssignAdvisorConfirm: () => void;
   handleTimelineApproveSubmit: () => void;
   handleTimelineRejectSubmit: () => void;
-  filtered: PendingApproval[];
   filteredEvals: Evaluator[];
   filteredAdvisors: Evaluator[];
   evalSearch: string;
@@ -62,12 +58,9 @@ interface ProposalsContextValue {
 const ProposalsContext = createContext<ProposalsContextValue | undefined>(undefined);
 
 export function ProposalsProvider({ children }: { children: React.ReactNode }) {
-  const [proposals, setProposals] = useState<PendingApproval[]>([]);
-  const [isLoadingData, setIsLoadingData] = useState(true);
-
   const [tab, setTab] = useState<string>("all");
   const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<PendingApproval | null>(null);
+  const [selected, setSelected] = useState<PendingApproval | ProposalListItem | null>(null);
   const [drawerTab, setDrawerTab] = useState<"details" | "team" | "approve" | "budget">("details");
 
   const [showAssign, setShowAssign] = useState(false);
@@ -84,30 +77,6 @@ export function ProposalsProvider({ children }: { children: React.ReactNode }) {
   const [showTimelineReject, setShowTimelineReject] = useState(false);
   const [timelineRejectComment, setTimelineRejectComment] = useState("");
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        setIsLoadingData(true);
-        const data = await getPendingApprovals();
-        setProposals(data);
-      } catch (err) {
-        console.error("Failed to fetch pending approvals", err);
-      } finally {
-        setIsLoadingData(false);
-      }
-    }
-    loadData();
-  }, []);
-
-  const filtered = proposals.filter((p) => {
-    const matchTab = tab === "all" || p.currentStatus === tab;
-    const matchSearch =
-      p.title.toLowerCase().includes(search.toLowerCase()) ||
-      p.createdByName.toLowerCase().includes(search.toLowerCase()) ||
-      p.id.toLowerCase().includes(search.toLowerCase());
-    return matchTab && matchSearch;
-  });
-
   const filteredEvals = EVALUATORS.filter((e) =>
     (e.name + e.specialty).toLowerCase().includes(evalSearch.toLowerCase()),
   );
@@ -116,7 +85,7 @@ export function ProposalsProvider({ children }: { children: React.ReactNode }) {
     (a.name + a.specialty).toLowerCase().includes(advisorSearch.toLowerCase()),
   );
 
-  const openDrawer = (p: PendingApproval) => {
+  const openDrawer = (p: PendingApproval | ProposalListItem) => {
     setSelected(p);
     setDrawerTab("details");
     setPickedEvalIds([]);
@@ -143,7 +112,7 @@ export function ProposalsProvider({ children }: { children: React.ReactNode }) {
 
   const handleAssignConfirm = () => {
     if (!selected) return;
-    setSelected((s: PendingApproval | null) => (s && s.id === selected.id ? { ...s } : s)); // Keep selection state alive temporarily
+    setSelected((s) => (s && s.id === selected.id ? { ...s } : s)); // Keep selection state alive temporarily
     setShowAssign(false);
     setEvalSearch("");
     setPickedEvalIds([]);
@@ -170,8 +139,6 @@ export function ProposalsProvider({ children }: { children: React.ReactNode }) {
   return (
     <ProposalsContext.Provider
       value={{
-        proposals,
-        isLoadingData,
         tab,
         setTab,
         search,
@@ -204,7 +171,6 @@ export function ProposalsProvider({ children }: { children: React.ReactNode }) {
         handleAssignAdvisorConfirm,
         handleTimelineApproveSubmit,
         handleTimelineRejectSubmit,
-        filtered,
         filteredEvals,
         filteredAdvisors,
         evalSearch,

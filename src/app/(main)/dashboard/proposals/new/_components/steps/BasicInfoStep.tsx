@@ -94,13 +94,7 @@ export function BasicInfoStep() {
       {/* Research Info */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <div className="grid gap-1.5">
-          <Label
-            htmlFor="researchArea"
-            className={cn(
-              "font-semibold text-slate-700 text-sm dark:text-slate-300",
-              errors.researchArea && "text-red-500",
-            )}
-          >
+          <Label htmlFor="researchArea" className={cn("font-semibold text-sm", errors.title && "text-red-500")}>
             Research Area
           </Label>
           <Input
@@ -116,13 +110,7 @@ export function BasicInfoStep() {
         </div>
 
         <div className="grid gap-1.5">
-          <Label
-            htmlFor="proposalProgram"
-            className={cn(
-              "font-semibold text-slate-700 text-sm dark:text-slate-300",
-              errors.proposalProgram && "text-red-500",
-            )}
-          >
+          <Label htmlFor="proposalProgram" className={cn("font-semibold text-sm", errors.title && "text-red-500")}>
             Proposal Program
           </Label>
           <Controller
@@ -130,12 +118,7 @@ export function BasicInfoStep() {
             name="proposalProgram"
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger
-                  className={cn(
-                    "h-10 rounded-md bg-white text-sm dark:bg-slate-950",
-                    errors.proposalProgram && "border-red-500 focus-visible:ring-red-500",
-                  )}
-                >
+                <SelectTrigger className={cn("font-semibold text-sm", errors.title && "text-red-500")}>
                   <SelectValue placeholder="Select a program..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -151,13 +134,7 @@ export function BasicInfoStep() {
 
         {/* Department — Combobox (single, search-first) */}
         <div className="grid gap-1.5 sm:col-span-2 lg:col-span-1">
-          <Label
-            htmlFor="departmentId"
-            className={cn(
-              "font-semibold text-slate-700 text-sm dark:text-slate-300",
-              errors.departmentId && "text-red-500",
-            )}
-          >
+          <Label htmlFor="departmentId" className={cn("font-semibold text-sm", errors.title && "text-red-500")}>
             Host Department
           </Label>
           <Controller
@@ -230,7 +207,7 @@ export function BasicInfoStep() {
           {errors.durationMonths && <p className="text-red-500 text-xs">{errors.durationMonths.message}</p>}
         </div>
         <div className="flex flex-col justify-end">
-          <Label className="mb-2 font-semibold text-slate-700 text-sm dark:text-slate-300">Grant & Funding</Label>
+          <Label className={cn("mb-2 font-semibold text-sm", errors.title && "text-red-500")}>Grant & Funding</Label>
           <Controller
             control={control}
             name="isFunded"

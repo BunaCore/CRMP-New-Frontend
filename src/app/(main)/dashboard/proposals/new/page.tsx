@@ -142,10 +142,10 @@ export default function NewProposalPage() {
           </Button>
         </Link>
         <div>
-          <h1 className="font-semibold text-2xl text-slate-900 tracking-tight dark:text-slate-100">
+          <h1 className="font-black text-3xl text-slate-900 tracking-tighter sm:text-4xl dark:text-slate-100">
             New Research Proposal
           </h1>
-          <p className="mt-0.5 text-[13px] text-slate-500 dark:text-slate-400">
+          <p className="mt-0.5 text-[13px] text-slate-500 text-sm md:text-base dark:text-slate-400">
             Draft your research framework, complete your whole team, and organize the budget.
           </p>
         </div>

@@ -47,3 +47,8 @@ export interface InviteUserPayload {
   email: string;
   roleId: string;
 }
+
+export interface UpdateUserRolesPayload {
+  userId: string;
+  roleIds: string[];
+}

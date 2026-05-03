@@ -24,7 +24,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,6 +37,7 @@ import { useGetUserById } from "@/lib/api/users/queries";
 
 import { MOCK_USER_DETAILS_BY_ID } from "../_data/mock-users";
 import type { AdminUserDetails } from "../types";
+import { UserRolesPanel } from "./_components/user-roles-panel";
 
 // --- Loading Skeleton ---
 function PageSkeleton() {
@@ -351,47 +352,7 @@ export default function UserDetailsPage() {
 
           {/* --- Roles Tab --- */}
           <TabsContent value="roles" className="mt-0 outline-none">
-            <Card className="overflow-hidden border-slate-200/60 shadow-none dark:border-slate-800/60">
-              <CardHeader className="border-slate-100 border-b bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/20">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="font-bold text-lg">Assigned Access Roles</CardTitle>
-                    <CardDescription>Roles define what actions this user can perform in the system.</CardDescription>
-                  </div>
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                    Manage Roles
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {user.roles.map((role) => (
-                    <div
-                      key={role.id}
-                      className="flex items-center justify-between p-6 transition-colors hover:bg-slate-50/50 dark:hover:bg-slate-900/20"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                          <Shield className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <p className="font-bold text-slate-900 dark:text-slate-100">{role.name}</p>
-                          <p className="text-slate-500 text-xs">
-                            Granted on {new Date(role.grantedAt).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className="border-emerald-100 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-400"
-                      >
-                        Active Permission
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <UserRolesPanel user={user} />
           </TabsContent>
 
           {/* --- Coordination Tab --- */}

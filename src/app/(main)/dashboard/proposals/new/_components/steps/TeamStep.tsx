@@ -67,7 +67,7 @@ export function TeamStep() {
   };
 
   return (
-    <div className="fade-in slide-in-from-right-4 mt-4 grid min-h-[400px] animate-in grid-cols-1 gap-8 divide-slate-100 rounded-lg border border-slate-100 bg-slate-50/30 duration-500 lg:grid-cols-2 lg:divide-x dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900/10">
+    <div className="fade-in slide-in-from-right-4 mt-4 grid min-h-[400px] animate-in grid-cols-1 gap-8 rounded-2xl border border-slate-200/60 bg-white/70 shadow-[0_10px_30px_rgba(0,0,0,0.06)] backdrop-blur-md transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.10)] lg:grid-cols-2 lg:divide-x lg:divide-slate-200/60 dark:border-slate-800/60 dark:bg-slate-950/40 dark:lg:divide-slate-800/60">
       {/* Members (Left) */}
       <div className="flex flex-col gap-4 p-4 lg:p-6 lg:pr-8">
         <div>
