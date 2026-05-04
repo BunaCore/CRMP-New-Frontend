@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { PasswordField } from "@/components/auth/PasswordField";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -78,11 +79,7 @@ export function SignUpForm() {
       </div>
 
       {/* Password */}
-      <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
-        <Input id="password" type="password" disabled={isLoading} {...register("password")} />
-        {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
-      </div>
+      <PasswordField id="password" disabled={isLoading} error={errors.password?.message} {...register("password")} />
 
       {/* Role */}
       <div className="space-y-2">

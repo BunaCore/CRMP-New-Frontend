@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { PasswordField } from "@/components/auth/PasswordField";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -98,16 +99,17 @@ export function SignInForm() {
         {errors.email && <p className="font-medium text-red-500 text-sm">{errors.email.message}</p>}
       </div>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="password">Password</Label>
+      <PasswordField
+        id="password"
+        disabled={isLoading}
+        error={errors.password?.message}
+        endLabel={
           <a href="/login" className="font-medium text-blue-600 text-sm hover:text-blue-500 dark:text-blue-400">
             Forgot password?
           </a>
-        </div>
-        <Input id="password" type="password" disabled={isLoading} {...register("password")} />
-        {errors.password && <p className="font-medium text-red-500 text-sm">{errors.password.message}</p>}
-      </div>
+        }
+        {...register("password")}
+      />
 
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? (
