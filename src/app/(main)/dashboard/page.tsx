@@ -279,11 +279,14 @@ export default function DashboardPage() {
             team.
           </p>
         </div>
-        <Link href="/dashboard/proposals/new" passHref legacyBehavior>
-          <Button className="w-full rounded-full border-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 font-medium text-white shadow transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-md sm:w-auto">
+        <Button
+          asChild
+          className="w-full rounded-full border-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 font-medium text-white shadow transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-md sm:w-auto"
+        >
+          <Link href="/dashboard/proposals/new">
             <Plus className="mr-2 h-4 w-4" /> New Project
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
 
       {/* Summary Cards - Horizontal Scrolling on Mobile */}
