@@ -77,7 +77,7 @@ import { useQuery } from "@tanstack/react-query";
 export async function getProposalById(proposalId: string): Promise<ResearcherProposal> {
   const { apiClient } = await import("@/lib/api/client");
   // biome-ignore lint/suspicious/noExplicitAny: raw API response normalized below
-  const response = await apiClient.get<any>(`/proposals/${proposalId}`);
+  const response = await apiClient.get<ResearcherProposal>(`/proposals/${proposalId}`);
   return normalizeProposal(response.data);
 }
 
