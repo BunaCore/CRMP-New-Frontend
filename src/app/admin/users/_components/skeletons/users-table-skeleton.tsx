@@ -3,11 +3,13 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { TableBody, TableCell, TableRow } from "@/components/ui/table";
 
+const SKELETON_KEYS = ["sk-1", "sk-2", "sk-3", "sk-4", "sk-5"];
+
 export function UsersTableSkeleton() {
   return (
     <TableBody className="[&_tr]:h-[60px]">
-      {Array.from({ length: 5 }).map((_, idx) => (
-        <TableRow key={`users-skeleton-${idx}`}>
+      {SKELETON_KEYS.map((key) => (
+        <TableRow key={key}>
           <TableCell className="pl-5">
             <Skeleton className="h-4 w-24" />
           </TableCell>

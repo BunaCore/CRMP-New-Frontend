@@ -11,7 +11,7 @@ import { NextResponse } from "next/server";
 // All granular permission logic lives in client guards/components.
 // ============================================================
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const _tokenCookie = request.cookies.get("access_token")?.value;
   const { pathname: _pathname } = request.nextUrl;
 
