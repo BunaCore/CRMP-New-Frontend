@@ -51,6 +51,15 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface RegisterPayload {
+  email: string;
+  password: string;
+  fullName?: string;
+  departmentId: string;
+  phoneNumber?: string;
+  userProgram: "UG" | "PG";
+}
+
 // ─── Response Shapes ────────────────────────────────────────
 export interface LoginResponse {
   access_token: string; // Normalized from backend's accessToken
