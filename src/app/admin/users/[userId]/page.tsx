@@ -9,7 +9,6 @@ import {
   Briefcase,
   Building2,
   Calendar,
-  Edit,
   ExternalLink,
   History,
   Mail,
@@ -32,11 +31,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetUserById } from "@/lib/api/users/queries";
 
 import { MOCK_USER_DETAILS_BY_ID } from "../_data/mock-users";
 import type { AdminUserDetails } from "../types";
+import { EditUserModal } from "./_components/edit-user-modal";
 import { UserRolesPanel } from "./_components/user-roles-panel";
 
 // --- Loading Skeleton ---
@@ -166,9 +167,7 @@ export default function UserDetailsPage() {
         </div>
 
         <div className="flex w-full items-center gap-3 md:w-auto">
-          <Button variant="outline" className="flex-1 rounded-full font-semibold md:flex-auto">
-            <Edit className="mr-2 h-4 w-4" /> Edit Profile
-          </Button>
+          <EditUserModal user={user} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -358,36 +357,33 @@ export default function UserDetailsPage() {
           {/* --- Coordination Tab --- */}
           {user.departmentCoordination?.isCoordinator && (
             <TabsContent value="coordination" className="mt-0 outline-none">
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {user.departmentCoordination.departments.map((dept) => (
-                  <Card
-                    key={dept.id}
-                    className="group overflow-hidden border-slate-200/60 transition-all hover:border-emerald-200 hover:shadow-md dark:border-slate-800/60 dark:hover:border-emerald-900/50"
-                  >
-                    <CardHeader className="border-slate-100 border-b bg-slate-50/50 pb-3 transition-colors group-hover:bg-emerald-50/50 dark:border-slate-800 dark:bg-slate-900/20 dark:group-hover:bg-emerald-950/20">
-                      <div className="flex items-center justify-between">
-                        <Badge variant="outline" className="bg-white font-mono text-[10px] dark:bg-slate-950">
-                          {dept.code}
-                        </Badge>
-                        <BadgeCheck className="h-4 w-4 text-emerald-500" />
-                      </div>
-                    </CardHeader>
-                    <CardContent className="p-5">
-                      <h3 className="mb-1 font-bold text-slate-900 dark:text-slate-100">{dept.name}</h3>
-                      <p className="mb-4 flex items-center gap-1 text-slate-500 text-xs">
-                        <Calendar className="h-3 w-3" /> Assigned since {new Date(dept.assignedAt).toLocaleDateString()}
-                      </p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full font-semibold text-xs hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-900/20"
-                      >
-                        View Department Activity
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              <Card className="border-slate-200/60 shadow-none dark:border-slate-800/60">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Coordinated Departments</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Department</TableHead>
+                          <TableHead>Code</TableHead>
+                          <TableHead>Assigned At</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {user.departmentCoordination.departments.map((dept) => (
+                          <TableRow key={dept.id}>
+                            <TableCell className="font-medium">{dept.name}</TableCell>
+                            <TableCell>{dept.code}</TableCell>
+                            <TableCell>{new Date(dept.assignedAt).toLocaleDateString()}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           )}
         </div>

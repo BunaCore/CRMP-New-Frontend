@@ -13,6 +13,7 @@ export interface AdminUserListItem {
   departmentName: string | null;
   universityId: string | null;
   phoneNumber: string | null;
+  userProgram: "UG" | "PG" | null;
   isExternal: boolean;
   accountStatus: UserAccountStatus;
   avatarUrl: string | null;

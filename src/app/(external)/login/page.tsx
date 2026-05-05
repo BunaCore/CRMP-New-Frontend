@@ -24,7 +24,7 @@ export default function LoginPage() {
           <div className="mb-6 inline-flex items-center justify-center">
             <Image src="/logo.png" alt="CRMP Logo" width={64} height={64} className="object-contain" priority />
           </div>
-          <h1 className="font-extrabold text-4xl text-slate-900 tracking-tight sm:text-5xl dark:text-white">
+          <h1 className="font-extrabold font-serif text-xl text-slate-900 tracking-tight sm:text-5xl dark:text-white/40">
             {APP_CONFIG.meta.title || "CRMP"} Access Portal
           </h1>
           <p className="mt-6 text-lg text-slate-600 dark:text-slate-400">

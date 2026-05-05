@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { MoreVertical, Search, UserPlus, Users } from "lucide-react";
+import { toast } from "sonner";
 
 import { Can } from "@/access-control/permission-gates";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -24,6 +25,7 @@ import {
 } from "@/components/ui/pagination";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useUpdateUserStatus } from "@/lib/api/users/mutations";
 
 import { useAdminUsers } from "../users-context";
 import { UsersTableSkeleton } from "./skeletons/users-table-skeleton";
@@ -166,7 +168,8 @@ export function UsersTable() {
                       {user.departmentName ?? "N/A"}
                     </TableCell>
                     <TableCell className="py-4 text-[13px] text-slate-700 dark:text-slate-300">
-                      {user.roles.length} role{user.roles.length === 1 ? "" : "s"}
+                      {user.roles.length} role
+                      {user.roles.length === 1 ? "" : "s"}
                     </TableCell>
                     <TableCell className="py-4">
                       <Badge className="bg-transparent px-0 text-slate-700 shadow-none dark:text-slate-300">
@@ -196,6 +199,9 @@ export function UsersTable() {
                           </DropdownMenuItem>
                           <DropdownMenuItem disabled>Edit user</DropdownMenuItem>
                           <DropdownMenuItem disabled>Reset password</DropdownMenuItem>
+                          <Can permission="USER_PROVISION">
+                            <StatusToggleItem user={user} />
+                          </Can>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -240,5 +246,30 @@ export function UsersTable() {
         </div>
       </div>
     </div>
+  );
+}
+
+function StatusToggleItem({ user }: { user: { id: string; accountStatus: string } }) {
+  const mutation = useUpdateUserStatus();
+
+  const nextStatus = user.accountStatus === "active" ? "deactive" : "active";
+
+  const handleToggle = async () => {
+    try {
+      await mutation.mutateAsync({ userId: user.id, status: nextStatus });
+      toast.success(`User ${nextStatus === "active" ? "activated" : "deactivated"}`);
+    } catch (err) {
+      toast.error("Failed to update user status");
+    }
+  };
+
+  return (
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    <DropdownMenuItem
+      onClick={handleToggle}
+      className={nextStatus === "deactive" ? "text-destructive focus:text-destructive" : ""}
+    >
+      {nextStatus === "active" ? "Activate user" : "Deactivate user"}
+    </DropdownMenuItem>
   );
 }

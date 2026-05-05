@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useProposalProgramValidation } from "@/hooks/useProposalProgramValidation";
 import { useSearchDepartments } from "@/lib/api/departments/queries";
 import { ProposalProgram } from "@/lib/api/proposals/types";
 import { cn } from "@/lib/utils";
@@ -37,6 +38,7 @@ export function BasicInfoStep() {
 
   const file = watch("file");
   const _departmentLabel = watch("departmentLabel");
+  const { allowedPrograms, isRestricted, userProgram } = useProposalProgramValidation();
 
   // Department search state
   const [deptSearch, setDeptSearch] = useState("");
@@ -65,12 +67,29 @@ export function BasicInfoStep() {
         toast.error("Only PDF and DOCX files are allowed");
         return;
       }
-      setValue("file", selectedFile, { shouldValidate: true, shouldDirty: true });
+      setValue("file", selectedFile, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
       setLocalFileName(selectedFile.name);
     }
   };
 
   const displayFileName = localFileName || file?.name;
+  const proposalProgramOptions = [
+    {
+      value: ProposalProgram.UG,
+      label: "Undergraduate (UG)",
+    },
+    {
+      value: ProposalProgram.PG,
+      label: "Postgraduate (PG)",
+    },
+    {
+      value: ProposalProgram.GENERAL,
+      label: "General",
+    },
+  ].filter((option) => allowedPrograms.includes(option.value));
 
   return (
     <div className="fade-in slide-in-from-right-4 mx-auto mt-4 flex max-w-4xl animate-in flex-col gap-6 duration-500">
@@ -117,16 +136,25 @@ export function BasicInfoStep() {
             control={control}
             name="proposalProgram"
             render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className={cn("font-semibold text-sm", errors.title && "text-red-500")}>
-                  <SelectValue placeholder="Select a program..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ProposalProgram.UG}>Undergraduate (UG)</SelectItem>
-                  <SelectItem value={ProposalProgram.PG}>Postgraduate (PG)</SelectItem>
-                  <SelectItem value={ProposalProgram.GENERAL}>General</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className={cn("font-semibold text-sm", errors.title && "text-red-500")}>
+                    <SelectValue placeholder="Select a program..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {proposalProgramOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {isRestricted && userProgram && (
+                  <p className="text-slate-500 text-xs">
+                    Your account is limited to {userProgram === "UG" ? "Undergraduate" : "Postgraduate"} proposals.
+                  </p>
+                )}
+              </div>
             )}
           />
           {errors.proposalProgram && <p className="text-red-500 text-xs">{errors.proposalProgram.message}</p>}
