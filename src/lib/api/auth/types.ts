@@ -36,6 +36,10 @@ export interface UserProfile {
   avatarUrl?: string;
   permissions?: string[];
   /**
+   * User program: "UG" (Undergraduate), "PG" (Postgraduate), or null (no restriction)
+   */
+  userProgram?: "UG" | "PG" | null;
+  /**
    * Account status (e.g., "active", "inactive", "suspended").
    */
   accountStatus?: string;
