@@ -19,8 +19,10 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useDebounce } from "@/hooks/use-debounce";
-import { useAllProjectsQuery } from "@/lib/api/projects/queries";
+import { useAllProjectsQuery, useProjectDetailsQuery } from "@/lib/api/projects/queries";
+import type { ProjectListItem } from "@/lib/api/projects/types";
 
+import { ProjectDetailsDrawer } from "./project-details-drawer";
 import { AllProjectsTableSkeleton } from "./skeletons/all-projects-table-skeleton";
 
 export function AllProjectsTab() {
@@ -29,6 +31,7 @@ export function AllProjectsTab() {
   const [visibility, setVisibility] = useState<string>("all");
   const [program, setProgram] = useState<string>("all");
   const [page, setPage] = useState(1);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const limit = 10;
 
   const { data, isLoading } = useAllProjectsQuery({
@@ -38,6 +41,13 @@ export function AllProjectsTab() {
     page,
     limit,
   });
+
+  // Fetch full project details when a project is selected
+  const { data: projectDetails } = useProjectDetailsQuery(selectedProjectId);
+
+  const openProjectDrawer = (project: ProjectListItem) => {
+    setSelectedProjectId(project.projectId);
+  };
 
   const totalPages = data?.meta.totalPages ?? 0;
   const totalItems = data?.meta.totalItems ?? 0;
@@ -150,7 +160,11 @@ export function AllProjectsTab() {
             ) : (
               <TableBody>
                 {data.items.map((project) => (
-                  <TableRow key={project.projectId} className="h-15 hover:bg-muted/30">
+                  <TableRow
+                    key={project.projectId}
+                    className="h-15 hover:bg-muted/30 cursor-pointer transition-colors"
+                    onClick={() => openProjectDrawer(project)}
+                  >
                     <TableCell className="font-medium">
                       <div className="flex flex-col gap-1">
                         <span className="line-clamp-1" title={project.projectTitle}>
@@ -200,7 +214,22 @@ export function AllProjectsTab() {
                     </TableCell>
 
                     <TableCell className="text-right text-muted-foreground text-sm">
-                      {project.submissionDate ? new Date(project.submissionDate).toLocaleDateString() : "—"}
+                      <div className="flex items-center justify-end gap-2">
+                        <span>
+                          {project.submissionDate ? new Date(project.submissionDate).toLocaleDateString() : "—"}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-3"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openProjectDrawer(project);
+                          }}
+                        >
+                          View
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -269,6 +298,16 @@ export function AllProjectsTab() {
           </Pagination>
         </div>
       )}
+
+      <ProjectDetailsDrawer
+        open={!!selectedProjectId && !!projectDetails}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedProjectId(null);
+          }
+        }}
+        project={projectDetails || null}
+      />
     </div>
   );
 }

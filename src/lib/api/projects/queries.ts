@@ -1,9 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { apiClient } from "@/lib/api/client";
 import type { PaginatedResponse } from "@/lib/api/types/pagination";
 
-import type { ProjectListItem, ProjectsQueryParams } from "./types";
+import type { ProjectDetails, ProjectListItem, ProjectsQueryParams } from "./types";
 
 function buildProjectsQueryString(params: ProjectsQueryParams = {}): string {
   const searchParams = new URLSearchParams();
@@ -38,5 +38,100 @@ export function useAllProjectsQuery(params: ProjectsQueryParams = {}, enabled = 
     queryKey: ["projects", "all", params],
     queryFn: () => getAllProjects(params),
     enabled,
+  });
+}
+
+/**
+ * Fetch a single project by ID with full details (members, budget, etc).
+ * GET /projects/:id
+ */
+export async function getProjectDetails(projectId: string): Promise<ProjectDetails> {
+  const response = await apiClient.get<ProjectDetails>(`/projects/${projectId}`);
+  return response.data;
+}
+
+/**
+ * React Query hook for fetching a single project's details.
+ */
+export function useProjectDetailsQuery(projectId: string | null, enabled = true) {
+  const resolvedProjectId = projectId ?? "";
+
+  return useQuery({
+    queryKey: ["projects", resolvedProjectId],
+    queryFn: () => getProjectDetails(resolvedProjectId),
+    enabled: enabled && !!resolvedProjectId,
+  });
+}
+
+/**
+ * Toggle a project's public visibility.
+ * PATCH /projects/:projectId/visibility
+ */
+export async function updateProjectVisibility(projectId: string, isPublic: boolean) {
+  const response = await apiClient.patch(`/projects/${projectId}/visibility`, {
+    isPublic,
+  });
+  return response.data;
+}
+
+export function useUpdateProjectVisibility() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ projectId, isPublic }: { projectId: string; isPublic: boolean }) =>
+      updateProjectVisibility(projectId, isPublic),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["projects", variables.projectId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["projects", "all"] });
+    },
+  });
+}
+
+/**
+ * Upload a banner image for a project.
+ * POST /projects/:projectId/upload-banner
+ */
+export async function uploadProjectBanner(projectId: string, file: File) {
+  const form = new FormData();
+  form.append("file", file);
+  const response = await apiClient.post(`/projects/${projectId}/upload-banner`, form);
+  return response.data;
+}
+
+export function useUploadProjectBanner() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ projectId, file }: { projectId: string; file: File }) => uploadProjectBanner(projectId, file),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["projects", variables.projectId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["projects", "all"] });
+    },
+  });
+}
+
+/**
+ * Upload a public file for a project.
+ * POST /projects/:projectId/upload-public-file
+ */
+export async function uploadProjectPublicFile(projectId: string, file: File) {
+  const form = new FormData();
+  form.append("file", file);
+  const response = await apiClient.post(`/projects/${projectId}/upload-public-file`, form);
+  return response.data;
+}
+
+export function useUploadProjectPublicFile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ projectId, file }: { projectId: string; file: File }) => uploadProjectPublicFile(projectId, file),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["projects", variables.projectId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["projects", "all"] });
+    },
   });
 }
