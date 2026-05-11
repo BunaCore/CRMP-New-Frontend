@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api/client";
 import type { PaginatedResponse } from "@/lib/api/types/pagination";
 
-import type { ProjectDetails, ProjectListItem, ProjectsQueryParams } from "./types";
+import type { ProjectDetails, ProjectListItem, ProjectsQueryParams, PublicProjectListItem } from "./types";
 
 function buildProjectsQueryString(params: ProjectsQueryParams = {}): string {
   const searchParams = new URLSearchParams();
@@ -133,5 +133,25 @@ export function useUploadProjectPublicFile() {
       });
       queryClient.invalidateQueries({ queryKey: ["projects", "all"] });
     },
+  });
+}
+
+/**
+ * Fetch published public projects for the public research discovery page.
+ * GET /public/projects/
+ */
+export async function getPublicProjects(): Promise<PublicProjectListItem[]> {
+  const response = await apiClient.get<PublicProjectListItem[]>("/public/projects/");
+  return response.data;
+}
+
+/**
+ * React Query hook for fetching public projects.
+ */
+export function usePublicProjectsQuery(enabled = true) {
+  return useQuery({
+    queryKey: ["projects", "public"],
+    queryFn: () => getPublicProjects(),
+    enabled,
   });
 }

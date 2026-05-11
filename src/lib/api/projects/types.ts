@@ -22,6 +22,20 @@ export interface ProjectListItem {
   } | null;
 }
 
+export interface PublicProjectListItem {
+  projectId: string;
+  projectTitle: string;
+  projectDescription: string;
+  researchArea: string | null;
+  bannerUrl: string;
+  publicFileUrl: string;
+  projectProgram: string;
+  department: string;
+  departmentId: string;
+  publishedAt: string;
+  durationMonths: number;
+}
+
 export interface ProjectMember {
   userId: string;
   fullName: string;
