@@ -87,8 +87,8 @@ export function EditableProposalView({ proposal, onUpdate }: EditableProposalVie
   if (isEditing && proposal.isEditable) {
     return (
       <div className="flex flex-col gap-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
-        <div className="flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
-          <h3 className="font-bold text-slate-900 text-lg dark:text-slate-100">Edit Proposal</h3>
+        <div className="flex items-center justify-between border-slate-200 border-b pb-4 dark:border-slate-800">
+          <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100">Edit Proposal</h3>
           {!isSaving && (
             <button
               type="button"
@@ -102,7 +102,7 @@ export function EditableProposalView({ proposal, onUpdate }: EditableProposalVie
 
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="edit-title" className="font-bold text-sm text-slate-900 dark:text-slate-100">
+            <Label htmlFor="edit-title" className="font-bold text-slate-900 text-sm dark:text-slate-100">
               Title *
             </Label>
             <Input
@@ -117,7 +117,7 @@ export function EditableProposalView({ proposal, onUpdate }: EditableProposalVie
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="edit-area" className="font-bold text-sm text-slate-900 dark:text-slate-100">
+            <Label htmlFor="edit-area" className="font-bold text-slate-900 text-sm dark:text-slate-100">
               Research Area
             </Label>
             <Input
@@ -132,7 +132,7 @@ export function EditableProposalView({ proposal, onUpdate }: EditableProposalVie
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="edit-abstract" className="font-bold text-sm text-slate-900 dark:text-slate-100">
+            <Label htmlFor="edit-abstract" className="font-bold text-slate-900 text-sm dark:text-slate-100">
               Abstract
             </Label>
             <Textarea
@@ -146,7 +146,7 @@ export function EditableProposalView({ proposal, onUpdate }: EditableProposalVie
           </div>
         </div>
 
-        <div className="flex gap-3 border-t border-slate-200 pt-4 dark:border-slate-800">
+        <div className="flex gap-3 border-slate-200 border-t pt-4 dark:border-slate-800">
           <Button
             type="button"
             onClick={handleSave}

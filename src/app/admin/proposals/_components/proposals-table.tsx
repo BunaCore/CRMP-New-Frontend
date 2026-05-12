@@ -19,7 +19,9 @@ interface ProposalsTableProps {
   data: PendingApproval[] | ProposalListItem[];
   isLoading: boolean;
   type: "pending" | "proposals";
+  // biome-ignore lint/suspicious/noExplicitAny: generic filter
   onFilterChange: (filters: any) => void;
+  // biome-ignore lint/suspicious/noExplicitAny: generic filter
   filterParams?: any;
 }
 
@@ -171,7 +173,7 @@ export function ProposalsTable({ data, isLoading, type, onFilterChange, filterPa
             </TabsList>
           </Tabs>
         ) : (
-          <div className="text-sm font-medium text-slate-500">All proposals</div>
+          <div className="font-medium text-slate-500 text-sm">All proposals</div>
         )}
 
         <div className="relative w-full sm:w-70">

@@ -72,7 +72,7 @@ const MOCK_RELATED_PROJECTS: RelatedProject[] = [
 ];
 
 export function ActivityTab() {
-  const { projectId } = useWorkspace();
+  useWorkspace();
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -167,6 +167,7 @@ export function ActivityTab() {
               <CardContent className="p-0">
                 {/* Image/Diagram Preview */}
                 <div className="relative h-32 overflow-hidden bg-muted">
+                  {/* biome-ignore lint/performance/noImgElement: mock preview */}
                   <img
                     src={project.diagram}
                     alt="Proposal Diagram"

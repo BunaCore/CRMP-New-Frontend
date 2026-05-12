@@ -283,7 +283,7 @@ export default function DocumentEditor({ workspaceId, projectId }: DocumentEdito
         onImportMarkdownClick={() => setIsImportOpen(true)}
         onExportPdf={() => handleExport("pdf")}
         onExportMarkdown={() => handleExport("markdown")}
-        rightSlot={<CollabAwarenessBar />}
+        rightSlot={<CollabAwarenessBar projectId={projectId} />}
       />
 
       {/* Scrollable editor canvas */}

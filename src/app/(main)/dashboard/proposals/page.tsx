@@ -11,7 +11,6 @@ import {
   Edit,
   Eye,
   FileText,
-  Filter,
   Loader2,
   MoreHorizontal,
   Plus,
@@ -147,7 +146,7 @@ export default function ProposalsPage() {
   // ─── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 lg:p-10 ">
+    <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-6 lg:p-10">
       {/* Header Section */}
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
@@ -159,7 +158,7 @@ export default function ProposalsPage() {
           </p>
         </div>
         <Link href="/dashboard/proposals/new" className="w-full sm:w-auto">
-          <Button className="group h-8 w-full rounded-full border-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-3 text-xs font-medium text-white shadow transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-sm">
+          <Button className="group h-8 w-full rounded-full border-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-3 font-medium text-white text-xs shadow transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-sm">
             <Plus className="mr-1 h-3 w-3 transition-transform duration-300 group-hover:rotate-90" />
             New Proposal
           </Button>

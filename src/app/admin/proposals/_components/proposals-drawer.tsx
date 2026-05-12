@@ -260,6 +260,7 @@ export function ProposalsDrawer() {
                         abstract: details.abstract ?? selected.abstract,
                         researchArea: details.researchArea,
                         type: details.type,
+                        // biome-ignore lint/suspicious/noExplicitAny: status needs a cast
                         status: details.status as any,
                         isEditable: details.isEditable,
                         department: details.department,

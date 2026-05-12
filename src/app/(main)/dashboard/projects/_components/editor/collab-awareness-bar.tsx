@@ -13,6 +13,7 @@ import { ClipboardList, Loader2, Users, Wifi, WifiOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useTaskList } from "@/lib/api/task-management";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { type CollabConnectionStatus, useCollabStore } from "@/stores/collabStore";
@@ -90,11 +91,16 @@ function PeerAvatar({ name, color }: { name: string; color: string }) {
 
 // ─── Main component ───────────────────────────────────────────
 
-export function CollabAwarenessBar() {
+export function CollabAwarenessBar({ projectId }: { projectId: string }) {
   const isActive = useCollabStore((s) => s.isActive);
   const status = useCollabStore((s) => s.status);
   const peers = useCollabStore((s) => s.peers);
   const currentUser = useAuthStore((s) => s.user);
+
+  const { data: tasks = [] } = useTaskList(projectId);
+  const myActiveTasksCount = currentUser
+    ? tasks.filter((t) => t.assigneeId === currentUser.id && t.status !== "done").length
+    : 0;
 
   // Only render in collab mode
   if (!isActive) return null;
@@ -160,15 +166,22 @@ export function CollabAwarenessBar() {
             {peerCount + 1} {peerCount + 1 === 1 ? "editor" : "editors"}
           </span>
 
-          <TaskManagerModal>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 rounded-full transition-colors hover:bg-primary/10 hover:text-primary"
-              title="Task Management"
-            >
-              <ClipboardList className="h-3.5 w-3.5" />
-            </Button>
+          <TaskManagerModal projectId={projectId}>
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 rounded-full transition-colors hover:bg-primary/10 hover:text-primary"
+                title="Task Management"
+              >
+                <ClipboardList className="h-3.5 w-3.5" />
+              </Button>
+              {myActiveTasksCount > 0 && (
+                <span className="-top-1.5 -right-1.5 absolute flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500 font-bold text-[8px] text-white shadow-sm ring-1 ring-background">
+                  {myActiveTasksCount > 9 ? "9+" : myActiveTasksCount}
+                </span>
+              )}
+            </div>
           </TaskManagerModal>
         </div>
       )}

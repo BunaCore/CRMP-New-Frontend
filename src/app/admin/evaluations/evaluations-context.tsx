@@ -6,11 +6,13 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import { hasPermission } from "@/access-control/permission-gates";
 import { useDebounce } from "@/hooks/use-debounce";
 import { assignEvaluators } from "@/lib/api/proposals/mutations";
-import { getPendingApprovals, useProposalsListQuery } from "@/lib/api/proposals/queries";
-import type { PendingApproval, ProposalListItem } from "@/lib/api/proposals/types";
+import { getMyProposals, getPendingApprovals, useProposalsListQuery } from "@/lib/api/proposals/queries";
+import type { PendingApproval, ProposalListItem, ResearcherProposal } from "@/lib/api/proposals/types";
 import { useSearchUsers } from "@/lib/api/users/queries";
+import { useAuthStore } from "@/stores/authStore";
 
 import { ADVISORS } from "../proposals/_data/mock-proposals";
 import type { Evaluator } from "../proposals/types";
@@ -159,6 +161,13 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
 
   const totals = useMemo(() => rubricTotals(rubric), [rubric]);
 
+  // ── Determine what the current user can do ────────────────────────────────────
+  const { user } = useAuthStore();
+  const userPerms = user?.permissions ?? [];
+  // Evaluators can score but cannot assign evaluators — they use a different fetch path
+  const isEvaluatorOnly =
+    hasPermission(userPerms, "EVALUATION_SCORE_SUBMIT") && !hasPermission(userPerms, "EVALUATOR_ASSIGN");
+
   // ── Real API: proposals table data ───────────────────────────────────────────
   const [apiProposals, setApiProposals] = useState<EvalProposalRow[]>([]);
   const [isLoadingProposals, setIsLoadingProposals] = useState(true);
@@ -179,30 +188,59 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
     };
   }, []);
 
+  const mapMyProposalRow = useCallback((proposal: ResearcherProposal): EvalProposalRow => {
+    return {
+      id: proposal.id,
+      title: proposal.title,
+      pi: proposal.pi.name,
+      piAvatar: proposal.pi.name.slice(0, 2).toUpperCase(),
+      piColor: "bg-indigo-100 text-indigo-700",
+      dept: proposal.department?.name || "N/A",
+      stage: proposal.status.replace(/_/g, " "),
+      budget: "—",
+      program: proposal.type || "—",
+      teamCount: proposal.team?.length ?? 0,
+    };
+  }, []);
+
   useEffect(() => {
     setIsLoadingProposals(true);
-    getPendingApprovals()
-      .then((data: PendingApproval[]) => {
-        const mapped: EvalProposalRow[] = data.map((p) => ({
-          id: p.id,
-          title: p.title,
-          pi: p.createdByName,
-          piAvatar: p.createdByName.slice(0, 2).toUpperCase(),
-          piColor: "bg-indigo-100 text-indigo-700",
-          dept: p.currentApproverRole,
-          stage: p.stepLabel,
-          budget: "—", // Budget not in PendingApproval — fetched in drawer
-          program: p.proposalProgram || "—",
-          teamCount: 0, // Not available in PendingApproval
-        }));
-        setApiProposals(mapped);
-      })
-      .catch(() => {
-        // silently fall back to empty; error shown in UI
-        setApiProposals([]);
-      })
-      .finally(() => setIsLoadingProposals(false));
-  }, []);
+
+    if (isEvaluatorOnly) {
+      // Evaluator: fetch proposals they're assigned to from /proposals/detail
+      getMyProposals()
+        .then((data: ResearcherProposal[]) => {
+          const mapped: EvalProposalRow[] = data.map(mapMyProposalRow);
+          setApiProposals(mapped);
+        })
+        .catch(() => {
+          setApiProposals([]);
+        })
+        .finally(() => setIsLoadingProposals(false));
+    } else {
+      // Admin / coordinator: use pending-approvals workflow endpoint
+      getPendingApprovals()
+        .then((data: PendingApproval[]) => {
+          const mapped: EvalProposalRow[] = data.map((p) => ({
+            id: p.id,
+            title: p.title,
+            pi: p.createdByName,
+            piAvatar: p.createdByName.slice(0, 2).toUpperCase(),
+            piColor: "bg-indigo-100 text-indigo-700",
+            dept: p.currentApproverRole,
+            stage: p.stepLabel,
+            budget: "—",
+            program: p.proposalProgram || "—",
+            teamCount: 0,
+          }));
+          setApiProposals(mapped);
+        })
+        .catch(() => {
+          setApiProposals([]);
+        })
+        .finally(() => setIsLoadingProposals(false));
+    }
+  }, [isEvaluatorOnly, mapMyProposalRow]);
 
   const filteredProposals = apiProposals.filter((p) =>
     (p.title + p.pi + p.id + p.dept).toLowerCase().includes(search.toLowerCase()),
