@@ -1,8 +1,8 @@
 import {
   BarChart,
-  Bell,
   BookOpen,
   CheckSquare,
+  Coins,
   FileText,
   Folder,
   LayoutDashboard,
@@ -72,9 +72,9 @@ export const sidebarItems: NavGroup[] = [
         icon: CheckSquare,
       },
       {
-        title: "Notifications",
-        url: "/dashboard/notifications",
-        icon: Bell,
+        title: "Budget Requests",
+        url: "/dashboard/researcher/budget",
+        icon: Coins,
       },
       {
         title: "Publications",

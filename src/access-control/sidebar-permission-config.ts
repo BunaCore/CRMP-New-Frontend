@@ -45,6 +45,10 @@ const DASHBOARD_MODULE_RULES: SidebarModuleRule[] = [
     url: "/dashboard/evaluations",
     permissions: ["FUNDED_EVALUATOR_ACCESS", "PROJECT_REVIEW"],
   },
+  {
+    url: "/dashboard/researcher/budget",
+    permissions: ["BUDGET_VIEW"],
+  },
 
   { url: "/dashboard/notifications", permissions: ["PROJECT_VIEW"] },
   {

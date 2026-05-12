@@ -14,8 +14,8 @@ function FormattedText({ text }: { text: string }) {
     <>
       {parts.map((part, i) => {
         if (part.startsWith("**") && part.endsWith("**")) {
-          // biome-ignore lint/suspicious/noArrayIndexKey: static parts
           return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: static parts
             <strong key={`part-${i}`} className="font-semibold text-foreground">
               {part.slice(2, -2)}
             </strong>

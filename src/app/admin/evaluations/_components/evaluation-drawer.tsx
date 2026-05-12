@@ -9,7 +9,7 @@ import { hasPermission } from "@/access-control/permission-gates";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { submitEvaluationScores } from "@/lib/api/proposals/mutations";
-import { fetchProposalEvaluations } from "@/lib/api/proposals/queries";
+import { fetchProposalEvaluations, useGetProposalMembers } from "@/lib/api/proposals/queries";
 import type { EvaluationRubric } from "@/lib/api/proposals/types";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
@@ -71,6 +71,8 @@ export function EvaluationDrawer() {
 
   const activeId = drawerKind === "proposal" ? activeProposal?.id : activeProject?.id;
 
+  const { data: members = [], isLoading: membersLoading } = useGetProposalMembers(activeId ?? null);
+
   useEffect(() => {
     if (drawerTab !== "scores" || !activeId) return;
 
@@ -109,18 +111,30 @@ export function EvaluationDrawer() {
   async function handleSubmitScores() {
     if (!activeId) return;
 
+    if (filteredApiRubrics.length === 0) {
+      toast.error("No rubrics found for this proposal. Cannot submit scores.");
+      return;
+    }
+
+    // Find the PI first, fall back to any MEMBER, then any member at all
+    const targetStudent =
+      members.find((m) => m.role === "PI") ?? members.find((m) => m.role === "MEMBER") ?? members[0];
+
+    if (!targetStudent) {
+      toast.error("Could not find a valid student to evaluate. Make sure team members are loaded.");
+      return;
+    }
+
+    const scores = filteredApiRubrics.map((rubricItem) => ({
+      rubricId: rubricItem.id,
+      studentId: targetStudent.userId,
+      score: draftScores[rubricItem.id]?.score ?? 0,
+      feedback: draftScores[rubricItem.id]?.feedback ?? "",
+      projectId: drawerKind === "project" ? activeId : null,
+    }));
+
     setIsSubmitting(true);
     try {
-      const scores = filteredApiRubrics.flatMap((rubricItem) => [
-        {
-          rubricId: rubricItem.id,
-          studentId: (drawerKind === "proposal" ? activeProposal?.id : activeProject?.id) || "",
-          score: draftScores[rubricItem.id]?.score ?? 0,
-          feedback: draftScores[rubricItem.id]?.feedback ?? "",
-          projectId: drawerKind === "project" ? activeId : null,
-        },
-      ]);
-
       await submitEvaluationScores(activeId, { scores });
       toast.success("Evaluation scores submitted successfully!");
     } catch {
@@ -282,6 +296,7 @@ export function EvaluationDrawer() {
                   draftScores={draftScores}
                   setDraftScores={setDraftScores}
                   scoresLoading={scoresLoading}
+                  membersLoading={membersLoading}
                   isSubmitting={isSubmitting}
                   totals={totals}
                   apiAggregate={apiAggregate}

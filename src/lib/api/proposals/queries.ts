@@ -148,7 +148,7 @@ export async function getAdminProposalDetails(proposalId: string): Promise<Admin
 
 /**
  * Fetch evaluations for a specific proposal.
- * GET /proposals/evaluations/:proposalId
+ * GET /proposals/:proposalId/evaluations
  *
  * @param proposalId - The ID of the proposal to fetch evaluations for.
  * @returns Evaluation data for the proposal.
@@ -156,7 +156,7 @@ export async function getAdminProposalDetails(proposalId: string): Promise<Admin
  */
 export async function fetchProposalEvaluations(proposalId: string): Promise<GetEvaluationsResponse> {
   const { apiClient } = await import("@/lib/api/client");
-  const response = await apiClient.get<GetEvaluationsResponse>(`/proposals/evaluations/${proposalId}`);
+  const response = await apiClient.get<GetEvaluationsResponse>(`/proposals/${proposalId}/evaluations`);
   return response.data;
 }
 

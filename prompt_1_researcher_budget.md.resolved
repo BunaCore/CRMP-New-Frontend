@@ -1,0 +1,341 @@
+# PROMPT 1 — Researcher / PI Budget Module
+## (For Frontend AI Agent — Copy & Paste Directly)
+
+---
+
+You are a senior frontend engineer working on a **Next.js + Shadcn UI** research management dashboard. Your task is to build the complete **Researcher Budget Module** from scratch. This module is exclusively for users who have the `BUDGET_VIEW` permission and the role of `RESEARCHER` or `PG_RESEARCHER`. Read every section carefully before writing a single line of code.
+
+---
+
+## 0. Tech Stack & Conventions
+
+- **Framework:** Next.js (App Router), TypeScript
+- **UI Library:** Shadcn UI components only (Card, Table, Badge, Dialog, Drawer, Button, Checkbox, Skeleton, Alert, Toast/Sonner)
+- **HTTP Client:** A pre-existing `apiClient` wrapper (axios-based) that automatically attaches the JWT Bearer token from the session. Use it like: `apiClient.get(url)`, `apiClient.post(url, body)`, `apiClient.patch(url, body)`. For file uploads use `apiClient.post(url, formData, { headers: { 'Content-Type': 'multipart/form-data' } })`
+- **State:** React `useState` + `useEffect`. No external state library needed.
+- **Auth:** A `useAuth()` hook is available, returning `{ user: { id, roles, permissions } }`. Use `permissions.includes('BUDGET_VIEW')` to gate the entire module.
+- **Routing:** The page lives at `/researcher/budget`
+- **Toasts:** Use `sonner` `toast.success()` / `toast.error()`
+
+---
+
+## 1. Permission Gate
+
+Wrap the **entire page** in a permission check. If the user does NOT have `BUDGET_VIEW` in their permissions array, render a full-page `AccessDenied` component (a centered card with a lock icon, "Access Restricted" heading, and a back button). Do not render anything else.
+
+---
+
+## 2. Page Architecture
+
+The page has **two distinct layers**:
+
+### Layer 1: Project Selector (Always Visible)
+A user can be a PI on **multiple approved projects**. The page must always start by letting the user pick which project they are managing budgets for.
+
+- Render a horizontal scrollable list of **Project Cards** at the top of the page. Each card shows:
+  - Project Title
+  - Project Type badge (PG / General)
+  - A mini progress bar: `Disbursed / Total Approved Budget`
+  - Active Request Status indicator (e.g., a yellow dot if there's a `PENDING` request)
+- Clicking a card **selects** it and highlights it with a colored border. The rest of the page (Layer 2) updates to show data for **only** the selected project.
+- Default: auto-select the first project on page load.
+
+### Layer 2: Budget Dashboard (Context = Selected Project)
+Everything below the project selector is scoped to the selected project.
+
+---
+
+## 3. API Endpoints — What to Call & When
+
+> **IMPORTANT:** You must infer the exact URL structure from the patterns below. The base URL comes from `process.env.NEXT_PUBLIC_API_URL`.
+
+### 3.1 — Fetch All Projects for Current Researcher
+```
+GET /budget/my-projects
+```
+**Expected Response JSON:**
+```json
+[
+  {
+    "projectId": "uuid-string",
+    "title": "Study of Soil Erosion in Highland Ethiopia",
+    "projectType": "PG" | "GENERAL",
+    "totalApprovedBudget": 150000,
+    "totalDisbursed": 50000,
+    "activeRequestStatus": "PENDING" | "RETURNED" | "RESUBMITTED" | null
+  }
+]
+```
+Call this once on page mount. Map over the response to render the project selector cards.
+
+---
+
+### 3.2 — Fetch Budget Dashboard for a Specific Project
+```
+GET /budget/project/:projectId/dashboard
+```
+**Expected Response JSON:**
+```json
+{
+  "projectId": "uuid-string",
+  "title": "Study of Soil Erosion in Highland Ethiopia",
+  "projectType": "PG",
+  "totalApprovedBudget": 150000,
+  "totalDisbursed": 50000,
+  "remainingBalance": 100000,
+  "budgetItems": [
+    {
+      "id": "item-uuid-1",
+      "description": "Laboratory Chemicals",
+      "category": "Lab Supplies",
+      "amount": 30000,
+      "status": "AVAILABLE" | "PENDING_DISBURSEMENT" | "PAID"
+    },
+    {
+      "id": "item-uuid-2",
+      "description": "Field Survey Equipment",
+      "category": "Equipment",
+      "amount": 20000,
+      "status": "PAID"
+    }
+  ],
+  "disbursementHistory": [
+    {
+      "id": "req-uuid-1",
+      "requestSequence": 1,
+      "totalAmount": 50000,
+      "submittedAt": "2025-01-15T09:30:00Z",
+      "status": "PAID",
+      "bankTransactionId": "TXN-ETB-00123",
+      "paidAt": "2025-01-18T14:00:00Z",
+      "clearanceDocumentUrl": null,
+      "financeFeedback": null,
+      "items": [
+        { "id": "item-uuid-2", "description": "Field Survey Equipment", "amount": 20000 }
+      ]
+    },
+    {
+      "id": "req-uuid-2",
+      "requestSequence": 2,
+      "totalAmount": 30000,
+      "submittedAt": "2025-02-10T10:00:00Z",
+      "status": "RETURNED",
+      "bankTransactionId": null,
+      "paidAt": null,
+      "clearanceDocumentUrl": "https://storage.example.com/receipts/req1-receipt.pdf",
+      "financeFeedback": "The uploaded receipt is blurry and unreadable. Please re-upload a clearer scan.",
+      "items": [
+        { "id": "item-uuid-1", "description": "Laboratory Chemicals", "amount": 30000 }
+      ]
+    }
+  ]
+}
+```
+Call this every time the user selects a different project. Show skeleton loaders while fetching.
+
+---
+
+### 3.3 — Submit a New Disbursement Request
+```
+POST /budget/project/:projectId/request
+```
+**For Request #1 (no clearance needed):**
+Send JSON body:
+```json
+{
+  "budgetItemIds": ["item-uuid-1", "item-uuid-3"]
+}
+```
+
+**For Request #2 and beyond (clearance document REQUIRED):**
+Send `multipart/form-data`:
+```
+Field: budgetItemIds[]  → ["item-uuid-1", "item-uuid-3"]  (append each ID separately)
+File:  clearanceDocument → <File object from input>
+```
+
+**Expected Success Response:**
+```json
+{
+  "requestId": "new-req-uuid",
+  "status": "PENDING",
+  "message": "Your disbursement request has been submitted successfully."
+}
+```
+
+After success: call `toast.success(...)`, close the modal, and **re-fetch** the dashboard for that project.
+
+---
+
+### 3.4 — Resubmit a Returned Request (Fix & Resubmit)
+```
+PATCH /budget/request/:requestId/resubmit
+```
+Send `multipart/form-data`:
+```
+File: clearanceDocument → <new File object>
+```
+
+**Expected Success Response:**
+```json
+{
+  "requestId": "req-uuid-2",
+  "status": "RESUBMITTED",
+  "message": "Your request has been resubmitted with the updated document."
+}
+```
+
+After success: `toast.success(...)`, close the fix drawer, and re-fetch dashboard.
+
+---
+
+## 4. UI Components to Build
+
+### 4.1 — Metric Cards Row
+Three `<Card>` components displayed in a 3-column grid:
+- **Total Approved Budget** — `totalApprovedBudget` formatted as ETB currency
+- **Total Disbursed** — `totalDisbursed` with a green color
+- **Remaining Balance** — `remainingBalance` with a blue color
+
+---
+
+### 4.2 — "Approved Budget Items" Table
+A `<Table>` listing ALL `budgetItems` from the dashboard response.
+
+| Column       | Details                                                                 |
+|--------------|-------------------------------------------------------------------------|
+| Item         | `description`                                                           |
+| Category     | `category`                                                              |
+| Amount       | `amount` formatted as ETB                                               |
+| Status Badge | `AVAILABLE` = blue outline; `PENDING_DISBURSEMENT` = yellow; `PAID` = green |
+
+> No action buttons here. This is read-only. It shows the full picture of the budget list.
+
+---
+
+### 4.3 — "Disbursement History" Table
+A `<Table>` listing all `disbursementHistory` entries.
+
+| Column        | Details                                                               |
+|---------------|-----------------------------------------------------------------------|
+| #             | `requestSequence` (e.g., "Request #1")                                |
+| Items         | Comma-separated list of item descriptions                             |
+| Total Amount  | `totalAmount` as ETB                                                  |
+| Submitted     | `submittedAt` formatted as human-readable date                        |
+| Status Badge  | `PENDING`=yellow; `RESUBMITTED`=blue; `PAID`=green; `RETURNED`=red   |
+| Days Waiting  | Computed: `Math.floor((Date.now() - new Date(submittedAt)) / 86400000)` — only show if status is PENDING or RESUBMITTED. Turn red if > 7 days. |
+| Action        | "View Details" button → opens a read-only drawer. If status is `RETURNED`, show a red "Fix & Resubmit" button instead. |
+
+---
+
+### 4.4 — "New Request" Button & Multi-Step Dialog
+
+Place a prominent "**+ Request Funds**" button in the page header. Disable it if:
+- There are NO `AVAILABLE` budget items (all items are Pending or Paid).
+- There is already an active request in `PENDING` or `RESUBMITTED` status.
+- Show a tooltip explaining why it's disabled.
+
+The button opens a `<Dialog>` with **3 steps** controlled by a local `step` state (1, 2, 3):
+
+**Step 1 — Select Items**
+- Header: "Select Budget Items to Request"
+- Render a checklist: only show items where `status === 'AVAILABLE'`
+- Each row: `[Checkbox] | Item Description | Category | Amount`
+- A "Select All" toggle at the top.
+- Running total at the bottom: "**Total Requested: ETB X**" — updates live as checkboxes are toggled.
+- Cannot proceed to Step 2 if no items are checked.
+
+**Step 2 — Upload Clearance (CONDITIONAL)**
+- **Logic:** Check `disbursementHistory.length`. If `=== 0`, **SKIP this step entirely** and jump to Step 3.
+- If `> 0`, render:
+  - A yellow info banner: "A clearance document is required because you have a previous disbursement."
+  - A drag-and-drop file upload zone. Accepted types: PDF, JPG, PNG. Max size: 10MB.
+  - Show the file name after selection with an X to remove it.
+  - Cannot proceed to Step 3 if no file is uploaded.
+
+**Step 3 — Review & Confirm**
+- Header: "Review Your Request"
+- A summary card listing the selected items and their amounts.
+- Big total at the bottom.
+- If a clearance document was uploaded, show a green checkmark with the filename.
+- A "**Submit Request**" button. On click, call `POST /budget/project/:projectId/request` with the correct payload (JSON or FormData based on whether clearance is present).
+- Show a loading spinner on the button while the API call is in progress.
+
+---
+
+### 4.5 — "Fix & Resubmit" Drawer
+Triggered by the "Fix & Resubmit" button on a `RETURNED` request row.
+
+A right-side `<Drawer>` (Shadcn Sheet component) containing:
+1. **Red Alert Box at the top:**
+   - Icon: ⚠️
+   - Title: "Finance has returned your request"
+   - Body: The `financeFeedback` string from the API.
+2. **Previous Document Section:**
+   - Shows the filename of the old clearance document (from `clearanceDocumentUrl`). 
+   - An "Open Previous Document" link that opens the URL in a new tab.
+3. **Upload New Document:**
+   - The same drag-and-drop zone as Step 2 above.
+   - Label: "Upload corrected clearance document / receipts"
+   - Cannot submit without a file.
+4. **"Resubmit" Button** at the bottom. On click, call `PATCH /budget/request/:requestId/resubmit` with the new file.
+
+---
+
+### 4.6 — Persistent "Returned Request" Alert Banner
+At the **very top of the page** (below the page title, above the project cards), if ANY project has a `RETURNED` request, render a dismissible red `<Alert>` banner:
+- "⚠️ One or more of your projects has a returned budget request. Please review and fix it."
+- Clicking the alert text navigates or scrolls to the affected project.
+
+---
+
+## 5. Loading, Error & Empty States
+
+| Scenario | What to Render |
+|---|---|
+| Projects loading | Skeleton cards (3 placeholder project cards) |
+| Dashboard loading | Skeleton rows in both tables |
+| API error on fetch | An error card with "Failed to load data. Try again." and a Retry button |
+| No projects found | Empty state: illustration + "You have no approved projects with a budget." |
+| No available items | Empty state inside the New Request dialog Step 1: "All budget items have been requested or disbursed." |
+
+---
+
+## 6. Key Business Rules to Enforce in the UI
+
+1. A user CANNOT have two active (PENDING/RESUBMITTED) requests on the same project simultaneously. The "New Request" button must be disabled in that case.
+2. A user CANNOT submit a new request if there is a RETURNED request — they must fix the existing one first. Show a tooltip: "You must fix and resubmit your returned request before making a new one."
+3. Items with `PENDING_DISBURSEMENT` or `PAID` status must NEVER appear in the Step 1 checklist.
+4. The `clearanceDocument` field is MANDATORY for any request that is not the first (i.e., `disbursementHistory.length > 0`). Block submission at the UI level.
+5. All currency must be formatted as Ethiopian Birr (ETB) with `toLocaleString('en-ET')` or equivalent.
+
+---
+
+## 7. File Structure to Create
+
+```
+app/
+└── researcher/
+    └── budget/
+        ├── page.tsx                    ← Main page, permission gate, data fetching
+        ├── _components/
+        │   ├── ProjectSelectorCard.tsx
+        │   ├── MetricCards.tsx
+        │   ├── BudgetItemsTable.tsx
+        │   ├── DisbursementHistoryTable.tsx
+        │   ├── NewRequestDialog.tsx    ← Multi-step dialog (Steps 1–3)
+        │   ├── FixResubmitDrawer.tsx
+        │   └── ReturnedBanner.tsx
+        └── _hooks/
+            ├── useMyProjects.ts
+            └── useProjectBudget.ts
+```
+
+---
+
+## 8. Do NOT Do
+
+- Do NOT use TailwindCSS arbitrary values where a Shadcn component exists.
+- Do NOT mock data. All data must come from the API endpoints defined above.
+- Do NOT show finance-only fields (bankTransactionId internal details) to the researcher.
+- Do NOT allow the researcher to edit line item amounts or descriptions.
