@@ -2,12 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { motion } from "framer-motion";
-
 import Link from "next/link";
 
 import { useQuery } from "@tanstack/react-query";
 import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, isFuture } from "date-fns";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
   CalendarDays,
@@ -274,11 +273,11 @@ export default function DashboardPage() {
       {/* Header Section */}
       <div className="flex flex-col items-start justify-between gap-1 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-black text-xl tracking-tight text-slate-900 dark:text-slate-100">
+          <h1 className="font-black text-slate-900 text-xl tracking-tight dark:text-slate-100">
             {roleLabel} <span>Dashboard</span>
           </h1>
 
-          <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+          <p className="mt-1 font-medium text-slate-500 text-xs dark:text-slate-400">
             Welcome back{user?.name ? `, ${user.name}` : ""}. Here&apos;s an overview of your research projects and
             team.
           </p>
@@ -310,13 +309,13 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="leading-none">
-                    <p className="text-[12px] font-medium uppercase tracking-wide text-muted-foreground">Active</p>
+                    <p className="font-medium text-[12px] text-muted-foreground uppercase tracking-wide">Active</p>
 
-                    <h3 className="text-sm font-semibold leading-none text-slate-900 dark:text-slate-100">12</h3>
+                    <h3 className="font-semibold text-slate-900 text-sm leading-none dark:text-slate-100">12</h3>
                   </div>
                 </div>
 
-                <p className="flex items-center gap-1 text-[12px] font-medium text-primary">
+                <p className="flex items-center gap-1 font-medium text-[12px] text-primary">
                   <ArrowRight className="h-3.5 w-3.5" />
                   +2
                 </p>
@@ -343,14 +342,14 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="leading-none">
-                    <p className="text-[12px] font-medium uppercase tracking-wide text-muted-foreground">Pending</p>
+                    <p className="font-medium text-[12px] text-muted-foreground uppercase tracking-wide">Pending</p>
 
-                    <h3 className="text-sm font-semibold leading-none text-slate-900 dark:text-slate-100">04</h3>
+                    <h3 className="font-semibold text-slate-900 text-sm leading-none dark:text-slate-100">04</h3>
                   </div>
                 </div>
 
                 {/* RIGHT */}
-                <p className="text-[11px] font-medium text-muted-foreground">Review</p>
+                <p className="font-medium text-[11px] text-muted-foreground">Review</p>
               </div>
             </CardContent>
           </Card>
@@ -374,14 +373,14 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="leading-none">
-                    <p className="text-[12px] font-medium uppercase tracking-wide text-muted-foreground">Team</p>
+                    <p className="font-medium text-[12px] text-muted-foreground uppercase tracking-wide">Team</p>
 
-                    <h3 className="text-sm font-semibold leading-none text-slate-900 dark:text-slate-100">24</h3>
+                    <h3 className="font-semibold text-slate-900 text-sm leading-none dark:text-slate-100">24</h3>
                   </div>
                 </div>
 
                 {/* RIGHT */}
-                <p className="text-[11px] font-medium text-muted-foreground">Members</p>
+                <p className="font-medium text-[11px] text-muted-foreground">Members</p>
               </div>
             </CardContent>
           </Card>
@@ -392,8 +391,8 @@ export default function DashboardPage() {
         {/* LEFT */}
         <div className="flex flex-col gap-2 lg:col-span-2">
           <Card className="flex h-full flex-col overflow-hidden border-slate-200/50 bg-white shadow-none dark:border-slate-800/50 dark:bg-slate-950/50">
-            <CardHeader className="border-b border-slate-100 bg-slate-50/30 px-3 py-1.5 dark:border-slate-800/50 dark:bg-slate-900/10">
-              <CardTitle className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+            <CardHeader className="border-slate-100 border-b bg-slate-50/30 px-3 py-1.5 dark:border-slate-800/50 dark:bg-slate-900/10">
+              <CardTitle className="font-semibold text-slate-800 text-xs dark:text-slate-200">
                 Active Projects Oversight
               </CardTitle>
               <CardDescription className="text-[10px] text-slate-500">Track ongoing research grants</CardDescription>
@@ -419,7 +418,7 @@ export default function DashboardPage() {
                       key={project.name}
                       className="border-slate-100 hover:bg-slate-50/30 dark:border-slate-800/50 dark:hover:bg-slate-800/20"
                     >
-                      <TableCell className="px-2 py-1.5 text-[11px] font-medium text-slate-800 dark:text-slate-200">
+                      <TableCell className="px-2 py-1.5 font-medium text-[11px] text-slate-800 dark:text-slate-200">
                         {project.name}
                       </TableCell>
 
@@ -450,9 +449,9 @@ export default function DashboardPage() {
         {/* RIGHT */}
         <div className="flex flex-col gap-5 lg:col-span-1">
           <Card className="border-slate-200/50 bg-white shadow-none dark:border-slate-800/50 dark:bg-slate-950/50">
-            <CardHeader className="border-b border-slate-100  px-3 py-1.5 dark:border-slate-800/50">
+            <CardHeader className="border-slate-100 border-b px-3 py-1.5 dark:border-slate-800/50">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xs font-semibold text-slate-800 dark:text-slate-200">Messages</CardTitle>
+                <CardTitle className="font-semibold text-slate-800 text-xs dark:text-slate-200">Messages</CardTitle>
 
                 <Badge className="bg-blue-100 px-2 py-0 text-[9px] text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
                   3
@@ -470,7 +469,7 @@ export default function DashboardPage() {
 
                     <div className="flex flex-1 flex-col leading-tight">
                       <div className="flex justify-between">
-                        <p className="text-[11px] font-medium text-slate-800 dark:text-white">{msg.sender}</p>
+                        <p className="font-medium text-[11px] text-slate-800 dark:text-white">{msg.sender}</p>
                         <span className="text-[8px] text-slate-400 dark:text-slate-200">{msg.time}</span>
                       </div>
                       <p className="mb-1 text-[11px] text-slate-500 leading-none dark:text-slate-400">{msg.role}</p>

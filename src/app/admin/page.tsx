@@ -1,25 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  AlertCircle,
-  Bell,
-  Briefcase,
-  Check,
-  CheckCircle2,
-  ChevronRight,
-  Coins,
-  FileCheck2,
-  FileSearch,
-  Files,
-  FileText,
-  LayoutDashboard,
-  Search,
-  ShieldAlert,
-  UserCog,
-  UserPlus,
-  Users,
-} from "lucide-react";
+import { Bell, Briefcase, CheckCircle2, Coins, FileCheck2, LayoutDashboard, Search } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +21,7 @@ const currentUser = {
   name: "Dr. Admin",
   role: "Finance", // e.g. VPRTT, RAD, Finance
 };
-const containerVariants = {
+const _containerVariants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -92,7 +74,7 @@ export default function AdminDashboardPage() {
             Research Control Center
           </h1>
 
-          <p className="font-medium text-sm text-slate-500 leading-tight dark:text-slate-400">
+          <p className="font-medium text-slate-500 text-sm leading-tight dark:text-slate-400">
             Welcome back, {currentUser.name}. Here's an overview of the university research ecosystem today.
           </p>
         </div>
@@ -100,27 +82,18 @@ export default function AdminDashboardPage() {
 
       {/* ----------------- STAT SUMMARY CARDS ----------------- */}
       <div className="mb-8 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:gap-6">
-        <motion.div variants={cardVariants} whileHover={{ y: -5 }} className="w-full group">
+        <motion.div variants={cardVariants} whileHover={{ y: -5 }} className="group w-full">
           <Card className="h-full border-slate-200/60 bg-white shadow-sm transition-all hover:shadow-md dark:border-slate-800/60 dark:bg-slate-950">
             <CardContent className="p-2">
               <div className="flex items-center justify-between gap-1">
                 <div className="flex items-center gap-1.5">
-                  <div
-                    className="
-                      flex h-7 w-7 items-center justify-center rounded-md
-                      bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400
-                      transition-all duration-300
-                      group-hover:bg-blue-600 group-hover:text-white
-                      group-hover:shadow-[0_0_12px_rgba(59,130,246,0.45)]
-                      group-hover:scale-105
-                    "
-                  >
+                  <div className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-50 text-blue-600 transition-all duration-300 group-hover:scale-105 group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-[0_0_12px_rgba(59,130,246,0.45)] dark:bg-blue-900/20 dark:text-blue-400">
                     <Briefcase className="h-3 w-3" />
                   </div>
 
                   <div className="leading-none">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">Projects</p>
-                    <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">142</h2>
+                    <p className="font-medium text-[10px] text-slate-500 uppercase tracking-wide">Projects</p>
+                    <h2 className="font-semibold text-slate-900 text-sm dark:text-slate-100">142</h2>
                   </div>
                 </div>
 
@@ -129,56 +102,38 @@ export default function AdminDashboardPage() {
             </CardContent>
           </Card>
         </motion.div>
-        <motion.div variants={cardVariants} whileHover={{ y: -5 }} className="w-full group">
+        <motion.div variants={cardVariants} whileHover={{ y: -5 }} className="group w-full">
           <Card className="h-full border-slate-200/60 bg-white shadow-sm transition-all hover:shadow-md dark:border-slate-800/60 dark:bg-slate-950">
             <CardContent className="p-2">
               <div className="flex items-center justify-between gap-1">
                 <div className="flex items-center gap-1.5">
-                  <div
-                    className="
-                    flex h-7 w-7 items-center justify-center rounded-md
-                    bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400
-                    transition-all duration-300
-                    group-hover:bg-amber-600 group-hover:text-white
-                group-hover:shadow-[0_0_12px_rgba(245,158,11,0.45)]
-                group-hover:scale-105
-              "
-                  >
+                  <div className="flex h-7 w-7 items-center justify-center rounded-md bg-amber-50 text-amber-600 transition-all duration-300 group-hover:scale-105 group-hover:bg-amber-600 group-hover:text-white group-hover:shadow-[0_0_12px_rgba(245,158,11,0.45)] dark:bg-amber-900/20 dark:text-amber-400">
                     <FileCheck2 className="h-3 w-3" />
                   </div>
 
                   <div className="leading-none">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">Pending</p>
-                    <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">28</h2>
+                    <p className="font-medium text-[10px] text-slate-500 uppercase tracking-wide">Pending</p>
+                    <h2 className="font-semibold text-slate-900 text-sm dark:text-slate-100">28</h2>
                   </div>
                 </div>
 
-                <span className="text-[12px] font-bold text-red-600 dark:text-red-400">Alert</span>
+                <span className="font-bold text-[12px] text-red-600 dark:text-red-400">Alert</span>
               </div>
             </CardContent>
           </Card>
         </motion.div>
-        <motion.div variants={cardVariants} whileHover={{ y: -5 }} className="w-full group">
+        <motion.div variants={cardVariants} whileHover={{ y: -5 }} className="group w-full">
           <Card className="relative h-full border-slate-200/60 bg-white shadow-sm transition-all hover:shadow-md dark:border-slate-800/60 dark:bg-slate-950">
             <CardContent className="p-2">
               <div className="flex items-center justify-between gap-1">
                 <div className="flex items-center gap-1.5">
-                  <div
-                    className="
-                flex h-7 w-7 items-center justify-center rounded-md
-                bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400
-                transition-all duration-300
-                group-hover:bg-indigo-600 group-hover:text-white
-                group-hover:shadow-[0_0_12px_rgba(99,102,241,0.45)]
-                group-hover:scale-105
-              "
-                  >
+                  <div className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-50 text-indigo-600 transition-all duration-300 group-hover:scale-105 group-hover:bg-indigo-600 group-hover:text-white group-hover:shadow-[0_0_12px_rgba(99,102,241,0.45)] dark:bg-indigo-900/20 dark:text-indigo-400">
                     <Coins className="h-3 w-3" />
                   </div>
 
                   <div className="leading-none">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">Budget</p>
-                    <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">2.4M</h2>
+                    <p className="font-medium text-[10px] text-slate-500 uppercase tracking-wide">Budget</p>
+                    <h2 className="font-semibold text-slate-900 text-sm dark:text-slate-100">2.4M</h2>
                   </div>
                 </div>
 
@@ -187,28 +142,19 @@ export default function AdminDashboardPage() {
             </CardContent>
           </Card>
         </motion.div>
-        <motion.div variants={cardVariants} whileHover={{ y: -5 }} className="w-full group">
+        <motion.div variants={cardVariants} whileHover={{ y: -5 }} className="group w-full">
           <Card className="h-full border-slate-200/60 bg-white shadow-sm transition-all hover:shadow-md dark:border-slate-800/60 dark:bg-slate-950">
             <CardContent className="p-2">
               <div className="flex items-center justify-between gap-1">
                 {/* LEFT SIDE */}
                 <div className="flex items-center gap-1.5">
-                  <div
-                    className="
-                  flex h-7 w-7 items-center justify-center rounded-md
-                  bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400
-                  transition-all duration-300
-                  group-hover:bg-emerald-600 group-hover:text-white
-                  group-hover:shadow-[0_0_12px_rgba(16,185,129,0.45)]
-                  group-hover:scale-105
-                "
-                  >
+                  <div className="flex h-7 w-7 items-center justify-center rounded-md bg-emerald-50 text-emerald-600 transition-all duration-300 group-hover:scale-105 group-hover:bg-emerald-600 group-hover:text-white group-hover:shadow-[0_0_12px_rgba(16,185,129,0.45)] dark:bg-emerald-900/20 dark:text-emerald-400">
                     <CheckCircle2 className="h-3 w-3" />
                   </div>
 
                   <div className="leading-none">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">Done</p>
-                    <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">56</h2>
+                    <p className="font-medium text-[10px] text-slate-500 uppercase tracking-wide">Done</p>
+                    <h2 className="font-semibold text-slate-900 text-sm dark:text-slate-100">56</h2>
                   </div>
                 </div>
 
@@ -227,9 +173,9 @@ export default function AdminDashboardPage() {
         <div className="flex flex-col gap-3 xl:col-span-1">
           <Card className="border-red-200/40 bg-white shadow-sm dark:border-red-900/30 dark:bg-slate-950/50">
             {/* HEADER (compact) */}
-            <CardHeader className="border-b border-red-100 px-3 py-2 dark:border-red-900/20">
+            <CardHeader className="border-red-100 border-b px-3 py-2 dark:border-red-900/20">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                <CardTitle className="flex items-center gap-2 font-semibold text-slate-900 text-sm dark:text-slate-100">
                   <Bell className="h-4 w-4 text-red-500" />
                   Notifications
                 </CardTitle>
@@ -256,14 +202,14 @@ export default function AdminDashboardPage() {
                 {/* Content */}
                 <div className="flex flex-1 flex-col leading-tight">
                   <div className="flex justify-between">
-                    <p className="text-[11px] font-semibold text-slate-800 dark:text-slate-200">Dr. Research Office</p>
+                    <p className="font-semibold text-[11px] text-slate-800 dark:text-slate-200">Dr. Research Office</p>
                     <span className="text-[9px] text-slate-400">2m</span>
                   </div>
 
                   <p className="text-[10px] text-slate-500">Project Transfer Request (PRJ-102)</p>
 
                   <div className="mt-1.5 flex gap-2">
-                    <Button size="sm" className="h-5 px-2 text-[10px] bg-emerald-600">
+                    <Button size="sm" className="h-5 bg-emerald-600 px-2 text-[10px]">
                       Approve
                     </Button>
                     <Button size="sm" variant="destructive" className="h-5 px-2 text-[10px]">
@@ -283,14 +229,14 @@ export default function AdminDashboardPage() {
                 {/* Content */}
                 <div className="flex flex-1 flex-col leading-tight">
                   <div className="flex justify-between">
-                    <p className="text-[11px] font-semibold text-slate-800 dark:text-slate-200">Co-PI Office</p>
+                    <p className="font-semibold text-[11px] text-slate-800 dark:text-slate-200">Co-PI Office</p>
                     <span className="text-[9px] text-slate-400">10m</span>
                   </div>
 
                   <p className="text-[10px] text-slate-500">Team Replacement Request (PRJ-204)</p>
 
                   <div className="mt-1.5 flex gap-2">
-                    <Button size="sm" className="h-5 px-2 text-[10px] bg-blue-600">
+                    <Button size="sm" className="h-5 bg-blue-600 px-2 text-[10px]">
                       Review
                     </Button>
                     <Button size="sm" variant="outline" className="h-5 px-2 text-[10px]">
@@ -303,7 +249,7 @@ export default function AdminDashboardPage() {
           </Card>
         </div>
         {/* ================= RIGHT: DATA TABLE ================= */}
-        <div className="xl:col-span-2 flex flex-col gap-4">
+        <div className="flex flex-col gap-4 xl:col-span-2">
           <Card className="border-slate-200/60 bg-white shadow-sm dark:border-slate-800/60 dark:bg-slate-950">
             {/* Header + Search */}
             <CardHeader className="border-b pb-3 dark:border-slate-800">
@@ -312,14 +258,14 @@ export default function AdminDashboardPage() {
                   <CardTitle className="font-bold text-md text-slate-900 dark:text-slate-100">
                     Project Registry
                   </CardTitle>
-                  <CardDescription className="text-xs text-slate-500">
+                  <CardDescription className="text-slate-500 text-xs">
                     Search and manage all active research projects
                   </CardDescription>
                 </div>
 
                 <div className="relative w-full md:w-64">
-                  <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <Input placeholder="Search projects..." className="h-9 pl-8 rounded-full" />
+                  <Search className="-translate-y-1/2 absolute top-1/2 left-2.5 h-4 w-4 text-slate-400" />
+                  <Input placeholder="Search projects..." className="h-9 rounded-full pl-8" />
                 </div>
               </div>
             </CardHeader>
@@ -343,11 +289,11 @@ export default function AdminDashboardPage() {
                       <TableCell className="font-medium text-sm">{p.name}</TableCell>
 
                       {/* PI (you don’t have this field yet) */}
-                      <TableCell className="text-sm text-slate-500">—</TableCell>
+                      <TableCell className="text-slate-500 text-sm">—</TableCell>
 
                       {/* Status with badge (better UI than plain text) */}
                       <TableCell>
-                        <Badge className={`${p.badgeColor} text-[10px] px-2 py-0`}>{p.status}</Badge>
+                        <Badge className={`${p.badgeColor} px-2 py-0 text-[10px]`}>{p.status}</Badge>
                       </TableCell>
 
                       {/* Actions */}

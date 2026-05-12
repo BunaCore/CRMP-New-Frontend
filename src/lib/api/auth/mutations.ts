@@ -7,7 +7,7 @@
 // ============================================================
 
 import { getMockLoginResponse } from "@/data/mock-auth";
-import type { LoginCredentials, LoginResponse, UserProfile } from "@/lib/api/auth/types";
+import type { LoginCredentials, LoginResponse, RegisterPayload, UserProfile } from "@/lib/api/auth/types";
 import { mapBackendPermissionsToFrontend } from "@/lib/permissions/permission-mapper";
 
 // ─── 🟢 MOCK SWITCH ──────────────────────────────────────────
@@ -54,19 +54,16 @@ export async function registerUser(_payload: {
   email: string;
   password: string;
   fullName: string;
-  department?: string;
+  departmentId?: string;
+  phoneNumber?: string;
+  userProgram: "UG" | "PG" | null;
 }): Promise<{ message: string }> {
   if (USE_MOCK) {
     await new Promise((r) => setTimeout(r, 600));
     return { message: "Registration successful. Please sign in." };
   }
-
-  // 🔴 REAL BACKEND
-  /*
+  // REAL BACKEND
   const { apiClient } = await import("@/lib/api/client");
-  const response = await apiClient.post<{ message: string }>("/auth/register", payload);
+  const response = await apiClient.post<{ message: string }>("/auth/register", _payload as RegisterPayload);
   return response.data;
-  */
-
-  throw new Error("Set USE_MOCK = false and uncomment the real block above.");
 }

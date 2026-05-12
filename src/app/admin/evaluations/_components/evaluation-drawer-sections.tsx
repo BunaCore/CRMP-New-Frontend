@@ -2,7 +2,6 @@
 
 import { format } from "date-fns";
 import {
-  Award,
   Banknote,
   CalendarDays,
   CheckCircle2,
@@ -12,7 +11,6 @@ import {
   GraduationCap,
   Loader2,
   Send,
-  ShieldCheck,
   UserCheck,
   Users,
 } from "lucide-react";
@@ -30,9 +28,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useGetProposalMembers } from "@/lib/api/proposals/queries";
 import type { EvaluationRubric, ProposalMemberWithUser } from "@/lib/api/proposals/types";
 
-import { formatPeopleList } from "../../proposals/_components/proposals-table";
 import { TimelineTab } from "../../proposals/_components/timeline-tab";
-import type { DrawerTab, EvalProjectRow, EvalProposalRow, RubricItem } from "../types";
+import type { EvalProjectRow, EvalProposalRow, RubricItem } from "../types";
 
 export interface DraftScore {
   score: number;
@@ -254,6 +251,7 @@ interface EvaluationScoresTabProps {
   draftScores: Record<string, DraftScore>;
   setDraftScores: React.Dispatch<React.SetStateAction<Record<string, DraftScore>>>;
   scoresLoading: boolean;
+  membersLoading: boolean;
   isSubmitting: boolean;
   totals: { earned: number; max: number; pct: number };
   apiAggregate: { earned: number; max: number };
@@ -264,11 +262,13 @@ export function EvaluationScoresTab({
   drawerKind,
   rubric,
   setRubric,
+  // biome-ignore lint/correctness/noUnusedFunctionParameters: reserved for other tabs
   apiRubrics,
   filteredApiRubrics,
   draftScores,
   setDraftScores,
   scoresLoading,
+  membersLoading,
   isSubmitting,
   totals,
   apiAggregate,
@@ -306,14 +306,14 @@ export function EvaluationScoresTab({
         )}
       </div>
 
-      {scoresLoading && (
+      {(scoresLoading || membersLoading) && (
         <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 py-12 dark:border-slate-800 dark:bg-slate-900/30">
           <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
-          <p className="text-slate-500 text-xs">Loading rubrics from server…</p>
+          <p className="text-slate-500 text-xs">Loading rubrics and members from server…</p>
         </div>
       )}
 
-      {!scoresLoading && filteredApiRubrics.length > 0 && (
+      {!(scoresLoading || membersLoading) && filteredApiRubrics.length > 0 && (
         <div className="flex flex-col gap-3">
           {filteredApiRubrics.map((row, i) => {
             const draft = draftScores[row.id] ?? { score: 0, feedback: "" };
@@ -400,7 +400,7 @@ export function EvaluationScoresTab({
         </div>
       )}
 
-      {!scoresLoading && filteredApiRubrics.length === 0 && (
+      {!(scoresLoading || membersLoading) && filteredApiRubrics.length === 0 && (
         <div className="flex flex-col gap-3">
           {rubric.map((row, i) => {
             const pct = row.max > 0 ? (row.score / row.max) * 100 : 0;
@@ -482,7 +482,12 @@ export function EvaluationScoresTab({
           <Button
             type="button"
             className="h-10 bg-indigo-600 font-semibold text-white shadow hover:bg-indigo-700"
-            disabled={isSubmitting || scoresLoading || filteredApiRubrics.length === 0}
+            disabled={
+              isSubmitting ||
+              scoresLoading ||
+              membersLoading ||
+              (filteredApiRubrics.length === 0 && rubric.length === 0)
+            }
             onClick={handleSubmitScores}
           >
             {isSubmitting ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Send className="mr-1.5 h-4 w-4" />}
@@ -738,10 +743,10 @@ export function TeamTabContent({ proposalId }: TeamTabContentProps) {
         {memberGroups.map((group) => (
           <div
             key={group.role}
-            className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm shadow-slate-200/50 dark:border-slate-800 dark:bg-slate-950 dark:shadow-none"
+            className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-slate-200/50 shadow-sm dark:border-slate-800 dark:bg-slate-950 dark:shadow-none"
           >
-            <div className="border-b border-slate-100 px-4 py-3 dark:border-slate-800">
-              <p className="font-semibold text-sm text-slate-900 dark:text-slate-100">
+            <div className="border-slate-100 border-b px-4 py-3 dark:border-slate-800">
+              <p className="font-semibold text-slate-900 text-sm dark:text-slate-100">
                 {roleLabels[group.role] || group.role.replace(/_/g, " ")}
               </p>
               <p className="mt-0.5 text-slate-500 text-xs dark:text-slate-400">
@@ -766,7 +771,7 @@ export function TeamTabContent({ proposalId }: TeamTabContentProps) {
                       </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium text-sm text-slate-900 dark:text-slate-100">
+                      <p className="truncate font-medium text-slate-900 text-sm dark:text-slate-100">
                         {member.user.fullName}
                       </p>
                       <p className="truncate text-slate-500 text-xs dark:text-slate-400">{member.user.email}</p>

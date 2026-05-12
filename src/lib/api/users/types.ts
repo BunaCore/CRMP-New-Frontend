@@ -18,6 +18,7 @@ export interface UserListItem {
   departmentName: string | null;
   universityId: string | null;
   phoneNumber: string | null;
+  userProgram: "UG" | "PG" | null;
   isExternal: boolean;
   accountStatus: string;
   avatarUrl: string | null;
@@ -51,4 +52,18 @@ export interface InviteUserPayload {
 export interface UpdateUserRolesPayload {
   userId: string;
   roleIds: string[];
+}
+
+export interface UpdateUserStatusPayload {
+  userId: string;
+  status: "active" | "deactive";
+}
+
+export interface UpdateUserProfilePayload {
+  userId: string;
+  fullName?: string;
+  email?: string;
+  phoneNumber?: string | null;
+  universityId?: string | null;
+  userProgram?: "UG" | "PG" | null;
 }

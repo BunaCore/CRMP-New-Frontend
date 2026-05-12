@@ -2,7 +2,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { apiClient } from "@/lib/api/client";
 
-import type { InviteUserPayload, UpdateUserRolesPayload } from "./types";
+import type {
+  InviteUserPayload,
+  UpdateUserProfilePayload,
+  UpdateUserRolesPayload,
+  UpdateUserStatusPayload,
+} from "./types";
 
 /**
  * Invite user to the system (admin).
@@ -43,6 +48,53 @@ export function useUpdateUserRoles() {
         queryKey: ["users", "byId", variables.userId],
       });
       queryClient.invalidateQueries({ queryKey: ["users", "list"] });
+    },
+  });
+}
+
+/**
+ * Update a user's account status (active/deactive).
+ * PATCH /users/:id/status
+ */
+export async function updateUserStatus(payload: UpdateUserStatusPayload) {
+  const response = await apiClient.patch(`/users/${payload.userId}/status`, {
+    status: payload.status,
+  });
+  return response.data;
+}
+
+export function useUpdateUserStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateUserStatus,
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["users", "list"] });
+      queryClient.invalidateQueries({
+        queryKey: ["users", "byId", variables.userId],
+      });
+    },
+  });
+}
+
+/**
+ * Update user profile information.
+ * PATCH /users/:id
+ */
+export async function updateUserProfile(payload: UpdateUserProfilePayload) {
+  const { userId, ...data } = payload;
+  const response = await apiClient.patch(`/users/${userId}`, data);
+  return response.data;
+}
+
+export function useUpdateUserProfile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateUserProfile,
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["users", "list"] });
+      queryClient.invalidateQueries({
+        queryKey: ["users", "byId", variables.userId],
+      });
     },
   });
 }

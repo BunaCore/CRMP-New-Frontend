@@ -125,7 +125,7 @@ function WorkflowStepItem({ step, isLast }: { step: WorkflowStep; isLast: boolea
   return (
     <div className="relative flex gap-5">
       {/* Connector line */}
-      {!isLast && <div className="absolute top-6 -bottom-8 left-1.25 w-px bg-slate-200 dark:bg-slate-800" />}
+      {!isLast && <div className="-bottom-8 absolute top-6 left-1.25 w-px bg-slate-200 dark:bg-slate-800" />}
 
       {/* Status icon */}
       <div className="relative z-10 mt-1 flex h-3 w-3 shrink-0 items-center justify-center">
@@ -690,55 +690,52 @@ export default function ProposalDetailsPage() {
                             disabled={isSaving}
                             className="h-10"
                           />
-                          {editFile && <span className="text-xs text-slate-500">{editFile.name}</span>}
+                          {editFile && <span className="text-slate-500 text-xs">{editFile.name}</span>}
                         </div>
                       </div>
                     )}
 
-                    {proposal.isEditable && (
-                      <>
-                        {isEditing ? (
-                          <div className="mt-1 flex flex-wrap items-center gap-2">
-                            <Button
-                              type="button"
-                              onClick={handleSaveEditableFields}
-                              disabled={isSaving}
-                              className="rounded-full bg-blue-600 text-white hover:bg-blue-700"
-                            >
-                              {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                              Save Changes
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              className="rounded-full"
-                              disabled={isSaving}
-                              onClick={() => {
-                                setEditTitle(proposal.title ?? "");
-                                setEditAbstract(proposal.abstract ?? "");
-                                setEditResearchArea(proposal.researchArea ?? "");
-                                setEditFile(null);
-                                setIsEditing(false);
-                              }}
-                            >
-                              Cancel
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="mt-1">
-                            <Button
-                              type="button"
-                              onClick={handleResubmitProposal}
-                              disabled={isResubmitting}
-                              className="rounded-full bg-blue-600 text-white hover:bg-blue-700"
-                            >
-                              {isResubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                              Resubmit Proposal
-                            </Button>
-                          </div>
-                        )}
-                      </>
-                    )}
+                    {proposal.isEditable &&
+                      (isEditing ? (
+                        <div className="mt-1 flex flex-wrap items-center gap-2">
+                          <Button
+                            type="button"
+                            onClick={handleSaveEditableFields}
+                            disabled={isSaving}
+                            className="rounded-full bg-blue-600 text-white hover:bg-blue-700"
+                          >
+                            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            Save Changes
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="rounded-full"
+                            disabled={isSaving}
+                            onClick={() => {
+                              setEditTitle(proposal.title ?? "");
+                              setEditAbstract(proposal.abstract ?? "");
+                              setEditResearchArea(proposal.researchArea ?? "");
+                              setEditFile(null);
+                              setIsEditing(false);
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="mt-1">
+                          <Button
+                            type="button"
+                            onClick={handleResubmitProposal}
+                            disabled={isResubmitting}
+                            className="rounded-full bg-blue-600 text-white hover:bg-blue-700"
+                          >
+                            {isResubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            Resubmit Proposal
+                          </Button>
+                        </div>
+                      ))}
                   </CardContent>
                 </Card>
 

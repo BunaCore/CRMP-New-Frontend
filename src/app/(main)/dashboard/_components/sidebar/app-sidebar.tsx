@@ -105,7 +105,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link prefetch={false} href="/dashboard" className="flex items-center gap-2">
-                <Image src="/logo.png" alt="Logo" width={24} height={24} className="object-contain" />
+                <Image src="/logo.png" alt="Logo" width={24} height={24} className="object-contain shrink-0" />
                 <span className="font-semibold text-base">{APP_CONFIG.name}</span>
               </Link>
             </SidebarMenuButton>
