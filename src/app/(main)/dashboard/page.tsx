@@ -1,7 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import Link from "next/link";
+
+import { useQuery } from "@tanstack/react-query";
+import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, isFuture } from "date-fns";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -31,6 +35,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useSession } from "@/context/SessionContext";
+import { getMyProposals } from "@/lib/api/proposals/queries";
 
 export default function DashboardPage() {
   const [showRSVPModal, setShowRSVPModal] = useState(false);
@@ -99,7 +104,7 @@ export default function DashboardPage() {
   ];
 
   // Mock data for recent activity
-  const activities = [
+  const _activities = [
     {
       title: "Evaluation submitted",
       desc: "Dr. Smith submitted eval for AI Health Diagnostics.",
@@ -161,76 +166,127 @@ export default function DashboardPage() {
     },
   ];
 
-  // ─── MOCK FEATURE TOGGLE ─────────────────────────
-  // Set to false to hide the scheduled defence alerts
-  const SHOW_MOCK_APPOINTMENT = true;
+  // Fetch user's proposals using React Query
+  const { data: userProposals, isLoading: _isLoadingProposals } = useQuery({
+    queryKey: ["dashboard_proposals"],
+    queryFn: getMyProposals,
+  });
 
-  const mockAppointment = {
-    title: "Quantum Computing Simulation",
-    date: "14 Mar 2025",
-    time: "10:00 AM (EAT)",
-    venue: "Main Campus — Senate Hall",
-    message:
-      "Please ensure your presentation is strictly 15 minutes. The evaluation committee has already reviewed your abstract.",
-  };
+  // Find the single closest upcoming defence
+  const upcomingDefence = useMemo(() => {
+    if (!userProposals) return null;
+
+    const allDefences = userProposals.flatMap((p) =>
+      (p.defenceSchedules || []).map((d) => ({
+        ...d,
+        proposalTitle: p.title,
+        proposalId: p.id,
+      })),
+    );
+
+    // Filter only future defences and sort by closest date
+    const futureDefences = allDefences
+      .filter((d) => isFuture(new Date(d.defenceDate)))
+      .sort((a, b) => new Date(a.defenceDate).getTime() - new Date(b.defenceDate).getTime());
+
+    return futureDefences[0] || null;
+  }, [userProposals]);
+
+  const [timeLeft, setTimeLeft] = useState<{ d: number; h: number; m: number; s: number } | null>(null);
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (!upcomingDefence) {
+      setTimeLeft(null);
+      return;
+    }
+
+    const targetDate = new Date(upcomingDefence.defenceDate);
+
+    const updateTimer = () => {
+      const now = new Date();
+      if (!isFuture(targetDate)) {
+        setTimeLeft(null);
+        return;
+      }
+
+      const d = differenceInDays(targetDate, now);
+      const h = differenceInHours(targetDate, now) % 24;
+      const m = differenceInMinutes(targetDate, now) % 60;
+      const s = differenceInSeconds(targetDate, now) % 60;
+
+      setTimeLeft({ d, h, m, s });
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [upcomingDefence]);
+
+  // Determine urgency level (amber vs red)
+  const isUrgent = timeLeft !== null && timeLeft.d === 0 && timeLeft.h < 24; // Less than 24 hours
+  const alertColor = isUrgent
+    ? "border-red-200/80 bg-gradient-to-r from-red-50 to-red-100/50 dark:border-red-900/50 dark:from-red-950/40 dark:to-red-900/20"
+    : "border-amber-200/80 bg-gradient-to-r from-amber-50 to-amber-100/50 dark:border-amber-900/50 dark:from-amber-950/40 dark:to-amber-900/20";
+
+  const textTitleColor = isUrgent ? "text-red-900 dark:text-red-200" : "text-amber-900 dark:text-amber-200";
+  const textDescColor = isUrgent ? "text-red-700 dark:text-red-400" : "text-amber-700 dark:text-amber-400";
+  const iconBgColor = isUrgent ? "bg-red-500" : "bg-amber-500";
+  const buttonColor = isUrgent
+    ? "bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-500"
+    : "bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-500";
 
   return (
-    <div className="flex flex-1 flex-col gap-4 pt-0.5">
-      {/* Banner */}
-      {SHOW_MOCK_APPOINTMENT && (
-        <motion.div
-          initial={{ y: 15, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          whileHover={{ y: -2 }}
-          transition={{ duration: 0.25 }}
-          className="group relative flex items-center gap-2 overflow-hidden rounded-xl border border-slate-200/50 bg-card p-2 shadow-sm transition-all hover:shadow-md dark:border-slate-800/50 dark:bg-slate-950/50"
+    <div className="flex flex-1 flex-col gap-8">
+      {/* Dynamic Defence Alert Notification */}
+      {upcomingDefence && timeLeft !== null && (
+        <div
+          className={`flex flex-col items-center gap-4 rounded-xl border p-4 shadow-sm transition-colors duration-500 sm:flex-row ${alertColor}`}
         >
-          {/* background glow (smaller + softer) */}
-          <div className="absolute -right-8 -top-8 h-20 w-20 rounded-full bg-[#13DAEC]/10 blur-2xl" />
-          <div className="absolute -left-8 -bottom-8 h-20 w-20 rounded-full bg-[#13DAEC]/10 blur-2xl" />
-
-          {/* icon (smaller) */}
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 text-white">
-            <CalendarDays className="h-3.5 w-3.5" />
+          <div
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white shadow-sm transition-colors duration-500 ${iconBgColor}`}
+          >
+            <CalendarDays className="h-5 w-5" />
           </div>
-
-          {/* text */}
-          <div className="flex-1 min-w-0">
-            <h3 className="text-[11px] font-semibold text-red-600 truncate leading-tight">Upcoming Proposal Defence</h3>
-
-            <p className="text-[11px] text-slate-600 truncate leading-tight dark:text-slate-300">
-              <span className="font-medium text-slate-900 dark:text-slate-100">{mockAppointment.title}</span> –{" "}
-              {mockAppointment.date}, {mockAppointment.time}
+          <div className="flex-1 text-center sm:text-left">
+            <h3 className={`font-bold text-sm transition-colors duration-500 ${textTitleColor}`}>
+              {isUrgent ? "CRITICAL: " : "Action Required: "} Upcoming Proposal Defence
+            </h3>
+            <p className={`mt-0.5 text-sm transition-colors duration-500 ${textDescColor}`}>
+              Your defence for <strong className="font-bold">{upcomingDefence.proposalTitle}</strong> is coming up in{" "}
+              <span className="rounded bg-white/50 px-1.5 py-0.5 font-bold font-mono tracking-tight dark:bg-black/20">
+                {timeLeft.d}d {timeLeft.h.toString().padStart(2, "0")}h {timeLeft.m.toString().padStart(2, "0")}m{" "}
+                {timeLeft.s.toString().padStart(2, "0")}s
+              </span>
             </p>
           </div>
 
           {/* button (smaller) */}
           <Button
             onClick={() => setShowRSVPModal(true)}
-            size="sm"
-            className="h-7 px-2.5 text-[11px] rounded-md bg-red-600 text-white"
+            className={`w-full font-semibold text-white shadow-sm transition-colors duration-500 sm:w-auto ${buttonColor}`}
           >
             View
           </Button>
-        </motion.div>
+        </div>
       )}
       {/* Header Section */}
       <div className="flex flex-col items-start justify-between gap-1 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-black text-xl tracking-tight text-slate-900 dark:text-slate-100">
+          <h1 className="font-black text-slate-900 text-xl tracking-tight dark:text-slate-100">
             {roleLabel} <span>Dashboard</span>
           </h1>
 
-          <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+          <p className="mt-1 font-medium text-slate-500 text-xs dark:text-slate-400">
             Welcome back{user?.name ? `, ${user.name}` : ""}. Here&apos;s an overview of your research projects and
             team.
           </p>
         </div>
-
-        <Button className="group h-8 rounded-full px-4 text-xs font-medium bg-primary text-white shadow hover:bg-primary/90 sm:w-auto">
-          <Plus className="mr-1.5 h-3.5 w-3.5 transition-transform duration-300 group-hover:rotate-90" />
-          New Project
-        </Button>
+        <Link href="/dashboard/proposals/new" passHref legacyBehavior>
+          <Button className="w-full rounded-full border-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 font-medium text-white shadow transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-md sm:w-auto">
+            <Plus className="mr-2 h-4 w-4" /> New Project
+          </Button>
+        </Link>
       </div>
 
       {/* Summary Cards */}
@@ -253,13 +309,13 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="leading-none">
-                    <p className="text-[12px] font-medium uppercase tracking-wide text-muted-foreground">Active</p>
+                    <p className="font-medium text-[12px] text-muted-foreground uppercase tracking-wide">Active</p>
 
-                    <h3 className="text-sm font-semibold leading-none text-slate-900 dark:text-slate-100">12</h3>
+                    <h3 className="font-semibold text-slate-900 text-sm leading-none dark:text-slate-100">12</h3>
                   </div>
                 </div>
 
-                <p className="flex items-center gap-1 text-[12px] font-medium text-primary">
+                <p className="flex items-center gap-1 font-medium text-[12px] text-primary">
                   <ArrowRight className="h-3.5 w-3.5" />
                   +2
                 </p>
@@ -286,14 +342,14 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="leading-none">
-                    <p className="text-[12px] font-medium uppercase tracking-wide text-muted-foreground">Pending</p>
+                    <p className="font-medium text-[12px] text-muted-foreground uppercase tracking-wide">Pending</p>
 
-                    <h3 className="text-sm font-semibold leading-none text-slate-900 dark:text-slate-100">04</h3>
+                    <h3 className="font-semibold text-slate-900 text-sm leading-none dark:text-slate-100">04</h3>
                   </div>
                 </div>
 
                 {/* RIGHT */}
-                <p className="text-[11px] font-medium text-muted-foreground">Review</p>
+                <p className="font-medium text-[11px] text-muted-foreground">Review</p>
               </div>
             </CardContent>
           </Card>
@@ -317,14 +373,14 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="leading-none">
-                    <p className="text-[12px] font-medium uppercase tracking-wide text-muted-foreground">Team</p>
+                    <p className="font-medium text-[12px] text-muted-foreground uppercase tracking-wide">Team</p>
 
-                    <h3 className="text-sm font-semibold leading-none text-slate-900 dark:text-slate-100">24</h3>
+                    <h3 className="font-semibold text-slate-900 text-sm leading-none dark:text-slate-100">24</h3>
                   </div>
                 </div>
 
                 {/* RIGHT */}
-                <p className="text-[11px] font-medium text-muted-foreground">Members</p>
+                <p className="font-medium text-[11px] text-muted-foreground">Members</p>
               </div>
             </CardContent>
           </Card>
@@ -335,8 +391,8 @@ export default function DashboardPage() {
         {/* LEFT */}
         <div className="flex flex-col gap-2 lg:col-span-2">
           <Card className="flex h-full flex-col overflow-hidden border-slate-200/50 bg-white shadow-none dark:border-slate-800/50 dark:bg-slate-950/50">
-            <CardHeader className="border-b border-slate-100 bg-slate-50/30 px-3 py-1.5 dark:border-slate-800/50 dark:bg-slate-900/10">
-              <CardTitle className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+            <CardHeader className="border-slate-100 border-b bg-slate-50/30 px-3 py-1.5 dark:border-slate-800/50 dark:bg-slate-900/10">
+              <CardTitle className="font-semibold text-slate-800 text-xs dark:text-slate-200">
                 Active Projects Oversight
               </CardTitle>
               <CardDescription className="text-[10px] text-slate-500">Track ongoing research grants</CardDescription>
@@ -362,7 +418,7 @@ export default function DashboardPage() {
                       key={project.name}
                       className="border-slate-100 hover:bg-slate-50/30 dark:border-slate-800/50 dark:hover:bg-slate-800/20"
                     >
-                      <TableCell className="px-2 py-1.5 text-[11px] font-medium text-slate-800 dark:text-slate-200">
+                      <TableCell className="px-2 py-1.5 font-medium text-[11px] text-slate-800 dark:text-slate-200">
                         {project.name}
                       </TableCell>
 
@@ -393,9 +449,9 @@ export default function DashboardPage() {
         {/* RIGHT */}
         <div className="flex flex-col gap-5 lg:col-span-1">
           <Card className="border-slate-200/50 bg-white shadow-none dark:border-slate-800/50 dark:bg-slate-950/50">
-            <CardHeader className="border-b border-slate-100  px-3 py-1.5 dark:border-slate-800/50">
+            <CardHeader className="border-slate-100 border-b px-3 py-1.5 dark:border-slate-800/50">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xs font-semibold text-slate-800 dark:text-slate-200">Messages</CardTitle>
+                <CardTitle className="font-semibold text-slate-800 text-xs dark:text-slate-200">Messages</CardTitle>
 
                 <Badge className="bg-blue-100 px-2 py-0 text-[9px] text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
                   3
@@ -413,13 +469,15 @@ export default function DashboardPage() {
 
                     <div className="flex flex-1 flex-col leading-tight">
                       <div className="flex justify-between">
-                        <p className="text-[11px] font-medium text-slate-800 dark:text-white">{msg.sender}</p>
+                        <p className="font-medium text-[11px] text-slate-800 dark:text-white">{msg.sender}</p>
                         <span className="text-[8px] text-slate-400 dark:text-slate-200">{msg.time}</span>
                       </div>
-
-                      <p className="text-[9px] text-slate-500 dark:text-slate-400">{msg.role}</p>
-
-                      <p className="text-[10px] text-slate-600 dark:text-slate-500">{msg.message}</p>
+                      <p className="mb-1 text-[11px] text-slate-500 leading-none dark:text-slate-400">{msg.role}</p>
+                      <p
+                        className={`line-clamp-2 text-[13px] leading-relaxed ${msg.unread ? "font-medium text-slate-700 dark:text-slate-300" : "text-slate-500 dark:text-slate-400"}`}
+                      >
+                        {msg.message}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -428,6 +486,78 @@ export default function DashboardPage() {
           </Card>
         </div>
       </div>
+
+      <Dialog open={showRSVPModal} onOpenChange={setShowRSVPModal}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/50">
+              <CalendarDays className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+            </div>
+            <DialogTitle className="mt-4 text-center font-semibold text-xl">Defence Appointment RSVP</DialogTitle>
+            <DialogDescription className="text-center text-slate-500">
+              Please review the details below and confirm your attendance or request a reschedule.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="my-4 flex flex-col gap-4">
+            <div className="flex flex-col gap-1 rounded-lg border bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
+              <p className="font-bold text-[11px] text-slate-500 uppercase tracking-wider">Proposal</p>
+              <p className="font-semibold text-slate-900 dark:text-slate-100">{upcomingDefence?.proposalTitle}</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1 rounded-lg border bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/50">
+                <p className="flex items-center gap-1.5 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                  <CalendarDays className="h-3.5 w-3.5" /> Date & Time
+                </p>
+                <p className="font-semibold text-slate-900 dark:text-slate-100">
+                  {upcomingDefence
+                    ? new Date(upcomingDefence.defenceDate).toLocaleString(undefined, {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })
+                    : "—"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1 rounded-lg border bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
+              <p className="flex items-center gap-1.5 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                <MapPin className="h-3.5 w-3.5" /> Location / Link
+              </p>
+              <p className="font-semibold text-slate-900 dark:text-slate-100">{upcomingDefence?.location}</p>
+            </div>
+
+            {upcomingDefence?.note && (
+              <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-4 dark:border-indigo-900/30 dark:bg-indigo-900/10">
+                <p className="flex items-center gap-1.5 font-bold text-[11px] text-indigo-600 uppercase tracking-wider dark:text-indigo-400">
+                  <MessageSquare className="h-3.5 w-3.5" /> Message from Admin
+                </p>
+                <p className="mt-2 text-indigo-900 text-sm leading-relaxed dark:text-indigo-200">
+                  {upcomingDefence.note}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="flex-col sm:flex-row sm:space-x-2">
+            <Button variant="outline" onClick={() => setShowRSVPModal(false)} className="w-full sm:w-auto">
+              Request Reschedule
+            </Button>
+            <Button
+              onClick={() => setShowRSVPModal(false)}
+              className="w-full bg-amber-600 text-white hover:bg-amber-700 sm:w-auto"
+            >
+              <CheckCircle2 className="mr-2 h-4 w-4" />
+              Confirm Attendance
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -14,6 +14,11 @@ export const apiClient = axios.create({
 // ─── Request Interceptor: inject Bearer token ───────────────
 apiClient.interceptors.request.use(
   async (config) => {
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+      delete config.headers["content-type"];
+    }
+
     // Lazy ESM import avoids circular dependency while satisfying lint rules.
     const { useAuthStore } = await import("@/stores/authStore");
     const token: string | null = useAuthStore.getState().access_token;

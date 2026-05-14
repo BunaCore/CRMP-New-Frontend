@@ -19,11 +19,14 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { Hash, MessageSquarePlus, Search, UserPlus, Users } from "lucide-react";
 import { useState } from "react";
+import { useGetRecommendations } from "@/lib/api/recommendations/queries";
+import { useCreateChat } from "@/lib/api/chat/mutations";
+import { Loader2, Sparkles } from "lucide-react";
 import { CreateChatModal } from "./create-chat-modal";
 
-interface ChatRoomsListProps {
-  onStartDirectMessage: (memberId: string) => void;
-}
+type ChatRoomsListProps = {
+  currentUserId: string;
+};
 
 function getInitials(name: string) {
   return name
@@ -39,13 +42,18 @@ function formatRelativeTime(timestamp: string | undefined) {
   return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
 }
 
-export function ChatRoomsList({ onStartDirectMessage }: ChatRoomsListProps) {
+export function ChatRoomsList({ currentUserId }: ChatRoomsListProps) {
   const { data: rooms = [] } = useGetChats();
   const activeChatId = useChatStore((s) => s.activeChatId);
   const setActiveChatId = useChatStore((s) => s.setActiveChatId);
   const presenceMap = useChatStore((s) => s.presenceMap);
   const setCreateChatMode = useChatStore((s) => s.setCreateChatMode);
   const setIsCreateChatOpen = useChatStore((s) => s.setIsCreateChatOpen);
+
+  const { data: recommendations = [], isLoading: isLoadingRecommendations } = useGetRecommendations(
+    parseInt(currentUserId, 10),
+  );
+  const { mutate: createChat, isPending: isCreatingChat } = useCreateChat();
 
   const [searchQuery, onSearchChange] = useState("");
   const [filterType, onFilterTypeChange] = useState<string>("all");
@@ -225,8 +233,47 @@ export function ChatRoomsList({ onStartDirectMessage }: ChatRoomsListProps) {
           )}
         </div>
 
-        {/* Start New Direct Message Section */}
-        {/* Temporarily disabled while we implement "all members" directory fetching */}
+        {/* Recommended Members Section */}
+        <div className="mt-4 border-t p-4">
+          <div className="mb-3 flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <h3 className="font-semibold text-foreground text-sm">Recommended to Connect</h3>
+          </div>
+          {isLoadingRecommendations ? (
+            <div className="flex justify-center p-4">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : recommendations.length === 0 ? (
+            <p className="text-center text-muted-foreground text-xs">No recommendations available</p>
+          ) : (
+            <div className="space-y-2">
+              {recommendations.map((rec) => (
+                <div key={rec.id} className="flex items-center justify-between rounded-lg border bg-card p-3 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                        {getInitials(rec.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <span className="font-medium text-foreground text-sm">{rec.name}</span>
+                      <span className="text-muted-foreground text-xs">Match: {Math.round(rec.score * 100)}%</span>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8"
+                    disabled={isCreatingChat}
+                    onClick={() => createChat({ type: "dm", memberIds: [rec.id.toString()] })}
+                  >
+                    Message
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </ScrollArea>
     </div>
   );

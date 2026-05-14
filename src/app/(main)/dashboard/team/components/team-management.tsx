@@ -15,16 +15,11 @@ const CURRENT_USER_ID = "2";
 export function TeamManagement() {
   const activeChatId = useChatStore((s) => s.activeChatId);
 
-  const handleStartDirectMessage = useCallback((memberId: string) => {
-    // Logic to be moved downstream using API
-    alert(`Initiate direct message with user ${memberId} - Not fully implemented without members directory.`);
-  }, []);
-
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Panel - Chat Rooms List */}
       <div className="w-full shrink-0 sm:w-80 lg:w-96 flex overflow-hidden">
-        <ChatRoomsList onStartDirectMessage={handleStartDirectMessage} />
+        <ChatRoomsList currentUserId={CURRENT_USER_ID} />
       </div>
 
       {/* Right Panel - Chat Section (Group or Direct) */}

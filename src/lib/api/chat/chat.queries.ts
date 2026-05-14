@@ -18,6 +18,7 @@ export function useGetChats() {
 export function useGetChatById(chatId: string | null) {
   return useQuery({
     queryKey: ["chat", chatId],
+    // biome-ignore lint/style/noNonNullAssertion: enabled guarantees chatId is set
     queryFn: () => getChatById(chatId!),
     enabled: !!chatId,
   });
@@ -29,6 +30,7 @@ export function useGetChatById(chatId: string | null) {
 export function useGetMessages(chatId: string | null) {
   return useInfiniteQuery({
     queryKey: ["messages", chatId],
+    // biome-ignore lint/style/noNonNullAssertion: enabled guarantees chatId is set
     queryFn: ({ pageParam }) => getMessages(chatId!, pageParam as string | null),
     getNextPageParam: (lastPage) => lastPage.nextCursor || undefined,
     initialPageParam: null as string | null,

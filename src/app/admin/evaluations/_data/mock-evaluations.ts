@@ -2,9 +2,21 @@ import type { EvalProjectRow, EvalProposalRow, RubricItem } from "../types";
 
 export const DEMO_RUBRIC: RubricItem[] = [
   { order: 1, name: "Advisor", kind: "continuous", max: 20, score: 19 },
-  { order: 2, name: "Proposal Defence", kind: "continuous", max: 15, score: 13.32 },
+  {
+    order: 2,
+    name: "Proposal Defence",
+    kind: "continuous",
+    max: 15,
+    score: 13.32,
+  },
   { order: 3, name: "Documentation", kind: "continuous", max: 20, score: 15 },
-  { order: 4, name: "Defence — Individual", kind: "continuous", max: 15, score: 12.88 },
+  {
+    order: 4,
+    name: "Defence — Individual",
+    kind: "continuous",
+    max: 15,
+    score: 12.88,
+  },
   { order: 5, name: "Defence — Group", kind: "final", max: 30, score: 24.8 },
 ];
 
@@ -18,6 +30,8 @@ export const EVAL_PROPOSALS: EvalProposalRow[] = [
     dept: "Agricultural Engineering",
     stage: "Committee review",
     budget: "Br 118,000",
+    program: "Agricultural Innovation Program",
+    teamCount: 4,
     budgetItems: [
       { description: "Soil Moisture IoT Sensors", amount: 60000 },
       { description: "Data Logging Equipment", amount: 30000 },
@@ -34,6 +48,8 @@ export const EVAL_PROPOSALS: EvalProposalRow[] = [
     dept: "Biomedical Engineering",
     stage: "External evaluation",
     budget: "Br 203,500",
+    program: "Health Technologies Initiative",
+    teamCount: 5,
     budgetItems: [
       { description: "Socket Material Resins", amount: 80000 },
       { description: "3D Printing Filaments", amount: 60000 },
@@ -50,6 +66,8 @@ export const EVAL_PROPOSALS: EvalProposalRow[] = [
     dept: "Environmental Science",
     stage: "Scoring complete",
     budget: "Br 86,400",
+    program: "Climate & Sustainability Research",
+    teamCount: 3,
     budgetItems: [
       { description: "High-Res Satellite Imagery", amount: 45000 },
       { description: "GIS Software Licenses", amount: 20000 },

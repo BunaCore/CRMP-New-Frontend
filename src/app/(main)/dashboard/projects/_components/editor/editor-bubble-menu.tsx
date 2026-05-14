@@ -25,6 +25,8 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
+import { AiToolbarMenu } from "./ai-toolbar-menu";
+
 interface EditorBubbleMenuProps {
   editor: Editor;
   onSetLink: () => void;
@@ -45,6 +47,10 @@ export function EditorBubbleMenu({ editor, onSetLink }: EditorBubbleMenuProps) {
         "rounded-xl border border-border/60 bg-card/95 p-1 shadow-2xl backdrop-blur-sm",
       )}
     >
+      <AiToolbarMenu editor={editor} />
+
+      <Separator orientation="vertical" className="mx-0.5 h-4" />
+
       {/* Inline code — useful for citations, variable names */}
       <Button
         variant="ghost"

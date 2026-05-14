@@ -46,7 +46,7 @@ const BACKEND_TO_FRONTEND_PERMISSION_MAP: Record<string, string> = {
 
   // --- Users ---
   "user:read": "USER_VIEW",
-  "user:provision": "ADMIN_EDIT",
+  "user:provision": "USER_PROVISION",
   "user:assign_role": "ADMIN_EDIT",
 
   // --- Roles & Permissions Management ---
@@ -72,7 +72,9 @@ const BACKEND_TO_FRONTEND_PERMISSION_MAP: Record<string, string> = {
   "ethics:decide": "PROJECT_APPROVE",
 
   "budget:view": "BUDGET_VIEW",
-  "budget:manage": "BUDGET_APPROVE", // Treat manage as approve for now
+  "budget:manage": "BUDGET_MANAGE",
+  "budget:approve": "BUDGET_APPROVE",
+  "budget:reject": "BUDGET_REJECT",
 
   // --- System & Platform ---
   "system:config": "ADMIN_EDIT",

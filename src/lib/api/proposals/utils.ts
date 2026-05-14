@@ -23,7 +23,9 @@ export function getStatusBadgeClass(status: ProposalStatus | string): string {
       return "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200/50";
     case "Revision":
       return "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200/50";
-    case "Approved":
+    case "Needs_Revision":
+      return "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200/50";
+    case "Accepted":
       return "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200/50";
     case "Rejected":
       return "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200/50";
@@ -51,6 +53,8 @@ export function getStatusLabel(status: ProposalStatus | string): string {
       return "Under Review";
     case "Revision":
       return "Revisions Required";
+    case "Needs_Revision":
+      return "Needs Revision";
     case "Accepted":
       return "Approved";
     case "Rejected":

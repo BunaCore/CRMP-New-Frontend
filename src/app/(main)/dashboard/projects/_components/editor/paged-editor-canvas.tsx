@@ -38,7 +38,7 @@ export const PAGE_HEIGHT = 1123;
 export const PAGE_MARGIN_X = 96;
 
 /** Top and bottom text margin inside each page (≈ 1 in at 96 dpi). */
-export const PAGE_MARGIN_Y = 96;
+export const PAGE_MARGIN_Y = 64;
 
 /** Visible grey gap between consecutive page sheets. */
 export const PAGE_GAP = 24;
@@ -124,6 +124,31 @@ export function PagedEditorCanvas({ editor }: PagedEditorCanvasProps) {
     return () => window.removeEventListener("resize", recalc);
   }, [recalc]);
 
+  // ── AI Action Application ───────────────────────────────────────────────────
+  useEffect(() => {
+    if (!editor) return;
+
+    const handleAiAction = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const action = customEvent.detail;
+      if (!action) return;
+
+      if (action.type === "replace" && action.from !== undefined && action.to !== undefined && action.content) {
+        editor
+          .chain()
+          .focus()
+          .setTextSelection({ from: action.from, to: action.to })
+          .insertContent(action.content)
+          .run();
+      } else if (action.type === "insert" && action.content) {
+        editor.chain().focus().insertContent(action.content).run();
+      }
+    };
+
+    window.addEventListener("apply-ai-action", handleAiAction as EventListener);
+    return () => window.removeEventListener("apply-ai-action", handleAiAction as EventListener);
+  }, [editor]);
+
   // ── Derived ────────────────────────────────────────────────────────────────
   /** Total pixel height of the page column (all sheets + all inter-page gaps). */
   const totalCanvasHeight = pageCount * PAGE_HEIGHT + Math.max(0, pageCount - 1) * PAGE_GAP;
@@ -136,7 +161,7 @@ export function PagedEditorCanvas({ editor }: PagedEditorCanvasProps) {
       style={{
         width: "100%",
         minHeight: "100%",
-        paddingTop: 48,
+        paddingTop: 16,
         paddingBottom: 96,
         boxSizing: "border-box",
       }}

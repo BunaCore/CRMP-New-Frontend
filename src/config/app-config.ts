@@ -7,7 +7,7 @@ export const APP_CONFIG = {
   version: packageJson.version,
   copyright: `© ${currentYear}, CRMP.`,
   meta: {
-    title: "CRMP - Collaborative Project Management",
+    title: "CRMP - Collaborative Research Management System",
     description: "CRMP is a modern, collaborative project management dashboard.",
   },
 };

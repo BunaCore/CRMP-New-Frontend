@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useProposalProgramValidation } from "@/hooks/useProposalProgramValidation";
 import { useSearchDepartments } from "@/lib/api/departments/queries";
 import { ProposalProgram } from "@/lib/api/proposals/types";
 import { cn } from "@/lib/utils";
@@ -37,6 +38,7 @@ export function BasicInfoStep() {
 
   const file = watch("file");
   const _departmentLabel = watch("departmentLabel");
+  const { allowedPrograms, isRestricted, userProgram } = useProposalProgramValidation();
 
   // Department search state
   const [deptSearch, setDeptSearch] = useState("");
@@ -46,6 +48,9 @@ export function BasicInfoStep() {
     debouncedDeptSearch,
     isDeptSearchActive,
   );
+
+  // Local state to force immediate UI update for file upload
+  const [localFileName, setLocalFileName] = useState<string>("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -62,9 +67,29 @@ export function BasicInfoStep() {
         toast.error("Only PDF and DOCX files are allowed");
         return;
       }
-      setValue("file", selectedFile, { shouldValidate: true });
+      setValue("file", selectedFile, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+      setLocalFileName(selectedFile.name);
     }
   };
+
+  const displayFileName = localFileName || file?.name;
+  const proposalProgramOptions = [
+    {
+      value: ProposalProgram.UG,
+      label: "Undergraduate (UG)",
+    },
+    {
+      value: ProposalProgram.PG,
+      label: "Postgraduate (PG)",
+    },
+    {
+      value: ProposalProgram.GENERAL,
+      label: "General",
+    },
+  ].filter((option) => allowedPrograms.includes(option.value));
 
   return (
     <div className="fade-in slide-in-from-right-4 mx-auto mt-4 flex max-w-4xl animate-in flex-col gap-6 duration-500">
@@ -111,16 +136,25 @@ export function BasicInfoStep() {
             control={control}
             name="proposalProgram"
             render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className={cn("font-semibold text-sm", errors.title && "text-red-500")}>
-                  <SelectValue placeholder="Select a program..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ProposalProgram.UG}>Undergraduate (UG)</SelectItem>
-                  <SelectItem value={ProposalProgram.PG}>Postgraduate (PG)</SelectItem>
-                  <SelectItem value={ProposalProgram.GENERAL}>General</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className={cn("font-semibold text-sm", errors.title && "text-red-500")}>
+                    <SelectValue placeholder="Select a program..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {proposalProgramOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {isRestricted && userProgram && (
+                  <p className="text-slate-500 text-xs">
+                    Your account is limited to {userProgram === "UG" ? "Undergraduate" : "Postgraduate"} proposals.
+                  </p>
+                )}
+              </div>
             )}
           />
           {errors.proposalProgram && <p className="text-red-500 text-xs">{errors.proposalProgram.message}</p>}
@@ -279,7 +313,7 @@ export function BasicInfoStep() {
         <Controller
           control={control}
           name="file"
-          render={({ field }) => (
+          render={() => (
             <>
               <input
                 type="file"
@@ -301,10 +335,10 @@ export function BasicInfoStep() {
                   Upload full proposal layout
                 </p>
                 <p className="mt-0.5 text-balance text-slate-500 text-xs">PDF or DOCX (maximum 10MB)</p>
-                {file && (
+                {displayFileName && (
                   <div className="mt-4 flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50/50 px-3 py-1 text-blue-700 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-300">
                     <Check className="h-3.5 w-3.5" />
-                    <span className="max-w-[200px] truncate font-semibold text-xs">{file.name}</span>
+                    <span className="max-w-[200px] truncate font-semibold text-xs">{displayFileName}</span>
                   </div>
                 )}
               </label>

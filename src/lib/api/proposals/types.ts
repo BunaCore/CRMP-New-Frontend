@@ -35,6 +35,7 @@ export interface CreateProposalPayload {
   durationMonths: number; // >= 1
   budget: BudgetItem[];
   members: ProposalMember[];
+  fileId?: string; // UUID of uploaded file
 }
 
 /**
@@ -183,7 +184,21 @@ export interface DefenceSchedule {
   createdAt: string; // ISO date
 }
 
-export type ProposalStatus = "Draft" | "Under_Review" | "Revision" | "Accepted" | "Rejected" | "Pending";
+export type ProposalStatus =
+  | "Draft"
+  | "Under_Review"
+  | "Revision"
+  | "Needs_Revision"
+  | "Accepted"
+  | "Rejected"
+  | "Pending";
+
+export interface UpdateProposalPayload {
+  fileId?: string;
+  title?: string;
+  abstract?: string;
+  researchArea?: string;
+}
 
 /**
  * Full rich proposal returned by GET /proposals/detail.
@@ -193,8 +208,11 @@ export type ProposalStatus = "Draft" | "Under_Review" | "Revision" | "Accepted" 
 export interface ResearcherProposal {
   id: string; // UUID
   title: string;
+  abstract?: string;
+  researchArea?: string;
   type: string; // e.g. "PG" | "UG" | "GENERAL"
   status: ProposalStatus;
+  isEditable?: boolean; // true when rejected and can be resubmitted
   department: ProposalDepartment;
   pi: PiMember;
   advisors: Advisor[];
@@ -203,6 +221,15 @@ export interface ResearcherProposal {
   workflow: Workflow;
   comments: ProposalComment[];
   defenceSchedules: DefenceSchedule[];
+  file?: {
+    id: string;
+    name: string;
+    mimeType: string;
+    size: number;
+    url: string;
+    visibility: string;
+    expiresIn?: number;
+  };
   createdAt: string; // ISO date
 }
 
@@ -225,6 +252,43 @@ export interface ProposalResponse {
   status: ProposalStatus;
   createdAt: string;
   updatedAt: string;
+}
+
+export type ProposalListStatus = "Draft" | "Under_Review" | "Approved" | "Rejected";
+
+export interface ProposalListDepartment {
+  id: string;
+  name: string;
+  code: string;
+}
+
+export interface ProposalListPerson {
+  id: string;
+  name: string;
+}
+
+export interface ProposalListItem {
+  id: string;
+  title: string;
+  abstract: string;
+  program: ProposalProgram;
+  pi: ProposalListPerson;
+  advisors: ProposalListPerson[];
+  evaluators: ProposalListPerson[];
+  teamCount: number;
+  department: ProposalListDepartment;
+  submittedDate: string;
+  status: ProposalListStatus;
+  budget: number;
+  isFunded: boolean;
+  degreeLevel: string;
+  researchArea: string;
+}
+
+export interface ProposalListQueryParams {
+  program?: ProposalProgram;
+  search?: string;
+  status?: ProposalListStatus;
 }
 
 // ─── Dropdown/Selector types ───────────────────────────────────────────────────
@@ -266,6 +330,9 @@ export interface PendingApproval {
 export interface AdminProposalDetail {
   id: string;
   title: string;
+  abstract?: string;
+  researchArea?: string;
+  isEditable?: boolean;
   type: string;
   status: ProposalStatus | string;
   budget: {
@@ -280,6 +347,15 @@ export interface AdminProposalDetail {
   workflow: Workflow;
   comments: ProposalComment[];
   defenceSchedules: DefenceSchedule[];
+  file?: {
+    id: string;
+    name: string;
+    mimeType: string;
+    size: number;
+    url: string;
+    visibility: string;
+    expiresIn?: number;
+  };
   createdAt: string;
 }
 
@@ -326,4 +402,21 @@ export interface SubmitEvaluationScoresPayload {
 export interface ProposalMemberEntry {
   userId: string;
   role: "PI" | "MEMBER" | string;
+}
+
+export interface ProposalMemberUser {
+  id: string;
+  fullName: string;
+  email: string;
+  department: string | null;
+  isExternal: boolean;
+}
+
+export interface ProposalMemberWithUser {
+  id: string;
+  proposalId: string;
+  userId: string;
+  role: string;
+  addedAt: string;
+  user: ProposalMemberUser;
 }

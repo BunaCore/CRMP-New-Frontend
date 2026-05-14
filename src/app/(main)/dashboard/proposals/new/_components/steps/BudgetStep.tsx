@@ -1,5 +1,5 @@
 import { Plus, Trash2 } from "lucide-react";
-import { useFieldArray, useFormContext } from "react-hook-form";
+import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,6 @@ export function BudgetStep() {
   const {
     control,
     register,
-    watch,
     formState: { errors },
   } = useFormContext<CreateProposalFormValues>();
 
@@ -20,10 +19,14 @@ export function BudgetStep() {
     name: "budget",
   });
 
-  const budgetRows = watch("budget");
+  const budgetRows =
+    useWatch({
+      control,
+      name: "budget",
+    }) || [];
 
   const calculateTotalBudget = () => {
-    return budgetRows.reduce((acc, row) => acc + (parseFloat(String(row.amount)) || 0), 0);
+    return budgetRows.reduce((acc, row) => acc + (parseFloat(String(row?.amount)) || 0), 0);
   };
 
   const handleAddBudgetRow = () => {
@@ -47,6 +50,7 @@ export function BudgetStep() {
               Initial Grant Estimate
             </p>
             <p className="font-bold text-2xl text-blue-600 dark:text-blue-400">
+              Birr{" "}
               {calculateTotalBudget().toLocaleString(undefined, {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,

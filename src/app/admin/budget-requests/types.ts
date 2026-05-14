@@ -1,36 +1,74 @@
-export type BudgetRequestStatus = "Pending" | "Paid" | "Returned" | "Resubmitted";
-export type BudgetRequestMode = "All-at-once" | "Phased";
+// ============================================================
+// FINANCE BUDGET MODULE — Shared Types
+// ============================================================
 
-export interface BudgetPhase {
-  phase: number;
-  label: string;
-  amount: number;
-  status: BudgetRequestStatus;
-  /** null = no clearance required (Phase 1) */
-  clearanceFileName: string | null;
-  /** Date the PI submitted this request */
-  submittedAt: string | null;
-  /** Date Finance acted on it */
-  actedAt: string | null;
-  transactionId: string | null;
-  approvedAmount: number | null;
-  financeComment: string | null;
-  budgetItems?: { description: string; amount: number }[];
+export interface BudgetMetrics {
+  totalPendingAmount: number;
+  pendingCount: number;
+  totalDisbursedAllTime: number;
+  awaitingCorrectionCount: number;
 }
 
-export interface BudgetRequest {
+export interface BudgetRequestItem {
   id: string;
+  description: string;
+  category: string;
+  amount: number;
+}
+
+export type BudgetRequestStatus = "PENDING" | "RESUBMITTED" | "PAID" | "RETURNED";
+
+export interface BudgetRequest {
+  requestId: string;
   projectId: string;
   projectTitle: string;
-  pi: string;
-  piAvatar: string;
-  piColor: string;
-  dept: string;
-  totalBudget: number;
-  mode: BudgetRequestMode;
-  bankRoutingInfo: string;
-  phases: BudgetPhase[];
-  /** Which phase index is currently active/pending (0-based) */
-  activePhasIndex: number;
-  pgOfficerNote: string;
+  projectType: "PG" | "GENERAL";
+  piName: string;
+  piEmail: string;
+  requestSequence: number;
+  totalPhases: number;
+  totalAmount: number;
+  status: BudgetRequestStatus;
+  submittedAt: string;
+  paidAt: string | null;
+  clearanceDocumentUrl: string | null;
+  clearanceRequired: boolean;
+  bankTransactionId: string | null;
+  financeFeedback: string | null;
+  items: BudgetRequestItem[];
+}
+
+export interface TimelineEntry {
+  sequence: number;
+  amount: number;
+  status: "PAID" | "PENDING" | "RESUBMITTED" | "RETURNED" | "LOCKED";
+  submittedAt?: string;
+  paidAt?: string;
+  bankTransactionId?: string;
+}
+
+export interface ProjectBudgetSummary {
+  totalApprovedBudget: number;
+  totalPaid: number;
+  totalPending: number;
+  totalRemaining: number;
+}
+
+export interface BudgetRequestDetail extends BudgetRequest {
+  piPhone: string;
+  piBankName: string;
+  piBankAccountNumber: string;
+  clearanceDocumentName: string | null;
+  projectBudgetSummary: ProjectBudgetSummary;
+  disbursementTimeline: TimelineEntry[];
+}
+
+export type SortField = "amount" | "daysWaiting" | null;
+export type SortDir = "asc" | "desc";
+
+export interface BudgetFilters {
+  status: "ALL" | BudgetRequestStatus;
+  search: string;
+  sortField: SortField;
+  sortDir: SortDir;
 }

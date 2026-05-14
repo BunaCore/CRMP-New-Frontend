@@ -26,9 +26,9 @@ function WorkspaceContent({ projectId, workspaceId }: { projectId: string; works
   }, []);
 
   return (
-    <div className="group relative flex h-full min-h-0 w-full min-w-0 flex-1 overflow-hidden rounded-2xl border bg-background shadow-inner">
+    <div className="group relative flex h-screen min-h-0 w-full min-w-0 flex-1 overflow-hidden rounded-2xl border bg-background shadow-inner">
       {/* Main Content - Takes full width or shifts for sidebar */}
-      <main className="flex h-full min-w-0 flex-1 flex-col transition-all duration-500 ease-in-out">
+      <main className="relative flex min-w-0 flex-1 flex-col transition-all duration-500 ease-in-out">
         <MainView workspaceId={workspaceId} projectId={projectId} />
       </main>
 

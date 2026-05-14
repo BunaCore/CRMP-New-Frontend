@@ -45,6 +45,10 @@ const DASHBOARD_MODULE_RULES: SidebarModuleRule[] = [
     url: "/dashboard/evaluations",
     permissions: ["FUNDED_EVALUATOR_ACCESS", "PROJECT_REVIEW"],
   },
+  {
+    url: "/dashboard/researcher/budget",
+    permissions: ["BUDGET_VIEW"],
+  },
 
   { url: "/dashboard/notifications", permissions: ["PROJECT_VIEW"] },
   {
@@ -89,7 +93,7 @@ const ADMIN_MODULE_RULES: SidebarModuleRule[] = [
     url: "/admin/publications",
     permissions: ["FUNDED_RAD_ACCESS", "FUNDED_DECIDE", "FUNDED_VIEW"],
   },
-  { url: "/admin/users", permissions: ["USER_VIEW", "ADMIN_EDIT"] },
+  { url: "/admin/users", permissions: ["USER_PROVISION"] },
 
   { url: "/admin/reports", permissions: ["PROJECT_VIEW", "ADMIN_VIEW"] },
   { url: "/admin/notifications", permissions: ["PROJECT_VIEW", "ADMIN_VIEW"] },
