@@ -47,7 +47,6 @@ export function EditUserModal({ user, trigger }: EditUserModalProps) {
     register,
     control,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<EditUserFormData>({
     resolver: zodResolver(editUserSchema),
@@ -71,8 +70,9 @@ export function EditUserModal({ user, trigger }: EditUserModalProps) {
           toast.success("User profile updated successfully");
           setIsOpen(false);
         },
-        onError: (error: any) => {
-          toast.error(error?.response?.data?.message || "Failed to update user profile");
+        onError: (error: unknown) => {
+          const err = error as { response?: { data?: { message?: string } } };
+          toast.error(err?.response?.data?.message || "Failed to update user profile");
         },
       },
     );
@@ -98,21 +98,21 @@ export function EditUserModal({ user, trigger }: EditUserModalProps) {
           <div className="space-y-2">
             <Label htmlFor="fullName">Full Name</Label>
             <Input id="fullName" placeholder="John Doe" {...register("fullName")} disabled={isPending} />
-            {errors.fullName && <p className="text-sm text-red-500">{errors.fullName.message}</p>}
+            {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName.message}</p>}
           </div>
 
           {/* Email */}
           <div className="space-y-2">
             <Label htmlFor="email">Email Address</Label>
             <Input id="email" type="email" placeholder="john@example.com" {...register("email")} disabled={isPending} />
-            {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
           </div>
 
           {/* Phone Number */}
           <div className="space-y-2">
             <Label htmlFor="phoneNumber">Phone Number (Optional)</Label>
             <Input id="phoneNumber" placeholder="+1 (555) 123-4567" {...register("phoneNumber")} disabled={isPending} />
-            {errors.phoneNumber && <p className="text-sm text-red-500">{errors.phoneNumber.message}</p>}
+            {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber.message}</p>}
           </div>
 
           {/* University ID */}
@@ -124,7 +124,7 @@ export function EditUserModal({ user, trigger }: EditUserModalProps) {
               {...register("universityId")}
               disabled={isPending}
             />
-            {errors.universityId && <p className="text-sm text-red-500">{errors.universityId.message}</p>}
+            {errors.universityId && <p className="text-red-500 text-sm">{errors.universityId.message}</p>}
           </div>
 
           {/* User Program */}
@@ -150,7 +150,7 @@ export function EditUserModal({ user, trigger }: EditUserModalProps) {
                 </Select>
               )}
             />
-            {errors.userProgram && <p className="text-sm text-red-500">{errors.userProgram.message}</p>}
+            {errors.userProgram && <p className="text-red-500 text-sm">{errors.userProgram.message}</p>}
           </div>
 
           {/* Submit Buttons */}

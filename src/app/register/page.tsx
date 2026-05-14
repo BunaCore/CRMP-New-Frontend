@@ -25,7 +25,7 @@ export default function SignUpPage() {
             <Image src="/logo.png" alt="CRMP Logo" width={48} height={48} className="object-contain" priority />
           </div>
 
-          <h1 className="font-extrabold text-xl text-slate-900 tracking-tight sm:text-5xl dark:text-white/70 font-serif">
+          <h1 className="font-extrabold font-serif text-slate-900 text-xl tracking-tight sm:text-5xl dark:text-white/70">
             {APP_CONFIG.meta.title || "CRMP"} Join Platform
           </h1>
 
