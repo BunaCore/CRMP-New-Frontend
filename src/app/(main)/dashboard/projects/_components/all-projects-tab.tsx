@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { FolderOpen, Loader2, Lock, Search, Unlock } from "lucide-react";
+import { FolderOpen, Lock, Search, Unlock } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +36,7 @@ export function AllProjectsTab() {
 
   const { data, isLoading } = useAllProjectsQuery({
     search: debouncedSearch,
-    isPublic: visibility === "all" ? undefined : visibility === "public" ? true : false,
+    isPublic: visibility === "all" ? undefined : visibility === "public",
     program: program === "all" ? undefined : program,
     page,
     limit,
@@ -57,12 +57,12 @@ export function AllProjectsTab() {
   return (
     <div className="space-y-6">
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-card p-4 rounded-xl border shadow-sm">
+      <div className="flex flex-col items-center justify-between gap-4 rounded-xl border bg-card p-4 shadow-sm sm:flex-row">
         <div className="relative w-full sm:max-w-xs">
           <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Search all projects..."
-            className="pl-9 bg-background"
+            className="bg-background pl-9"
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -71,7 +71,7 @@ export function AllProjectsTab() {
           />
         </div>
 
-        <div className="flex w-full sm:w-auto items-center gap-3">
+        <div className="flex w-full items-center gap-3 sm:w-auto">
           <Select
             value={visibility}
             onValueChange={(val) => {
@@ -162,7 +162,7 @@ export function AllProjectsTab() {
                 {data.items.map((project) => (
                   <TableRow
                     key={project.projectId}
-                    className="h-15 hover:bg-muted/30 cursor-pointer transition-colors"
+                    className="h-15 cursor-pointer transition-colors hover:bg-muted/30"
                     onClick={() => openProjectDrawer(project)}
                   >
                     <TableCell className="font-medium">
@@ -170,7 +170,7 @@ export function AllProjectsTab() {
                         <span className="line-clamp-1" title={project.projectTitle}>
                           {project.projectTitle}
                         </span>
-                        <span className="text-xs text-muted-foreground line-clamp-1">
+                        <span className="line-clamp-1 text-muted-foreground text-xs">
                           {project.projectDescription || "No description provided."}
                         </span>
                       </div>
@@ -184,21 +184,21 @@ export function AllProjectsTab() {
                               <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${project.pi.id}`} />
                               <AvatarFallback>{project.pi.fullName.charAt(0)}</AvatarFallback>
                             </Avatar>
-                            <span className="text-sm line-clamp-1">{project.pi.fullName}</span>
+                            <span className="line-clamp-1 text-sm">{project.pi.fullName}</span>
                           </>
                         ) : (
                           <>
                             <Avatar className="h-6 w-6">
                               <AvatarFallback>?</AvatarFallback>
                             </Avatar>
-                            <span className="text-sm text-muted-foreground italic line-clamp-1">Unknown PI</span>
+                            <span className="line-clamp-1 text-muted-foreground text-sm italic">Unknown PI</span>
                           </>
                         )}
                       </div>
                     </TableCell>
 
                     <TableCell>
-                      <Badge variant="outline" className="font-normal text-xs bg-background">
+                      <Badge variant="outline" className="bg-background font-normal text-xs">
                         {project.projectProgram}
                       </Badge>
                     </TableCell>

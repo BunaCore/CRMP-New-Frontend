@@ -41,7 +41,7 @@ const MSG_AWARENESS = 1;
 // ─── Options ──────────────────────────────────────────────────
 
 export interface SocketIoYjsProviderOptions {
-  /** Socket.IO server base URL (e.g. http://localhost:3000) */
+  /** Socket.IO server base URL (e.g. http://localhost:3001) */
   url: string;
   /** Workspace ID — sent to backend to join the correct project room */
   workspaceId: string;

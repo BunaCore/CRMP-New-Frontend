@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
+
 import { useRouter } from "next/navigation";
 
 import Cookies from "js-cookie";
-import { BadgeCheck, Bell, CreditCard, LogOut } from "lucide-react";
+import { Bell, CircleUser, CreditCard, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -17,6 +19,8 @@ import {
 import { useSession } from "@/context/SessionContext";
 import { getInitials } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
+
+import { UserProfileDialog } from "./user-profile-dialog";
 
 export function AccountSwitcher({
   users,
@@ -32,6 +36,7 @@ export function AccountSwitcher({
   const { user: sessionUser } = useSession();
   const router = useRouter();
   const { logout } = useAuthStore();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const currentUser = sessionUser
     ? {
@@ -73,8 +78,8 @@ export function AccountSwitcher({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <BadgeCheck />
+          <DropdownMenuItem onClick={() => setIsProfileOpen(true)}>
+            <CircleUser />
             Account
           </DropdownMenuItem>
           <DropdownMenuItem>
@@ -92,6 +97,7 @@ export function AccountSwitcher({
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
+      <UserProfileDialog isOpen={isProfileOpen} onOpenChange={setIsProfileOpen} />
     </DropdownMenu>
   );
 }

@@ -11,7 +11,7 @@
 //   - On auth failure: HTTP 401/403 upgrade rejection → WS close
 //
 // URL derivation:
-//   NEXT_PUBLIC_API_URL is the HTTP base (e.g. http://localhost:3000).
+//   NEXT_PUBLIC_API_URL is the HTTP base (e.g. http://localhost:3001).
 //   We convert it to WebSocket (ws:// or wss://) and append /collab.
 //   WebsocketProvider then connects to ws://<host>/collab/<workspaceId>.
 // ============================================================
@@ -27,9 +27,9 @@ function toWsUrl(httpUrl: string): string {
     .replace(/\/$/, ""); // strip trailing slash
 }
 
-// NEXT_PUBLIC_API_URL: shared with the REST client (e.g. http://localhost:3000).
+// NEXT_PUBLIC_API_URL: shared with the REST client (e.g. http://localhost:3001).
 // The collab WS server lives on the SAME host:port under /collab/*.
-const COLLAB_WS_URL = `${toWsUrl(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000")}/collab`;
+const COLLAB_WS_URL = `${toWsUrl(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001")}/collab`;
 
 export interface CollabProviderOptions {
   workspaceId: string;

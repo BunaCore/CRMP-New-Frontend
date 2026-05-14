@@ -4,22 +4,20 @@
 // ============================================================
 
 export type UserRole =
-  | "PI"
-  | "RAD"
-  | "RA"
-  | "ADRPM"
-  | "AC"
-  | "VPRTT"
-  | "Finance"
-  | "Coordinator"
-  | "Department"
-  | "College/School"
-  | "PGMO"
-  | "Examiner/Evaluator"
-  | "Advisor"
-  | "Evaluator"
+  | "STUDENT"
+  | "FACULTY"
+  | "ADVISOR"
+  | "EVALUATOR"
+  | "COORDINATOR"
   | "DGC_MEMBER"
-  | "PG_OFFICE";
+  | "ADRPM"
+  | "PG_OFFICE"
+  | "RAD"
+  | "FINANCE"
+  | "VPRTT"
+  | "AC_MEMBER"
+  | "SYSTEM_ADMIN"
+  | "EXTERNAL_EXPERT";
 
 // Full user profile returned from backend after login or /auth/me
 export interface UserProfile {

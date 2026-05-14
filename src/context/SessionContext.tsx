@@ -26,6 +26,7 @@ export interface SessionUser {
   roles: UserRole[];
   email: string;
   avatarUrl?: string;
+  department?: string | null;
   permissions?: string[];
 }
 
@@ -50,6 +51,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         roles: (authUser.roles as UserRole[]) ?? null,
         email: authUser.email,
         avatarUrl: authUser.avatarUrl,
+        department: authUser.department,
         permissions: authUser.permissions,
       }
     : null;

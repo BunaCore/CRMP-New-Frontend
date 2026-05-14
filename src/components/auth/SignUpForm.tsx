@@ -6,7 +6,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { error } from "console";
 import { Loader2 } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -48,7 +47,6 @@ export function SignUpForm() {
     register,
     control,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
@@ -88,9 +86,10 @@ export function SignUpForm() {
       });
 
       router.push("/login");
-    } catch (_error: any) {
+    } catch (_error: unknown) {
+      const err = _error as { response: { data: { message: string } } };
       toast.error("Sign Up Failed", {
-        description: _error.response.data.message || "Something went wrong. Try again.",
+        description: err.response.data.message || "Something went wrong. Try again.",
       });
     } finally {
       setIsLoading(false);
@@ -115,7 +114,7 @@ export function SignUpForm() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <Label htmlFor="departmentId" className="mb-2 block text-sm font-medium">
+          <Label htmlFor="departmentId" className="mb-2 block font-medium text-sm">
             Department
           </Label>
           <Controller
@@ -159,7 +158,7 @@ export function SignUpForm() {
         </div>
 
         <div>
-          <Label htmlFor="userProgram" className="mb-2 block text-sm font-medium">
+          <Label htmlFor="userProgram" className="mb-2 block font-medium text-sm">
             Program
           </Label>
           <Controller
