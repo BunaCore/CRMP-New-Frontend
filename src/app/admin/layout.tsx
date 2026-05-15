@@ -7,6 +7,7 @@ import { ThemeSwitcher } from "@/app/(main)/dashboard/_components/sidebar/theme-
 import { DashboardSwitcher } from "@/components/dashboard-switcher";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
+import { AdminNavUser } from "./_components/admin-nav-user";
 import { AdminSidebar } from "./_components/admin-sidebar";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
@@ -25,6 +26,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
           <div className="flex items-center gap-2">
             <DashboardSwitcher />
             <ThemeSwitcher />
+            <AdminNavUser />
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">

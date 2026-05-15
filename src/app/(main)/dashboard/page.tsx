@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import Link from "next/link";
+
 import { useQuery } from "@tanstack/react-query";
 import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, isFuture } from "date-fns";
 import { motion } from "framer-motion";
@@ -160,10 +162,12 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button size="sm" className="h-9 gap-2">
-            <Plus className="h-3.5 w-3.5" />
-            New Proposal
-          </Button>
+          <Link href="/dashboard/proposals/new" className="w-full sm:w-auto">
+            <Button size="sm" className="h-9 gap-2">
+              <Plus className="h-3.5 w-3.5" />
+              New Proposal
+            </Button>
+          </Link>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
