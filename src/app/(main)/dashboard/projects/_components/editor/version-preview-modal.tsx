@@ -20,7 +20,7 @@
 
 import { useEffect, useState } from "react";
 
-import { EditorContent, useEditor } from "@tiptap/react";
+import { type AnyExtension, EditorContent, useEditor } from "@tiptap/react";
 import { format, formatDistanceToNow } from "date-fns";
 import {
   AlertCircle,
@@ -151,7 +151,7 @@ function RestoreFooter({
 
 function ReadOnlyPreview({ version }: { version: DocumentVersion }) {
   const editor = useEditor({
-    extensions: EDITOR_EXTENSIONS,
+    extensions: EDITOR_EXTENSIONS as AnyExtension[],
     content: version.content,
     editable: false,
     immediatelyRender: false,
@@ -257,7 +257,9 @@ export function VersionPreviewModal({
                 <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
-                    {formatDistanceToNow(new Date(summary.createdAt), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(summary.createdAt), {
+                      addSuffix: true,
+                    })}
                   </span>
                   <span className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />

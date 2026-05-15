@@ -55,6 +55,7 @@ export function TeamStep() {
       );
     } else {
       setValue("members", [...current, { value: id, label }], { shouldValidate: true });
+      setMemberSearch(""); // Clear search to hide other results
     }
   };
 
