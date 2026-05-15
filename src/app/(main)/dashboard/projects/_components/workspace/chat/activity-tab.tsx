@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { motion } from "framer-motion";
-import { Download, ExternalLink, FileText, Search, Share2, Sparkles } from "lucide-react";
+import { Download, ExternalLink, FileText, Search, Share2, Sparkles, User, Users } from "lucide-react";
 import { toast } from "sonner";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { apiClient } from "@/lib/api/client";
 
 import { useWorkspace } from "../workspace-context";
 
@@ -17,93 +17,118 @@ interface RelatedProject {
   id: string;
   title: string;
   researchArea: string;
-  hostDepartment: string;
+  department: string;
   abstract: string;
-  diagram: string; // URL or placeholder for the diagram
-  matchScore: number; // 0 to 100
-  downloadUrl: string;
+  matchScore: number;
+  advisor: string | null;
+  members: string[];
+  status: string;
 }
 
-const MOCK_RELATED_PROJECTS: RelatedProject[] = [
-  {
-    id: "rel-1",
-    title: "AI-Driven Urban Resilience Mapping",
-    researchArea: "Smart Cities & Machine Learning",
-    hostDepartment: "Department of Urban Planning",
-    abstract:
-      "This project explores the integration of real-time sensor data with deep learning models to predict urban infrastructure failures during extreme weather events. The goal is to provide a decision-support system for city planners.",
-    diagram: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&auto=format&fit=crop&q=60",
-    matchScore: 94,
-    downloadUrl: "#",
-  },
-  {
-    id: "rel-2",
-    title: "Sustainable Water Management in Arid Regions",
-    researchArea: "Environmental Engineering",
-    hostDepartment: "Department of Civil Engineering",
-    abstract:
-      "A comprehensive study on advanced desalination techniques and wastewater recycling frameworks tailored for high-scarcity environments. Includes a novel filtration system design.",
-    diagram: "https://images.unsplash.com/photo-1544333346-64e396efec4e?w=800&auto=format&fit=crop&q=60",
-    matchScore: 88,
-    downloadUrl: "#",
-  },
-  {
-    id: "rel-3",
-    title: "Blockchain for Decentralized Energy Markets",
-    researchArea: "FinTech & Renewable Energy",
-    hostDepartment: "School of Economics & Computer Science",
-    abstract:
-      "Implementing a peer-to-peer energy trading platform using Ethereum smart contracts to empower local communities with solar microgrids.",
-    diagram: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&auto=format&fit=crop&q=60",
-    matchScore: 82,
-    downloadUrl: "#",
-  },
-  {
-    id: "rel-4",
-    title: "Cognitive Computing in Higher Education",
-    researchArea: "Educational Technology",
-    hostDepartment: "Faculty of Education",
-    abstract:
-      "Analyzing the impact of personalized AI tutors on student engagement and retention rates in large-scale undergraduate courses.",
-    diagram: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800&auto=format&fit=crop&q=60",
-    matchScore: 76,
-    downloadUrl: "#",
-  },
+const DIAGRAM_URLS = [
+  "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&auto=format&fit=crop&q=60",
+  "https://images.unsplash.com/photo-1544333346-64e396efec4e?w=800&auto=format&fit=crop&q=60",
+  "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&auto=format&fit=crop&q=60",
+  "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800&auto=format&fit=crop&q=60",
 ];
 
+const getDiagramUrl = (id: string) => {
+  let sum = 0;
+  for (let i = 0; i < id.length; i++) sum += id.charCodeAt(i);
+  return DIAGRAM_URLS[sum % DIAGRAM_URLS.length];
+};
+
 export function ActivityTab() {
-  useWorkspace();
+  const { projectId } = useWorkspace();
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [projects, setProjects] = useState<RelatedProject[]>([]);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
+  const filteredProjects = projects.filter((project) => {
+    const term = searchTerm.toLowerCase().trim();
+    if (!term) return true;
+    return (
+      project.title.toLowerCase().includes(term) ||
+      project.abstract.toLowerCase().includes(term) ||
+      project.researchArea?.toLowerCase().includes(term) ||
+      project.department?.toLowerCase().includes(term) ||
+      project.advisor?.toLowerCase().includes(term) ||
+      project.members?.some((m) => m.toLowerCase().includes(term))
+    );
+  });
+
+  const fetchRelated = useCallback(
+    async (q?: string) => {
+      if (!projectId) return;
+      try {
+        setLoading(true);
+        const url =
+          q && q.trim().length > 0
+            ? `/projects/${projectId}/related?q=${encodeURIComponent(q)}`
+            : `/projects/${projectId}/related`;
+        const response = await apiClient.get(url);
+        setProjects(response.data);
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Failed to contact the backend microservice.";
+        toast.error("Failed to load similar projects", {
+          description: message,
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [projectId],
+  );
+
+  // Handle Search Input Debounce
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1200);
-    return () => clearTimeout(timer);
-  }, []);
+    const delayDebounceFn = setTimeout(() => {
+      fetchRelated(searchTerm);
+    }, 500);
 
-  const handleDownload = (project: RelatedProject) => {
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm, fetchRelated]);
+
+  const handleDownload = async (project: RelatedProject) => {
+    setDownloadingId(project.id);
     toast.success(`Starting download: ${project.title}.pdf`, {
       description: "Preparing your research document for offline viewing.",
       icon: <Download className="h-4 w-4" />,
     });
 
-    // Simulate a file download
-    const content = `Mock Project Data for: ${project.title}\n\nArea: ${project.researchArea}\nDepartment: ${project.hostDepartment}\n\nAbstract:\n${project.abstract}`;
-    const blob = new Blob([content], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${project.title.replace(/\s+/g, "_")}_Proposal.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    try {
+      const response = await apiClient.get(`/projects/${project.id}/download-pdf`, {
+        responseType: "blob",
+      });
+
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+
+      // Clean up title for filename
+      const safeTitle =
+        project.title
+          .replace(/[^a-zA-Z0-9_\- ]/g, "")
+          .trim()
+          .replace(/\s+/g, "_") || "Project";
+      a.download = `${safeTitle}_Proposal.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to download the generated PDF.";
+      toast.error("Download failed", {
+        description: message,
+      });
+    } finally {
+      setDownloadingId(null);
+    }
   };
 
-  if (loading) {
+  if (loading && projects.length === 0) {
     return (
       <div className="space-y-4 p-5">
         <div className="flex items-center justify-between">
@@ -123,9 +148,7 @@ export function ActivityTab() {
       <div className="shrink-0 space-y-4 p-6 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="rounded-xl bg-primary/10 p-2 text-primary">
-              <Sparkles className="h-5 w-5" />
-            </div>
+            <div className="rounded-xl bg-primary/10 p-2 text-primary" />
             <div>
               <h3 className="font-bold text-base tracking-tight">Related Research</h3>
               <p className="font-medium text-[11px] text-muted-foreground uppercase tracking-widest">
@@ -152,74 +175,107 @@ export function ActivityTab() {
 
       {/* Projects List */}
       <div className="custom-scrollbar flex-1 space-y-5 overflow-y-auto px-6 pb-6">
-        {MOCK_RELATED_PROJECTS.filter(
-          (p) =>
-            p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            p.researchArea.toLowerCase().includes(searchTerm.toLowerCase()),
-        ).map((project, index) => (
-          <motion.div
-            key={project.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1, duration: 0.4 }}
-          >
-            <Card className="group overflow-hidden rounded-3xl border-border/40 bg-background/60 transition-all duration-500 hover:bg-background hover:shadow-primary/5 hover:shadow-xl">
-              <CardContent className="p-0">
-                {/* Image/Diagram Preview */}
-                <div className="relative h-32 overflow-hidden bg-muted">
-                  {/* biome-ignore lint/performance/noImgElement: mock preview */}
-                  <img
-                    src={project.diagram}
-                    alt="Proposal Diagram"
-                    className="h-full w-full object-cover opacity-60 transition-all duration-700 group-hover:scale-105 group-hover:opacity-100"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-                  <div className="absolute top-3 right-3">
-                    <Badge className="border-none bg-primary/90 px-2.5 py-1 font-bold text-xs backdrop-blur-md hover:bg-primary">
-                      {project.matchScore}% Match
-                    </Badge>
+        {filteredProjects.length === 0 ? (
+          <div className="flex h-40 flex-col items-center justify-center text-center text-muted-foreground">
+            <Sparkles className="mb-2 h-8 w-8 text-primary opacity-40" />
+            <p className="font-medium text-sm">No related proposals found</p>
+            <p className="mt-1 text-muted-foreground/80 text-xs">
+              Try tweaking your search query or index more proposals
+            </p>
+          </div>
+        ) : (
+          filteredProjects.map((project, index) => (
+            <motion.div
+              key={project.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05, duration: 0.3 }}
+            >
+              <Card className="group overflow-hidden rounded-3xl border-border/40 bg-background/60 transition-all duration-500 hover:bg-background hover:shadow-primary/5 hover:shadow-xl">
+                <CardContent className="p-0">
+                  {/* Image/Diagram Preview */}
+                  <div className="relative h-32 overflow-hidden bg-muted">
+                    {/* biome-ignore lint/performance/noImgElement: mock preview */}
+                    <img
+                      src={getDiagramUrl(project.id)}
+                      alt="Proposal Diagram"
+                      className="h-full w-full object-cover opacity-60 transition-all duration-700 group-hover:scale-105 group-hover:opacity-100"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
                   </div>
-                </div>
 
-                <div className="space-y-3 p-5 pt-2">
-                  <div>
-                    <h4 className="mb-1.5 flex cursor-pointer items-center gap-2 font-bold text-sm leading-tight transition-colors group-hover:text-primary">
-                      {project.title}
-                      <ExternalLink className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-40" />
-                    </h4>
+                  <div className="space-y-3 p-5 pt-2">
+                    <div>
+                      <h4 className="mb-1.5 flex cursor-pointer items-center gap-2 font-bold text-sm leading-tight transition-colors group-hover:text-primary">
+                        {project.title}
+                        <ExternalLink className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-40" />
+                      </h4>
 
-                    <div className="flex flex-wrap gap-2">
-                      <div className="flex items-center gap-1.5 rounded-full border border-border/20 bg-slate-100 px-2 py-0.5 font-semibold text-[10px] text-muted-foreground dark:bg-zinc-800">
-                        <FileText className="h-3 w-3" />
-                        {project.researchArea}
-                      </div>
-                      <div className="rounded-full border border-border/20 bg-slate-100 px-2 py-0.5 font-semibold text-[10px] text-muted-foreground dark:bg-zinc-800">
-                        {project.hostDepartment}
+                      <div className="flex flex-wrap gap-2">
+                        <div className="flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-0.5 font-bold text-[10px] text-primary">
+                          {project.matchScore}% Match
+                        </div>
+                        <div className="flex items-center gap-1.5 rounded-full border border-border/20 bg-slate-100 px-2 py-0.5 font-semibold text-[10px] text-muted-foreground dark:bg-zinc-800">
+                          <FileText className="h-3 w-3" />
+                          {project.researchArea || "General"}
+                        </div>
+                        {project.department && (
+                          <div className="rounded-full border border-border/20 bg-slate-100 px-2 py-0.5 font-semibold text-[10px] text-muted-foreground dark:bg-zinc-800">
+                            {project.department}
+                          </div>
+                        )}
+                        {project.status && (
+                          <div className="rounded-full border border-border/20 bg-slate-100 px-2 py-0.5 font-semibold text-[10px] text-muted-foreground dark:bg-zinc-800">
+                            {project.status}
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </div>
 
-                  <p className="line-clamp-3 text-[12px] text-muted-foreground italic leading-relaxed">
-                    "{project.abstract}"
-                  </p>
+                    <p className="line-clamp-3 text-[12px] text-muted-foreground italic leading-relaxed">
+                      "{project.abstract}"
+                    </p>
 
-                  <div className="flex items-center gap-2 pt-1">
-                    <Button
-                      onClick={() => handleDownload(project)}
-                      className="h-9 flex-1 gap-2 rounded-xl bg-primary font-bold text-primary-foreground text-xs shadow-lg shadow-primary/20 hover:bg-primary/90"
-                    >
-                      <Download className="h-3.5 w-3.5" />
-                      Download Proposal
-                    </Button>
-                    <Button variant="outline" size="icon" className="h-9 w-9 shrink-0 rounded-xl">
-                      <Share2 className="h-3.5 w-3.5" />
-                    </Button>
+                    {/* Team Members & Advisor info */}
+                    <div className="space-y-1 border-border/10 border-t pt-2 text-[11px] text-muted-foreground/80">
+                      {project.advisor && (
+                        <div className="flex items-center gap-1">
+                          <User className="h-3 w-3 text-primary/60" />
+                          <span>
+                            <span className="font-semibold text-muted-foreground">Advisor:</span> {project.advisor}
+                          </span>
+                        </div>
+                      )}
+                      {project.members && project.members.length > 0 && (
+                        <div className="flex items-center gap-1">
+                          <Users className="h-3 w-3 text-primary/60" />
+                          <span>
+                            <span className="font-semibold text-muted-foreground">Members:</span>{" "}
+                            {project.members.join(", ")}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-1">
+                      <Button
+                        onClick={() => handleDownload(project)}
+                        disabled={downloadingId === project.id}
+                        className="h-9 flex-1 gap-2 rounded-xl bg-primary font-bold text-primary-foreground text-xs shadow-lg shadow-primary/20 hover:bg-primary/90"
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                        {downloadingId === project.id ? "Preparing PDF..." : "Download Proposal"}
+                      </Button>
+                      <Button variant="outline" size="icon" className="h-9 w-9 shrink-0 rounded-xl">
+                        <Share2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))
+        )}
       </div>
     </div>
   );

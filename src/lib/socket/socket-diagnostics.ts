@@ -52,8 +52,8 @@ export async function diagnoseSocketConnection(url: string): Promise<SocketDiagn
         diagnostics.healthCheckPassed = response.status === 200;
       }
     }
-  } catch (err: any) {
-    diagnostics.errorMessage = err.message || String(err);
+  } catch (err: unknown) {
+    diagnostics.errorMessage = (err instanceof Error ? err.message : String(err)) || String(err);
   }
 
   // 2. Diagnose Socket.IO endpoint
@@ -69,10 +69,10 @@ export async function diagnoseSocketConnection(url: string): Promise<SocketDiagn
     diagnostics.socketIoRouteAccessible = true;
     diagnostics.socketIoStatus = response.status;
     diagnostics.socketIoResponseText = await response.text();
-  } catch (err: any) {
+  } catch (err: unknown) {
     // If the HTTP check succeeded but this failed, it's specific to Socket.IO path/CORS
     if (diagnostics.errorMessage === null) {
-      diagnostics.errorMessage = err.message || String(err);
+      diagnostics.errorMessage = (err instanceof Error ? err.message : String(err)) || String(err);
     }
   }
 

@@ -34,21 +34,18 @@ class SocketManager {
       auth: {
         token: token,
       },
-      extraHeaders: {
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-      autoConnect: false,
-      // Try WebSocket first, then fall back to polling
+      // Ensure cookies/credentials are sent if needed
+      withCredentials: true,
+      // Prefer WebSocket, fallback to polling
       transports: ["websocket", "polling"],
+      autoConnect: false,
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
       reconnectionAttempts: 10,
       timeout: 20000,
-      // Socket.IO CORS configuration
-      withCredentials: true,
-      // Upgrade timeout to allow for slower connections
-      ...({ upgradeTimeout: 10000 } as any),
+      // Upgrade timeout for slower connections
+      upgradeTimeout: 10000,
     });
 
     this.setupInternalListeners();
@@ -87,7 +84,7 @@ class SocketManager {
       }
 
       // Log more diagnostic info
-      if ((error as any).type === "TransportError") {
+      if (error instanceof Error && (error as unknown as { type?: string }).type === "TransportError") {
         console.error("[SocketManager] Transport Error - Server may not be running or unreachable");
         console.error(`[SocketManager] Trying to reach: ${SOCKET_URL}`);
       }
