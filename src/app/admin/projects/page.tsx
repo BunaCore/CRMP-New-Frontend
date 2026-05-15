@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useAllProjectsQuery } from "@/lib/api/projects/queries";
 
 // ─── TYPES ──────────────────────────────────────────────────────────
 interface TeamMember {
@@ -78,16 +79,47 @@ const MOCK_PROJECTS: Project[] = [
     abstract:
       "This project investigates the application of deep convolutional networks and transformer-based architectures for automated disease detection in radiological imagery. The primary goal is to achieve radiologist-level accuracy on publicly available benchmark datasets.",
     team: [
-      { name: "Dr. S. Patel", role: "Co-Investigator", avatar: "SP", color: "bg-blue-100 text-blue-700" },
-      { name: "M. Chen", role: "Research Assistant", avatar: "MC", color: "bg-emerald-100 text-emerald-700" },
-      { name: "Prof. A. Ibrahim", role: "Advisor", avatar: "AI", color: "bg-amber-100 text-amber-700" },
+      {
+        name: "Dr. S. Patel",
+        role: "Co-Investigator",
+        avatar: "SP",
+        color: "bg-blue-100 text-blue-700",
+      },
+      {
+        name: "M. Chen",
+        role: "Research Assistant",
+        avatar: "MC",
+        color: "bg-emerald-100 text-emerald-700",
+      },
+      {
+        name: "Prof. A. Ibrahim",
+        role: "Advisor",
+        avatar: "AI",
+        color: "bg-amber-100 text-amber-700",
+      },
     ],
     timeline: [
       { date: "Jan 2024", label: "Project Kickoff & Setup", status: "done" },
-      { date: "Jun 2024", label: "Phase 1: Data Collection Complete", status: "done" },
-      { date: "Dec 2024", label: "Phase 2: Model Training & Evaluation", status: "active" },
-      { date: "Jun 2025", label: "Phase 3: Clinical Trials & Validation", status: "upcoming" },
-      { date: "Dec 2025", label: "Final Report & Publication", status: "upcoming" },
+      {
+        date: "Jun 2024",
+        label: "Phase 1: Data Collection Complete",
+        status: "done",
+      },
+      {
+        date: "Dec 2024",
+        label: "Phase 2: Model Training & Evaluation",
+        status: "active",
+      },
+      {
+        date: "Jun 2025",
+        label: "Phase 3: Clinical Trials & Validation",
+        status: "upcoming",
+      },
+      {
+        date: "Dec 2025",
+        label: "Final Report & Publication",
+        status: "upcoming",
+      },
     ],
   },
   {
@@ -106,14 +138,28 @@ const MOCK_PROJECTS: Project[] = [
     abstract:
       "A comprehensive study on deploying scalable micro-grid solutions powered by solar and wind in rural sub-Saharan Africa. Analyzes cost efficiency, maintenance models, and socio-economic impact on local communities.",
     team: [
-      { name: "Dr. F. Nakamura", role: "Co-Investigator", avatar: "FN", color: "bg-blue-100 text-blue-700" },
-      { name: "B. Alemu", role: "Field Engineer", avatar: "BA", color: "bg-slate-200 text-slate-700" },
+      {
+        name: "Dr. F. Nakamura",
+        role: "Co-Investigator",
+        avatar: "FN",
+        color: "bg-blue-100 text-blue-700",
+      },
+      {
+        name: "B. Alemu",
+        role: "Field Engineer",
+        avatar: "BA",
+        color: "bg-slate-200 text-slate-700",
+      },
     ],
     timeline: [
       { date: "Mar 2024", label: "Proposal Approved", status: "done" },
       { date: "Sep 2024", label: "Feasibility Study", status: "done" },
       { date: "Mar 2025", label: "Pilot Deployment", status: "active" },
-      { date: "Mar 2026", label: "Scale & Final Assessment", status: "upcoming" },
+      {
+        date: "Mar 2026",
+        label: "Scale & Final Assessment",
+        status: "upcoming",
+      },
     ],
   },
   {
@@ -132,8 +178,18 @@ const MOCK_PROJECTS: Project[] = [
     abstract:
       "Research into hybrid classical-quantum algorithms for solving NP-hard optimization problems in logistics and molecular simulation. Results published in Nature Quantum Information.",
     team: [
-      { name: "Dr. G. Bell", role: "Co-Investigator", avatar: "GB", color: "bg-indigo-100 text-indigo-700" },
-      { name: "R. Feynman Jr.", role: "Researcher", avatar: "RF", color: "bg-rose-100 text-rose-700" },
+      {
+        name: "Dr. G. Bell",
+        role: "Co-Investigator",
+        avatar: "GB",
+        color: "bg-indigo-100 text-indigo-700",
+      },
+      {
+        name: "R. Feynman Jr.",
+        role: "Researcher",
+        avatar: "RF",
+        color: "bg-rose-100 text-rose-700",
+      },
     ],
     timeline: [
       { date: "Feb 2022", label: "Project Initiated", status: "done" },
@@ -158,11 +214,26 @@ const MOCK_PROJECTS: Project[] = [
     endDate: "May 2026",
     abstract:
       "Development of a scalable, open-source genomic pipeline for processing next-generation sequencing data with a focus on rare disease identification in Ethiopian populations. Suspended pending ethics board re-review.",
-    team: [{ name: "M. Haile", role: "Data Analyst", avatar: "MH", color: "bg-amber-100 text-amber-700" }],
+    team: [
+      {
+        name: "M. Haile",
+        role: "Data Analyst",
+        avatar: "MH",
+        color: "bg-amber-100 text-amber-700",
+      },
+    ],
     timeline: [
       { date: "May 2024", label: "IRB Ethics Approval", status: "done" },
-      { date: "Aug 2024", label: "Pipeline Architecture Design", status: "done" },
-      { date: "Nov 2024", label: "Data Collection (Suspended)", status: "active" },
+      {
+        date: "Aug 2024",
+        label: "Pipeline Architecture Design",
+        status: "done",
+      },
+      {
+        date: "Nov 2024",
+        label: "Data Collection (Suspended)",
+        status: "active",
+      },
       { date: "Feb 2025", label: "Analysis Phase", status: "upcoming" },
     ],
   },
@@ -182,8 +253,18 @@ const MOCK_PROJECTS: Project[] = [
     abstract:
       "Using real-time sensor data and reinforcement learning to improve urban traffic signal coordination in Addis Ababa. Aims to reduce average commute time by 20%.",
     team: [
-      { name: "H. Tesfaye", role: "ML Engineer", avatar: "HT", color: "bg-blue-100 text-blue-700" },
-      { name: "Dr. Y. Kebede", role: "Advisor", avatar: "YK", color: "bg-emerald-100 text-emerald-700" },
+      {
+        name: "H. Tesfaye",
+        role: "ML Engineer",
+        avatar: "HT",
+        color: "bg-blue-100 text-blue-700",
+      },
+      {
+        name: "Dr. Y. Kebede",
+        role: "Advisor",
+        avatar: "YK",
+        color: "bg-emerald-100 text-emerald-700",
+      },
     ],
     timeline: [
       { date: "Apr 2025", label: "Proposal Submission", status: "active" },
@@ -226,6 +307,17 @@ const STATUS_CONFIG: Record<string, { label: string; className: string; icon: Re
 const PROGRESS_COLOR = (p: number) =>
   p === 100 ? "bg-emerald-500" : p >= 60 ? "bg-blue-600" : p >= 30 ? "bg-amber-500" : "bg-red-500";
 
+// Map backend projectStage values to valid UI statuses
+function normalizeStatus(stage: string | undefined | null): Project["status"] {
+  if (!stage) return "Pending";
+  const normalized = stage.toUpperCase();
+  if (normalized.includes("ACTIVE") || normalized.includes("APPROVED")) return "Active";
+  if (normalized.includes("REVIEW")) return "Under Review";
+  if (normalized.includes("COMPLETE")) return "Completed";
+  if (normalized.includes("SUSPEND")) return "Suspended";
+  return "Pending";
+}
+
 // ─── PAGE ────────────────────────────────────────────────────────────
 export default function AdminProjectsPage() {
   const [search, setSearch] = useState("");
@@ -233,7 +325,42 @@ export default function AdminProjectsPage() {
   const [selected, setSelected] = useState<Project | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "team" | "timeline">("overview");
 
-  const filtered = MOCK_PROJECTS.filter((p) => {
+  // Fetch admin projects (paginated). We request a reasonably large limit for the registry.
+  const { data: projectsResp } = useAllProjectsQuery({ limit: 200 }, true);
+  const fetched = projectsResp?.items ?? [];
+
+  // Map API ProjectListItem -> local Project UI shape used by this page.
+  const mapItem = (it: any): Project => {
+    const piName = it.pi?.fullName ?? "Unknown";
+    const initials = piName
+      .split(" ")
+      .map((s: string) => s[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+
+    return {
+      id: it.projectId ?? it.projectId,
+      name: it.projectTitle ?? "Untitled Project",
+      code: it.projectId ?? "",
+      pi: piName,
+      piAvatar: initials,
+      piColor: "bg-slate-200 text-slate-700",
+      dept: it.projectProgram ?? it.department ?? "-",
+      status: normalizeStatus(it.projectStage),
+      progress: 0,
+      budget: it.budget?.totalAmount ?? "",
+      startDate: it.submissionDate ? new Date(it.submissionDate).toLocaleDateString() : "-",
+      endDate: "-",
+      abstract: it.projectDescription ?? "",
+      team: [],
+      timeline: [],
+    };
+  };
+
+  const sourceProjects: Project[] = fetched.length ? fetched.map(mapItem) : MOCK_PROJECTS;
+
+  const filtered = sourceProjects.filter((p) => {
     const matchSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.pi.toLowerCase().includes(search.toLowerCase()) ||
@@ -414,7 +541,7 @@ export default function AdminProjectsPage() {
         {/* Footer count */}
         <div className="flex items-center justify-between border-slate-100 border-t px-5 py-3 dark:border-slate-800">
           <p className="font-medium text-slate-400 text-xs">
-            Showing {filtered.length} of {MOCK_PROJECTS.length} projects
+            Showing {filtered.length} of {projectsResp?.meta?.totalItems ?? sourceProjects.length} projects
           </p>
           {statusFilter !== "All" && (
             <button
