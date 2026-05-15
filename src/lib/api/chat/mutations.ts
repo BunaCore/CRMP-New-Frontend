@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { emitJoinChat } from "@/lib/socket/emitter";
 import { useChatStore } from "@/stores/chat-store";
 
 import { apiClient } from "../client";
@@ -25,6 +26,8 @@ export function useCreateChat() {
       queryClient.invalidateQueries({ queryKey: ["chats"] });
       // Immediately open the newly created chat
       setActiveChatId(chat.id);
+      // Join the newly created room for realtime events
+      emitJoinChat({ chatId: chat.id });
     },
   });
 }
