@@ -3,17 +3,11 @@
 import { useState } from "react";
 
 import {
-  AlertCircle,
   BadgeCheck,
-  BellRing,
   BookOpen,
   Briefcase,
   Building2,
-  Calendar,
   Camera,
-  CheckCircle2,
-  ChevronRight,
-  Clock,
   Edit3,
   Eye,
   EyeOff,
@@ -21,24 +15,15 @@ import {
   Fingerprint,
   Globe,
   GraduationCap,
-  Key,
-  Languages,
   Laptop,
-  LineChart,
   Link as LinkIcon,
-  Lock,
   Mail,
   MapPin,
   Phone,
   Plus,
   Save,
-  Settings,
-  Shield,
   ShieldCheck,
   Smartphone,
-  User,
-  Users,
-  X,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -68,7 +53,7 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="!max-w-[calc(100vw-4rem)] -translate-x-1/2 -translate-y-1/2 fixed top-1/2 left-1/2 flex h-[calc(100vh-4rem)] w-[calc(100vw-4rem)] flex-col gap-0 overflow-hidden rounded-2xl border-border/40 bg-background p-0 shadow-2xl xl:!max-w-6xl">
+      <DialogContent className="!max-w-[calc(100vw-4rem)] -translate-x-1/2 -translate-y-1/2 xl:!max-w-6xl fixed top-1/2 left-1/2 flex h-[calc(100vh-4rem)] w-[calc(100vw-4rem)] flex-col gap-0 overflow-hidden rounded-2xl border-border/40 bg-background p-0 shadow-2xl">
         <DialogHeader className="sr-only">
           <DialogTitle>Account Settings</DialogTitle>
           <DialogDescription>
@@ -78,7 +63,7 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
 
         <div className="custom-scrollbar flex h-full w-full flex-col overflow-y-auto">
           {/* Gradient Banner Header with Avatar & Name inside */}
-          <div className="relative w-full shrink-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-6 pb-6 pt-12 sm:px-10 sm:pb-8 sm:pt-20">
+          <div className="relative w-full shrink-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-6 pt-12 pb-6 sm:px-10 sm:pt-20 sm:pb-8">
             <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay" />
 
             {/* Avatar Overlay & Title */}
@@ -136,34 +121,34 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
           <div className="flex flex-col px-6 sm:px-10">
             {/* Main Tabs Area */}
             <Tabs defaultValue="profile" className="mt-8 flex flex-col pb-6">
-              <TabsList className="h-auto w-full justify-start rounded-none border-b border-border/50 bg-transparent p-0">
+              <TabsList className="h-auto w-full justify-start rounded-none border-border/50 border-b bg-transparent p-0">
                 <TabsTrigger
                   value="profile"
-                  className="rounded-none border-b-2 border-transparent px-4 py-3 font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                  className="rounded-none border-transparent border-b-2 px-4 py-3 font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 >
                   Profile Details
                 </TabsTrigger>
                 <TabsTrigger
                   value="institutional"
-                  className="rounded-none border-b-2 border-transparent px-4 py-3 font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                  className="rounded-none border-transparent border-b-2 px-4 py-3 font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 >
                   Institutional Identity
                 </TabsTrigger>
                 <TabsTrigger
                   value="research"
-                  className="rounded-none border-b-2 border-transparent px-4 py-3 font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                  className="rounded-none border-transparent border-b-2 px-4 py-3 font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 >
                   Research Profile
                 </TabsTrigger>
                 <TabsTrigger
                   value="preferences"
-                  className="rounded-none border-b-2 border-transparent px-4 py-3 font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                  className="rounded-none border-transparent border-b-2 px-4 py-3 font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 >
                   Preferences
                 </TabsTrigger>
                 <TabsTrigger
                   value="security"
-                  className="rounded-none border-b-2 border-transparent px-4 py-3 font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                  className="rounded-none border-transparent border-b-2 px-4 py-3 font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 >
                   Security
                 </TabsTrigger>
@@ -263,7 +248,7 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
                       <Separator />
 
                       <div className="space-y-4">
-                        <Label className="text-lg font-semibold text-foreground">Active Permissions</Label>
+                        <Label className="font-semibold text-foreground text-lg">Active Permissions</Label>
                         <div className="flex flex-wrap gap-2">
                           {user.permissions?.map((perm) => (
                             <Badge
@@ -334,7 +319,7 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
 
                   <div className="grid gap-8 md:grid-cols-2">
                     <div className="space-y-4">
-                      <Label className="text-lg font-semibold text-foreground">Expertise & Interests</Label>
+                      <Label className="font-semibold text-foreground text-lg">Expertise & Interests</Label>
                       <div className="flex flex-wrap gap-2">
                         <Badge variant="outline" className="px-3 py-1">
                           Machine Learning
@@ -359,7 +344,7 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
                     </div>
 
                     <div className="space-y-4">
-                      <Label className="text-lg font-semibold text-foreground">External Profiles</Label>
+                      <Label className="font-semibold text-foreground text-lg">External Profiles</Label>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between rounded-lg border p-3">
                           <div className="flex items-center gap-3">
@@ -397,7 +382,7 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
                   <div className="grid gap-8 md:grid-cols-2">
                     <div className="space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold text-foreground">Notifications</h3>
+                        <h3 className="font-semibold text-foreground text-lg">Notifications</h3>
                         <p className="text-muted-foreground text-sm">Manage how you receive alerts.</p>
                       </div>
                       <div className="space-y-4">
@@ -427,7 +412,7 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
 
                     <div className="space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold text-foreground">System Preferences</h3>
+                        <h3 className="font-semibold text-foreground text-lg">System Preferences</h3>
                         <p className="text-muted-foreground text-sm">Customize your dashboard experience.</p>
                       </div>
                       <div className="space-y-4">
@@ -466,7 +451,7 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
                   <div className="grid gap-8 md:grid-cols-2">
                     <div className="space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold text-foreground">Password Management</h3>
+                        <h3 className="font-semibold text-foreground text-lg">Password Management</h3>
                         <p className="text-muted-foreground text-sm">Update your account password.</p>
                       </div>
                       <div className="space-y-4 rounded-xl border p-5">
@@ -477,7 +462,7 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                              className="absolute top-0 right-0 h-full px-3 hover:bg-transparent"
                               onClick={() => setShowPassword(!showPassword)}
                             >
                               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -492,7 +477,7 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
                       </div>
 
                       <div>
-                        <h3 className="mt-8 text-lg font-semibold text-foreground">Two-Factor Authentication (2FA)</h3>
+                        <h3 className="mt-8 font-semibold text-foreground text-lg">Two-Factor Authentication (2FA)</h3>
                         <p className="mb-4 text-muted-foreground text-sm">Add an extra layer of security.</p>
                         <div className="space-y-3">
                           <div className="flex items-center justify-between rounded-lg border p-4">
@@ -511,7 +496,7 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
                             <div className="flex items-center gap-3">
                               <Mail className="h-5 w-5 text-emerald-600" />
                               <div>
-                                <p className="font-medium text-sm text-emerald-800 dark:text-emerald-400">
+                                <p className="font-medium text-emerald-800 text-sm dark:text-emerald-400">
                                   Email Verification
                                 </p>
                                 <p className="text-emerald-600/80 text-xs">Configured</p>
@@ -531,7 +516,7 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
 
                     <div className="space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold text-foreground">Active Sessions</h3>
+                        <h3 className="font-semibold text-foreground text-lg">Active Sessions</h3>
                         <p className="text-muted-foreground text-sm">Devices currently logged into your account.</p>
                       </div>
                       <div className="space-y-3">

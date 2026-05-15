@@ -304,7 +304,7 @@ export function ResearcherView() {
                   {/* Progress bar */}
                   <div className="mt-4 flex items-center gap-2">
                     <Progress value={progressPct} className="h-1.5 flex-1" />
-                    <span className="font-mono text-[11px] font-semibold text-foreground">
+                    <span className="font-mono font-semibold text-[11px] text-foreground">
                       {p.currentStep}/{p.totalSteps}
                     </span>
                   </div>
@@ -312,7 +312,7 @@ export function ResearcherView() {
                   {/* Footer: Step pill + Arrow */}
                   <div className="mt-3 flex items-center justify-between">
                     <span
-                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium ${
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-medium text-[10px] ${
                         isStuck
                           ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
                           : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
@@ -370,7 +370,7 @@ export function ResearcherView() {
                   </div>
                   {i < (selectedProposal?.steps.length ?? 0) - 1 && (
                     <div
-                      className={`w-0.5 flex-1 min-h-[24px] ${
+                      className={`min-h-[24px] w-0.5 flex-1 ${
                         step.status === "completed" ? "bg-emerald-400" : "bg-border"
                       }`}
                     />
@@ -378,7 +378,7 @@ export function ResearcherView() {
                 </div>
 
                 {/* Step Label */}
-                <div className="pb-4 pt-1">
+                <div className="pt-1 pb-4">
                   <p
                     className={`font-medium text-sm ${
                       step.status === "current"
@@ -394,7 +394,7 @@ export function ResearcherView() {
                     <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">Completed {step.date}</p>
                   )}
                   {step.status === "current" && step.holder && (
-                    <p className="mt-0.5 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-medium text-blue-700 inline-block dark:bg-blue-900/50 dark:text-blue-300">
+                    <p className="mt-0.5 inline-block rounded-full bg-blue-100 px-2 py-0.5 font-medium text-[10px] text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
                       {step.daysWaiting}d with {step.holder}
                     </p>
                   )}
@@ -440,7 +440,7 @@ export function ResearcherView() {
                 return (
                   <div key={proj.id} className="rounded-md border border-border/40 p-2">
                     <div className="flex items-center justify-between">
-                      <span className="max-w-[180px] truncate text-[11px] font-medium text-foreground">
+                      <span className="max-w-[180px] truncate font-medium text-[11px] text-foreground">
                         {proj.title}
                       </span>
                       <span
@@ -469,10 +469,10 @@ export function ResearcherView() {
                 <Clock className="h-3 w-3" />
                 Latest Request
               </p>
-              <p className="mt-1 font-medium text-sm text-foreground">{BUDGET_AGGREGATE.latestRequest.item}</p>
+              <p className="mt-1 font-medium text-foreground text-sm">{BUDGET_AGGREGATE.latestRequest.item}</p>
               <p className="mt-0.5 text-[10px] text-muted-foreground">{BUDGET_AGGREGATE.latestRequest.project}</p>
               <div className="mt-1.5 flex items-center justify-between">
-                <span className="font-mono font-semibold text-sm text-amber-700 dark:text-amber-300">
+                <span className="font-mono font-semibold text-amber-700 text-sm dark:text-amber-300">
                   ETB {BUDGET_AGGREGATE.latestRequest.amount.toLocaleString()}
                 </span>
                 <Badge variant="outline" className="border-amber-300 text-[10px] text-amber-700 dark:text-amber-400">
@@ -565,7 +565,7 @@ export function ResearcherView() {
                 </Avatar>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="truncate font-semibold text-xs text-foreground">{fb.name}</span>
+                    <span className="truncate font-semibold text-foreground text-xs">{fb.name}</span>
                     <span className="flex-shrink-0 text-[10px] text-muted-foreground">{fb.time}</span>
                   </div>
                   <p className="mt-0.5 text-muted-foreground text-xs leading-relaxed">{fb.comment}</p>
@@ -599,7 +599,7 @@ export function ResearcherView() {
               return (
                 <div key={pub.id} className="rounded-lg border border-border/50 p-3">
                   {/* Paper Info */}
-                  <p className="font-semibold text-sm text-foreground leading-snug">{pub.title}</p>
+                  <p className="font-semibold text-foreground text-sm leading-snug">{pub.title}</p>
                   <p className="mt-0.5 text-[10px] text-muted-foreground">{pub.journal}</p>
                   <p className="mt-0.5 text-[9px] text-muted-foreground/70">{pub.project}</p>
 
