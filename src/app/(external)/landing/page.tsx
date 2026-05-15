@@ -22,7 +22,10 @@ export default function LandingPage() {
         </Link>
 
         <nav className="hidden items-center space-x-8 md:flex">
-          <Link href="#" className="border-[#eab308] border-b-2 pb-1 font-bold text-[#1b2b5a] text-[14px]">
+          <Link
+            href="/public/projects"
+            className="border-[#eab308] border-b-2 pb-1 font-bold text-[#1b2b5a] text-[14px]"
+          >
             Research
           </Link>
           <Link href="#" className="pb-1 text-[14px] text-slate-500 transition-colors hover:text-slate-900">
@@ -38,8 +41,11 @@ export default function LandingPage() {
 
         {/* Access Platform Button */}
         <div>
-          <Button className="h-10 rounded-sm bg-[#0b1b3d] px-6 font-medium text-[13px] text-white tracking-wide hover:bg-[#162752]">
-            Access Platform
+          <Button
+            asChild
+            className="h-10 rounded-sm bg-[#0b1b3d] px-6 font-medium text-[13px] text-white tracking-wide hover:bg-[#162752]"
+          >
+            <Link href="/public/projects">Access Platform</Link>
           </Button>
         </div>
       </header>

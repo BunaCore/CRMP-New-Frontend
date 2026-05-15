@@ -46,6 +46,7 @@ export interface AdminUserDetails extends Omit<AdminUserListItem, "roles"> {
       code: string;
       assignedAt: string;
     }>;
+    supportingDocument?: import("@/lib/api/files/types").FileDetails | null;
   };
 }
 

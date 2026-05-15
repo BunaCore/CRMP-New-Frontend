@@ -20,7 +20,9 @@ export async function getUsers(role?: string, q?: string): Promise<UserOption[]>
   const params: Record<string, string> = {};
   if (role) params.role = role;
   if (q) params.q = q;
-  const response = await apiClient.get<UserOption[]>("/users/selector", { params });
+  const response = await apiClient.get<UserOption[]>("/users/selector", {
+    params,
+  });
   return response.data;
 }
 
@@ -59,10 +61,10 @@ export function useGetUserById(userId: string | null, enabled = true) {
 }
 
 /**
- * Convenience function to fetch advisors (faculty)
+ * Convenience function to fetch advisors.
  */
 export async function getAdvisors(): Promise<UserOption[]> {
-  return getUsers("FACULTY");
+  return getUsers("ADVISOR");
 }
 
 /**
@@ -88,12 +90,23 @@ export function useSearchUsers(q: string, enabled = true) {
 }
 
 /**
- * Hook to search advisors (role=FACULTY) with a debounced query.
+ * Hook to search advisors (role=ADVISOR) with a debounced query.
  */
 export function useSearchAdvisors(q: string, enabled = true) {
   return useQuery({
-    queryKey: ["users", "selector", q],
-    queryFn: () => getUsers(undefined, q),
+    queryKey: ["users", "selector", "ADVISOR", q],
+    queryFn: () => getUsers("ADVISOR", q),
+    enabled,
+  });
+}
+
+/**
+ * Hook to search evaluators (role=EVALUATOR) with a debounced query.
+ */
+export function useSearchEvaluators(q: string, enabled = true) {
+  return useQuery({
+    queryKey: ["users", "selector", "EVALUATOR", q],
+    queryFn: () => getUsers("EVALUATOR", q),
     enabled,
   });
 }

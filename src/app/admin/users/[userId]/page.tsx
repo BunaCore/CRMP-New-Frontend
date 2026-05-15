@@ -24,6 +24,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import DocumentPreview from "@/components/ui/document-preview";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +36,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetUserById } from "@/lib/api/users/queries";
 
-import { MOCK_USER_DETAILS_BY_ID } from "../_data/mock-users";
 import type { AdminUserDetails } from "../types";
 import { EditUserModal } from "./_components/edit-user-modal";
 import { UserRolesPanel } from "./_components/user-roles-panel";
@@ -74,8 +74,7 @@ export default function UserDetailsPage() {
 
   const { data: userData, isLoading } = useGetUserById(userId);
 
-  // Fallback to mock data for development if needed
-  const user = (userData || MOCK_USER_DETAILS_BY_ID[userId]) as AdminUserDetails | undefined;
+  const user = userData as AdminUserDetails | undefined;
 
   if (isLoading) return <PageSkeleton />;
 
@@ -304,6 +303,28 @@ export default function UserDetailsPage() {
                     </div>
                   </CardContent>
                 </Card>
+                {/* Supporting Document */}
+                {user.supportingDocument && (
+                  <Card className="overflow-hidden border-slate-200/60 shadow-none dark:border-slate-800/60">
+                    <CardHeader className="border-slate-100 border-b bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/20">
+                      <CardTitle className="font-bold text-lg">Supporting Document</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-semibold">{user.supportingDocument.originalName}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {user.supportingDocument.mimeType} •{" "}
+                            {Math.round((user.supportingDocument.size ?? 0) / 1024)} KB
+                          </p>
+                        </div>
+                        <div>
+                          <DocumentPreview file={user.supportingDocument} trigger={<Button>Preview</Button>} />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
 
               {/* Sidebar Info */}
