@@ -15,7 +15,15 @@ export function proxy(request: NextRequest) {
   const _tokenCookie = request.cookies.get("access_token")?.value;
   const { pathname: _pathname } = request.nextUrl;
 
-  // Block unauthenticated access to protected routes.
+  // 1. Proxy API requests to the backend
+  if (_pathname.startsWith("/auth") || _pathname.startsWith("/api")) {
+    const backendUrl = new URL(request.url);
+    backendUrl.hostname = "localhost";
+    backendUrl.port = "3001";
+    return NextResponse.rewrite(backendUrl);
+  }
+
+  // 2. Block unauthenticated access to protected routes.
   const isProtected = _pathname.startsWith("/admin") || _pathname.startsWith("/dashboard");
   if (isProtected && !_tokenCookie) {
     const loginUrl = new URL("/login", request.url);
@@ -27,5 +35,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/dashboard/:path*"],
+  matcher: ["/admin/:path*", "/dashboard/:path*", "/auth/:path*", "/api/:path*"],
 };

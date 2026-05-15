@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, isFuture } from "date-fns";
 import { motion } from "framer-motion";
-import { Bell, CalendarDays, CheckCircle2, MapPin } from "lucide-react";
+import { Bell, CalendarDays, CheckCircle2, MapPin, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,9 +20,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useSession } from "@/context/SessionContext";
 import { getMyProposals } from "@/lib/api/proposals/queries";
 
-import { AdminView } from "./_components/views/admin-view";
-import { ApproverView } from "./_components/views/approver-view";
-import { FinanceView } from "./_components/views/finance-view";
 // Perspectives components
 import { ResearcherView } from "./_components/views/researcher-view";
 
@@ -100,21 +97,9 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, [upcomingDefence]);
 
-  // Determine which perspective to show based on RolePermissions logic
-  const renderView = () => {
-    if (!user) return null;
-    const roles = user.roles || [];
-
-    if (roles.includes("SYSTEM_ADMIN")) return <AdminView />;
-    if (roles.includes("FINANCE")) return <FinanceView />;
-
-    // Management/Approver perspectives
-    const approverRoles = ["COORDINATOR", "DGC_MEMBER", "ADRPM", "PG_OFFICE", "RAD", "VPRTT", "AC_MEMBER"];
-    if (roles.some((r) => approverRoles.includes(r))) return <ApproverView />;
-
-    // Default perspective for Student, Faculty, Advisor, Evaluator
-    return <ResearcherView />;
-  };
+  // In the Workspace environment, every user is treated as a researcher.
+  // Role-specific views (Finance, Approver, Admin) live in the Admin Console (/admin).
+  // The Workspace always shows the unified ResearcherView.
 
   const isUrgent = timeLeft !== null && timeLeft.d === 0 && timeLeft.h < 24;
 
@@ -175,6 +160,10 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <Button size="sm" className="h-9 gap-2">
+            <Plus className="h-3.5 w-3.5" />
+            New Proposal
+          </Button>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -195,7 +184,7 @@ export default function DashboardPage() {
 
       {/* Perspectives Content */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        {renderView()}
+        <ResearcherView />
       </motion.div>
 
       {/* RSVP Modal */}
