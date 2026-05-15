@@ -160,10 +160,15 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button size="sm" className="h-9 gap-2">
-            <Plus className="h-3.5 w-3.5" />
-            New Proposal
-          </Button>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button
+              size="sm"
+              className="h-9 gap-2 bg-gradient-to-r from-primary to-primary/80 shadow-md shadow-primary/20 transition-all hover:shadow-lg hover:shadow-primary/30"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              New Proposal
+            </Button>
+          </motion.div>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
