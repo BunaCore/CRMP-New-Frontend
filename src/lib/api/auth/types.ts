@@ -59,7 +59,10 @@ export interface RegisterPayload {
   fullName?: string;
   departmentId: string;
   phoneNumber?: string;
+  universityId?: string;
   userProgram: "UG" | "PG";
+  isExternal?: boolean;
+  supportingDocumentFileId?: string;
 }
 
 // ─── Response Shapes ────────────────────────────────────────

@@ -90,3 +90,16 @@ export async function assignEvaluators(proposalId: string, userIds: string[]): P
     userIds,
   });
 }
+
+/**
+ * Assign a single advisor to a proposal.
+ * POST /proposals/:id/advisor-assign
+ * @param proposalId - Proposal ID
+ * @param userId - User ID to assign as advisor
+ */
+export async function assignAdvisor(proposalId: string, userId: string): Promise<void> {
+  const { apiClient } = await import("@/lib/api/client");
+  await apiClient.post(`/proposals/${proposalId}/advisor-assign`, {
+    userId,
+  });
+}

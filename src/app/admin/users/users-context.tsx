@@ -12,8 +12,6 @@ import { useInviteUser } from "@/lib/api/users/mutations";
 import { useGetUserById, useGetUsersList } from "@/lib/api/users/queries";
 import type { UsersListResponse } from "@/lib/api/users/types";
 
-import { MOCK_PERMISSIONS, MOCK_ROLE_PERMISSIONS_BY_ROLE_ID, MOCK_ROLES } from "./_data/mock-roles-permissions";
-import { MOCK_USER_DETAILS_BY_ID, MOCK_USERS } from "./_data/mock-users";
 import type { AdminUserDetails, AdminUserListItem, InvitePayload, Role } from "./types";
 
 type AdminUsersTab = "users" | "roles";
@@ -67,15 +65,8 @@ export function UsersProvider({ children }: { children: React.ReactNode }) {
   const limit = 5;
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [selectedRoleId, setSelectedRoleId] = useState(MOCK_ROLES[0]?.id ?? "");
-  const [draftByRole, setDraftByRole] = useState<Record<string, Set<string>>>(
-    Object.fromEntries(
-      Object.entries(MOCK_ROLE_PERMISSIONS_BY_ROLE_ID).map(([id, value]) => [
-        id,
-        new Set(value.permissions.map((p) => p.permissionId)),
-      ]),
-    ),
-  );
+  const [selectedRoleId, setSelectedRoleId] = useState("");
+  const [draftByRole, setDraftByRole] = useState<Record<string, Set<string>>>({});
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -104,6 +95,14 @@ export function UsersProvider({ children }: { children: React.ReactNode }) {
   const userDetailsQuery = useGetUserById(selectedUserId);
 
   useEffect(() => {
+    if (selectedRoleId) return;
+    const firstRoleId = rolesQuery.data?.[0]?.id;
+    if (firstRoleId) {
+      setSelectedRoleId(firstRoleId);
+    }
+  }, [rolesQuery.data, selectedRoleId]);
+
+  useEffect(() => {
     if (!selectedRoleId) return;
     if (!rolePermissionsQuery.data) return;
     const permissionIds = new Set(rolePermissionsQuery.data.permissions.map((p) => p.permissionId));
@@ -111,12 +110,12 @@ export function UsersProvider({ children }: { children: React.ReactNode }) {
   }, [rolePermissionsQuery.data, selectedRoleId]);
 
   const usersResponse: UsersListResponse = usersQuery.data ?? {
-    items: MOCK_USERS,
+    items: [],
     meta: {
       page,
       limit,
-      totalItems: MOCK_USERS.length,
-      totalPages: Math.max(1, Math.ceil(MOCK_USERS.length / limit)),
+      totalItems: 0,
+      totalPages: 0,
       hasNextPage: false,
       hasPrevPage: false,
     },
@@ -127,8 +126,8 @@ export function UsersProvider({ children }: { children: React.ReactNode }) {
       id: r.id,
       name: r.name,
       description: r.description,
-    })) ?? MOCK_ROLES;
-  const permissions: AccessPermission[] = permissionsQuery.data ?? MOCK_PERMISSIONS;
+    })) ?? [];
+  const permissions: AccessPermission[] = permissionsQuery.data ?? [];
 
   const totalItems = usersResponse.meta.totalItems;
   const totalPages = usersResponse.meta.totalPages;
@@ -141,9 +140,7 @@ export function UsersProvider({ children }: { children: React.ReactNode }) {
           ...userDetailsQuery.data,
           accountStatus: userDetailsQuery.data.accountStatus as AdminUserDetails["accountStatus"],
         } satisfies AdminUserDetails)
-      : selectedUserId
-        ? (MOCK_USER_DETAILS_BY_ID[selectedUserId] ?? null)
-        : null
+      : null
   ) as AdminUserDetails | null;
 
   const selectedRolePermissions = draftByRole[selectedRoleId] ?? new Set<string>();
