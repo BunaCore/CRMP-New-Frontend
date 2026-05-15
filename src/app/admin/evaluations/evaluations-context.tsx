@@ -8,13 +8,14 @@ import { toast } from "sonner";
 
 import { hasPermission } from "@/access-control/permission-gates";
 import { useDebounce } from "@/hooks/use-debounce";
-import { assignEvaluators } from "@/lib/api/proposals/mutations";
+import { useAllProjectsQuery } from "@/lib/api/projects/queries";
+import type { ProjectListItem } from "@/lib/api/projects/types";
+import { assignAdvisor, assignEvaluators } from "@/lib/api/proposals/mutations";
 import { getMyProposals, getPendingApprovals, useProposalsListQuery } from "@/lib/api/proposals/queries";
 import type { PendingApproval, ProposalListItem, ResearcherProposal } from "@/lib/api/proposals/types";
-import { useSearchUsers } from "@/lib/api/users/queries";
+import { useSearchAdvisors, useSearchEvaluators } from "@/lib/api/users/queries";
 import { useAuthStore } from "@/stores/authStore";
 
-import { ADVISORS } from "../proposals/_data/mock-proposals";
 import type { Evaluator } from "../proposals/types";
 import { DEMO_RUBRIC } from "./_data/mock-evaluations";
 import type { DrawerTab, EvalProjectRow, EvalProposalRow, MainTab, RubricItem } from "./types";
@@ -41,7 +42,7 @@ interface EvaluationsContextValue {
   drawerTab: DrawerTab;
   setDrawerTab: React.Dispatch<React.SetStateAction<DrawerTab>>;
   activeProposal: EvalProposalRow | null;
-  activeProject: EvalProjectRow | null;
+  activeProject: ProjectListItem | null;
 
   rubric: RubricItem[];
   setRubric: React.Dispatch<React.SetStateAction<RubricItem[]>>;
@@ -86,10 +87,10 @@ interface EvaluationsContextValue {
   isLoadingProposals: boolean;
 
   filteredProposals: EvalProposalRow[];
-  filteredProjects: EvalProjectRow[];
+  filteredProjects: ProjectListItem[];
 
   openDrawerProposal: (row: EvalProposalRow) => void;
-  openDrawerProject: (row: EvalProjectRow) => void;
+  openDrawerProject: (row: ProjectListItem) => void;
   closeDrawer: () => void;
   handleSendDefenceInvite: () => void;
   handleConfirmApproveEvaluation: () => void;
@@ -120,7 +121,7 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
   const [drawerKind, setDrawerKind] = useState<"proposal" | "project">("proposal");
   const [drawerTab, setDrawerTab] = useState<DrawerTab>("overview");
   const [activeProposal, setActiveProposal] = useState<EvalProposalRow | null>(null);
-  const [activeProject, setActiveProject] = useState<EvalProjectRow | null>(null);
+  const [activeProject, setActiveProject] = useState<ProjectListItem | null>(null);
 
   const [rubric, setRubric] = useState<RubricItem[]>(DEMO_RUBRIC);
 
@@ -145,6 +146,7 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
   const [showAssignAdvisor, setShowAssignAdvisor] = useState(false);
   const [advisorSearch, setAdvisorSearch] = useState("");
   const [pickedAdvisorIds, setPickedAdvisorIds] = useState<string[]>([]);
+  const debouncedAdvisorSearch = useDebounce(advisorSearch, 300);
 
   const [showTimelineReject, setShowTimelineReject] = useState(false);
   const [timelineRejectComment, setTimelineRejectComment] = useState("");
@@ -154,7 +156,7 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
     drawerKind === "proposal" && activeProposal
       ? `p-${activeProposal.id}`
       : activeProject
-        ? `j-${activeProject.id}`
+        ? `j-${activeProject.projectId}`
         : "";
   const isEvalApproved = selectionKey ? !!evalApproved[selectionKey] : false;
   const isEvalRejected = selectionKey ? !!evalRejected[selectionKey] : false;
@@ -172,6 +174,10 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
   const [apiProposals, setApiProposals] = useState<EvalProposalRow[]>([]);
   const [isLoadingProposals, setIsLoadingProposals] = useState(true);
   const allProposalsQuery = useProposalsListQuery({}, mainTab === "proposals" && proposalScope === "all");
+
+  // ── Real API: projects table data ───────────────────────────────────────────
+  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
+  const allProjectsQuery = useAllProjectsQuery({ limit: 200 }, mainTab === "projects");
 
   const mapAllProposalRow = useCallback((proposal: ProposalListItem): EvalProposalRow => {
     return {
@@ -254,10 +260,28 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
   );
   const visibleProposals = proposalScope === "all" ? allProposalRows : filteredProposals;
   const loadingVisibleProposals = proposalScope === "all" ? allProposalsQuery.isLoading : isLoadingProposals;
-  // Projects: no dedicated backend endpoint yet — keep empty until connected
-  const filteredProjects: EvalProjectRow[] = [];
 
-  const evalUsersQuery = useSearchUsers(debouncedEvalSearch, showAssign);
+  const filteredProjects = useMemo(
+    () =>
+      (allProjectsQuery.data?.items ?? []).filter((project) =>
+        (
+          project.projectTitle +
+          project.projectId +
+          project.projectProgram +
+          project.projectDescription +
+          (project.pi?.fullName ?? "")
+        )
+          .toLowerCase()
+          .includes(search.toLowerCase()),
+      ),
+    [allProjectsQuery.data?.items, search],
+  );
+
+  useEffect(() => {
+    setIsLoadingProjects(allProjectsQuery.isLoading);
+  }, [allProjectsQuery.isLoading]);
+
+  const evalUsersQuery = useSearchEvaluators(debouncedEvalSearch, showAssign);
 
   const filteredEvals = useMemo<Evaluator[]>(() => {
     const users = evalUsersQuery.data ?? [];
@@ -308,9 +332,38 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
     },
   });
 
-  const filteredAdvisors = ADVISORS.filter((a) =>
-    (a.name + a.specialty).toLowerCase().includes(advisorSearch.toLowerCase()),
-  );
+  const advisorUsersQuery = useSearchAdvisors(debouncedAdvisorSearch, showAssignAdvisor);
+
+  const filteredAdvisors = useMemo<Evaluator[]>(() => {
+    const users = advisorUsersQuery.data ?? [];
+    return users.map((u, idx) => {
+      const id = u.id || u.value;
+      const name = u.name || u.label || "Unknown user";
+      const initials =
+        name
+          .split(" ")
+          .filter(Boolean)
+          .slice(0, 2)
+          .map((part) => part[0]?.toUpperCase() ?? "")
+          .join("") || "US";
+
+      const palette = [
+        "bg-violet-100 text-violet-700",
+        "bg-indigo-100 text-indigo-700",
+        "bg-emerald-100 text-emerald-700",
+        "bg-blue-100 text-blue-700",
+      ];
+
+      return {
+        id,
+        name,
+        avatar: initials,
+        color: palette[idx % palette.length],
+        specialty: u.email || "Advisor",
+        assigned: 0,
+      };
+    });
+  }, [advisorUsersQuery.data]);
 
   function openDrawerProposal(row: EvalProposalRow) {
     setDrawerKind("proposal");
@@ -322,7 +375,7 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
     setDrawerOpen(true);
   }
 
-  function openDrawerProject(row: EvalProjectRow) {
+  function openDrawerProject(row: ProjectListItem) {
     setDrawerKind("project");
     setActiveProject(row);
     setActiveProposal(null);
@@ -354,7 +407,7 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
   };
 
   const toggleAdvisorPick = (id: string) => {
-    setPickedAdvisorIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    setPickedAdvisorIds((prev) => (prev[0] === id ? [] : [id]));
   };
 
   const handleAssignConfirm = () => {
@@ -365,10 +418,32 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
     });
   };
 
+  const { mutate: assignAdvisorMutate } = useMutation({
+    mutationFn: ({ proposalId, userId }: { proposalId: string; userId: string }) => assignAdvisor(proposalId, userId),
+    onSuccess: (_, variables) => {
+      toast.success("Advisor assigned successfully");
+      setShowAssignAdvisor(false);
+      setAdvisorSearch("");
+      setPickedAdvisorIds([]);
+      queryClient.invalidateQueries({
+        queryKey: ["proposals", "byId", variables.proposalId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["proposals", "pending-approvals"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["proposals", "list"] });
+    },
+    onError: () => {
+      toast.error("Failed to assign advisor");
+    },
+  });
+
   const handleAssignAdvisorConfirm = () => {
-    setShowAssignAdvisor(false);
-    setAdvisorSearch("");
-    setPickedAdvisorIds([]);
+    if (!activeProposal?.id || pickedAdvisorIds.length === 0) return;
+    assignAdvisorMutate({
+      proposalId: activeProposal.id,
+      userId: pickedAdvisorIds[0],
+    });
   };
 
   const handleTimelineRejectSubmit = () => {

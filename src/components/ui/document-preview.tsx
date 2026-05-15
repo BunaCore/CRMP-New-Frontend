@@ -11,6 +11,10 @@ interface DocumentPreviewProps {
   trigger?: React.ReactNode;
 }
 
+type TriggerElementProps = {
+  onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+};
+
 export function DocumentPreview({ file, trigger }: DocumentPreviewProps) {
   const [open, setOpen] = React.useState(false);
   const isImage = file.mimeType?.startsWith("image/");
@@ -24,12 +28,12 @@ export function DocumentPreview({ file, trigger }: DocumentPreviewProps) {
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const triggerNode = React.isValidElement(trigger) ? (
-    React.cloneElement(trigger as React.ReactElement, {
+  const triggerNode = React.isValidElement<TriggerElementProps>(trigger) ? (
+    React.cloneElement(trigger, {
       onClick: (e: any) => {
         e?.preventDefault?.();
         setOpen(true);
-        trigger.props?.onClick?.(e);
+        trigger.props.onClick?.(e);
       },
     })
   ) : (
@@ -57,7 +61,7 @@ export function DocumentPreview({ file, trigger }: DocumentPreviewProps) {
             >
               <div className="mb-2 flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-semibold">{file.originalName}</h3>
+                  <h3 className="text-lg font-semibold">{file.name}</h3>
                   <p className="text-sm text-muted-foreground">
                     {Math.round((file.size ?? 0) / 1024)} KB — {file.mimeType}
                   </p>
@@ -88,7 +92,7 @@ export function DocumentPreview({ file, trigger }: DocumentPreviewProps) {
                 {isImage && (
                   <img
                     src={file.url}
-                    alt={file.originalName}
+                    alt={file.name}
                     className="mx-auto w-auto max-h-[70vh] object-contain"
                   />
                 )}
@@ -96,7 +100,7 @@ export function DocumentPreview({ file, trigger }: DocumentPreviewProps) {
                 {isPdf && (
                   <iframe
                     src={file.url}
-                    title={file.originalName}
+                    title={file.name}
                     className="h-[70vh] w-full border"
                   />
                 )}

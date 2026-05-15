@@ -125,7 +125,7 @@ export default function UserDetailsPage() {
           <div className="relative">
             <Avatar className="h-20 w-20 border-2 border-white shadow-xl dark:border-slate-900">
               <AvatarImage src={user.avatarUrl || ""} alt={user.fullName || ""} />
-              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 font-bold text-2xl text-white">
+              <AvatarFallback className="bg-linear-to-br from-blue-500 to-indigo-600 font-bold text-2xl text-white">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -304,27 +304,36 @@ export default function UserDetailsPage() {
                   </CardContent>
                 </Card>
                 {/* Supporting Document */}
-                {user.supportingDocument && (
-                  <Card className="overflow-hidden border-slate-200/60 shadow-none dark:border-slate-800/60">
-                    <CardHeader className="border-slate-100 border-b bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/20">
-                      <CardTitle className="font-bold text-lg">Supporting Document</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-semibold">{user.supportingDocument.originalName}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {user.supportingDocument.mimeType} •{" "}
-                            {Math.round((user.supportingDocument.size ?? 0) / 1024)} KB
-                          </p>
-                        </div>
-                        <div>
-                          <DocumentPreview file={user.supportingDocument} trigger={<Button>Preview</Button>} />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
+                {user.departmentCoordination?.supportingDocument &&
+                  (() => {
+                    const supportingDocument = user.departmentCoordination.supportingDocument;
+                    const previewFile = {
+                      ...supportingDocument,
+                      visibility: supportingDocument.visibility as "private" | "public",
+                    };
+
+                    return (
+                      <Card className="overflow-hidden border-slate-200/60 shadow-none dark:border-slate-800/60">
+                        <CardHeader className="border-slate-100 border-b bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/20">
+                          <CardTitle className="font-bold text-lg">Supporting Document</CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-semibold">{user.departmentCoordination?.supportingDocument?.name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {user.departmentCoordination?.supportingDocument?.mimeType} •{" "}
+                                {Math.round((user.departmentCoordination?.supportingDocument?.size ?? 0) / 1024)} KB
+                              </p>
+                            </div>
+                            <div>
+                              <DocumentPreview file={previewFile} trigger={<Button>Preview</Button>} />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })()}
               </div>
 
               {/* Sidebar Info */}
