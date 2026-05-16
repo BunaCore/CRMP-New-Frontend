@@ -228,7 +228,7 @@ export function EvaluationsTabs() {
                       <TableCell className="py-4">
                         <div className="flex items-center gap-2">
                           <Avatar className="h-7 w-7">
-                            <AvatarFallback className="font-bold text-[10px] bg-slate-200 text-slate-700">
+                            <AvatarFallback className="bg-slate-200 font-bold text-[10px] text-slate-700">
                               {p.pi?.fullName
                                 ?.split(" ")
                                 .map((part) => part[0])

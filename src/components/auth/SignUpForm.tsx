@@ -133,7 +133,7 @@ export function SignUpForm() {
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="fullName" className="block text-sm font-medium text-muted-foreground">
+            <Label htmlFor="fullName" className="block font-medium text-muted-foreground text-sm">
               Full name
             </Label>
             <Input id="fullName" placeholder="John Doe" disabled={isLoading} {...register("fullName")} />
@@ -141,7 +141,7 @@ export function SignUpForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="block text-sm font-medium text-muted-foreground">
+            <Label htmlFor="email" className="block font-medium text-muted-foreground text-sm">
               Email address
             </Label>
             <Input id="email" type="email" placeholder="you@example.com" disabled={isLoading} {...register("email")} />
@@ -167,7 +167,7 @@ export function SignUpForm() {
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="departmentId" className="block text-sm font-medium text-muted-foreground">
+            <Label htmlFor="departmentId" className="block font-medium text-muted-foreground text-sm">
               Department
             </Label>
             <Controller
@@ -212,7 +212,7 @@ export function SignUpForm() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="userProgram" className="block text-sm font-medium text-muted-foreground">
+              <Label htmlFor="userProgram" className="block font-medium text-muted-foreground text-sm">
                 Program
               </Label>
               <Controller
@@ -234,7 +234,7 @@ export function SignUpForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="universityId" className="block text-sm font-medium text-muted-foreground">
+              <Label htmlFor="universityId" className="block font-medium text-muted-foreground text-sm">
                 University ID <span className="text-muted-foreground/80">(Optional)</span>
               </Label>
               <Input id="universityId" placeholder="ID-1234" disabled={isLoading} {...register("universityId")} />
@@ -243,7 +243,7 @@ export function SignUpForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phoneNumber" className="block text-sm font-medium text-muted-foreground">
+            <Label htmlFor="phoneNumber" className="block font-medium text-muted-foreground text-sm">
               Phone number <span className="text-muted-foreground/80">(Optional)</span>
             </Label>
             <Input id="phoneNumber" placeholder="+251 9xx xxx xxx" disabled={isLoading} {...register("phoneNumber")} />
@@ -284,7 +284,7 @@ export function SignUpForm() {
 
       {isExternal && (
         <div className="space-y-2">
-          <Label htmlFor="supportingDocument" className="block text-sm font-medium text-muted-foreground">
+          <Label htmlFor="supportingDocument" className="block font-medium text-muted-foreground text-sm">
             Supporting document
           </Label>
           <Input
@@ -299,7 +299,7 @@ export function SignUpForm() {
           <p className="text-muted-foreground text-xs">
             Upload a PDF or image file that verifies your external status.
           </p>
-          {supportingDocumentFile && <p className="text-sm text-foreground">Selected: {supportingDocumentFile.name}</p>}
+          {supportingDocumentFile && <p className="text-foreground text-sm">Selected: {supportingDocumentFile.name}</p>}
         </div>
       )}
 

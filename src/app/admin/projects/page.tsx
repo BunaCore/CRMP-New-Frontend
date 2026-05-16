@@ -28,6 +28,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAllProjectsQuery } from "@/lib/api/projects/queries";
+import type { ProjectListItem } from "@/lib/api/projects/types";
 
 // ─── TYPES ──────────────────────────────────────────────────────────
 interface TeamMember {
@@ -330,7 +331,7 @@ export default function AdminProjectsPage() {
   const fetched = projectsResp?.items ?? [];
 
   // Map API ProjectListItem -> local Project UI shape used by this page.
-  const mapItem = (it: any): Project => {
+  const mapItem = (it: ProjectListItem): Project => {
     const piName = it.pi?.fullName ?? "Unknown";
     const initials = piName
       .split(" ")
@@ -340,16 +341,16 @@ export default function AdminProjectsPage() {
       .toUpperCase();
 
     return {
-      id: it.projectId ?? it.projectId,
+      id: it.projectId,
       name: it.projectTitle ?? "Untitled Project",
       code: it.projectId ?? "",
       pi: piName,
       piAvatar: initials,
       piColor: "bg-slate-200 text-slate-700",
-      dept: it.projectProgram ?? it.department ?? "-",
+      dept: it.projectProgram ?? "-",
       status: normalizeStatus(it.projectStage),
       progress: 0,
-      budget: it.budget?.totalAmount ?? "",
+      budget: "-",
       startDate: it.submissionDate ? new Date(it.submissionDate).toLocaleDateString() : "-",
       endDate: "-",
       abstract: it.projectDescription ?? "",

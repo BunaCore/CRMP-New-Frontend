@@ -8,6 +8,7 @@ import {
   Briefcase,
   Building2,
   Camera,
+  Clock,
   Edit3,
   Eye,
   EyeOff,
@@ -62,15 +63,18 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
         </DialogHeader>
 
         <div className="custom-scrollbar flex h-full w-full flex-col overflow-y-auto">
-          {/* Gradient Banner Header with Avatar & Name inside */}
-          <div className="relative w-full shrink-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-6 pt-12 pb-6 sm:px-10 sm:pt-20 sm:pb-8">
+          {/* Gradient Banner Header - Content-free background */}
+          <div className="relative h-32 w-full shrink-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 sm:h-40">
             <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay" />
+          </div>
 
-            {/* Avatar Overlay & Title */}
-            <div className="relative z-10 flex flex-col items-start gap-6 sm:flex-row sm:items-end sm:justify-between">
-              <div className="flex items-end gap-5">
-                <div className="group relative shrink-0">
-                  <Avatar className="h-32 w-32 overflow-hidden rounded-3xl border-4 border-background bg-muted shadow-xl sm:h-40 sm:w-40">
+          {/* Profile Identity Section (Overlapping Banner) */}
+          <div className="px-6 pb-6 sm:px-10">
+            <div className="relative flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
+                {/* Avatar Overlay */}
+                <div className="group -mt-16 sm:-mt-20 relative shrink-0">
+                  <Avatar className="h-32 w-32 overflow-hidden rounded-full border-4 border-background bg-muted shadow-xl sm:h-40 sm:w-40">
                     <AvatarImage src={user.avatarUrl || ""} className="object-cover" />
                     <AvatarFallback className="font-black text-4xl text-primary sm:text-5xl">
                       {user.name
@@ -82,26 +86,38 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
                   <Button
                     size="icon"
                     variant="secondary"
-                    className="-bottom-2 -right-2 absolute h-10 w-10 rounded-full border shadow-lg"
+                    className="-bottom-1 -right-1 absolute h-9 w-9 rounded-full border shadow-lg sm:h-10 sm:w-10"
                   >
-                    <Camera className="h-5 w-5" />
+                    <Camera className="h-4 w-4 w-5 sm:h-5" />
                   </Button>
                 </div>
-                <div className="mb-2 space-y-1 sm:mb-4">
-                  <div className="flex items-center gap-2">
-                    <h2 className="font-black text-3xl text-white tracking-tight sm:text-4xl">{user.name}</h2>
-                    <TooltipBadge title="Verified Identity">
-                      <BadgeCheck className="h-6 w-6 text-blue-200" />
-                    </TooltipBadge>
+
+                {/* Name & Badge Area */}
+                <div className="space-y-1.5 pb-1">
+                  <div className="flex items-center gap-3">
+                    <h2 className="font-black text-2xl text-foreground tracking-tight sm:text-4xl">{user.name}</h2>
+                    <Badge
+                      variant="outline"
+                      className="gap-1 border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-bold text-[10px] text-emerald-600 dark:text-emerald-400"
+                    >
+                      <BadgeCheck className="h-3 w-3" /> Verified Profile
+                    </Badge>
                   </div>
-                  <p className="font-medium text-lg text-white/80">{user.roles?.[0] || "Researcher"}</p>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-muted-foreground text-sm">
+                    <span className="font-medium">{user.roles?.[0] || "Researcher"}</span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-3.5 w-3.5" /> Start Date: 27 Jan 2025
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div className="mb-2 sm:mb-4">
+
+              {/* Action Button */}
+              <div className="pb-1">
                 <Button
-                  variant={isEditing ? "default" : "outline"}
+                  variant="outline"
                   size="sm"
-                  className="gap-2 border-white/20 bg-white/10 font-semibold text-white shadow-sm hover:bg-white/20 hover:text-white"
+                  className="h-9 gap-2 rounded-xl border-border/60 font-semibold shadow-xs transition-all hover:bg-muted"
                   onClick={() => setIsEditing(!isEditing)}
                 >
                   {isEditing ? (
@@ -120,35 +136,35 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
 
           <div className="flex flex-col px-6 sm:px-10">
             {/* Main Tabs Area */}
-            <Tabs defaultValue="profile" className="mt-8 flex flex-col pb-6">
-              <TabsList className="h-auto w-full justify-start rounded-none border-border/50 border-b bg-transparent p-0">
+            <Tabs defaultValue="profile" className="mt-6 flex flex-col pb-6">
+              <TabsList className="h-auto w-full justify-center gap-8 rounded-none border-border/50 border-b bg-transparent p-0">
                 <TabsTrigger
                   value="profile"
-                  className="rounded-none border-transparent border-b-2 px-4 py-3 font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                  className="relative rounded-none border-transparent border-b-2 bg-transparent px-1 py-3 font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:font-bold data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 >
                   Profile Details
                 </TabsTrigger>
                 <TabsTrigger
                   value="institutional"
-                  className="rounded-none border-transparent border-b-2 px-4 py-3 font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                  className="relative rounded-none border-transparent border-b-2 bg-transparent px-1 py-3 font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:font-bold data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 >
                   Institutional Identity
                 </TabsTrigger>
                 <TabsTrigger
                   value="research"
-                  className="rounded-none border-transparent border-b-2 px-4 py-3 font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                  className="relative rounded-none border-transparent border-b-2 bg-transparent px-1 py-3 font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:font-bold data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 >
                   Research Profile
                 </TabsTrigger>
                 <TabsTrigger
                   value="preferences"
-                  className="rounded-none border-transparent border-b-2 px-4 py-3 font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                  className="relative rounded-none border-transparent border-b-2 bg-transparent px-1 py-3 font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:font-bold data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 >
                   Preferences
                 </TabsTrigger>
                 <TabsTrigger
                   value="security"
-                  className="rounded-none border-transparent border-b-2 px-4 py-3 font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none"
+                  className="relative rounded-none border-transparent border-b-2 bg-transparent px-1 py-3 font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:font-bold data-[state=active]:text-foreground data-[state=active]:shadow-none"
                 >
                   Security
                 </TabsTrigger>
@@ -564,10 +580,4 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
       </DialogContent>
     </Dialog>
   );
-}
-
-// Helper component for tooltip badge
-function TooltipBadge({ children, title }: { children: React.ReactNode; title: string }) {
-  // Can wrap in Tooltip from shadcn if imported, simplified here for ease
-  return <div title={title}>{children}</div>;
 }

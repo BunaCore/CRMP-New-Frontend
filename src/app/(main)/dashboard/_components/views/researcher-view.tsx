@@ -1,25 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
   ArrowRight,
+  BarChart3,
   BookOpen,
   CheckCircle2,
   Circle,
   Clock,
   FileText,
   MessageSquare,
+  Users,
   Wallet,
 } from "lucide-react";
+import { Label, Pie, PieChart, Sector } from "recharts";
+import type { PieSectorShapeProps } from "recharts/types/polar/Pie";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { type ChartConfig, ChartContainer, ChartStyle, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // ─────────────────────────────────────────────────────────
 // Mock Data — will be replaced with real API calls
@@ -231,12 +237,211 @@ const PUB_STAGES = ["Draft", "Submitted", "Under Review", "Accepted", "Published
 // Component
 // ─────────────────────────────────────────────────────────
 
+const chartConfig = MY_PROJECTS.reduce(
+  (acc, proj, index) => {
+    const alphaValues = ["", "CC", "99", "66", "33"];
+    acc[proj.id] = {
+      label: proj.title,
+      color: `#1447E6${alphaValues[index % 5]}`,
+    };
+    return acc;
+  },
+  {
+    approved: { label: "Approved" },
+    spent: { label: "Spent" },
+    remaining: { label: "Remaining" },
+  } as ChartConfig,
+);
+
+function BudgetPieChart() {
+  const id = "budget-pie-interactive";
+  const [activeProject, setActiveProject] = useState(MY_PROJECTS[0].id);
+
+  const activeIndex = useMemo(() => MY_PROJECTS.findIndex((item) => item.id === activeProject), [activeProject]);
+  const projects = useMemo(() => MY_PROJECTS.map((item) => item.id), []);
+  const chartData = useMemo(
+    () =>
+      MY_PROJECTS.map((proj) => ({
+        ...proj,
+        fill: `var(--color-${proj.id})`,
+      })),
+    [],
+  );
+
+  const renderPieShape = useCallback(
+    ({ index, outerRadius = 0, ...props }: PieSectorShapeProps) => {
+      if (index === activeIndex) {
+        return (
+          <g>
+            <Sector {...props} outerRadius={outerRadius + 6} />
+            <Sector {...props} outerRadius={outerRadius + 14} innerRadius={outerRadius + 8} />
+          </g>
+        );
+      }
+      return <Sector {...props} outerRadius={outerRadius} />;
+    },
+    [activeIndex],
+  );
+
+  const activeProjData = chartData[activeIndex];
+  const pct = Math.round((activeProjData.spent / activeProjData.approved) * 100);
+  const isLow = activeProjData.remaining < activeProjData.approved * 0.15;
+
+  return (
+    <Card data-chart={id} className="flex flex-col border-border/50 bg-card/50">
+      <ChartStyle id={id} config={chartConfig} />
+      <CardHeader className="pb-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Wallet className="h-4 w-4 text-blue-400" />
+            <CardTitle className="font-semibold text-muted-foreground text-sm uppercase tracking-widest">
+              Budget Overview
+            </CardTitle>
+          </div>
+          <Select value={activeProject} onValueChange={setActiveProject}>
+            <SelectTrigger
+              className="h-6 w-fit min-w-[130px] max-w-[180px] rounded-full border-none bg-muted/50 px-3 text-[10px] shadow-none transition-colors hover:bg-muted/80 focus:ring-0 focus:ring-offset-0"
+              aria-label="Select a project"
+            >
+              <SelectValue placeholder="Select project" />
+            </SelectTrigger>
+            <SelectContent align="end" className="rounded-2xl border-border/50 bg-card/95 backdrop-blur-md">
+              {projects.map((key) => {
+                const config = chartConfig[key as keyof typeof chartConfig];
+                if (!config) return null;
+
+                const pData = chartData.find((p) => p.id === key);
+                const pLow = pData && pData.remaining < pData.approved * 0.15;
+
+                return (
+                  <SelectItem key={key} value={key} className="rounded-xl focus:bg-muted/80">
+                    <div className="flex items-center gap-2 text-[10px]">
+                      <span
+                        className="flex h-2 w-2 shrink-0 rounded-full"
+                        style={{ backgroundColor: `var(--color-${key})` }}
+                      />
+                      <span className="max-w-[120px] truncate font-medium">{config?.label}</span>
+                      {pLow && <AlertTriangle className="h-2.5 w-2.5 text-red-500" />}
+                    </div>
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+        <CardDescription className="mt-1 text-xs">
+          Total Approved: ETB {BUDGET_AGGREGATE.totalApproved.toLocaleString()}
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent className="flex flex-1 flex-col justify-center pt-2 pb-2">
+        <ChartContainer id={id} config={chartConfig} className="mx-auto aspect-square w-full max-w-[180px]">
+          <PieChart>
+            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+            <Pie
+              data={chartData}
+              dataKey="approved"
+              nameKey="title"
+              innerRadius={45}
+              strokeWidth={5}
+              shape={renderPieShape}
+            >
+              <Label
+                content={({ viewBox }) => {
+                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                    return (
+                      <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
+                        <tspan x={viewBox.cx} y={viewBox.cy} className="fill-foreground font-bold text-2xl">
+                          {pct}%
+                        </tspan>
+                        <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 20} className="fill-muted-foreground text-[10px]">
+                          Spent
+                        </tspan>
+                      </text>
+                    );
+                  }
+                }}
+              />
+            </Pie>
+          </PieChart>
+        </ChartContainer>
+
+        <div className="mt-4 flex flex-col items-center justify-center space-y-1 text-sm">
+          <div className="w-full truncate px-4 text-center font-medium text-foreground">{activeProjData.title}</div>
+          <div className="mt-2 flex gap-4 text-muted-foreground text-xs">
+            <span className="flex items-center gap-1">
+              <div className="h-2 w-2 rounded-full bg-emerald-500" />
+              Spent: {activeProjData.spent.toLocaleString()}
+            </span>
+            <span className={`flex items-center gap-1 ${isLow ? "font-bold text-red-500" : ""}`}>
+              <div className={`h-2 w-2 rounded-full ${isLow ? "bg-red-500" : "bg-amber-500"}`} />
+              Left: {activeProjData.remaining.toLocaleString()}
+              {isLow && " ⚠"}
+            </span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export function ResearcherView() {
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
-  const budgetPercent = Math.round((BUDGET_AGGREGATE.totalSpent / BUDGET_AGGREGATE.totalApproved) * 100);
 
   return (
     <div className="space-y-6">
+      {/* ═══════════ RESEARCHER STATUS OVERVIEW ═══════════ */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {[
+          {
+            label: "Assigned Tasks",
+            value: MY_TASKS.length,
+            sub: `${MY_TASKS.filter((t) => t.overdue).length} overdue items`,
+            color: "text-amber-500",
+            icon: CheckCircle2,
+          },
+          {
+            label: "Active Workspaces",
+            value: "3",
+            sub: "Collaborative projects",
+            color: "text-blue-500",
+            icon: Users,
+          },
+          {
+            label: "Research Output",
+            value: MY_PUBLICATIONS.length,
+            sub: "Publications & Patents",
+            color: "text-emerald-500",
+            icon: BarChart3,
+          },
+        ].map((m, idx) => (
+          <motion.div
+            key={m.label}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: idx * 0.1 }}
+            whileHover={{ y: -4, transition: { duration: 0.2 } }}
+          >
+            <Card className="h-full border-border/50 bg-white transition-shadow hover:shadow-md dark:border-white/5 dark:bg-[#0D0D0D] dark:hover:shadow-primary/5 dark:hover:shadow-xl">
+              <CardContent className="p-6">
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <p className="font-bold text-[11px] text-muted-foreground uppercase tracking-[0.15em]">{m.label}</p>
+                    <m.icon className={`h-5 w-5 ${m.color} opacity-80`} />
+                  </div>
+                  <div>
+                    <p className="font-bold font-mono text-4xl text-foreground tracking-tight dark:text-white">
+                      {m.value}
+                    </p>
+                    <p className={`mt-2 font-semibold text-[11px] ${m.color} dark:brightness-125`}>{m.sub}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+
       {/* ═══════════ PROPOSAL STAT CARDS (Clickable → Modal) ═══════════ */}
       <div>
         <div className="mb-4 flex items-center justify-between">
@@ -407,88 +612,19 @@ export function ResearcherView() {
 
       {/* ═══════════ BUDGET SUMMARY + MY TASKS ═══════════ */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {/* Budget Overview (Multi-Project) */}
-        <Card className="border-border/50 bg-card/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 font-semibold text-muted-foreground text-sm uppercase tracking-widest">
-              <Wallet className="h-4 w-4 text-blue-400" />
-              Budget Overview
-            </CardTitle>
-            <CardDescription className="text-xs">Across {MY_PROJECTS.length} active projects</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Aggregate Budget Bar */}
-            <div>
-              <div className="mb-2 flex justify-between text-xs">
-                <span className="text-muted-foreground">
-                  ETB {BUDGET_AGGREGATE.totalSpent.toLocaleString()} spent of ETB{" "}
-                  {BUDGET_AGGREGATE.totalApproved.toLocaleString()}
-                </span>
-                <span className="font-mono font-semibold text-foreground">{budgetPercent}%</span>
-              </div>
-              <Progress value={budgetPercent} className="h-2.5" />
-              <p className="mt-1.5 text-[10px] text-emerald-500">
-                Remaining: ETB {BUDGET_AGGREGATE.totalRemaining.toLocaleString()}
-              </p>
-            </div>
-
-            {/* Per-Project Breakdown */}
-            <div className="space-y-2">
-              {MY_PROJECTS.map((proj) => {
-                const pct = Math.round((proj.spent / proj.approved) * 100);
-                const isLow = proj.remaining < proj.approved * 0.15;
-                return (
-                  <div key={proj.id} className="rounded-md border border-border/40 p-2">
-                    <div className="flex items-center justify-between">
-                      <span className="max-w-[180px] truncate font-medium text-[11px] text-foreground">
-                        {proj.title}
-                      </span>
-                      <span
-                        className={`font-mono text-[10px] ${isLow ? "font-bold text-red-500" : "text-muted-foreground"}`}
-                      >
-                        {pct}%{isLow && " ⚠"}
-                      </span>
-                    </div>
-                    <Progress value={pct} className="mt-1 h-1" />
-                    <div className="mt-1 flex justify-between text-[9px] text-muted-foreground">
-                      <span>
-                        ETB {proj.spent.toLocaleString()} / {proj.approved.toLocaleString()}
-                      </span>
-                      <span className={isLow ? "font-semibold text-red-500" : ""}>
-                        Left: ETB {proj.remaining.toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Latest Budget Request */}
-            <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
-              <p className="flex items-center gap-1.5 font-bold text-[10px] text-amber-700 uppercase tracking-wider dark:text-amber-400">
-                <Clock className="h-3 w-3" />
-                Latest Request
-              </p>
-              <p className="mt-1 font-medium text-foreground text-sm">{BUDGET_AGGREGATE.latestRequest.item}</p>
-              <p className="mt-0.5 text-[10px] text-muted-foreground">{BUDGET_AGGREGATE.latestRequest.project}</p>
-              <div className="mt-1.5 flex items-center justify-between">
-                <span className="font-mono font-semibold text-amber-700 text-sm dark:text-amber-300">
-                  ETB {BUDGET_AGGREGATE.latestRequest.amount.toLocaleString()}
-                </span>
-                <Badge variant="outline" className="border-amber-300 text-[10px] text-amber-700 dark:text-amber-400">
-                  {BUDGET_AGGREGATE.latestRequest.status}
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex flex-col gap-4">
+          <BudgetPieChart />
+        </div>
 
         {/* My Tasks (Multi-Project) */}
-        <Card className="border-border/50 bg-card/50">
-          <CardHeader className="pb-3">
+        <Card className="group relative self-start overflow-hidden rounded-xl border-violet-500/20 bg-violet-500/5 shadow-sm transition-all hover:shadow-md">
+          <div className="-top-4 -right-4 pointer-events-none absolute p-4 opacity-[0.03] transition-all group-hover:scale-110 group-hover:opacity-[0.05]">
+            <FileText className="h-24 w-24 text-violet-500" />
+          </div>
+          <CardHeader className="relative z-10 pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 font-semibold text-muted-foreground text-sm uppercase tracking-widest">
-                <FileText className="h-4 w-4 text-violet-400" />
+              <CardTitle className="flex items-center gap-2 font-semibold text-foreground text-sm uppercase tracking-widest">
+                <FileText className="h-4 w-4 text-violet-500" />
                 My Tasks
               </CardTitle>
               <Badge variant={MY_TASKS.some((t) => t.overdue) ? "destructive" : "secondary"} className="text-[10px]">
@@ -496,48 +632,112 @@ export function ResearcherView() {
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="space-y-2">
-            {MY_TASKS.map((task) => (
-              <div
-                key={task.id}
-                className={`flex items-center gap-3 rounded-lg border p-2.5 transition-colors ${
-                  task.overdue
-                    ? "border-red-200 bg-red-50/50 dark:border-red-900/50 dark:bg-red-950/20"
-                    : "border-border/50 hover:bg-muted/30"
-                }`}
-              >
-                {/* Priority Indicator */}
-                <div
-                  className={`h-2 w-2 flex-shrink-0 rounded-full ${
-                    task.priority === "high"
-                      ? "bg-red-500"
-                      : task.priority === "medium"
-                        ? "bg-amber-500"
-                        : "bg-blue-400"
-                  }`}
-                />
-                {/* Task Content */}
-                <div className="min-w-0 flex-1">
-                  <p
-                    className={`text-sm ${task.overdue ? "font-semibold text-red-700 dark:text-red-300" : "text-foreground"}`}
-                  >
-                    {task.title}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground">{task.project}</p>
-                </div>
-                {/* Due Date */}
-                <span
-                  className={`flex-shrink-0 text-[11px] ${
-                    task.overdue
-                      ? "flex items-center gap-1 font-bold text-red-600 dark:text-red-400"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  {task.overdue && <AlertTriangle className="h-3 w-3" />}
-                  {task.due}
-                </span>
+          <CardContent className="relative z-10 flex h-[280px] flex-col px-4 pt-0 pb-4">
+            <div className="custom-scrollbar flex-1 overflow-y-auto px-1">
+              <div className="relative flex flex-col pt-2 pb-4">
+                {[...MY_TASKS]
+                  .sort((a, b) => {
+                    const priorityMap = { high: 3, medium: 2, low: 1 };
+                    return priorityMap[b.priority] - priorityMap[a.priority];
+                  })
+                  .map((task, index) => {
+                    const isTop = index === 0;
+
+                    return (
+                      <motion.div
+                        key={task.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className={`hover:-translate-y-1 relative rounded-xl bg-card p-2.5 shadow-sm transition-transform hover:shadow-md ${
+                          task.overdue ? "border border-red-500 dark:border-red-500" : "border border-border/60"
+                        } ${index > 0 ? "-mt-4 pt-7" : ""}`}
+                        style={{ zIndex: 50 - index }}
+                      >
+                        <div className="flex items-start justify-between">
+                          {/* Top left short bar */}
+                          <div className="flex flex-col gap-1.5">
+                            {isTop && <div className="h-[3px] w-5 rounded-full bg-amber-400" />}
+                          </div>
+                          {/* Options Menu (Three dots) */}
+                          <div className="mt-0.5 flex space-x-[2px]">
+                            <div className="h-0.5 w-0.5 rounded-full bg-muted-foreground/50" />
+                            <div className="h-0.5 w-0.5 rounded-full bg-muted-foreground/50" />
+                            <div className="h-0.5 w-0.5 rounded-full bg-muted-foreground/50" />
+                          </div>
+                        </div>
+
+                        <div className={`mt-1.5 ${isTop ? "mb-2" : "mb-0.5"}`}>
+                          <h3
+                            className={`font-semibold ${
+                              task.overdue ? "text-red-600 dark:text-red-400" : "text-foreground"
+                            } ${isTop ? "text-xs leading-tight" : "line-clamp-1 text-[10px] opacity-80"}`}
+                          >
+                            {task.title}
+                          </h3>
+
+                          {/* Project Name and Priority Dot */}
+                          <div className="mt-1 flex items-center gap-1.5">
+                            <div
+                              className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${
+                                task.priority === "high"
+                                  ? "bg-red-500"
+                                  : task.priority === "medium"
+                                    ? "bg-amber-500"
+                                    : "bg-blue-400"
+                              }`}
+                            />
+                            <span className="truncate font-medium text-[9px] text-muted-foreground">
+                              {task.project}
+                            </span>
+                          </div>
+
+                          {isTop && (
+                            <div className="mt-1.5 flex items-center gap-1.5">
+                              <Badge
+                                variant={task.overdue ? "destructive" : "secondary"}
+                                className={`border-none px-1 py-0 text-[8px] ${
+                                  task.overdue ? "" : "bg-muted text-muted-foreground"
+                                }`}
+                              >
+                                {task.overdue && <AlertTriangle className="mr-1 inline h-2 w-2" />}
+                                {task.due}
+                              </Badge>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Bottom Avatars & Comments */}
+                        <div className="mt-auto flex items-center justify-between">
+                          {isTop ? (
+                            <span className="font-medium text-[8px] text-muted-foreground">6 comments</span>
+                          ) : (
+                            <span /> // Spacer
+                          )}
+
+                          <div className="-space-x-1 flex">
+                            <Avatar className="h-4 w-4 border border-background">
+                              <AvatarImage src={`https://i.pravatar.cc/150?u=${task.id}`} />
+                              <AvatarFallback>A</AvatarFallback>
+                            </Avatar>
+                            {isTop && (
+                              <>
+                                <Avatar className="h-4 w-4 border border-background">
+                                  <AvatarImage src={`https://i.pravatar.cc/150?u=${task.id + 10}`} />
+                                  <AvatarFallback>B</AvatarFallback>
+                                </Avatar>
+                                <div className="flex h-4 w-4 items-center justify-center rounded-full border border-background bg-slate-500 font-medium text-[6px] text-white">
+                                  3+
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
               </div>
-            ))}
+            </div>
           </CardContent>
         </Card>
       </div>

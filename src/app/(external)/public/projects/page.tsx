@@ -34,7 +34,7 @@ export default function PublicProjectsPage() {
       <header className="border-border border-b bg-background/95 backdrop-blur-sm">
         <div className="mx-auto max-w-7xl px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
               <Image src="/logo.png" alt="CRMP Logo" width={40} height={40} className="object-contain" priority />
               <span className="font-semibold text-foreground">CRMP</span>
             </Link>
