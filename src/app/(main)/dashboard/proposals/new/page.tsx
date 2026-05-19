@@ -54,9 +54,16 @@ export default function NewProposalPage() {
     handleSubmit,
     watch,
     trigger,
+    setValue,
     formState: { isSubmitting },
   } = methods;
   const isFunded = watch("isFunded");
+
+  React.useEffect(() => {
+    if (user?.userProgram) {
+      setValue("proposalProgram", user.userProgram as ProposalProgram, { shouldValidate: true });
+    }
+  }, [user?.userProgram, setValue]);
 
   const { mutateAsync: createProposalMutation, isPending } = useCreateProposal();
 

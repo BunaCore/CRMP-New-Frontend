@@ -114,9 +114,9 @@ export function SignUpForm() {
 
       router.push("/login");
     } catch (_error: unknown) {
-      const err = _error as { response: { data: { message: string } } };
+      const err = _error as { response?: { data?: { message?: string } } };
       toast.error("Sign Up Failed", {
-        description: err.response.data.message || "Something went wrong. Try again.",
+        description: err?.response?.data?.message || "Something went wrong. Try again.",
       });
     } finally {
       setIsLoading(false);

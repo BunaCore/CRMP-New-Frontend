@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { AlertCircle, Undo2 } from "lucide-react";
+import { AlertCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -21,7 +21,7 @@ import { apiClient } from "@/lib/api/client";
 
 import { useBudgetRequestsCtx } from "../../_context/BudgetRequestsContext";
 
-export function ReturnModal() {
+export function RejectModal() {
   const { state, dispatch } = useBudgetRequestsCtx();
 
   const [feedback, setFeedback] = useState("");
@@ -47,61 +47,58 @@ export function ReturnModal() {
     if (!request) return;
 
     try {
-      await apiClient.patch(`/budget/admin/requests/${request.requestId}/return`, {
+      await apiClient.patch(`/budget/admin/requests/${request.requestId}/reject`, {
         feedback: feedback.trim(),
       });
 
-      toast.success("Request returned to PI.");
+      toast.success("Request permanently rejected.");
 
       // Close everything
-      dispatch({ type: "SET_RETURN_MODAL", payload: false });
+      dispatch({ type: "SET_REJECT_MODAL", payload: false });
       dispatch({ type: "SET_DRAWER_OPEN", payload: false });
       dispatch({ type: "SET_ACTIVE_REQUEST", payload: null });
 
-      // Trigger a shared refetch across all hook instances
+      // Trigger a shared refetch
       dispatch({ type: "TRIGGER_REFETCH" });
     } catch (err) {
       // biome-ignore lint/suspicious/noExplicitAny: error handling
       const error = err as any;
-      toast.error(error.response?.data?.message || "Failed to return request.");
+      toast.error(error.response?.data?.message || "Failed to reject request.");
     } finally {
       setIsSubmitting(false);
     }
   }
 
   return (
-    <Dialog open={state.returnModalOpen} onOpenChange={(open) => dispatch({ type: "SET_RETURN_MODAL", payload: open })}>
+    <Dialog open={state.rejectModalOpen} onOpenChange={(open) => dispatch({ type: "SET_REJECT_MODAL", payload: open })}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-red-600">
-            <Undo2 className="h-5 w-5" />
-            Return for Correction
+          <DialogTitle className="flex items-center gap-2 text-destructive">
+            <XCircle className="h-5 w-5" />
+            Reject Disbursement Request
           </DialogTitle>
-          <DialogDescription>
-            Returning this request will notify the PI and allow them to correct and resubmit.
-          </DialogDescription>
+          <DialogDescription>This will permanently reject the request and release the budget items.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          <Alert className="border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/30">
-            <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
-            <AlertDescription className="text-red-800 text-sm dark:text-red-300">
-              You are returning Disbursement <span className="font-bold">#{request.requestSequence}</span> for project{" "}
-              <span className="inline-block max-w-[150px] truncate align-bottom font-bold">{request.projectTitle}</span>
-              .
+          <Alert variant="destructive" className="bg-destructive/5">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription className="font-medium text-sm">
+              You are rejecting Disbursement <span className="font-bold">#{request.requestSequence}</span>. The items
+              will become <span className="font-bold">AVAILABLE</span> for the PI to request again.
             </AlertDescription>
           </Alert>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="feedback">Reason for Return</Label>
+              <Label htmlFor="reject-feedback">Reason for Rejection</Label>
               <span className={`font-medium text-[10px] ${isFeedbackValid ? "text-muted-foreground" : "text-red-500"}`}>
                 {feedback.length} / {minLength} min
               </span>
             </div>
             <Textarea
-              id="feedback"
-              placeholder="Describe exactly what is wrong and what the PI needs to fix…"
+              id="reject-feedback"
+              placeholder="Provide a clear reason why this request is being rejected..."
               rows={4}
               value={feedback}
               onChange={(e) => {
@@ -117,13 +114,13 @@ export function ReturnModal() {
         <DialogFooter>
           <Button
             variant="outline"
-            onClick={() => dispatch({ type: "SET_RETURN_MODAL", payload: false })}
+            onClick={() => dispatch({ type: "SET_REJECT_MODAL", payload: false })}
             disabled={isSubmitting}
           >
             Cancel
           </Button>
           <Button variant="destructive" onClick={handleConfirm} disabled={!isFeedbackValid || isSubmitting}>
-            {isSubmitting ? "Returning..." : "Return to PI"}
+            {isSubmitting ? "Rejecting..." : "Permanently Reject"}
           </Button>
         </DialogFooter>
       </DialogContent>

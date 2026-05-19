@@ -112,7 +112,7 @@ export function ChatPanel() {
                     className="flex-1 gap-2 rounded-lg font-bold text-xs transition-all data-[state=active]:bg-background data-[state=active]:shadow-sm dark:data-[state=active]:bg-zinc-800"
                   >
                     <Bell className="h-3.5 w-3.5" />
-                    Activity
+                    Related
                   </TabsTrigger>
                 </TabsList>
               </div>

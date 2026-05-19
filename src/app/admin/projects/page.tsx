@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   AlertTriangle,
@@ -20,15 +20,35 @@ import {
 } from "lucide-react";
 
 import { Can } from "@/access-control/permission-gates";
+import { TimelineTab } from "@/app/admin/proposals/_components/timeline-tab";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useAllProjectsQuery } from "@/lib/api/projects/queries";
-import type { ProjectListItem } from "@/lib/api/projects/types";
+import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/context/SessionContext";
+import { useDebounce } from "@/hooks/use-debounce";
+
+import {
+  type AdminProjectListItem,
+  getAdminProjectExportUrl,
+  terminateAdminProject,
+  useAdminProjectDetails,
+  useAdminProjects,
+} from "./_hooks/useAdminProjects";
 
 // ─── TYPES ──────────────────────────────────────────────────────────
 interface TeamMember {
@@ -63,7 +83,7 @@ interface Project {
 }
 
 // ─── MOCK DATA ───────────────────────────────────────────────────────
-const MOCK_PROJECTS: Project[] = [
+const _MOCK_PROJECTS: Project[] = [
   {
     id: "PRJ-001",
     name: "Advanced Deep Learning for Medical Imagery Analysis",
@@ -309,7 +329,7 @@ const PROGRESS_COLOR = (p: number) =>
   p === 100 ? "bg-emerald-500" : p >= 60 ? "bg-blue-600" : p >= 30 ? "bg-amber-500" : "bg-red-500";
 
 // Map backend projectStage values to valid UI statuses
-function normalizeStatus(stage: string | undefined | null): Project["status"] {
+function _normalizeStatus(stage: string | undefined | null): Project["status"] {
   if (!stage) return "Pending";
   const normalized = stage.toUpperCase();
   if (normalized.includes("ACTIVE") || normalized.includes("APPROVED")) return "Active";
@@ -321,58 +341,89 @@ function normalizeStatus(stage: string | undefined | null): Project["status"] {
 
 // ─── PAGE ────────────────────────────────────────────────────────────
 export default function AdminProjectsPage() {
+  const { user: sessionUser } = useSession();
+  const canDoAdminActions = sessionUser?.roles?.some((r) =>
+    ["coordinator", "dgc_member", "adrpm"].includes(r.toLowerCase()),
+  );
+
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 400);
   const [statusFilter, setStatusFilter] = useState("All");
-  const [selected, setSelected] = useState<Project | null>(null);
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  // Selected project for the drawer (using any for now until Drawer is overhauled)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: project object
+  const [selected, setSelected] = useState<any | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "team" | "timeline">("overview");
 
-  // Fetch admin projects (paginated). We request a reasonably large limit for the registry.
-  const { data: projectsResp } = useAllProjectsQuery({ limit: 200 }, true);
-  const fetched = projectsResp?.items ?? [];
+  // Dialog state
+  const [showTerminateDialog, setShowTerminateDialog] = useState(false);
+  const [terminateReason, setTerminateReason] = useState("");
+  const [isTerminating, setIsTerminating] = useState(false);
 
-  // Map API ProjectListItem -> local Project UI shape used by this page.
-  const mapItem = (it: ProjectListItem): Project => {
-    const piName = it.pi?.fullName ?? "Unknown";
-    const initials = piName
-      .split(" ")
-      .map((s: string) => s[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
-
-    return {
-      id: it.projectId,
-      name: it.projectTitle ?? "Untitled Project",
-      code: it.projectId ?? "",
-      pi: piName,
-      piAvatar: initials,
-      piColor: "bg-slate-200 text-slate-700",
-      dept: it.projectProgram ?? "-",
-      status: normalizeStatus(it.projectStage),
-      progress: 0,
-      budget: "-",
-      startDate: it.submissionDate ? new Date(it.submissionDate).toLocaleDateString() : "-",
-      endDate: "-",
-      abstract: it.projectDescription ?? "",
-      team: [],
-      timeline: [],
-    };
-  };
-
-  const sourceProjects: Project[] = fetched.length ? fetched.map(mapItem) : MOCK_PROJECTS;
-
-  const filtered = sourceProjects.filter((p) => {
-    const matchSearch =
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.pi.toLowerCase().includes(search.toLowerCase()) ||
-      p.code.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === "All" || p.status === statusFilter;
-    return matchSearch && matchStatus;
+  const { data, isLoading, isError, refetch } = useAdminProjects({
+    search: debouncedSearch,
+    status: statusFilter,
+    page,
+    limit,
   });
 
-  const openDrawer = (project: Project) => {
-    setSelected(project);
+  const { data: projectDetails, isLoading: isDetailsLoading } = useAdminProjectDetails(selected?.id || null);
+
+  const projects = data?.data || [];
+  const meta = data?.meta || { total: 0, page: 1, totalPages: 1 };
+
+  // Reset page to 1 when search or status changes
+  useEffect(() => {
+    setPage(1);
+  }, []);
+
+  const openDrawer = (project: AdminProjectListItem) => {
+    // We add some mock properties to prevent the old drawer from crashing
+    // before the Drawer overhaul is implemented.
+    setSelected({
+      ...project,
+      dept: typeof project.department === "string" ? project.department : project.department?.name || "N/A",
+      pi: typeof project.pi === "string" ? project.pi : project.pi?.name || "N/A",
+      piAvatar: typeof project.pi === "string" ? project.pi.charAt(0) : project.pi?.name?.charAt(0) || "U",
+      piColor: "bg-blue-100 text-blue-700",
+      budget:
+        typeof project.budget === "object"
+          ? `${project.budget.currency || "$"}${project.budget.total}`
+          : project.budget,
+      abstract: "Abstract will be loaded from detail API...",
+      team: [],
+      timeline: [],
+    });
     setActiveTab("overview");
+  };
+
+  const handleTerminate = async () => {
+    if (!selected || !terminateReason.trim()) return;
+    setIsTerminating(true);
+    try {
+      await terminateAdminProject(selected.id, terminateReason);
+      setShowTerminateDialog(false);
+      setTerminateReason("");
+      setSelected(null);
+      refetch();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsTerminating(false);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!selected) return;
+    try {
+      const url = await getAdminProjectExportUrl(selected.id);
+      window.open(url, "_blank");
+    } catch (e) {
+      console.error("Failed to generate export URL", e);
+    }
   };
 
   return (
@@ -445,15 +496,70 @@ export default function AdminProjectsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.length === 0 ? (
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: Skeletons don't reorder
+                <TableRow key={`skeleton-${i}`}>
+                  <TableCell className="py-4 pl-5">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-[200px]" />
+                      <Skeleton className="h-3 w-[150px]" />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-[120px] rounded-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-[80px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-2 w-full max-w-[120px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-[80px]" />
+                  </TableCell>
+                  <TableCell />
+                </TableRow>
+              ))
+            ) : isError ? (
+              <TableRow>
+                <TableCell colSpan={6} className="py-8 text-center">
+                  <Alert variant="destructive" className="mx-auto max-w-md border-red-200 bg-red-50 text-red-800">
+                    <AlertTriangle className="h-4 w-4 text-red-600" />
+                    <AlertDescription className="ml-2 flex items-center justify-between">
+                      Failed to load projects.
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => refetch()}
+                        className="ml-4 h-7 border-red-200 text-xs hover:bg-red-100"
+                      >
+                        Retry
+                      </Button>
+                    </AlertDescription>
+                  </Alert>
+                </TableCell>
+              </TableRow>
+            ) : projects.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="py-16 text-center text-slate-400 text-sm italic">
                   No projects match your search.
                 </TableCell>
               </TableRow>
             ) : (
-              filtered.map((project) => {
-                const cfg = STATUS_CONFIG[project.status];
+              projects.map((project) => {
+                const cfg = STATUS_CONFIG[project.status] || STATUS_CONFIG.Pending;
+
+                // Safe accessors for nested objects that might be strings in DTO
+                const deptName =
+                  typeof project.department === "string" ? project.department : project.department?.name || "N/A";
+                const piName = typeof project.pi === "string" ? project.pi : project.pi?.name || "Unknown";
+                const piInitials = piName.substring(0, 2).toUpperCase();
+                const budgetText =
+                  typeof project.budget === "object" && project.budget
+                    ? `${project.budget.currency || "$"}${project.budget.total.toLocaleString()}`
+                    : project.budget?.toString() || "$0";
+
                 return (
                   <TableRow
                     key={project.id}
@@ -467,7 +573,7 @@ export default function AdminProjectsPage() {
                           {project.name}
                         </span>
                         <span className="font-bold text-[11px] text-slate-400 uppercase tracking-wider">
-                          {project.code} · {project.dept}
+                          {project.code} · {deptName}
                         </span>
                       </div>
                     </TableCell>
@@ -476,12 +582,12 @@ export default function AdminProjectsPage() {
                     <TableCell className="py-4">
                       <div className="flex items-center gap-2.5">
                         <Avatar className="h-7 w-7 shrink-0">
-                          <AvatarFallback className={`font-bold text-[10px] ${project.piColor}`}>
-                            {project.piAvatar}
+                          <AvatarFallback className="bg-blue-100 font-bold text-[10px] text-blue-700">
+                            {piInitials}
                           </AvatarFallback>
                         </Avatar>
                         <span className="truncate font-medium text-[13px] text-slate-700 dark:text-slate-300">
-                          {project.pi}
+                          {piName}
                         </span>
                       </div>
                     </TableCell>
@@ -513,9 +619,7 @@ export default function AdminProjectsPage() {
 
                     {/* Budget */}
                     <TableCell className="py-4">
-                      <span className="font-semibold text-[13px] text-slate-700 dark:text-slate-300">
-                        {project.budget}
-                      </span>
+                      <span className="font-semibold text-[13px] text-slate-700 dark:text-slate-300">{budgetText}</span>
                     </TableCell>
 
                     {/* View */}
@@ -539,20 +643,34 @@ export default function AdminProjectsPage() {
           </TableBody>
         </Table>
 
-        {/* Footer count */}
+        {/* Footer count & Pagination */}
         <div className="flex items-center justify-between border-slate-100 border-t px-5 py-3 dark:border-slate-800">
           <p className="font-medium text-slate-400 text-xs">
-            Showing {filtered.length} of {projectsResp?.meta?.totalItems ?? sourceProjects.length} projects
+            Showing {projects.length} of {meta.total} projects
           </p>
-          {statusFilter !== "All" && (
-            <button
-              type="button"
-              onClick={() => setStatusFilter("All")}
-              className="font-semibold text-blue-600 text-xs hover:underline dark:text-blue-400"
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs"
+              disabled={page <= 1 || isLoading}
+              onClick={() => setPage((p) => p - 1)}
             >
-              Clear filter
-            </button>
-          )}
+              Previous
+            </Button>
+            <span className="font-medium text-slate-500 text-xs">
+              Page {meta.page} of {Math.max(1, meta.totalPages)}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs"
+              disabled={page >= meta.totalPages || isLoading}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -572,12 +690,17 @@ export default function AdminProjectsPage() {
                       <Badge className="border-0 bg-slate-200/80 font-bold text-[10px] text-slate-700 uppercase dark:bg-slate-800 dark:text-slate-300">
                         {selected.code}
                       </Badge>
-                      <Badge
-                        className={`${STATUS_CONFIG[selected.status].className} pointer-events-none flex items-center gap-1 border-0 font-bold text-[10px]`}
-                      >
-                        {STATUS_CONFIG[selected.status].icon}
-                        {selected.status}
-                      </Badge>
+                      {(() => {
+                        const selectedCfg = STATUS_CONFIG[selected.status] || STATUS_CONFIG.Pending;
+                        return (
+                          <Badge
+                            className={`${selectedCfg.className} pointer-events-none flex items-center gap-1 border-0 font-bold text-[10px]`}
+                          >
+                            {selectedCfg.icon}
+                            {selected.status}
+                          </Badge>
+                        );
+                      })()}
                     </div>
                     <SheetTitle className="pr-2 font-bold text-[16px] text-slate-900 leading-snug tracking-tight dark:text-slate-100">
                       {selected.name}
@@ -671,9 +794,17 @@ export default function AdminProjectsPage() {
                       <h4 className="mb-2.5 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
                         <FileText className="h-3.5 w-3.5" /> Project Abstract
                       </h4>
-                      <p className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-[13px] text-slate-600 leading-relaxed dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
-                        {selected.abstract}
-                      </p>
+                      {isDetailsLoading ? (
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-full" />
+                          <Skeleton className="h-4 w-5/6" />
+                          <Skeleton className="h-4 w-4/6" />
+                        </div>
+                      ) : (
+                        <p className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-[13px] text-slate-600 leading-relaxed dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
+                          {projectDetails?.abstract || selected.abstract}
+                        </p>
+                      )}
                     </div>
 
                     {/* Admin Actions */}
@@ -688,15 +819,26 @@ export default function AdminProjectsPage() {
                           </Button>
                         </Can>
 
-                        <Can permission="PROJECT_REJECT">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 border-red-200 font-semibold text-red-600 text-xs hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-900/20"
-                          >
-                            Suspend / Terminate
-                          </Button>
-                        </Can>
+                        {canDoAdminActions && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 border-red-200 font-semibold text-red-600 text-xs hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-900/20"
+                              onClick={() => setShowTerminateDialog(true)}
+                            >
+                              Suspend / Terminate
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 font-semibold text-xs"
+                              onClick={handleDownload}
+                            >
+                              Download as PDF
+                            </Button>
+                          </>
+                        )}
                         <Button size="sm" variant="outline" className="h-8 font-semibold text-xs">
                           View Report
                         </Button>
@@ -731,22 +873,32 @@ export default function AdminProjectsPage() {
                     </div>
 
                     {/* Team Members */}
-                    {selected.team.map((m) => (
-                      <div
-                        key={m.avatar}
-                        className="flex items-center gap-4 rounded-lg border border-slate-100 bg-slate-50/30 p-3.5 transition-colors hover:bg-slate-100/60 dark:border-slate-800 dark:bg-slate-900/20 dark:hover:bg-slate-900/40"
-                      >
-                        <Avatar className="h-10 w-10">
-                          <AvatarFallback className={`font-bold text-xs ${m.color}`}>{m.avatar}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex min-w-0 flex-col">
-                          <span className="truncate font-semibold text-slate-900 text-sm dark:text-slate-100">
-                            {m.name}
-                          </span>
-                          <span className="font-medium text-slate-500 text-xs">{m.role}</span>
-                        </div>
+                    {isDetailsLoading ? (
+                      <div className="space-y-3">
+                        <Skeleton className="h-16 w-full" />
+                        <Skeleton className="h-16 w-full" />
                       </div>
-                    ))}
+                    ) : (
+                      // biome-ignore lint/suspicious/noExplicitAny: member object
+                      (projectDetails?.team || selected.team).map((m: any) => (
+                        <div
+                          key={m.avatar || m.avatarUrl || m.name}
+                          className="flex items-center gap-4 rounded-lg border border-slate-100 bg-slate-50/30 p-3.5 transition-colors hover:bg-slate-100/60 dark:border-slate-800 dark:bg-slate-900/20 dark:hover:bg-slate-900/40"
+                        >
+                          <Avatar className="h-10 w-10">
+                            <AvatarFallback className={`font-bold text-xs ${m.color || "bg-slate-100"}`}>
+                              {m.avatar || m.name?.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex min-w-0 flex-col">
+                            <span className="truncate font-semibold text-slate-900 text-sm dark:text-slate-100">
+                              {m.name}
+                            </span>
+                            <span className="font-medium text-slate-500 text-xs">{m.role}</span>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 )}
 
@@ -754,43 +906,20 @@ export default function AdminProjectsPage() {
                 {activeTab === "timeline" && (
                   <div className="flex flex-col gap-0">
                     <h4 className="mb-5 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
-                      <Clock className="h-3.5 w-3.5" /> Project Milestones
+                      <Clock className="h-3.5 w-3.5" /> Project Timeline Workflow
                     </h4>
-                    <div className="relative ml-3 flex flex-col gap-0 border-slate-200 border-l-2 dark:border-slate-700">
-                      {selected.timeline.map((event) => (
-                        <div key={`${event.date}-${event.label}`} className="relative pb-7 pl-6 last:pb-0">
-                          {/* Dot */}
-                          <div
-                            className={`-left-[9px] absolute top-0.5 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white dark:border-slate-950 ${
-                              event.status === "done"
-                                ? "bg-emerald-500"
-                                : event.status === "active"
-                                  ? "bg-blue-600 ring-4 ring-blue-100 dark:ring-blue-900/30"
-                                  : "bg-slate-300 dark:bg-slate-700"
-                            }`}
-                          >
-                            {event.status === "done" && <CheckCircle2 className="h-2.5 w-2.5 text-white" />}
-                          </div>
-                          <p className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">{event.date}</p>
-                          <p
-                            className={`mt-0.5 font-semibold text-sm ${
-                              event.status === "done"
-                                ? "text-slate-600 dark:text-slate-400"
-                                : event.status === "active"
-                                  ? "text-blue-700 dark:text-blue-400"
-                                  : "text-slate-400 dark:text-slate-600"
-                            }`}
-                          >
-                            {event.label}
-                          </p>
-                          {event.status === "active" && (
-                            <span className="mt-1 inline-block rounded-full bg-blue-50 px-2 py-0.5 font-bold text-[10px] text-blue-600 dark:bg-blue-900/20 dark:text-blue-500">
-                              IN PROGRESS
-                            </span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                    {/* Inject the standard ApprovalTimeline used by Proposals */}
+                    {isDetailsLoading ? (
+                      <div className="ml-4 space-y-4">
+                        <Skeleton className="h-20 w-full" />
+                        <Skeleton className="h-20 w-full" />
+                        <Skeleton className="h-20 w-full" />
+                      </div>
+                    ) : projectDetails?.timeline || projectDetails?.proposalId ? (
+                      <TimelineTab proposalId={projectDetails.proposalId || selected.proposalId || selected.id} />
+                    ) : (
+                      <p className="ml-4 text-slate-500 text-sm">No approval timeline available for this project.</p>
+                    )}
                   </div>
                 )}
               </div>
@@ -798,6 +927,35 @@ export default function AdminProjectsPage() {
           )}
         </SheetContent>
       </Sheet>
+
+      {/* Terminate Dialog */}
+      <Dialog open={showTerminateDialog} onOpenChange={setShowTerminateDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Suspend or Terminate Project</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to suspend or terminate this project? This will restrict access for the PI and
+              research team. You must provide a reason below.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Textarea
+              placeholder="Enter the mandatory reason for termination here..."
+              value={terminateReason}
+              onChange={(e) => setTerminateReason(e.target.value)}
+              className="min-h-[100px]"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowTerminateDialog(false)} disabled={isTerminating}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleTerminate} disabled={!terminateReason.trim() || isTerminating}>
+              {isTerminating ? "Terminating..." : "Confirm Termination"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
