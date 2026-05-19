@@ -172,14 +172,14 @@ export default function InvitationAcceptClientPage({ token }: InvitationAcceptCl
 
   return (
     <div className="flex min-h-dvh w-full bg-slate-50 font-sans dark:bg-slate-950">
-      <div className="relative hidden h-dvh w-1/2 flex-col justify-center overflow-hidden border-r border-slate-200 bg-white px-10 pt-10 lg:flex dark:border-slate-800 dark:bg-slate-900">
-        <div className="absolute inset-0 z-0 bg-[url('/media/grid.svg')] bg-center mask-[linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+      <div className="relative hidden h-dvh w-1/2 flex-col justify-center overflow-hidden border-slate-200 border-r bg-white px-10 pt-10 lg:flex dark:border-slate-800 dark:bg-slate-900">
+        <div className="mask-[linear-gradient(180deg,white,rgba(255,255,255,0))] absolute inset-0 z-0 bg-[url('/media/grid.svg')] bg-center" />
 
         <div className="relative z-10 mx-auto flex max-w-xl flex-col items-center justify-center text-center">
           <div className="mb-6 inline-flex items-center justify-center">
             <Image src="/logo.png" alt="CRMP Logo" width={64} height={64} className="object-contain" priority />
           </div>
-          <h1 className="font-serif text-xl font-extrabold tracking-tight text-slate-900 sm:text-5xl dark:text-white/40">
+          <h1 className="font-extrabold font-serif text-slate-900 text-xl tracking-tight sm:text-5xl dark:text-white/40">
             {APP_CONFIG.meta.title || "CRMP"} Access Portal
           </h1>
           <p className="mt-6 text-lg text-slate-600 dark:text-slate-400">
@@ -193,10 +193,10 @@ export default function InvitationAcceptClientPage({ token }: InvitationAcceptCl
         <ScrollArea className="h-full min-h-0 w-full">
           <div className="mx-auto w-full max-w-sm lg:w-96">
             <div className="text-center lg:text-left">
-              <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+              <h2 className="mt-2 font-bold text-3xl text-slate-900 tracking-tight dark:text-white">
                 Accept your invitation
               </h2>
-              <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+              <p className="mt-2 text-slate-600 text-sm dark:text-slate-400">
                 Complete your account to start collaborating.
               </p>
             </div>
@@ -207,21 +207,21 @@ export default function InvitationAcceptClientPage({ token }: InvitationAcceptCl
                   <input type="hidden" {...register("token")} />
 
                   {isInviteLoading ? (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 text-muted-foreground text-sm">
                       <Loader2 className="h-4 w-4 animate-spin" /> Loading invitation...
                     </div>
                   ) : inviteError ? (
-                    <div className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                    <div className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-destructive text-sm">
                       {inviteError}
                     </div>
                   ) : invite ? (
                     <>
                       <div className="rounded-lg bg-muted/50 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        <p className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
                           Invited to CRMP as{" "}
                         </p>
-                        <span className="text-sm font-semibold text-foreground">{invite.roleName}</span>
-                        <div className="text-sm text-muted-foreground">
+                        <span className="font-semibold text-foreground text-sm">{invite.roleName}</span>
+                        <div className="text-muted-foreground text-sm">
                           {formatExpiryRelative(invite.expiresAt) === "expired"
                             ? "Invitation has expired"
                             : `Invitation will expire in ${formatExpiryRelative(invite.expiresAt)}`}
@@ -229,34 +229,34 @@ export default function InvitationAcceptClientPage({ token }: InvitationAcceptCl
                       </div>
 
                       <div className="flex flex-col">
-                        <Label htmlFor="email" className="mb-2 text-sm font-medium leading-none">
+                        <Label htmlFor="email" className="mb-2 font-medium text-sm leading-none">
                           Email address
                         </Label>
                         <Input id="email" value={invite.email} disabled />
-                        <Label htmlFor="fullName" className="mb-2 text-sm font-medium leading-none">
+                        <Label htmlFor="fullName" className="mb-2 font-medium text-sm leading-none">
                           Full name
                         </Label>
                         <Input id="fullName" autoComplete="name" {...register("fullName")} />
-                        {errors.fullName && <p className="mt-2 text-sm text-red-500">{errors.fullName.message}</p>}
+                        {errors.fullName && <p className="mt-2 text-red-500 text-sm">{errors.fullName.message}</p>}
                       </div>
 
                       <div className="flex flex-col">
-                        <Label htmlFor="phoneNumber" className="mb-2 text-sm font-medium leading-none">
+                        <Label htmlFor="phoneNumber" className="mb-2 font-medium text-sm leading-none">
                           Phone number
                         </Label>
                         <Input id="phoneNumber" autoComplete="tel" {...register("phoneNumber")} />
                         {errors.phoneNumber && (
-                          <p className="mt-2 text-sm text-red-500">{errors.phoneNumber.message}</p>
+                          <p className="mt-2 text-red-500 text-sm">{errors.phoneNumber.message}</p>
                         )}
                       </div>
 
                       <div className="flex flex-col">
-                        <Label htmlFor="universityId" className="mb-2 text-sm font-medium leading-none">
+                        <Label htmlFor="universityId" className="mb-2 font-medium text-sm leading-none">
                           University ID
                         </Label>
                         <Input id="universityId" {...register("universityId")} />
                         {errors.universityId && (
-                          <p className="mt-2 text-sm text-red-500">{errors.universityId.message}</p>
+                          <p className="mt-2 text-red-500 text-sm">{errors.universityId.message}</p>
                         )}
                       </div>
 
@@ -270,7 +270,7 @@ export default function InvitationAcceptClientPage({ token }: InvitationAcceptCl
                       />
 
                       {isExpired && (
-                        <div className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-amber-200">
+                        <div className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800 text-sm dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-amber-200">
                           This invitation has expired. Please request a new invite from your administrator.
                         </div>
                       )}
@@ -285,7 +285,7 @@ export default function InvitationAcceptClientPage({ token }: InvitationAcceptCl
                         )}
                       </Button>
 
-                      <div className="text-center text-sm text-muted-foreground">
+                      <div className="text-center text-muted-foreground text-sm">
                         Already have an account?{" "}
                         <Link prefetch={false} className="text-blue-600 hover:underline" href="/login">
                           Sign in

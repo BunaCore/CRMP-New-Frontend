@@ -28,6 +28,7 @@ export function useCreateTask(projectId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: taskManagementKeys.tasks(projectId) });
       queryClient.invalidateQueries({ queryKey: taskManagementKeys.summary(projectId) });
+      queryClient.invalidateQueries({ queryKey: [...taskManagementKeys.all, "my-tasks"] });
     },
     onError: (error) => {
       console.error("Create task error:", normalizeTaskError(error));
@@ -48,6 +49,7 @@ export function useUpdateTask(projectId: string, taskId: string) {
       queryClient.invalidateQueries({ queryKey: taskManagementKeys.task(projectId, taskId) });
       queryClient.invalidateQueries({ queryKey: taskManagementKeys.tasks(projectId) });
       queryClient.invalidateQueries({ queryKey: taskManagementKeys.summary(projectId) });
+      queryClient.invalidateQueries({ queryKey: [...taskManagementKeys.all, "my-tasks"] });
     },
     onError: (error) => {
       console.error("Update task error:", normalizeTaskError(error));

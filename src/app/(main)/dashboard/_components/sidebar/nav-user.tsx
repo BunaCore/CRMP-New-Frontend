@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { useRouter } from "next/navigation";
 
 import Cookies from "js-cookie";
@@ -19,6 +21,8 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/c
 import { getInitials } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 
+import { UserProfileDialog } from "./user-profile-dialog";
+
 export function NavUser({
   user,
 }: {
@@ -31,6 +35,7 @@ export function NavUser({
   const { isMobile } = useSidebar();
   const router = useRouter();
   const { logout } = useAuthStore();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -79,7 +84,7 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsProfileOpen(true)}>
                 <CircleUser />
                 Account
               </DropdownMenuItem>
@@ -100,6 +105,8 @@ export function NavUser({
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
+
+      <UserProfileDialog isOpen={isProfileOpen} onOpenChange={setIsProfileOpen} />
     </SidebarMenu>
   );
 }

@@ -258,7 +258,7 @@ function StatusToggleItem({ user }: { user: { id: string; accountStatus: string 
     try {
       await mutation.mutateAsync({ userId: user.id, status: nextStatus });
       toast.success(`User ${nextStatus === "active" ? "activated" : "deactivated"}`);
-    } catch (err) {
+    } catch (_err) {
       toast.error("Failed to update user status");
     }
   };

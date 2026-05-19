@@ -2,7 +2,7 @@ import { io, type Socket } from "socket.io-client";
 
 // Define the environment variable for your backend URL in production
 // Since we don't know the exact URL, default to empty to enforce relying on relative or env
-const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 class SocketManager {
   private static instance: SocketManager;
@@ -28,10 +28,13 @@ class SocketManager {
     // which is how the backend receives the Authorization header.
     // Forcing websocket-only would skip that HTTP phase and drop the headers.
     this.socket = io(SOCKET_URL, {
-      extraHeaders: {
-        Authorization: token,
+      auth: {
+        token: token,
       },
       autoConnect: false,
+      transports: ["websocket", "polling"],
+      reconnectionAttempts: 5,
+      timeout: 10000,
     });
 
     this.setupInternalListeners();

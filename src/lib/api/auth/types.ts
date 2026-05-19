@@ -4,22 +4,20 @@
 // ============================================================
 
 export type UserRole =
-  | "PI"
-  | "RAD"
-  | "RA"
-  | "ADRPM"
-  | "AC"
-  | "VPRTT"
-  | "Finance"
-  | "Coordinator"
-  | "Department"
-  | "College/School"
-  | "PGMO"
-  | "Examiner/Evaluator"
-  | "Advisor"
-  | "Evaluator"
+  | "STUDENT"
+  | "FACULTY"
+  | "ADVISOR"
+  | "EVALUATOR"
+  | "COORDINATOR"
   | "DGC_MEMBER"
-  | "PG_OFFICE";
+  | "ADRPM"
+  | "PG_OFFICE"
+  | "RAD"
+  | "FINANCE"
+  | "VPRTT"
+  | "AC_MEMBER"
+  | "SYSTEM_ADMIN"
+  | "EXTERNAL_EXPERT";
 
 // Full user profile returned from backend after login or /auth/me
 export interface UserProfile {
@@ -39,14 +37,13 @@ export interface UserProfile {
    * User program: "UG" (Undergraduate), "PG" (Postgraduate), or null (no restriction)
    */
   userProgram?: "UG" | "PG" | null;
-  /**
-   * Account status (e.g., "active", "inactive", "suspended").
-   */
   accountStatus?: string;
-  /**
-   * Boolean flag sent from the backend to determine if user can access admin dashboard
-   */
   canAccessAdmin?: boolean;
+  phoneNumber?: string;
+  university?: string;
+  universityId?: string;
+  isExternal?: boolean;
+  createdAt?: string | Date;
 }
 
 // ─── Request Shapes ─────────────────────────────────────────
@@ -61,7 +58,10 @@ export interface RegisterPayload {
   fullName?: string;
   departmentId: string;
   phoneNumber?: string;
+  universityId?: string;
   userProgram: "UG" | "PG";
+  isExternal?: boolean;
+  supportingDocumentFileId?: string;
 }
 
 // ─── Response Shapes ────────────────────────────────────────

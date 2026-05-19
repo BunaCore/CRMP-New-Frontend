@@ -52,12 +52,12 @@ export function ActionsAndModals() {
     handleTimelineRejectSubmit,
   } = useEvaluations();
 
-  const title = activeProposal?.title || activeProject?.title;
+  const title = activeProposal?.title || activeProject?.projectTitle;
 
   return (
     <>
       <Dialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
-        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[440px]">
+        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-110">
           <DialogHeader className="border-slate-100 border-b px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="flex items-center gap-3">
               <div className="rounded-lg bg-emerald-100 p-2 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
@@ -82,7 +82,7 @@ export function ActionsAndModals() {
               </Label>
               <Textarea
                 id="ap-note"
-                className="min-h-[88px] resize-none text-sm dark:border-slate-700 dark:bg-slate-950"
+                className="min-h-22 resize-none text-sm dark:border-slate-700 dark:bg-slate-950"
                 placeholder="e.g. Approved after dean’s addendum received."
                 value={approveNote}
                 onChange={(e) => setApproveNote(e.target.value)}
@@ -106,7 +106,7 @@ export function ActionsAndModals() {
 
       {/* ASSIGN EVALUATOR DIALOG */}
       <Dialog open={showAssign} onOpenChange={setShowAssign}>
-        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[480px]">
+        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-120">
           <DialogHeader className="border-slate-100 border-b px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-blue-100 p-2 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
@@ -128,7 +128,7 @@ export function ActionsAndModals() {
             </div>
           </DialogHeader>
 
-          <div className="flex max-h-[320px] flex-col gap-1.5 overflow-y-auto px-4 py-4">
+          <div className="flex max-h-80 flex-col gap-1.5 overflow-y-auto px-4 py-4">
             {filteredEvals.length === 0 && (
               <p className="rounded-lg border border-slate-200 border-dashed py-6 text-center text-slate-500 text-xs dark:border-slate-700 dark:text-slate-400">
                 No users found. Try a different search term.
@@ -204,7 +204,7 @@ export function ActionsAndModals() {
 
       {/* ASSIGN ADVISOR DIALOG */}
       <Dialog open={showAssignAdvisor} onOpenChange={setShowAssignAdvisor}>
-        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[480px]">
+        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-120">
           <DialogHeader className="border-slate-100 border-b px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-violet-100 p-2 text-violet-600 dark:bg-violet-900/40 dark:text-violet-400">
@@ -213,7 +213,7 @@ export function ActionsAndModals() {
               <DialogTitle className="font-bold text-base">Assign Advisor</DialogTitle>
             </div>
             <DialogDescription className="ml-11 text-slate-500 text-xs">
-              Select one or more research advisors. All selected advisors will be linked into the system.
+              Select one research advisor to link into the system.
             </DialogDescription>
             <div className="relative mt-3">
               <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-slate-400" />
@@ -226,7 +226,7 @@ export function ActionsAndModals() {
             </div>
           </DialogHeader>
 
-          <div className="flex max-h-[320px] flex-col gap-1.5 overflow-y-auto px-4 py-4">
+          <div className="flex max-h-80 flex-col gap-1.5 overflow-y-auto px-4 py-4">
             {filteredAdvisors.map((ad) => {
               const on = pickedAdvisorIds.includes(ad.id);
               return (
@@ -289,7 +289,7 @@ export function ActionsAndModals() {
               onClick={handleAssignAdvisorConfirm}
             >
               <GraduationCap className="mr-1.5 h-4 w-4" />
-              Save advisors
+              Save advisor
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -297,7 +297,7 @@ export function ActionsAndModals() {
 
       {/* REJECT DIALOG */}
       <Dialog open={showTimelineReject} onOpenChange={setShowTimelineReject}>
-        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-[460px]">
+        <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-115">
           <DialogHeader className="border-slate-100 border-b px-6 pt-6 pb-4 dark:border-slate-800">
             <div className="mb-1 flex items-center gap-3">
               <div className="rounded-lg bg-rose-100 p-2 text-rose-600 dark:bg-rose-900/40 dark:text-rose-400">
@@ -327,7 +327,7 @@ export function ActionsAndModals() {
               <Textarea
                 id="timeline-reject-comment"
                 placeholder="Be specific: which criteria failed, what evidence is missing, and what would be required to reconsider."
-                className="min-h-[140px] resize-none rounded-lg bg-white text-sm focus-visible:ring-rose-400 dark:bg-slate-950"
+                className="min-h-35 resize-none rounded-lg bg-white text-sm focus-visible:ring-rose-400 dark:bg-slate-950"
                 value={timelineRejectComment}
                 onChange={(e) => setTimelineRejectComment(e.target.value)}
               />

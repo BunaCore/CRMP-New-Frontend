@@ -41,7 +41,7 @@ const MSG_AWARENESS = 1;
 // ─── Options ──────────────────────────────────────────────────
 
 export interface SocketIoYjsProviderOptions {
-  /** Socket.IO server base URL (e.g. http://localhost:3000) */
+  /** Socket.IO server base URL (e.g. http://localhost:3001) */
   url: string;
   /** Workspace ID — sent to backend to join the correct project room */
   workspaceId: string;
@@ -71,12 +71,10 @@ export class SocketIoYjsProvider {
     this.awareness = new awarenessProtocol.Awareness(opts.doc);
 
     this.socket = io(opts.url, {
-      // Authorization header — backend reads from client.handshake.headers['authorization']
-      extraHeaders: { Authorization: `Bearer ${opts.token}` },
+      // Authorization token — backend reads from client.handshake.auth.token
+      auth: { token: opts.token },
       autoConnect: false,
-      // Start with polling so extraHeaders are sent in the HTTP phase,
-      // then upgrade to WebSocket. Mirrors the existing SocketManager.
-      transports: ["polling", "websocket"],
+      transports: ["websocket", "polling"],
     });
 
     this.bindSocketListeners();

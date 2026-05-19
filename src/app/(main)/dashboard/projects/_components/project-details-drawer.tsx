@@ -63,13 +63,13 @@ export function ProjectDetailsDrawer({ open, onOpenChange, project }: ProjectDet
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
-        className="flex w-full flex-col overflow-hidden border-l border-slate-200/80 bg-white p-0 shadow-2xl dark:border-slate-800 dark:bg-slate-950 sm:max-w-200 xl:max-w-250"
+        className="flex w-full flex-col overflow-hidden border-slate-200/80 border-l bg-white p-0 shadow-2xl sm:max-w-200 xl:max-w-250 dark:border-slate-800 dark:bg-slate-950"
         side="right"
       >
-        <SheetHeader className="shrink-0 space-y-0 border-b border-slate-100 bg-linear-to-b from-slate-50/90 to-white px-6 pb-4 pt-6 dark:border-slate-800 dark:from-slate-900/80 dark:to-slate-950">
+        <SheetHeader className="shrink-0 space-y-0 border-slate-100 border-b bg-linear-to-b from-slate-50/90 to-white px-6 pt-6 pb-4 dark:border-slate-800 dark:from-slate-900/80 dark:to-slate-950">
           <div className="flex flex-col gap-2">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="border-0 bg-slate-200/80 font-bold text-[10px] uppercase text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+              <Badge className="border-0 bg-slate-200/80 font-bold text-[10px] text-slate-700 uppercase dark:bg-slate-800 dark:text-slate-300">
                 {project.isPublic ? "Public" : "Private"}
               </Badge>
               <Badge
@@ -78,14 +78,14 @@ export function ProjectDetailsDrawer({ open, onOpenChange, project }: ProjectDet
               >
                 {project.projectProgram}
               </Badge>
-              <Badge className="border-0 bg-blue-100 font-bold text-[10px] uppercase text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+              <Badge className="border-0 bg-blue-100 font-bold text-[10px] text-blue-700 uppercase dark:bg-blue-900/30 dark:text-blue-300">
                 {project.projectStage}
               </Badge>
             </div>
-            <SheetTitle className="pr-2 text-[16px] font-bold leading-snug tracking-tight text-slate-900 dark:text-slate-100">
+            <SheetTitle className="pr-2 font-bold text-[16px] text-slate-900 leading-snug tracking-tight dark:text-slate-100">
               {project.projectTitle}
             </SheetTitle>
-            <div className="text-xs font-medium leading-relaxed text-slate-500">
+            <div className="font-medium text-slate-500 text-xs leading-relaxed">
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                 <span className="flex items-center gap-1.5">
                   <Calendar className="h-3.5 w-3.5 text-slate-400" />
@@ -107,7 +107,7 @@ export function ProjectDetailsDrawer({ open, onOpenChange, project }: ProjectDet
             <button
               type="button"
               onClick={() => setActiveTab("main")}
-              className={`rounded-lg px-4 py-2 text-xs font-semibold transition-all ${
+              className={`rounded-lg px-4 py-2 font-semibold text-xs transition-all ${
                 activeTab === "main"
                   ? "bg-white text-blue-700 shadow-sm dark:bg-slate-800 dark:text-blue-400"
                   : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
@@ -118,7 +118,7 @@ export function ProjectDetailsDrawer({ open, onOpenChange, project }: ProjectDet
             <button
               type="button"
               onClick={() => setActiveTab("team")}
-              className={`rounded-lg px-4 py-2 text-xs font-semibold transition-all ${
+              className={`rounded-lg px-4 py-2 font-semibold text-xs transition-all ${
                 activeTab === "team"
                   ? "bg-white text-blue-700 shadow-sm dark:bg-slate-800 dark:text-blue-400"
                   : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
@@ -129,7 +129,7 @@ export function ProjectDetailsDrawer({ open, onOpenChange, project }: ProjectDet
             <button
               type="button"
               onClick={() => setActiveTab("budget")}
-              className={`rounded-lg px-4 py-2 text-xs font-semibold transition-all ${
+              className={`rounded-lg px-4 py-2 font-semibold text-xs transition-all ${
                 activeTab === "budget"
                   ? "bg-white text-blue-700 shadow-sm dark:bg-slate-800 dark:text-blue-400"
                   : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
@@ -140,7 +140,7 @@ export function ProjectDetailsDrawer({ open, onOpenChange, project }: ProjectDet
             <button
               type="button"
               onClick={() => setActiveTab("publication")}
-              className={`rounded-lg px-4 py-2 text-xs font-semibold transition-all ${
+              className={`rounded-lg px-4 py-2 font-semibold text-xs transition-all ${
                 activeTab === "publication"
                   ? "bg-white text-blue-700 shadow-sm dark:bg-slate-800 dark:text-blue-400"
                   : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
@@ -155,33 +155,33 @@ export function ProjectDetailsDrawer({ open, onOpenChange, project }: ProjectDet
           {activeTab === "main" && (
             <>
               <div>
-                <h4 className="mb-2.5 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <h4 className="mb-2.5 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
                   <FileText className="h-3.5 w-3.5" /> Description
                 </h4>
-                <p className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-[13px] leading-relaxed text-slate-600 dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
+                <p className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-[13px] text-slate-600 leading-relaxed dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
                   {project.projectDescription || "No description provided."}
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                  <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Research Area</p>
-                  <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200">
+                  <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Research Area</p>
+                  <p className="font-semibold text-[13px] text-slate-800 dark:text-slate-200">
                     {project.researchArea || "N/A"}
                   </p>
                 </div>
                 <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                  <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Duration</p>
-                  <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200">
+                  <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Duration</p>
+                  <p className="font-semibold text-[13px] text-slate-800 dark:text-slate-200">
                     {project.durationMonths} months
                   </p>
                 </div>
                 <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                  <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Funded</p>
+                  <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Funded</p>
                   <Badge variant={project.isFunded ? "default" : "secondary"}>{project.isFunded ? "Yes" : "No"}</Badge>
                 </div>
                 <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                  <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
                     Ethical Clearance
                   </p>
                   <Badge variant="outline">{project.ethicalClearanceStatus}</Badge>
@@ -190,154 +190,146 @@ export function ProjectDetailsDrawer({ open, onOpenChange, project }: ProjectDet
             </>
           )}
 
-          {activeTab === "team" && (
-            <>
-              {project.members && project.members.length > 0 ? (
-                <div className="space-y-5">
-                  {rolesGrouped &&
-                    Object.entries(rolesGrouped).map(
-                      ([roleKey, members]) =>
-                        members.length > 0 && (
-                          <div key={roleKey}>
-                            <h4 className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                              <Users className="h-3.5 w-3.5" />
-                              {roleKey === "PI"
-                                ? "Principal Investigator"
-                                : roleKey === "ADVISOR"
-                                  ? "Advisors"
-                                  : "Members"}
-                            </h4>
-                            <div className="space-y-3">
-                              {members.map((member) => (
-                                <div
-                                  key={member.userId}
-                                  className="flex items-center gap-3 rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50"
-                                >
-                                  <Avatar className="h-10 w-10">
-                                    <AvatarFallback className="bg-blue-100/80 font-bold text-[11px] text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                                      {member.fullName
-                                        .split(" ")
-                                        .slice(0, 2)
-                                        .map((part) => part[0])
-                                        .join("")
-                                        .toUpperCase()}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <div className="min-w-0 flex-1">
-                                    <p className="truncate text-[13px] font-semibold text-slate-800 dark:text-slate-200">
-                                      {member.fullName}
-                                    </p>
-                                    <p className="truncate text-[12px] text-slate-500 dark:text-slate-400">
-                                      {member.email}
-                                    </p>
-                                  </div>
-                                  <Badge variant={getRoleBadgeVariant(member.role)} className="font-bold text-[10px]">
-                                    {member.role}
-                                  </Badge>
+          {activeTab === "team" &&
+            (project.members && project.members.length > 0 ? (
+              <div className="space-y-5">
+                {rolesGrouped &&
+                  Object.entries(rolesGrouped).map(
+                    ([roleKey, members]) =>
+                      members.length > 0 && (
+                        <div key={roleKey}>
+                          <h4 className="mb-3 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                            <Users className="h-3.5 w-3.5" />
+                            {roleKey === "PI"
+                              ? "Principal Investigator"
+                              : roleKey === "ADVISOR"
+                                ? "Advisors"
+                                : "Members"}
+                          </h4>
+                          <div className="space-y-3">
+                            {members.map((member) => (
+                              <div
+                                key={member.userId}
+                                className="flex items-center gap-3 rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50"
+                              >
+                                <Avatar className="h-10 w-10">
+                                  <AvatarFallback className="bg-blue-100/80 font-bold text-[11px] text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                                    {member.fullName
+                                      .split(" ")
+                                      .slice(0, 2)
+                                      .map((part) => part[0])
+                                      .join("")
+                                      .toUpperCase()}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="min-w-0 flex-1">
+                                  <p className="truncate font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                                    {member.fullName}
+                                  </p>
+                                  <p className="truncate text-[12px] text-slate-500 dark:text-slate-400">
+                                    {member.email}
+                                  </p>
                                 </div>
-                              ))}
-                            </div>
-                          </div>
-                        ),
-                    )}
-                </div>
-              ) : (
-                <div className="py-12 text-center">
-                  <Users className="mx-auto mb-2 h-10 w-10 text-slate-300 dark:text-slate-700" />
-                  <p className="text-[13px] text-slate-500 dark:text-slate-400">No team members assigned yet.</p>
-                </div>
-              )}
-            </>
-          )}
-
-          {activeTab === "budget" && (
-            <>
-              {project.budget ? (
-                <div className="space-y-5">
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                      <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Status</p>
-                      <Badge variant="outline" className="text-[11px]">
-                        {project.budget.currentStatus}
-                      </Badge>
-                    </div>
-                    <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                      <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                        Total Amount
-                      </p>
-                      <p className="text-[13px] font-bold text-slate-800 dark:text-slate-200">
-                        ETB{" "}
-                        {parseFloat(project.budget.totalAmount).toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                      </p>
-                    </div>
-                  </div>
-
-                  {project.budget.approvedAmount && (
-                    <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                      <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                        Approved Amount
-                      </p>
-                      <p className="text-[13px] font-bold text-slate-800 dark:text-slate-200">
-                        ETB{" "}
-                        {parseFloat(project.budget.approvedAmount).toLocaleString(undefined, {
-                          maximumFractionDigits: 2,
-                        })}
-                      </p>
-                    </div>
-                  )}
-
-                  <div>
-                    <h4 className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                      <Banknote className="h-3.5 w-3.5" /> Budget Items
-                    </h4>
-                    <div className="space-y-3">
-                      {project.budget.items.map((item) => (
-                        <div
-                          key={item.id}
-                          className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50"
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0 flex-1">
-                              <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200">
-                                {item.description}
-                              </p>
-                              <p className="text-[11px] text-slate-500 dark:text-slate-400">Line {item.lineIndex}</p>
-                            </div>
-                            <p className="whitespace-nowrap text-[13px] font-bold text-slate-800 dark:text-slate-200">
-                              ETB{" "}
-                              {parseFloat(item.requestedAmount).toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                            </p>
+                                <Badge variant={getRoleBadgeVariant(member.role)} className="font-bold text-[10px]">
+                                  {member.role}
+                                </Badge>
+                              </div>
+                            ))}
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
+                      ),
+                  )}
+              </div>
+            ) : (
+              <div className="py-12 text-center">
+                <Users className="mx-auto mb-2 h-10 w-10 text-slate-300 dark:text-slate-700" />
+                <p className="text-[13px] text-slate-500 dark:text-slate-400">No team members assigned yet.</p>
+              </div>
+            ))}
 
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Created on {new Date(project.budget.createdAt).toLocaleDateString()}
+          {activeTab === "budget" &&
+            (project.budget ? (
+              <div className="space-y-5">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
+                    <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Status</p>
+                    <Badge variant="outline" className="text-[11px]">
+                      {project.budget.currentStatus}
+                    </Badge>
+                  </div>
+                  <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
+                    <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Total Amount</p>
+                    <p className="font-bold text-[13px] text-slate-800 dark:text-slate-200">
+                      ETB{" "}
+                      {parseFloat(project.budget.totalAmount).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                    </p>
                   </div>
                 </div>
-              ) : (
-                <div className="py-12 text-center">
-                  <Banknote className="mx-auto mb-2 h-10 w-10 text-slate-300 dark:text-slate-700" />
-                  <p className="text-[13px] text-slate-500 dark:text-slate-400">No budget information available.</p>
+
+                {project.budget.approvedAmount && (
+                  <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
+                    <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                      Approved Amount
+                    </p>
+                    <p className="font-bold text-[13px] text-slate-800 dark:text-slate-200">
+                      ETB{" "}
+                      {parseFloat(project.budget.approvedAmount).toLocaleString(undefined, {
+                        maximumFractionDigits: 2,
+                      })}
+                    </p>
+                  </div>
+                )}
+
+                <div>
+                  <h4 className="mb-3 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                    <Banknote className="h-3.5 w-3.5" /> Budget Items
+                  </h4>
+                  <div className="space-y-3">
+                    {project.budget.items.map((item) => (
+                      <div
+                        key={item.id}
+                        className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <p className="font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                              {item.description}
+                            </p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">Line {item.lineIndex}</p>
+                          </div>
+                          <p className="whitespace-nowrap font-bold text-[13px] text-slate-800 dark:text-slate-200">
+                            ETB{" "}
+                            {parseFloat(item.requestedAmount).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              )}
-            </>
-          )}
+
+                <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Created on {new Date(project.budget.createdAt).toLocaleDateString()}
+                </div>
+              </div>
+            ) : (
+              <div className="py-12 text-center">
+                <Banknote className="mx-auto mb-2 h-10 w-10 text-slate-300 dark:text-slate-700" />
+                <p className="text-[13px] text-slate-500 dark:text-slate-400">No budget information available.</p>
+              </div>
+            ))}
 
           {activeTab === "publication" && (
             <div className="space-y-5">
               <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Visibility</p>
+                    <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Visibility</p>
                     <p className="text-[13px] text-slate-600 dark:text-slate-400">
                       Make this project public so others can view and download public files.
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                    <span className="text-slate-500 text-xs dark:text-slate-400">
                       {project.isPublic ? "Public" : "Private"}
                     </span>
                     <Switch
@@ -357,13 +349,13 @@ export function ProjectDetailsDrawer({ open, onOpenChange, project }: ProjectDet
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                  <p className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  <p className="mb-3 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
                     <ImageIcon className="h-3.5 w-3.5" /> Banner
                   </p>
                   {project.bannerUrl ? (
                     <div className="space-y-3">
                       <div className="overflow-hidden rounded-md border border-slate-200 dark:border-slate-800">
-                        <img
+                        <Image
                           src={project.bannerUrl}
                           alt="Project banner"
                           width={1200}
@@ -378,7 +370,7 @@ export function ProjectDetailsDrawer({ open, onOpenChange, project }: ProjectDet
                   ) : (
                     <div className="py-6 text-center">
                       <ImageIcon className="mx-auto mb-2 h-10 w-10 text-slate-300 dark:text-slate-700" />
-                      <p className="mb-3 text-sm text-slate-500 dark:text-slate-400">No banner uploaded.</p>
+                      <p className="mb-3 text-slate-500 text-sm dark:text-slate-400">No banner uploaded.</p>
                       <Button onClick={openBannerPicker} className="mx-auto">
                         <Upload className="mr-2 h-4 w-4" /> Upload Banner
                       </Button>
@@ -402,7 +394,7 @@ export function ProjectDetailsDrawer({ open, onOpenChange, project }: ProjectDet
                 </div>
 
                 <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                  <p className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  <p className="mb-3 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
                     <FileText className="h-3.5 w-3.5" /> Public File
                   </p>
                   {project.publicFileUrl ? (
@@ -440,14 +432,14 @@ export function ProjectDetailsDrawer({ open, onOpenChange, project }: ProjectDet
                           <RefreshCw className="mr-2 h-4 w-4" /> Swap File
                         </Button>
                       </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                      <p className="text-slate-500 text-xs dark:text-slate-400">
                         Uploaded: {project.publishedAt ? new Date(project.publishedAt).toLocaleDateString() : "—"}
                       </p>
                     </div>
                   ) : (
                     <div className="py-6 text-center">
                       <FileText className="mx-auto mb-2 h-10 w-10 text-slate-300 dark:text-slate-700" />
-                      <p className="mb-3 text-sm text-slate-500 dark:text-slate-400">No public file uploaded.</p>
+                      <p className="mb-3 text-slate-500 text-sm dark:text-slate-400">No public file uploaded.</p>
                       <Button onClick={openPublicFilePicker} className="mx-auto">
                         <Upload className="mr-2 h-4 w-4" /> Upload PDF
                       </Button>

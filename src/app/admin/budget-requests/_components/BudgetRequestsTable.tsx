@@ -44,6 +44,11 @@ const statusConfig: Record<BudgetRequestStatus, { label: string; className: stri
     label: "Returned",
     className: "border-red-300 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300",
   },
+  REJECTED: {
+    label: "Rejected",
+    className:
+      "border-destructive bg-destructive/10 text-destructive dark:border-destructive dark:bg-destructive/20 dark:text-destructive",
+  },
 };
 
 function SortButton({ field, label }: { field: SortField; label: string }) {

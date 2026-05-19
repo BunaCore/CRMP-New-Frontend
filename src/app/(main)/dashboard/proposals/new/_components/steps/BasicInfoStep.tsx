@@ -38,7 +38,7 @@ export function BasicInfoStep() {
 
   const file = watch("file");
   const _departmentLabel = watch("departmentLabel");
-  const { allowedPrograms, isRestricted, userProgram } = useProposalProgramValidation();
+  const { allowedPrograms, userProgram } = useProposalProgramValidation();
 
   // Department search state
   const [deptSearch, setDeptSearch] = useState("");
@@ -128,37 +128,34 @@ export function BasicInfoStep() {
           {errors.researchArea && <p className="text-red-500 text-xs">{errors.researchArea.message}</p>}
         </div>
 
-        <div className="grid gap-1.5">
-          <Label htmlFor="proposalProgram" className={cn("font-semibold text-sm", errors.title && "text-red-500")}>
-            Proposal Program
-          </Label>
-          <Controller
-            control={control}
-            name="proposalProgram"
-            render={({ field }) => (
-              <div className="space-y-2">
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className={cn("font-semibold text-sm", errors.title && "text-red-500")}>
-                    <SelectValue placeholder="Select a program..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {proposalProgramOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {isRestricted && userProgram && (
-                  <p className="text-slate-500 text-xs">
-                    Your account is limited to {userProgram === "UG" ? "Undergraduate" : "Postgraduate"} proposals.
-                  </p>
-                )}
-              </div>
-            )}
-          />
-          {errors.proposalProgram && <p className="text-red-500 text-xs">{errors.proposalProgram.message}</p>}
-        </div>
+        {!userProgram && (
+          <div className="grid gap-1.5">
+            <Label htmlFor="proposalProgram" className={cn("font-semibold text-sm", errors.title && "text-red-500")}>
+              Proposal Program
+            </Label>
+            <Controller
+              control={control}
+              name="proposalProgram"
+              render={({ field }) => (
+                <div className="space-y-2">
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className={cn("font-semibold text-sm", errors.title && "text-red-500")}>
+                      <SelectValue placeholder="Select a program..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {proposalProgramOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            />
+            {errors.proposalProgram && <p className="text-red-500 text-xs">{errors.proposalProgram.message}</p>}
+          </div>
+        )}
 
         {/* Department — Combobox (single, search-first) */}
         <div className="grid gap-1.5 sm:col-span-2 lg:col-span-1">

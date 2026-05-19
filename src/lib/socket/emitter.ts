@@ -11,6 +11,15 @@ export function emitSendMessage(payload: { chatId: string; content: string; temp
   }
 }
 
+export function emitJoinChat(payload: { chatId: string }) {
+  const socket = socketManager.getSocket();
+  if (socket) {
+    socket.emit("chat:join", payload);
+  } else {
+    console.warn("Socket not connected, cannot emit chat:join");
+  }
+}
+
 // Per-chat typing debounce: emit immediately, then throttle subsequent fires
 export function emitTyping(payload: { chatId: string }) {
   const socket = socketManager.getSocket();

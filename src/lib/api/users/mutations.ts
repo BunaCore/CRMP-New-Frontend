@@ -1,9 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import type { UserProfile } from "@/lib/api/auth/types";
 import { apiClient } from "@/lib/api/client";
+import { useAuthStore } from "@/stores/authStore";
 
 import type {
   InviteUserPayload,
+  UpdateSelfProfilePayload,
   UpdateUserProfilePayload,
   UpdateUserRolesPayload,
   UpdateUserStatusPayload,
@@ -95,6 +98,28 @@ export function useUpdateUserProfile() {
       queryClient.invalidateQueries({
         queryKey: ["users", "byId", variables.userId],
       });
+    },
+  });
+}
+
+/**
+ * Update the current user's own profile.
+ * PATCH /users/me — only requires JWT (no admin perms).
+ * On success, syncs the updated user back into the Zustand auth store
+ * so sidebar/nav components reflect changes immediately.
+ */
+export async function updateSelfProfile(payload: UpdateSelfProfilePayload): Promise<UserProfile> {
+  const response = await apiClient.patch<UserProfile>("/users/me", payload);
+  return response.data;
+}
+
+export function useUpdateSelfProfile() {
+  const updateUser = useAuthStore((s) => s.updateUser);
+  return useMutation({
+    mutationFn: updateSelfProfile,
+    onSuccess: (data) => {
+      // Sync updated user back into Zustand so UI reflects changes immediately
+      updateUser(data);
     },
   });
 }

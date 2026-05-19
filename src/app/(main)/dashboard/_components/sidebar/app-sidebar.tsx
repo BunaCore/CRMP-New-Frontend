@@ -93,7 +93,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             }
 
             // Sidebar visibility uses OR semantics: show if the user has any required permission.
-            return required.some((p) => hasPermission(user?.permissions ?? [], p));
+            const hasAccess = required.some((p) => hasPermission(user?.permissions ?? [], p));
+            if (!hasAccess) return false;
+
+            // Restrict Budget Requests for UG students
+            if (item.url === "/dashboard/researcher/budget" && user?.userProgram === "UG") {
+              return false;
+            }
+
+            return true;
           }),
         }))
         .filter((group) => group.items.length > 0);
@@ -105,7 +113,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link prefetch={false} href="/dashboard" className="flex items-center gap-2">
-                <Image src="/logo.png" alt="Logo" width={24} height={24} className="object-contain shrink-0" />
+                <Image src="/logo.png" alt="Logo" width={24} height={24} className="shrink-0 object-contain" />
                 <span className="font-semibold text-base">{APP_CONFIG.name}</span>
               </Link>
             </SidebarMenuButton>
