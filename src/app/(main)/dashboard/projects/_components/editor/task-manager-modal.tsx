@@ -58,6 +58,7 @@ import {
   useUpdateTask,
 } from "@/lib/api/task-management";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/stores/authStore";
 
 export function TaskManagerModal({ children, projectId }: { children: React.ReactNode; projectId: string }) {
   return (
@@ -852,6 +853,7 @@ function TaskCard({ task, projectId }: { task: Task; projectId: string }) {
 function SummaryView({ projectId }: { projectId: string }) {
   const { data: tasks = [] } = useTaskList(projectId);
   const { data: members = [] } = useTeamMembers(projectId);
+  const user = useAuthStore((state) => state.user);
 
   // Compute stats
   const totalTasks = tasks.length;
@@ -873,11 +875,13 @@ function SummaryView({ projectId }: { projectId: string }) {
     })
     .filter((w) => w.taskCount > 0);
 
-  // Compute upcoming deadlines
+  // Compute upcoming deadlines for the logged-in user
   const upcomingDeadlines = tasks
-    .filter((t) => t.dueDate && new Date(t.dueDate) >= new Date(new Date().setHours(0, 0, 0, 0)))
-    // biome-ignore lint/style/noNonNullAssertion: filtered above
-    .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime())
+    .filter((t) => t.assigneeId === user?.id && t.dueDate && t.status !== "done")
+    .sort((a, b) => {
+      if (!a.dueDate || !b.dueDate) return 0;
+      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    })
     .slice(0, 5)
     .map((t) => ({
       id: t.id,

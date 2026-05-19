@@ -301,7 +301,7 @@ export function ProposalsDrawer() {
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="font-semibold">{details.file.name}</p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-muted-foreground text-sm">
                               {details.file.mimeType} • {Math.round((details.file.size ?? 0) / 1024)} KB
                             </p>
                           </div>

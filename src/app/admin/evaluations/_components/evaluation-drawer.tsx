@@ -7,7 +7,6 @@ import { toast } from "sonner";
 
 import { hasPermission } from "@/access-control/permission-gates";
 import { Badge } from "@/components/ui/badge";
-import DocumentPreview from "@/components/ui/document-preview";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { submitEvaluationScores } from "@/lib/api/proposals/mutations";
 import { fetchProposalEvaluations, getAdminProposalDetails, useGetProposalMembers } from "@/lib/api/proposals/queries";

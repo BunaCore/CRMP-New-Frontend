@@ -321,7 +321,7 @@ export default function UserDetailsPage() {
                           <div className="flex items-center justify-between">
                             <div>
                               <p className="font-semibold">{user.departmentCoordination?.supportingDocument?.name}</p>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-muted-foreground text-sm">
                                 {user.departmentCoordination?.supportingDocument?.mimeType} •{" "}
                                 {Math.round((user.departmentCoordination?.supportingDocument?.size ?? 0) / 1024)} KB
                               </p>

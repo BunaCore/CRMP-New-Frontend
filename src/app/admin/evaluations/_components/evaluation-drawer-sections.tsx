@@ -33,7 +33,7 @@ import { useGetProposalMembers } from "@/lib/api/proposals/queries";
 import type { EvaluationRubric, ProposalMemberWithUser } from "@/lib/api/proposals/types";
 
 import { TimelineTab } from "../../proposals/_components/timeline-tab";
-import type { EvalProposalRow, RubricItem } from "../types";
+import type { BudgetItem, EvalProposalRow, RubricItem } from "../types";
 
 export interface DraftScore {
   score: number;
@@ -72,7 +72,7 @@ export function EvaluationOverviewTab({
           <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Principal Investigator</p>
           <div className="flex items-center gap-2">
             <Avatar className="h-7 w-7">
-              <AvatarFallback className={`font-bold text-[10px] bg-slate-200 text-slate-700`}>
+              <AvatarFallback className={`bg-slate-200 font-bold text-[10px] text-slate-700`}>
                 {drawerKind === "proposal"
                   ? activeProposal?.piAvatar
                   : activeProject?.pi?.fullName
@@ -136,7 +136,7 @@ export function EvaluationOverviewTab({
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-semibold">{proposalFile.name}</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   {proposalFile.mimeType} • {Math.round((proposalFile.size ?? 0) / 1024)} KB
                 </p>
               </div>
@@ -233,7 +233,7 @@ export function EvaluationBudgetTab({ drawerKind, activeProposal, activeProject 
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-[13px] dark:divide-slate-800/80">
-              {(drawerKind === "proposal" ? activeProposal?.budgetItems : [])?.map((item: any, i: number) => (
+              {(drawerKind === "proposal" ? activeProposal?.budgetItems : [])?.map((item: BudgetItem, i: number) => (
                 <tr key={`${item.description}-${i}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20">
                   <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{item.description}</td>
                   <td className="px-4 py-3 text-right font-medium text-slate-800 dark:text-slate-200">
@@ -253,7 +253,9 @@ export function EvaluationBudgetTab({ drawerKind, activeProposal, activeProject 
                     ? new Intl.NumberFormat("en-US", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
-                      }).format(activeProposal.budgetItems.reduce((acc: number, curr: any) => acc + curr.amount, 0))
+                      }).format(
+                        activeProposal.budgetItems.reduce((acc: number, curr: BudgetItem) => acc + curr.amount, 0),
+                      )
                     : activeProposal?.budget || "—"}
                 </td>
               </tr>

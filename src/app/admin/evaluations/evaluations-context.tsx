@@ -18,7 +18,7 @@ import { useAuthStore } from "@/stores/authStore";
 
 import type { Evaluator } from "../proposals/types";
 import { DEMO_RUBRIC } from "./_data/mock-evaluations";
-import type { DrawerTab, EvalProjectRow, EvalProposalRow, MainTab, RubricItem } from "./types";
+import type { DrawerTab, EvalProposalRow, MainTab, RubricItem } from "./types";
 
 export function rubricTotals(items: RubricItem[]) {
   const earned = items.reduce((s, r) => s + r.score, 0);
@@ -176,7 +176,7 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
   const allProposalsQuery = useProposalsListQuery({}, mainTab === "proposals" && proposalScope === "all");
 
   // ── Real API: projects table data ───────────────────────────────────────────
-  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
+  const [_isLoadingProjects, setIsLoadingProjects] = useState(true);
   const allProjectsQuery = useAllProjectsQuery({ limit: 200 }, mainTab === "projects");
 
   const mapAllProposalRow = useCallback((proposal: ProposalListItem): EvalProposalRow => {
