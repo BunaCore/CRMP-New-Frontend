@@ -23,17 +23,21 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import DocumentPreview from "@/components/ui/document-preview";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { exportWorkspace, fetchWorkspaces, triggerDownload } from "@/lib/api/editor/workspace.api";
+import type { FileDetails } from "@/lib/api/files/types";
+import type { ProjectListItem } from "@/lib/api/projects/types";
 import { useGetProposalMembers } from "@/lib/api/proposals/queries";
 import type { EvaluationRubric, ProposalMemberWithUser } from "@/lib/api/proposals/types";
 
 import { TimelineTab } from "../../proposals/_components/timeline-tab";
-import type { EvalProjectRow, EvalProposalRow, RubricItem } from "../types";
+import type { BudgetItem, EvalProposalRow, RubricItem } from "../types";
 
 export interface DraftScore {
   score: number;
@@ -43,13 +47,14 @@ export interface DraftScore {
 interface EvaluationOverviewTabProps {
   drawerKind: "proposal" | "project";
   activeProposal: EvalProposalRow | null;
-  activeProject: EvalProjectRow | null;
+  activeProject: ProjectListItem | null;
   canAssignEvaluators: boolean;
   canAssignAdvisors: boolean;
   evaluatorSummary: string;
   advisorSummary: string;
   onAssignEvaluators: () => void;
   onAssignAdvisor: () => void;
+  proposalFile?: FileDetails | null;
 }
 
 export function EvaluationOverviewTab({
@@ -62,18 +67,19 @@ export function EvaluationOverviewTab({
   advisorSummary,
   onAssignEvaluators,
   onAssignAdvisor,
+  proposalFile,
 }: EvaluationOverviewTabProps) {
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExportPdf = async () => {
-    if (drawerKind !== "project" || !activeProject?.id) return;
+    if (drawerKind !== "project" || !activeProject?.projectId) return;
     setIsExporting(true);
     try {
-      const workspaces = await fetchWorkspaces(activeProject.id);
+      const workspaces = await fetchWorkspaces(activeProject.projectId);
       if (workspaces && workspaces.length > 0) {
         const workspaceId = workspaces[0].id;
         const blob = await exportWorkspace(workspaceId, "pdf");
-        triggerDownload(blob, `${activeProject.title || "Project"}.pdf`);
+        triggerDownload(blob, `${activeProject.projectTitle || "Project"}.pdf`);
       } else {
         alert("No workspace found for this project.");
       }
@@ -92,21 +98,28 @@ export function EvaluationOverviewTab({
           <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Principal Investigator</p>
           <div className="flex items-center gap-2">
             <Avatar className="h-7 w-7">
-              <AvatarFallback
-                className={`font-bold text-[10px] ${drawerKind === "proposal" ? activeProposal?.piColor : activeProject?.leadColor}`}
-              >
-                {drawerKind === "proposal" ? activeProposal?.piAvatar : activeProject?.leadAvatar}
+              <AvatarFallback className={`bg-slate-200 font-bold text-[10px] text-slate-700`}>
+                {drawerKind === "proposal"
+                  ? activeProposal?.piAvatar
+                  : activeProject?.pi?.fullName
+                    ? activeProject.pi.fullName
+                        .split(" ")
+                        .map((s) => s[0])
+                        .slice(0, 2)
+                        .join("")
+                        .toUpperCase()
+                    : "—"}
               </AvatarFallback>
             </Avatar>
             <span className="truncate font-semibold text-[13px] text-slate-800 dark:text-slate-200">
-              {drawerKind === "proposal" ? activeProposal?.pi : activeProject?.lead}
+              {drawerKind === "proposal" ? activeProposal?.pi : activeProject?.pi?.fullName || "No PI"}
             </span>
           </div>
         </div>
         <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
           <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Budget Requested</p>
           <p className="font-extrabold text-indigo-600 text-xl dark:text-indigo-400">
-            {drawerKind === "proposal" ? activeProposal?.budget : activeProject?.budget}
+            {drawerKind === "proposal" ? activeProposal?.budget : activeProject?.isFunded ? "Funded" : "—"}
           </p>
         </div>
         <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
@@ -114,7 +127,7 @@ export function EvaluationOverviewTab({
           <p className="flex items-center gap-1.5 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
             <CalendarDays className="h-3.5 w-3.5 text-slate-400" />
             {/* biome-ignore lint/suspicious/noExplicitAny: dynamic access allowed for mockup */}
-            {(activeProposal as any)?.submittedDate || "Mar 12, 2025"}
+            {(activeProposal as any)?.submittedDate || activeProject?.submissionDate || "Mar 12, 2025"}
           </p>
         </div>
         <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
@@ -122,7 +135,7 @@ export function EvaluationOverviewTab({
           <p className="flex items-center gap-1.5 font-semibold text-[13px] text-slate-800 dark:text-slate-200">
             <Users className="h-3.5 w-3.5 text-slate-400" />
             {/* biome-ignore lint/suspicious/noExplicitAny: dynamic access allowed for mockup */}
-            {(activeProposal as any)?.teamCount || 3} members
+            {(activeProposal as any)?.teamCount || (activeProject as any)?.team?.length || "—"} members
           </p>
         </div>
       </div>
@@ -134,9 +147,32 @@ export function EvaluationOverviewTab({
         <p className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-[13px] text-slate-600 leading-relaxed dark:border-slate-800 dark:bg-slate-900/30 dark:text-slate-400">
           {/* biome-ignore lint/suspicious/noExplicitAny: dynamic access allowed for mockup */}
           {(activeProposal as any)?.abstract ||
+            activeProject?.projectDescription ||
             "Abstract details are under evaluation. Provide comprehensive details regarding the evaluated item."}
         </p>
       </div>
+
+      {/* ── FILE PREVIEW ── */}
+      {proposalFile && (
+        <Card className="overflow-hidden border-slate-200/60 shadow-none dark:border-slate-800/60">
+          <CardHeader className="border-slate-100 border-b bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/20">
+            <CardTitle className="font-bold text-lg">Proposal Document</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-semibold">{proposalFile.name}</p>
+                <p className="text-muted-foreground text-sm">
+                  {proposalFile.mimeType} • {Math.round((proposalFile.size ?? 0) / 1024)} KB
+                </p>
+              </div>
+              <div>
+                <DocumentPreview file={proposalFile} trigger={<Button>Preview</Button>} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div>
         <h4 className="mb-3 font-bold text-[11px] text-slate-500 uppercase tracking-wider">Workflow Actions</h4>
@@ -207,7 +243,7 @@ export function EvaluationOverviewTab({
 interface EvaluationBudgetTabProps {
   drawerKind: "proposal" | "project";
   activeProposal: EvalProposalRow | null;
-  activeProject: EvalProjectRow | null;
+  activeProject: ProjectListItem | null;
 }
 
 export function EvaluationBudgetTab({ drawerKind, activeProposal, activeProject }: EvaluationBudgetTabProps) {
@@ -219,13 +255,13 @@ export function EvaluationBudgetTab({ drawerKind, activeProposal, activeProject 
             <Banknote className="h-3.5 w-3.5" /> Total Requested
           </p>
           <p className="font-extrabold text-2xl text-indigo-600 dark:text-indigo-400">
-            {drawerKind === "proposal" ? activeProposal?.budget : activeProject?.budget}
+            {drawerKind === "proposal" ? activeProposal?.budget : activeProject?.isFunded ? "Funded" : "—"}
           </p>
         </div>
         <div className="flex flex-col justify-center rounded-xl border border-slate-200/80 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/30">
           <p className="mb-1 font-bold text-[10px] text-slate-500 uppercase tracking-wider">Status</p>
           <p className="font-semibold text-[15px] text-slate-800 dark:text-slate-200">
-            {drawerKind === "project" && activeProject ? activeProject.evalStatus : "Under Evaluation"}
+            {drawerKind === "project" && activeProject ? activeProject.projectStage : "Under Evaluation"}
           </p>
         </div>
       </div>
@@ -243,41 +279,30 @@ export function EvaluationBudgetTab({ drawerKind, activeProposal, activeProject 
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-[13px] dark:divide-slate-800/80">
-              {(drawerKind === "proposal" ? activeProposal?.budgetItems : activeProject?.budgetItems)?.map(
-                (item, i) => (
-                  <tr key={`${item.description}-${i}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20">
-                    <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{item.description}</td>
-                    <td className="px-4 py-3 text-right font-medium text-slate-800 dark:text-slate-200">
-                      {new Intl.NumberFormat("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }).format(item.amount)}
-                    </td>
-                  </tr>
-                ),
-              )}
+              {(drawerKind === "proposal" ? activeProposal?.budgetItems : [])?.map((item: BudgetItem, i: number) => (
+                <tr key={`${item.description}-${i}`} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20">
+                  <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{item.description}</td>
+                  <td className="px-4 py-3 text-right font-medium text-slate-800 dark:text-slate-200">
+                    {new Intl.NumberFormat("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(item.amount)}
+                  </td>
+                </tr>
+              ))}
             </tbody>
             <tfoot className="bg-slate-50 dark:bg-slate-900/50">
               <tr>
                 <td className="px-4 py-3 font-bold text-slate-900 dark:text-slate-100">Total</td>
                 <td className="px-4 py-3 text-right font-bold text-indigo-600 dark:text-indigo-400">
-                  {(drawerKind === "proposal" ? activeProposal : activeProject)?.budgetItems?.reduce(
-                    (acc, curr) => acc + curr.amount,
-                    0,
-                  )
+                  {drawerKind === "proposal" && activeProposal?.budgetItems && activeProposal.budgetItems.length > 0
                     ? new Intl.NumberFormat("en-US", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       }).format(
-                        (drawerKind === "proposal" ? activeProposal : activeProject)?.budgetItems?.reduce(
-                          (acc, curr) => acc + curr.amount,
-                          0,
-                        ) ?? 0,
+                        activeProposal.budgetItems.reduce((acc: number, curr: BudgetItem) => acc + curr.amount, 0),
                       )
-                    : (drawerKind === "proposal" ? activeProposal?.budget : activeProject?.budget)?.replace(
-                        /[^0-9.]/g,
-                        "",
-                      )}
+                    : activeProposal?.budget || "—"}
                 </td>
               </tr>
             </tfoot>

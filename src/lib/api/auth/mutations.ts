@@ -56,7 +56,10 @@ export async function registerUser(_payload: {
   fullName: string;
   departmentId?: string;
   phoneNumber?: string;
+  universityId?: string;
   userProgram: "UG" | "PG" | null;
+  isExternal?: boolean;
+  supportingDocumentFileId?: string;
 }): Promise<{ message: string }> {
   if (USE_MOCK) {
     await new Promise((r) => setTimeout(r, 600));

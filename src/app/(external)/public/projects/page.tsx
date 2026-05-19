@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import Image from "next/image";
+import Link from "next/link";
 
 import { ThemeSwitcher } from "@/app/(main)/dashboard/_components/sidebar/theme-switcher";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -33,10 +34,10 @@ export default function PublicProjectsPage() {
       <header className="border-border border-b bg-background/95 backdrop-blur-sm">
         <div className="mx-auto max-w-7xl px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
               <Image src="/logo.png" alt="CRMP Logo" width={40} height={40} className="object-contain" priority />
               <span className="font-semibold text-foreground">CRMP</span>
-            </div>
+            </Link>
             <ThemeSwitcher />
           </div>
         </div>

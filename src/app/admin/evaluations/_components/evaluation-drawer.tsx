@@ -9,8 +9,8 @@ import { hasPermission } from "@/access-control/permission-gates";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { submitEvaluationScores } from "@/lib/api/proposals/mutations";
-import { fetchProposalEvaluations, useGetProposalMembers } from "@/lib/api/proposals/queries";
-import type { EvaluationRubric } from "@/lib/api/proposals/types";
+import { fetchProposalEvaluations, getAdminProposalDetails, useGetProposalMembers } from "@/lib/api/proposals/queries";
+import type { AdminProposalDetail, EvaluationRubric } from "@/lib/api/proposals/types";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -25,7 +25,7 @@ import {
   EvaluationScoresTab,
   TeamTabContent,
 } from "./evaluation-drawer-sections";
-import { STATUS_STYLES } from "./evaluations-tabs";
+import { getProjectStatusBadge } from "./evaluations-tabs";
 
 export function EvaluationDrawer() {
   const {
@@ -70,8 +70,9 @@ export function EvaluationDrawer() {
   const [draftScores, setDraftScores] = useState<Record<string, Record<string, DraftScore>>>({});
   const [scoresLoading, setScoresLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [proposalDetails, setProposalDetails] = useState<AdminProposalDetail | null>(null);
 
-  const activeId = drawerKind === "proposal" ? activeProposal?.id : activeProject?.id;
+  const activeId = drawerKind === "proposal" ? activeProposal?.id : activeProject?.projectId;
 
   const { data: proposalMembers = [], isLoading: proposalMembersLoading } = useGetProposalMembers(
     drawerKind === "proposal" ? (activeId ?? null) : null,
@@ -135,8 +136,19 @@ export function EvaluationDrawer() {
       .finally(() => setScoresLoading(false));
   }, [drawerTab, activeId]);
 
-  // Hide project-phase rubrics when in the proposal tab, but show all in project tab
-  const filteredApiRubrics = apiRubrics.filter((r) => (drawerKind === "proposal" ? r.phase === "PROPOSAL" : true));
+  // Fetch proposal details (for file preview)
+  useEffect(() => {
+    if (!activeId || drawerKind !== "proposal") {
+      setProposalDetails(null);
+      return;
+    }
+
+    getAdminProposalDetails(activeId).then(setProposalDetails).catch(console.error);
+  }, [activeId, drawerKind]);
+
+  const phaseFilter = drawerKind === "proposal" ? "PROPOSAL" : "PROJECT";
+  const filteredApiRubrics = apiRubrics.filter((rubricItem) => rubricItem.phase === phaseFilter);
+
   // For display aggregate, we'll average student scores or just sum the first student's score
   const targetStudentId =
     members.find((m) => m.role === "PI")?.userId ??
@@ -217,14 +229,14 @@ export function EvaluationDrawer() {
     }
   }
 
-  const drawerTitle = drawerKind === "proposal" ? activeProposal?.title : activeProject?.title;
+  const drawerTitle = drawerKind === "proposal" ? activeProposal?.title : activeProject?.projectTitle;
   const drawerSubtitle =
     drawerKind === "proposal"
       ? activeProposal
         ? `${activeProposal.id} · ${activeProposal.dept} · ${activeProposal.pi}`
         : ""
       : activeProject
-        ? `${activeProject.id} · ${activeProject.dept} · ${activeProject.lead}`
+        ? `${activeProject.projectId} · ${activeProject.projectProgram} · ${activeProject.pi?.fullName ?? "No PI"}`
         : "";
 
   const evaluatorSummary = (activeProposal as { evaluators?: string[] } | null)?.evaluators?.length
@@ -264,9 +276,12 @@ export function EvaluationDrawer() {
                 </Badge>
                 {drawerKind === "project" && activeProject && (
                   <Badge
-                    className={cn("border-0 font-bold text-[10px]", STATUS_STYLES[activeProject.evalStatus].className)}
+                    className={cn(
+                      "border-0 font-bold text-[10px]",
+                      getProjectStatusBadge(activeProject.projectStage).className,
+                    )}
                   >
-                    {activeProject.evalStatus}
+                    {activeProject.projectStage}
                   </Badge>
                 )}
                 {isEvalApproved && (
@@ -344,6 +359,14 @@ export function EvaluationDrawer() {
                   advisorSummary={advisorSummary}
                   onAssignEvaluators={handleAssignEvaluatorsClick}
                   onAssignAdvisor={handleAssignAdvisorClick}
+                  proposalFile={
+                    proposalDetails?.file
+                      ? {
+                          ...proposalDetails.file,
+                          visibility: proposalDetails.file.visibility as "private" | "public",
+                        }
+                      : undefined
+                  }
                 />
               )}
 

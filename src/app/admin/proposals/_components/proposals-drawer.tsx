@@ -19,6 +19,7 @@ import { EditableProposalView } from "@/app/(main)/proposals/_components/editabl
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import DocumentPreview from "@/components/ui/document-preview";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
@@ -287,6 +289,35 @@ export function ProposalsDrawer() {
                         </p>
                       </div>
                     )
+                  )}
+
+                  {/* ── FILE PREVIEW ── */}
+                  {details.file && (
+                    <Card className="overflow-hidden border-slate-200/60 shadow-none dark:border-slate-800/60">
+                      <CardHeader className="border-slate-100 border-b bg-slate-50/50 pb-4 dark:border-slate-800 dark:bg-slate-900/20">
+                        <CardTitle className="font-bold text-lg">Proposal Document</CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-semibold">{details.file.name}</p>
+                            <p className="text-muted-foreground text-sm">
+                              {details.file.mimeType} • {Math.round((details.file.size ?? 0) / 1024)} KB
+                            </p>
+                          </div>
+                          <div>
+                            <DocumentPreview
+                              file={
+                                details.file
+                                  ? { ...details.file, visibility: details.file.visibility as "private" | "public" }
+                                  : details.file
+                              }
+                              trigger={<Button>Preview</Button>}
+                            />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
                   )}
                 </>
               )}

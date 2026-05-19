@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api/client";
 
 import type {
+  Task,
   TaskActivityResponse,
   TaskDetailResponse,
   TaskListResponse,
@@ -22,6 +23,17 @@ import {
   unwrapTaskSummary,
   unwrapTeamMembers,
 } from "./utils";
+
+// List my tasks across all projects
+export function useMyTasks() {
+  return useQuery({
+    queryKey: [...taskManagementKeys.all, "my-tasks"],
+    queryFn: async (): Promise<(Task & { projectTitle?: string })[]> => {
+      const response = await apiClient.get<{ tasks: (Task & { projectTitle?: string })[] }>("/tasks/me");
+      return response.data.tasks;
+    },
+  });
+}
 
 // List tasks by project
 export function useTaskList(projectId: string) {

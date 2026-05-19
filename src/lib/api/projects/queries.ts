@@ -222,3 +222,28 @@ export function useScheduleProjectDefence() {
     },
   });
 }
+
+/**
+ * Fetch projects for admin context.
+ * GET /projects
+ * Returns the same structure as /projects/all for use in admin evaluations view.
+ */
+export async function getAdminProjects(
+  params: ProjectsQueryParams = {},
+): Promise<PaginatedResponse<ProjectListItem> | ProjectListItem[]> {
+  const response = await apiClient.get<PaginatedResponse<ProjectListItem> | ProjectListItem[]>(
+    `/projects${buildProjectsQueryString(params)}`,
+  );
+  return response.data;
+}
+
+/**
+ * React Query hook for fetching admin projects.
+ */
+export function useAdminProjectsQuery(params: ProjectsQueryParams = {}, enabled = true) {
+  return useQuery({
+    queryKey: ["projects", "admin", params],
+    queryFn: () => getAdminProjects(params),
+    enabled,
+  });
+}

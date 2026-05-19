@@ -70,9 +70,9 @@ export function EditUserModal({ user, trigger }: EditUserModalProps) {
           toast.success("User profile updated successfully");
           setIsOpen(false);
         },
-        // biome-ignore lint/suspicious/noExplicitAny: error object
-        onError: (error: any) => {
-          toast.error(error?.response?.data?.message || "Failed to update user profile");
+        onError: (error: unknown) => {
+          const err = error as { response?: { data?: { message?: string } } };
+          toast.error(err?.response?.data?.message || "Failed to update user profile");
         },
       },
     );
