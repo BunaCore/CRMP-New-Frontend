@@ -10,13 +10,10 @@ import {
   Camera,
   Clock,
   Edit3,
-  Eye,
-  EyeOff,
   FileText,
   Fingerprint,
   Globe,
   GraduationCap,
-  Laptop,
   Link as LinkIcon,
   Mail,
   MapPin,
@@ -24,7 +21,6 @@ import {
   Plus,
   Save,
   ShieldCheck,
-  Smartphone,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -48,7 +44,6 @@ interface UserProfileDialogProps {
 export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogProps) {
   const { user } = useSession();
   const [isEditing, setIsEditing] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   if (!user) return null;
 
@@ -162,12 +157,6 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
                 >
                   Preferences
                 </TabsTrigger>
-                <TabsTrigger
-                  value="security"
-                  className="relative rounded-none border-transparent border-b-2 bg-transparent px-1 py-3 font-medium text-muted-foreground transition-colors hover:text-foreground data-[state=active]:border-primary data-[state=active]:font-bold data-[state=active]:text-foreground data-[state=active]:shadow-none"
-                >
-                  Security
-                </TabsTrigger>
               </TabsList>
 
               <div className="mt-6 pr-2">
@@ -194,10 +183,10 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
                         <Phone className="h-4 w-4" /> Phone Number
                       </Label>
                       {isEditing ? (
-                        <Input defaultValue="+251 911 234 567" />
+                        <Input defaultValue={user.phoneNumber || "+251 911 234 567"} />
                       ) : (
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-foreground">+251 911 234 567</span>
+                          <span className="font-medium text-foreground">{user.phoneNumber || "+251 911 234 567"}</span>
                           <Badge variant="outline" className="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30">
                             Verified
                           </Badge>
@@ -213,6 +202,33 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
                       ) : (
                         <span className="font-medium text-foreground">Addis Ababa, Ethiopia</span>
                       )}
+                    </div>
+                    <div className="space-y-4">
+                      <Label className="flex items-center gap-2 text-muted-foreground">
+                        <Clock className="h-4 w-4" /> Member Since
+                      </Label>
+                      <span className="font-medium text-foreground">
+                        {user.createdAt
+                          ? new Date(user.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+                          : "October 2023"}
+                      </span>
+                    </div>
+                    <div className="space-y-4">
+                      <Label className="flex items-center gap-2 text-muted-foreground">
+                        <ShieldCheck className="h-4 w-4" /> Account Status
+                      </Label>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant="outline"
+                          className={
+                            user.accountStatus === "active"
+                              ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30"
+                              : "bg-amber-50 text-amber-600 dark:bg-amber-950/30"
+                          }
+                        >
+                          {user.accountStatus?.toUpperCase() || "ACTIVE"}
+                        </Badge>
+                      </div>
                     </div>
                     <div className="space-y-4 lg:col-span-3">
                       <Label className="flex items-center gap-2 text-muted-foreground">
@@ -242,21 +258,35 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-muted-foreground">Staff ID</Label>
+                          <Label className="text-muted-foreground">Identification ID</Label>
                           <div className="flex items-center gap-2 font-semibold text-lg">
-                            <Fingerprint className="h-5 w-5 text-slate-500" /> AASTU-2023-8942
+                            <Fingerprint className="h-5 w-5 text-slate-500" /> {user.universityId || "AASTU-2023-8942"}
                           </div>
                         </div>
                         <div className="space-y-2">
                           <Label className="text-muted-foreground">Department</Label>
                           <div className="flex items-center gap-2 font-semibold text-lg">
-                            <Building2 className="h-5 w-5 text-blue-500" /> Software Engineering
+                            <Building2 className="h-5 w-5 text-blue-500" /> {user.department || "Software Engineering"}
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-muted-foreground">School/College</Label>
+                          <Label className="text-muted-foreground">University / Institution</Label>
                           <div className="flex items-center gap-2 font-semibold text-lg">
-                            <GraduationCap className="h-5 w-5 text-indigo-500" /> College of Electrical & Mechanical
+                            <GraduationCap className="h-5 w-5 text-indigo-500" /> {user.university || "AASTU"}
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-muted-foreground">Academic Program</Label>
+                          <div className="flex items-center gap-2 font-semibold text-lg">
+                            <BookOpen className="h-5 w-5 text-emerald-500" />{" "}
+                            {user.userProgram === "PG" ? "Postgraduate (PG)" : "Undergraduate (UG)"}
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-muted-foreground">Affiliation Type</Label>
+                          <div className="flex items-center gap-2 font-semibold text-lg">
+                            <ShieldCheck className="h-5 w-5 text-amber-500" />{" "}
+                            {user.isExternal ? "External Researcher" : "Internal Member"}
                           </div>
                         </div>
                       </div>
@@ -456,118 +486,6 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
                             </SelectContent>
                           </Select>
                           <p className="text-muted-foreground text-xs">Applies only if you hold dual roles.</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                {/* 5. Security */}
-                <TabsContent value="security" className="m-0 focus-visible:outline-none">
-                  <div className="grid gap-8 md:grid-cols-2">
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="font-semibold text-foreground text-lg">Password Management</h3>
-                        <p className="text-muted-foreground text-sm">Update your account password.</p>
-                      </div>
-                      <div className="space-y-4 rounded-xl border p-5">
-                        <div className="space-y-2">
-                          <Label>Current Password</Label>
-                          <div className="relative">
-                            <Input type={showPassword ? "text" : "password"} />
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="absolute top-0 right-0 h-full px-3 hover:bg-transparent"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Label>New Password</Label>
-                          <Input type={showPassword ? "text" : "password"} />
-                        </div>
-                        <Button className="w-full">Update Password</Button>
-                      </div>
-
-                      <div>
-                        <h3 className="mt-8 font-semibold text-foreground text-lg">Two-Factor Authentication (2FA)</h3>
-                        <p className="mb-4 text-muted-foreground text-sm">Add an extra layer of security.</p>
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between rounded-lg border p-4">
-                            <div className="flex items-center gap-3">
-                              <Smartphone className="h-5 w-5 text-muted-foreground" />
-                              <div>
-                                <p className="font-medium text-sm">Authenticator App</p>
-                                <p className="text-muted-foreground text-xs">Not configured</p>
-                              </div>
-                            </div>
-                            <Button variant="outline" size="sm">
-                              Enable
-                            </Button>
-                          </div>
-                          <div className="flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900/50 dark:bg-emerald-950/20">
-                            <div className="flex items-center gap-3">
-                              <Mail className="h-5 w-5 text-emerald-600" />
-                              <div>
-                                <p className="font-medium text-emerald-800 text-sm dark:text-emerald-400">
-                                  Email Verification
-                                </p>
-                                <p className="text-emerald-600/80 text-xs">Configured</p>
-                              </div>
-                            </div>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="border-emerald-200 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-800 dark:text-emerald-400 dark:hover:bg-emerald-900/50"
-                            >
-                              Manage
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="font-semibold text-foreground text-lg">Active Sessions</h3>
-                        <p className="text-muted-foreground text-sm">Devices currently logged into your account.</p>
-                      </div>
-                      <div className="space-y-3">
-                        <div className="flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                              <Laptop className="h-5 w-5 text-primary" />
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <p className="font-medium text-sm">Windows • Chrome</p>
-                                <Badge className="h-5 bg-emerald-500 text-[10px]">Current Session</Badge>
-                              </div>
-                              <p className="text-muted-foreground text-xs">Addis Ababa, ET • Active now</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-                              <Smartphone className="h-5 w-5 text-slate-500" />
-                            </div>
-                            <div>
-                              <p className="font-medium text-sm">iPhone 13 • Safari</p>
-                              <p className="text-muted-foreground text-xs">Addis Ababa, ET • Last active 2 hours ago</p>
-                            </div>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                          >
-                            Revoke
-                          </Button>
                         </div>
                       </div>
                     </div>

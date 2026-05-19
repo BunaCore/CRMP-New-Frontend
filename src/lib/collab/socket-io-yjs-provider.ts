@@ -71,12 +71,10 @@ export class SocketIoYjsProvider {
     this.awareness = new awarenessProtocol.Awareness(opts.doc);
 
     this.socket = io(opts.url, {
-      // Authorization header — backend reads from client.handshake.headers['authorization']
-      extraHeaders: { Authorization: `Bearer ${opts.token}` },
+      // Authorization token — backend reads from client.handshake.auth.token
+      auth: { token: opts.token },
       autoConnect: false,
-      // Start with polling so extraHeaders are sent in the HTTP phase,
-      // then upgrade to WebSocket. Mirrors the existing SocketManager.
-      transports: ["polling", "websocket"],
+      transports: ["websocket", "polling"],
     });
 
     this.bindSocketListeners();

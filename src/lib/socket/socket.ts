@@ -28,11 +28,11 @@ class SocketManager {
     // which is how the backend receives the Authorization header.
     // Forcing websocket-only would skip that HTTP phase and drop the headers.
     this.socket = io(SOCKET_URL, {
-      extraHeaders: {
-        Authorization: token,
+      auth: {
+        token: token,
       },
       autoConnect: false,
-      transports: ["polling", "websocket"],
+      transports: ["websocket", "polling"],
       reconnectionAttempts: 5,
       timeout: 10000,
     });

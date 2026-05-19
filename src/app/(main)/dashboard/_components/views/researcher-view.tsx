@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -26,6 +27,16 @@ import { type ChartConfig, ChartContainer, ChartStyle, ChartTooltip, ChartToolti
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useSession } from "@/context/SessionContext";
+import { useMyBudgetProjects } from "@/lib/api/budget/queries";
+import { apiClient } from "@/lib/api/client";
+import type { ProjectListItem } from "@/lib/api/projects/types";
+import { getMyProposals } from "@/lib/api/proposals/queries";
+import { shortProposalId } from "@/lib/api/proposals/utils";
+import { useMyTasks } from "@/lib/api/task-management/queries";
+import type { Task } from "@/lib/api/task-management/types";
+import type { WorkspaceInfo } from "@/types/editor";
 
 // ─────────────────────────────────────────────────────────
 // Mock Data — will be replaced with real API calls
@@ -51,91 +62,7 @@ interface Proposal {
   steps: ProposalStep[];
 }
 
-const MY_PROPOSALS: Proposal[] = [
-  {
-    id: "PRO-2024-001",
-    title: "AI-Based Crop Disease Detection",
-    type: "PG",
-    currentStep: 3,
-    totalSteps: 6,
-    currentStepLabel: "DGC Review",
-    holder: "DGC Committee",
-    daysWaiting: 3,
-    steps: [
-      { label: "Submitted", status: "completed", date: "Nov 2" },
-      { label: "Coordinator", status: "completed", date: "Nov 5" },
-      { label: "DGC Review", status: "current", holder: "DGC Committee", daysWaiting: 3 },
-      { label: "ADRPM", status: "pending" },
-      { label: "Budget Approval", status: "pending" },
-      { label: "Project Created", status: "pending" },
-    ],
-  },
-  {
-    id: "PRO-2024-003",
-    title: "Carbon Footprint Analytics Platform",
-    type: "UG",
-    currentStep: 1,
-    totalSteps: 5,
-    currentStepLabel: "Coordinator Assign",
-    holder: "Dept. Coordinator",
-    daysWaiting: 1,
-    steps: [
-      { label: "Submitted", status: "completed", date: "Dec 1" },
-      { label: "Coordinator", status: "current", holder: "Dept. Coordinator", daysWaiting: 1 },
-      { label: "DGC Review", status: "pending" },
-      { label: "Advisor Assign", status: "pending" },
-      { label: "Project Created", status: "pending" },
-    ],
-  },
-  {
-    id: "PRO-2024-005",
-    title: "Rural Water Quality Monitoring System",
-    type: "PG",
-    currentStep: 5,
-    totalSteps: 6,
-    currentStepLabel: "Budget Approval",
-    holder: "Finance Office",
-    daysWaiting: 5,
-    steps: [
-      { label: "Submitted", status: "completed", date: "Oct 10" },
-      { label: "Coordinator", status: "completed", date: "Oct 12" },
-      { label: "DGC Review", status: "completed", date: "Oct 20" },
-      { label: "ADRPM", status: "completed", date: "Nov 1" },
-      { label: "Budget Approval", status: "current", holder: "Finance Office", daysWaiting: 5 },
-      { label: "Project Created", status: "pending" },
-    ],
-  },
-];
-
-const MY_PROJECTS = [
-  {
-    id: "PRJ-001",
-    title: "AI-Based Crop Disease Detection",
-    approved: 48000,
-    spent: 18200,
-    remaining: 29800,
-  },
-  {
-    id: "PRJ-003",
-    title: "Rural Water Quality Monitoring System",
-    approved: 22000,
-    spent: 17500,
-    remaining: 4500,
-  },
-];
-
-const BUDGET_AGGREGATE = {
-  totalApproved: 70000,
-  totalSpent: 35700,
-  totalRemaining: 34300,
-  latestRequest: {
-    project: "AI-Based Crop Disease Detection",
-    item: "Lab Equipment (Spectrophotometer)",
-    amount: 5000,
-    status: "Pending Finance Approval",
-  },
-};
-
+// (Mock data removed; we now use real data from the API)
 const ADVISOR_FEEDBACK = [
   {
     id: 1,
@@ -168,50 +95,6 @@ const ADVISOR_FEEDBACK = [
     time: "2d ago",
   },
 ];
-
-const MY_TASKS = [
-  {
-    id: 1,
-    title: "Upload ethics clearance form",
-    due: "2 days ago",
-    overdue: true,
-    priority: "high" as const,
-    project: "AI-Based Crop Disease",
-  },
-  {
-    id: 2,
-    title: "Submit revised methodology chapter",
-    due: "Tomorrow",
-    overdue: false,
-    priority: "high" as const,
-    project: "AI-Based Crop Disease",
-  },
-  {
-    id: 3,
-    title: "Prepare defence presentation slides",
-    due: "In 5 days",
-    overdue: false,
-    priority: "medium" as const,
-    project: "AI-Based Crop Disease",
-  },
-  {
-    id: 4,
-    title: "Submit water sample test results",
-    due: "In 3 days",
-    overdue: false,
-    priority: "medium" as const,
-    project: "Rural Water Quality",
-  },
-  {
-    id: 5,
-    title: "Review co-researcher's data analysis",
-    due: "In 1 week",
-    overdue: false,
-    priority: "low" as const,
-    project: "Rural Water Quality",
-  },
-];
-
 const MY_PUBLICATIONS = [
   {
     id: 1,
@@ -237,36 +120,82 @@ const PUB_STAGES = ["Draft", "Submitted", "Under Review", "Accepted", "Published
 // Component
 // ─────────────────────────────────────────────────────────
 
-const chartConfig = MY_PROJECTS.reduce(
-  (acc, proj, index) => {
-    const alphaValues = ["", "CC", "99", "66", "33"];
-    acc[proj.id] = {
-      label: proj.title,
-      color: `#1447E6${alphaValues[index % 5]}`,
-    };
-    return acc;
-  },
-  {
-    approved: { label: "Approved" },
-    spent: { label: "Spent" },
-    remaining: { label: "Remaining" },
-  } as ChartConfig,
-);
-
 function BudgetPieChart() {
-  const id = "budget-pie-interactive";
-  const [activeProject, setActiveProject] = useState(MY_PROJECTS[0].id);
+  const { user } = useSession();
+  const hasBudgetPermission = useMemo(() => {
+    if (!user) return false;
+    const hasKey = user.permissions?.includes("budget:view");
+    const hasRole = user.roles?.some((r) => ["STUDENT", "FACULTY", "RAD", "FINANCE"].includes(r));
+    return !!(hasKey || hasRole);
+  }, [user]);
 
-  const activeIndex = useMemo(() => MY_PROJECTS.findIndex((item) => item.id === activeProject), [activeProject]);
-  const projects = useMemo(() => MY_PROJECTS.map((item) => item.id), []);
+  const { data: rawProjects, isLoading } = useMyBudgetProjects({
+    enabled: hasBudgetPermission,
+  });
+  const id = "budget-pie-interactive";
+
+  // Filter out UG projects which have no budget
+  const projects = useMemo(() => {
+    return rawProjects?.filter((p) => p.projectType !== "UG") || [];
+  }, [rawProjects]);
+
+  const [activeProject, setActiveProject] = useState<string>("");
+
+  // Auto-select first project
+  useMemo(() => {
+    if (projects.length > 0 && !activeProject) {
+      setActiveProject(projects[0].projectId);
+    }
+  }, [projects, activeProject]);
+
+  const activeIndex = useMemo(() => {
+    const idx = projects.findIndex((item) => item.projectId === activeProject);
+    return idx === -1 ? 0 : idx;
+  }, [activeProject, projects]);
+
   const chartData = useMemo(
     () =>
-      MY_PROJECTS.map((proj) => ({
+      projects.map((proj) => ({
         ...proj,
-        fill: `var(--color-${proj.id})`,
+        approved: Number(proj.totalApprovedBudget),
+        spent: Number(proj.totalDisbursed),
+        remaining: Number(proj.totalApprovedBudget) - Number(proj.totalDisbursed),
+        fill: `var(--color-${proj.projectId})`,
       })),
-    [],
+    [projects],
   );
+
+  const chartConfig = useMemo(() => {
+    return projects.reduce(
+      (acc, proj, index) => {
+        const alphaValues = ["", "CC", "99", "66", "33"];
+        acc[proj.projectId] = {
+          label: proj.title,
+          color: `#1447E6${alphaValues[index % 5] || "11"}`,
+        };
+        return acc;
+      },
+      {
+        approved: { label: "Approved" },
+        spent: { label: "Spent" },
+        remaining: { label: "Remaining" },
+      } as ChartConfig,
+    );
+  }, [projects]);
+
+  const aggregate = useMemo(() => {
+    let totalApproved = 0;
+    let totalSpent = 0;
+    for (const p of projects) {
+      totalApproved += Number(p.totalApprovedBudget);
+      totalSpent += Number(p.totalDisbursed);
+    }
+    return {
+      totalApproved,
+      totalSpent,
+      totalRemaining: totalApproved - totalSpent,
+    };
+  }, [projects]);
 
   const renderPieShape = useCallback(
     ({ index, outerRadius = 0, ...props }: PieSectorShapeProps) => {
@@ -284,8 +213,19 @@ function BudgetPieChart() {
   );
 
   const activeProjData = chartData[activeIndex];
-  const pct = Math.round((activeProjData.spent / activeProjData.approved) * 100);
-  const isLow = activeProjData.remaining < activeProjData.approved * 0.15;
+  const pct =
+    activeProjData && activeProjData.approved > 0
+      ? Math.round((activeProjData.spent / activeProjData.approved) * 100)
+      : 0;
+  const isLow = activeProjData && activeProjData.remaining < activeProjData.approved * 0.15;
+
+  if (isLoading) {
+    return <Skeleton className="h-[380px] w-full rounded-xl" />;
+  }
+
+  if (projects.length === 0) {
+    return null; // Don't render budget overview if no projects with budget
+  }
 
   return (
     <Card data-chart={id} className="flex flex-col border-border/50 bg-card/50">
@@ -306,11 +246,12 @@ function BudgetPieChart() {
               <SelectValue placeholder="Select project" />
             </SelectTrigger>
             <SelectContent align="end" className="rounded-2xl border-border/50 bg-card/95 backdrop-blur-md">
-              {projects.map((key) => {
+              {projects.map((proj) => {
+                const key = proj.projectId;
                 const config = chartConfig[key as keyof typeof chartConfig];
                 if (!config) return null;
 
-                const pData = chartData.find((p) => p.id === key);
+                const pData = chartData.find((p) => p.projectId === key);
                 const pLow = pData && pData.remaining < pData.approved * 0.15;
 
                 return (
@@ -330,7 +271,7 @@ function BudgetPieChart() {
           </Select>
         </div>
         <CardDescription className="mt-1 text-xs">
-          Total Approved: ETB {BUDGET_AGGREGATE.totalApproved.toLocaleString()}
+          Total Approved: ETB {aggregate.totalApproved.toLocaleString()}
         </CardDescription>
       </CardHeader>
 
@@ -385,8 +326,168 @@ function BudgetPieChart() {
   );
 }
 
+// ─────────────────────────────────────────────────────────
+// Live Data Hook — Aggregates stats across user's projects
+// ─────────────────────────────────────────────────────────
+function useResearcherStats(userId: string | undefined) {
+  return useQuery({
+    queryKey: ["researcher-dashboard-stats", userId],
+    queryFn: async () => {
+      // 1. Fetch the current user's projects
+      const projectsRes = await apiClient.get<ProjectListItem[]>("/projects");
+      const projects = Array.isArray(projectsRes.data) ? projectsRes.data : [];
+
+      if (projects.length === 0) {
+        return { projects: 0, tasks: 0, overdueTasks: 0, workspaces: 0 };
+      }
+
+      // 2. Fetch tasks and workspaces for each project in parallel
+      const [tasksResults, workspacesResults] = await Promise.all([
+        Promise.allSettled(
+          projects.map((p) => apiClient.get<{ tasks: Task[] } | Task[]>(`/projects/${p.projectId}/tasks`)),
+        ),
+        Promise.allSettled(projects.map((p) => apiClient.get<WorkspaceInfo[]>(`/workspaces/project/${p.projectId}`))),
+      ]);
+
+      // 3. Aggregate tasks assigned to this user
+      let totalTasks = 0;
+      let overdueTasks = 0;
+      const now = new Date();
+      for (const result of tasksResults) {
+        if (result.status === "fulfilled") {
+          const raw = result.value.data;
+          const tasks: Task[] = Array.isArray(raw) ? raw : ((raw as { tasks: Task[] })?.tasks ?? []);
+          for (const task of tasks) {
+            if (!userId || task.assigneeId === userId) {
+              totalTasks++;
+              if (task.dueDate && new Date(task.dueDate) < now && task.status !== "done") {
+                overdueTasks++;
+              }
+            }
+          }
+        }
+      }
+
+      // 4. Aggregate workspaces
+      let totalWorkspaces = 0;
+      for (const result of workspacesResults) {
+        if (result.status === "fulfilled") {
+          const ws = result.value.data;
+          totalWorkspaces += Array.isArray(ws) ? ws.length : 0;
+        }
+      }
+
+      return {
+        projects: projects.length,
+        tasks: totalTasks,
+        overdueTasks,
+        workspaces: totalWorkspaces,
+      };
+    },
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    refetchOnWindowFocus: false,
+  });
+}
+
 export function ResearcherView() {
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
+  const { user } = useSession();
+
+  // ── Live data from backend ──────────────────────────────────
+  const { data: stats, isLoading: statsLoading } = useResearcherStats(user?.id);
+
+  // Proposals data
+  const { data: apiProposals, isLoading: proposalsLoading } = useQuery({
+    queryKey: ["myProposals"],
+    queryFn: getMyProposals,
+  });
+
+  // Tasks data
+  const { data: apiTasks, isLoading: tasksLoading } = useMyTasks();
+
+  const myTasks = useMemo(() => {
+    if (!apiTasks) return [];
+    const now = new Date();
+
+    // Filter active tasks that have a due date
+    const filteredTasks = apiTasks.filter((t) => t.dueDate && t.status !== "done");
+
+    // Sort by due date ascending
+    const sortedTasks = [...filteredTasks].sort((a, b) => {
+      if (!a.dueDate || !b.dueDate) return 0;
+      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    });
+
+    // Limit to 5 upcoming deadlines
+    const slicedTasks = sortedTasks.slice(0, 5);
+
+    return slicedTasks.map((t) => {
+      let dueStr = "No due date";
+      let overdue = false;
+      if (t.dueDate) {
+        const d = new Date(t.dueDate);
+        overdue = d < now && t.status !== "done";
+        const diffDays = Math.round((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        if (diffDays === 0) dueStr = "Today";
+        else if (diffDays === 1) dueStr = "Tomorrow";
+        else if (diffDays === -1) dueStr = "Yesterday";
+        else if (diffDays < -1) dueStr = `${Math.abs(diffDays)} days ago`;
+        else dueStr = `In ${diffDays} days`;
+      }
+      return {
+        id: t.id,
+        title: t.title,
+        due: dueStr,
+        overdue,
+        priority: t.priority as "high" | "medium" | "low",
+        project: t.projectTitle || "Unassigned",
+      };
+    });
+  }, [apiTasks]);
+
+  const activeProposals = useMemo(() => {
+    if (!apiProposals) return [];
+
+    // Filter to active ones
+    const active = apiProposals.filter((p) =>
+      ["Under_Review", "Revision", "Needs_Revision", "Pending"].includes(p.status),
+    );
+
+    return active.map((p) => {
+      const steps: ProposalStep[] = p.workflow.steps.map((s) => {
+        let status: "completed" | "current" | "pending" = "pending";
+        if (s.stepOrder < p.workflow.currentStepOrder) status = "completed";
+        else if (s.stepOrder === p.workflow.currentStepOrder) status = "current";
+
+        if (s.isActive) status = "current";
+        else if (s.status === "Accepted") status = "completed";
+
+        return {
+          label: s.label,
+          status,
+          holder: s.role,
+          daysWaiting: s.isActive ? 2 : undefined, // Simulated
+          date: undefined,
+        };
+      });
+
+      const currentStepInfo = p.workflow.steps.find((s) => s.isActive) || p.workflow.steps[p.workflow.steps.length - 1];
+
+      return {
+        id: shortProposalId(p.id),
+        rawId: p.id,
+        title: p.title,
+        type: p.type,
+        currentStep: p.workflow.currentStepOrder || 1,
+        totalSteps: p.workflow.steps.length || 1,
+        currentStepLabel: currentStepInfo?.label || "Unknown",
+        holder: currentStepInfo?.role || "Unknown",
+        daysWaiting: 2, // Simulated
+        steps,
+      };
+    });
+  }, [apiProposals]);
 
   return (
     <div className="space-y-6">
@@ -395,22 +496,22 @@ export function ResearcherView() {
         {[
           {
             label: "Assigned Tasks",
-            value: MY_TASKS.length,
-            sub: `${MY_TASKS.filter((t) => t.overdue).length} overdue items`,
+            value: stats?.tasks ?? 0,
+            sub: `${stats?.overdueTasks ?? 0} overdue items`,
             color: "text-amber-500",
             icon: CheckCircle2,
           },
           {
             label: "Active Workspaces",
-            value: "3",
+            value: stats?.workspaces ?? 0,
             sub: "Collaborative projects",
             color: "text-blue-500",
             icon: Users,
           },
           {
             label: "Research Output",
-            value: MY_PUBLICATIONS.length,
-            sub: "Publications & Patents",
+            value: stats?.projects ?? 0,
+            sub: "Projects & Publications",
             color: "text-emerald-500",
             icon: BarChart3,
           },
@@ -430,10 +531,18 @@ export function ResearcherView() {
                     <m.icon className={`h-5 w-5 ${m.color} opacity-80`} />
                   </div>
                   <div>
-                    <p className="font-bold font-mono text-4xl text-foreground tracking-tight dark:text-white">
-                      {m.value}
-                    </p>
-                    <p className={`mt-2 font-semibold text-[11px] ${m.color} dark:brightness-125`}>{m.sub}</p>
+                    {statsLoading ? (
+                      <Skeleton className="mb-2 h-10 w-16" />
+                    ) : (
+                      <p className="font-bold font-mono text-4xl text-foreground tracking-tight dark:text-white">
+                        {m.value}
+                      </p>
+                    )}
+                    {statsLoading ? (
+                      <Skeleton className="mt-2 h-4 w-24" />
+                    ) : (
+                      <p className={`mt-2 font-semibold text-[11px] ${m.color} dark:brightness-125`}>{m.sub}</p>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -443,99 +552,109 @@ export function ResearcherView() {
       </div>
 
       {/* ═══════════ PROPOSAL STAT CARDS (Clickable → Modal) ═══════════ */}
-      <div>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-semibold text-muted-foreground text-sm uppercase tracking-widest">My Proposals</h2>
-          <Badge variant="secondary" className="font-mono text-[10px]">
-            {MY_PROPOSALS.length} active
-          </Badge>
-        </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {MY_PROPOSALS.map((p, idx) => {
-            const progressPct = Math.round((p.currentStep / p.totalSteps) * 100);
-            const isStuck = p.daysWaiting >= 5;
-            return (
-              <button type="button" key={p.id} onClick={() => setSelectedProposal(p)} className="group text-left">
-                <motion.div
-                  initial={{ y: 40, opacity: 0 }}
-                  whileInView={{ y: 0, opacity: 1 }}
-                  whileHover={{
-                    y: -8,
-                    scale: 1.03,
-                    boxShadow: "0px 20px 40px rgba(0,0,0,0.15)",
-                  }}
-                  transition={{ duration: 0.4, delay: idx * 0.08 }}
-                  viewport={{ once: true }}
-                  className={`relative flex h-full flex-col overflow-hidden rounded-3xl border p-5 shadow-sm ${
-                    isStuck
-                      ? "border-amber-300 bg-amber-50/50 dark:border-amber-800/50 dark:bg-amber-950/30"
-                      : "border-gray-300 bg-card dark:border-slate-800/50 dark:bg-slate-950/50"
-                  }`}
-                >
-                  {/* Gradient top bar */}
-                  <div
-                    className={`absolute top-0 right-0 left-0 h-1 bg-gradient-to-r opacity-0 transition-opacity group-hover:opacity-100 ${
-                      isStuck
-                        ? "from-amber-400/60 via-amber-300/30 to-transparent"
-                        : "from-primary/40 via-primary/20 to-transparent"
-                    }`}
-                  />
+      {(proposalsLoading || activeProposals.length > 0) && (
+        <div>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-semibold text-muted-foreground text-sm uppercase tracking-widest">My Proposals</h2>
+            <Badge variant="secondary" className="font-mono text-[10px]">
+              {activeProposals.length} active
+            </Badge>
+          </div>
 
-                  {/* Icon + Badge row */}
-                  <div className="flex items-start justify-between">
-                    <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all group-hover:scale-105 ${
+          {proposalsLoading ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <Skeleton className="h-[250px] w-full rounded-3xl" />
+              <Skeleton className="h-[250px] w-full rounded-3xl" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {activeProposals.map((p, idx) => {
+                const progressPct = Math.round((p.currentStep / p.totalSteps) * 100);
+                const isStuck = p.daysWaiting >= 5;
+                return (
+                  <button type="button" key={p.id} onClick={() => setSelectedProposal(p)} className="group text-left">
+                    <motion.div
+                      initial={{ y: 40, opacity: 0 }}
+                      whileInView={{ y: 0, opacity: 1 }}
+                      whileHover={{
+                        y: -8,
+                        scale: 1.03,
+                        boxShadow: "0px 20px 40px rgba(0,0,0,0.15)",
+                      }}
+                      transition={{ duration: 0.4, delay: idx * 0.08 }}
+                      viewport={{ once: true }}
+                      className={`relative flex h-full flex-col overflow-hidden rounded-3xl border p-5 shadow-sm ${
                         isStuck
-                          ? "bg-amber-100 text-amber-600 group-hover:bg-amber-500 group-hover:text-white dark:bg-amber-900/40"
-                          : "bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white"
+                          ? "border-amber-300 bg-amber-50/50 dark:border-amber-800/50 dark:bg-amber-950/30"
+                          : "border-gray-300 bg-card dark:border-slate-800/50 dark:bg-slate-950/50"
                       }`}
                     >
-                      <FileText className="h-5 w-5" />
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Badge variant="outline" className="font-mono text-[10px]">
-                        {p.type}
-                      </Badge>
-                      {isStuck && <span className="text-amber-500 text-sm">⚠</span>}
-                    </div>
-                  </div>
+                      {/* Gradient top bar */}
+                      <div
+                        className={`absolute top-0 right-0 left-0 h-1 bg-gradient-to-r opacity-0 transition-opacity group-hover:opacity-100 ${
+                          isStuck
+                            ? "from-amber-400/60 via-amber-300/30 to-transparent"
+                            : "from-primary/40 via-primary/20 to-transparent"
+                        }`}
+                      />
 
-                  {/* Title */}
-                  <p className="mt-4 line-clamp-1 font-bold text-lg transition-colors group-hover:text-primary">
-                    {p.title}
-                  </p>
-                  <p className="mt-1 font-mono text-muted-foreground text-xs">{p.id}</p>
+                      {/* Icon + Badge row */}
+                      <div className="flex items-start justify-between">
+                        <div
+                          className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all group-hover:scale-105 ${
+                            isStuck
+                              ? "bg-amber-100 text-amber-600 group-hover:bg-amber-500 group-hover:text-white dark:bg-amber-900/40"
+                              : "bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white"
+                          }`}
+                        >
+                          <FileText className="h-5 w-5" />
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Badge variant="outline" className="font-mono text-[10px]">
+                            {p.type}
+                          </Badge>
+                          {isStuck && <span className="text-amber-500 text-sm">⚠</span>}
+                        </div>
+                      </div>
 
-                  {/* Progress bar */}
-                  <div className="mt-4 flex items-center gap-2">
-                    <Progress value={progressPct} className="h-1.5 flex-1" />
-                    <span className="font-mono font-semibold text-[11px] text-foreground">
-                      {p.currentStep}/{p.totalSteps}
-                    </span>
-                  </div>
+                      {/* Title */}
+                      <p className="mt-4 line-clamp-1 font-bold text-lg transition-colors group-hover:text-primary">
+                        {p.title}
+                      </p>
+                      <p className="mt-1 font-mono text-muted-foreground text-xs">{p.id}</p>
 
-                  {/* Footer: Step pill + Arrow */}
-                  <div className="mt-3 flex items-center justify-between">
-                    <span
-                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-medium text-[10px] ${
-                        isStuck
-                          ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
-                          : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
-                      }`}
-                    >
-                      <Clock className="h-2.5 w-2.5" />
-                      {p.daysWaiting}d — {p.currentStepLabel}
-                    </span>
-                    <div className="flex h-8 w-8 translate-x-2 items-center justify-center rounded-full bg-primary/10 text-primary opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100">
-                      <ArrowRight className="h-4 w-4" />
-                    </div>
-                  </div>
-                </motion.div>
-              </button>
-            );
-          })}
+                      {/* Progress bar */}
+                      <div className="mt-4 flex items-center gap-2">
+                        <Progress value={progressPct} className="h-1.5 flex-1" />
+                        <span className="font-mono font-semibold text-[11px] text-foreground">
+                          {p.currentStep}/{p.totalSteps}
+                        </span>
+                      </div>
+
+                      {/* Footer: Step pill + Arrow */}
+                      <div className="mt-3 flex items-center justify-between">
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-medium text-[10px] ${
+                            isStuck
+                              ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                              : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+                          }`}
+                        >
+                          <Clock className="h-2.5 w-2.5" />
+                          {p.daysWaiting}d — {p.currentStepLabel}
+                        </span>
+                        <div className="flex h-8 w-8 translate-x-2 items-center justify-center rounded-full bg-primary/10 text-primary opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100">
+                          <ArrowRight className="h-4 w-4" />
+                        </div>
+                      </div>
+                    </motion.div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
       {/* ═══════════ PROPOSAL STEPPER MODAL ═══════════ */}
       <Dialog open={!!selectedProposal} onOpenChange={() => setSelectedProposal(null)}>
@@ -627,20 +746,27 @@ export function ResearcherView() {
                 <FileText className="h-4 w-4 text-violet-500" />
                 My Tasks
               </CardTitle>
-              <Badge variant={MY_TASKS.some((t) => t.overdue) ? "destructive" : "secondary"} className="text-[10px]">
-                {MY_TASKS.filter((t) => t.overdue).length} overdue
+              <Badge variant={myTasks.some((t) => t.overdue) ? "destructive" : "secondary"} className="text-[10px]">
+                {myTasks.filter((t) => t.overdue).length} overdue
               </Badge>
             </div>
           </CardHeader>
           <CardContent className="relative z-10 flex h-[280px] flex-col px-4 pt-0 pb-4">
             <div className="custom-scrollbar flex-1 overflow-y-auto px-1">
               <div className="relative flex flex-col pt-2 pb-4">
-                {[...MY_TASKS]
-                  .sort((a, b) => {
-                    const priorityMap = { high: 3, medium: 2, low: 1 };
-                    return priorityMap[b.priority] - priorityMap[a.priority];
-                  })
-                  .map((task, index) => {
+                {tasksLoading ? (
+                  <div className="flex flex-col gap-2 p-2">
+                    <Skeleton className="h-12 w-full rounded-xl" />
+                    <Skeleton className="h-12 w-full rounded-xl" />
+                    <Skeleton className="h-12 w-full rounded-xl" />
+                  </div>
+                ) : myTasks.length === 0 ? (
+                  <div className="flex h-[200px] flex-col items-center justify-center text-center">
+                    <CheckCircle2 className="mb-2 h-8 w-8 text-muted-foreground opacity-50" />
+                    <p className="text-muted-foreground text-xs">All caught up! No tasks assigned.</p>
+                  </div>
+                ) : (
+                  myTasks.map((task, index) => {
                     const isTop = index === 0;
 
                     return (
@@ -735,7 +861,8 @@ export function ResearcherView() {
                         </div>
                       </motion.div>
                     );
-                  })}
+                  })
+                )}
               </div>
             </div>
           </CardContent>
