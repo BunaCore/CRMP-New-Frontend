@@ -8,8 +8,16 @@ import { toast } from "sonner";
 
 import { hasPermission } from "@/access-control/permission-gates";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useGetEvaluationProjects } from "@/lib/api/evaluations/queries";
+import type { EvaluationItem, EvaluationRubric } from "@/lib/api/evaluations/types";
+import { useScheduleProjectDefence } from "@/lib/api/projects/queries";
 import { assignEvaluators } from "@/lib/api/proposals/mutations";
-import { getMyProposals, getPendingApprovals, useProposalsListQuery } from "@/lib/api/proposals/queries";
+import {
+  getMyProposals,
+  getPendingApprovals,
+  useProposalsListQuery,
+  useScheduleProposalDefence,
+} from "@/lib/api/proposals/queries";
 import type { PendingApproval, ProposalListItem, ResearcherProposal } from "@/lib/api/proposals/types";
 import { useSearchUsers } from "@/lib/api/users/queries";
 import { useAuthStore } from "@/stores/authStore";
@@ -36,6 +44,8 @@ interface EvaluationsContextValue {
   setProposalScope: React.Dispatch<React.SetStateAction<"assigned" | "all">>;
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
+  yearFilter: string;
+  setYearFilter: React.Dispatch<React.SetStateAction<string>>;
   drawerOpen: boolean;
   drawerKind: "proposal" | "project";
   drawerTab: DrawerTab;
@@ -107,6 +117,18 @@ interface EvaluationsContextValue {
   isAssigningEvaluators: boolean;
   advisorSearch: string;
   setAdvisorSearch: React.Dispatch<React.SetStateAction<string>>;
+
+  // State for new Modals in Projects Tab
+  scoreModalOpen: boolean;
+  setScoreModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  scheduleModalOpen: boolean;
+  setScheduleModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedEvalItem: EvaluationItem | null;
+  setSelectedEvalItem: React.Dispatch<React.SetStateAction<EvaluationItem | null>>;
+  selectedEvalRubric: EvaluationRubric | null;
+  setSelectedEvalRubric: React.Dispatch<React.SetStateAction<EvaluationRubric | null>>;
+  apiProjects: EvaluationItem[];
+  isSchedulingDefence: boolean;
 }
 
 const EvaluationsContext = createContext<EvaluationsContextValue | undefined>(undefined);
@@ -115,6 +137,7 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
   const [mainTab, setMainTab] = useState<MainTab>("proposals");
   const [proposalScope, setProposalScope] = useState<"assigned" | "all">("assigned");
   const [search, setSearch] = useState("");
+  const [yearFilter, setYearFilter] = useState("all");
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerKind, setDrawerKind] = useState<"proposal" | "project">("proposal");
@@ -148,6 +171,17 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
 
   const [showTimelineReject, setShowTimelineReject] = useState(false);
   const [timelineRejectComment, setTimelineRejectComment] = useState("");
+
+  const [scoreModalOpen, setScoreModalOpen] = useState(false);
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const [selectedEvalItem, setSelectedEvalItem] = useState<EvaluationItem | null>(null);
+  const [selectedEvalRubric, setSelectedEvalRubric] = useState<EvaluationRubric | null>(null);
+
+  const scheduleProposalMutation = useScheduleProposalDefence();
+  const scheduleProjectMutation = useScheduleProjectDefence();
+
+  const isSchedulingDefence = scheduleProposalMutation.isPending || scheduleProjectMutation.isPending;
+
   const queryClient = useQueryClient();
 
   const selectionKey =
@@ -185,6 +219,9 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
       budget: `$${proposal.budget?.toLocaleString() || 0}`,
       program: proposal.program || "—",
       teamCount: proposal.teamCount || 0,
+      year: proposal.submittedDate
+        ? new Date(proposal.submittedDate).getFullYear().toString()
+        : new Date().getFullYear().toString(),
     };
   }, []);
 
@@ -200,6 +237,9 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
       budget: "—",
       program: proposal.type || "—",
       teamCount: proposal.team?.length ?? 0,
+      year: proposal.createdAt
+        ? new Date(proposal.createdAt).getFullYear().toString()
+        : new Date().getFullYear().toString(),
     };
   }, []);
 
@@ -232,6 +272,9 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
             budget: "—",
             program: p.proposalProgram || "—",
             teamCount: 0,
+            year: p.submittedAt
+              ? new Date(p.submittedAt).getFullYear().toString()
+              : new Date().getFullYear().toString(),
           }));
           setApiProposals(mapped);
         })
@@ -242,20 +285,38 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
     }
   }, [isEvaluatorOnly, mapMyProposalRow]);
 
-  const filteredProposals = apiProposals.filter((p) =>
-    (p.title + p.pi + p.id + p.dept).toLowerCase().includes(search.toLowerCase()),
+  const filteredProposals = apiProposals.filter(
+    (p) =>
+      (p.title + p.pi + p.id + p.dept).toLowerCase().includes(search.toLowerCase()) &&
+      (yearFilter === "all" || p.year === yearFilter),
   );
   const allProposalRows = useMemo(
     () =>
       (allProposalsQuery.data ?? [])
         .map(mapAllProposalRow)
-        .filter((p) => (p.title + p.pi + p.id + p.dept + p.stage).toLowerCase().includes(search.toLowerCase())),
-    [allProposalsQuery.data, search, mapAllProposalRow],
+        .filter((p) => (p.title + p.pi + p.id + p.dept + p.stage).toLowerCase().includes(search.toLowerCase()))
+        .filter((p) => yearFilter === "all" || p.year === yearFilter),
+    [allProposalsQuery.data, search, yearFilter, mapAllProposalRow],
   );
   const visibleProposals = proposalScope === "all" ? allProposalRows : filteredProposals;
   const loadingVisibleProposals = proposalScope === "all" ? allProposalsQuery.isLoading : isLoadingProposals;
-  // Projects: no dedicated backend endpoint yet — keep empty until connected
-  const filteredProjects: EvalProjectRow[] = [];
+  const { data: projectsData } = useGetEvaluationProjects(1, 100);
+  const apiProjects = projectsData?.items || [];
+  const filteredProjects: EvalProjectRow[] = apiProjects
+    .map((p) => ({
+      id: p.id,
+      title: p.title,
+      lead: "Team Lead", // Placeholder, since it's mapped to EvalProjectRow
+      leadAvatar: "TL",
+      leadColor: "bg-emerald-100 text-emerald-700",
+      dept: "Department",
+      budget: "$0",
+      evalStatus: "On evaluation" as const,
+      totalScore: 0,
+      maxTotal: 0,
+      year: p.createdAt ? new Date(p.createdAt).getFullYear().toString() : new Date().getFullYear().toString(),
+    }))
+    .filter((p) => yearFilter === "all" || p.year === yearFilter);
 
   const evalUsersQuery = useSearchUsers(debouncedEvalSearch, showAssign);
 
@@ -338,8 +399,34 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
     setApproveNote("");
   }
 
-  function handleSendDefenceInvite() {
-    setDefenceDraftSent(true);
+  async function handleSendDefenceInvite() {
+    if (!defenceDate) return;
+
+    const payload = {
+      defenceDate: new Date(defenceDate).toISOString(),
+      location: defenceVenue || "TBD",
+      note: defenceMessage,
+    };
+
+    try {
+      if (drawerKind === "proposal" && activeProposal?.id) {
+        await scheduleProposalMutation.mutateAsync({
+          proposalId: activeProposal.id,
+          payload,
+        });
+        toast.success("Defence scheduled for proposal successfully");
+      } else if (drawerKind === "project" && activeProject?.id) {
+        await scheduleProjectMutation.mutateAsync({
+          projectId: activeProject.id,
+          payload,
+        });
+        toast.success("Defence scheduled for project successfully");
+      }
+      setDefenceDraftSent(true);
+      // biome-ignore lint/suspicious/noExplicitAny: error object
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message ?? "Failed to schedule defence");
+    }
   }
 
   function handleConfirmApproveEvaluation() {
@@ -389,6 +476,8 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
         setProposalScope,
         search,
         setSearch,
+        yearFilter,
+        setYearFilter,
         drawerOpen,
         drawerKind,
         drawerTab,
@@ -449,6 +538,16 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
         isAssigningEvaluators,
         advisorSearch,
         setAdvisorSearch,
+        scoreModalOpen,
+        setScoreModalOpen,
+        scheduleModalOpen,
+        setScheduleModalOpen,
+        selectedEvalItem,
+        setSelectedEvalItem,
+        selectedEvalRubric,
+        setSelectedEvalRubric,
+        apiProjects,
+        isSchedulingDefence,
       }}
     >
       {children}

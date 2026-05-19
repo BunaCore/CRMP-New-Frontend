@@ -38,7 +38,7 @@ export function WorkspaceTab() {
 
   return (
     <div className="space-y-6">
-      <div className="relative w-full md:w-72 mb-6">
+      <div className="relative mb-6 w-full md:w-72">
         <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-gray-400" />
         <Input
           placeholder="Search workspaces..."

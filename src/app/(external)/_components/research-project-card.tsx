@@ -3,7 +3,7 @@
 import Image from "next/image";
 
 import { format } from "date-fns";
-import { Download, FileText, User } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -83,7 +83,7 @@ export function ResearchProjectCard({ project }: ResearchProjectCardProps) {
               variant="ghost"
               title="Download PDF"
               aria-label="Download PDF"
-              className="absolute left-2 bottom-2 z-10 h-8 w-8"
+              className="absolute bottom-2 left-2 z-10 h-8 w-8"
             >
               <a href={project.publicFileUrl} target="_blank" rel="noopener noreferrer" download>
                 <Download className="h-4 w-4" />

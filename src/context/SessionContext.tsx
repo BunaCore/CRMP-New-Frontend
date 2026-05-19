@@ -27,6 +27,7 @@ export interface SessionUser {
   email: string;
   avatarUrl?: string;
   permissions?: string[];
+  userProgram?: string | null;
 }
 
 interface SessionContextType {
@@ -51,6 +52,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         email: authUser.email,
         avatarUrl: authUser.avatarUrl,
         permissions: authUser.permissions,
+        userProgram: authUser.userProgram,
       }
     : null;
 

@@ -23,7 +23,7 @@ export interface DisbursementRecord {
   requestSequence: number;
   totalAmount: number;
   submittedAt: string;
-  status: "PENDING" | "RESUBMITTED" | "PAID" | "RETURNED";
+  status: "PENDING" | "RESUBMITTED" | "PAID" | "RETURNED" | "REJECTED";
   bankTransactionId: string | null;
   paidAt: string | null;
   clearanceDocumentUrl: string | null;

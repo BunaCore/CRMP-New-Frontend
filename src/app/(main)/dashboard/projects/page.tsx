@@ -18,7 +18,7 @@ export default function ProjectsPage() {
         whileHover={{ y: -4 }}
         className="group relative mb-8 flex flex-col gap-6 overflow-hidden rounded-3xl border border-slate-200/50 bg-gray-50 p-5 shadow-sm transition-all hover:shadow-lg sm:flex-row dark:border-slate-800/50 dark:bg-slate-950/50"
       >
-        <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between w-full">
+        <div className="relative z-10 flex w-full flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="font-black text-lg text-slate-900 tracking-tighter md:text-2xl dark:text-slate-100">
               Projects

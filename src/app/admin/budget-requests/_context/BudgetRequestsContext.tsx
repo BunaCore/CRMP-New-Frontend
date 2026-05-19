@@ -19,6 +19,7 @@ interface State {
   drawerOpen: boolean;
   approveModalOpen: boolean;
   returnModalOpen: boolean;
+  rejectModalOpen: boolean;
   filters: BudgetFilters;
   lastRefetchAt: number;
 }
@@ -29,6 +30,7 @@ const initialState: State = {
   drawerOpen: false,
   approveModalOpen: false,
   returnModalOpen: false,
+  rejectModalOpen: false,
   filters: {
     status: "ALL",
     search: "",
@@ -45,6 +47,7 @@ type Action =
   | { type: "SET_DRAWER_OPEN"; payload: boolean }
   | { type: "SET_APPROVE_MODAL"; payload: boolean }
   | { type: "SET_RETURN_MODAL"; payload: boolean }
+  | { type: "SET_REJECT_MODAL"; payload: boolean }
   | { type: "SET_STATUS_FILTER"; payload: "ALL" | BudgetRequestStatus }
   | { type: "SET_SEARCH"; payload: string }
   | { type: "SET_SORT"; payload: { field: SortField; dir: SortDir } }
@@ -62,6 +65,8 @@ function reducer(state: State, action: Action): State {
       return { ...state, approveModalOpen: action.payload };
     case "SET_RETURN_MODAL":
       return { ...state, returnModalOpen: action.payload };
+    case "SET_REJECT_MODAL":
+      return { ...state, rejectModalOpen: action.payload };
     case "SET_STATUS_FILTER":
       return { ...state, filters: { ...state.filters, status: action.payload } };
     case "SET_SEARCH":

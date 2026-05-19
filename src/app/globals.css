@@ -247,3 +247,28 @@ html {
 .disable-transitions * {
   transition: none !important;
 }
+
+/* Custom toaster styling for proper contrast and shadows */
+.toaster.group {
+  --normal-bg: var(--popover);
+  --normal-text: var(--popover-foreground);
+  --normal-border: var(--border);
+  --border-radius: var(--radius);
+}
+
+.cn-toast {
+  background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 50%, #eff2f5 100%) !important;
+  color: var(--normal-text) !important;
+  border-color: var(--normal-border) !important;
+  border-radius: var(--normal-border-radius, var(--border-radius)) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
+}
+
+.cn-toast [data-description] {
+  color: var(--normal-text) !important;
+}
+
+.dark .cn-toast {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #0c0e1a 100%) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3) !important;
+}

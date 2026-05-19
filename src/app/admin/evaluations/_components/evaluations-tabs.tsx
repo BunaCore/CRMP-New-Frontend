@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
@@ -42,6 +43,8 @@ export function EvaluationsTabs() {
     setProposalScope,
     search,
     setSearch,
+    yearFilter,
+    setYearFilter,
     filteredProposals,
     filteredProjects,
     openDrawerProposal,
@@ -76,14 +79,28 @@ export function EvaluationsTabs() {
             </TabsTrigger>
           </TabsList>
 
-          <div className="relative w-full sm:w-72">
-            <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-3.5 w-3.5 text-slate-400" />
-            <Input
-              placeholder="Search title, ID, person, dept…"
-              className="h-9 rounded-lg pl-9 dark:bg-slate-950"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+          <div className="flex w-full items-center gap-2 sm:w-auto">
+            <Select value={yearFilter} onValueChange={setYearFilter}>
+              <SelectTrigger className="h-9 w-[120px] rounded-lg bg-white dark:bg-slate-950">
+                <SelectValue placeholder="Year" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Years</SelectItem>
+                <SelectItem value="2026">2026</SelectItem>
+                <SelectItem value="2025">2025</SelectItem>
+                <SelectItem value="2024">2024</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="relative w-full sm:w-64">
+              <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-3.5 w-3.5 text-slate-400" />
+              <Input
+                placeholder="Search title, ID, person, dept…"
+                className="h-9 rounded-lg pl-9 dark:bg-slate-950"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
