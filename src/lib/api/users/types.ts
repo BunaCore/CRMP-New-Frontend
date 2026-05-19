@@ -67,3 +67,12 @@ export interface UpdateUserProfilePayload {
   universityId?: string | null;
   userProgram?: "UG" | "PG" | null;
 }
+
+/**
+ * Payload for self-profile update.
+ * PATCH /users/me — only fullName and phoneNumber are editable by the user.
+ */
+export interface UpdateSelfProfilePayload {
+  fullName?: string;
+  phoneNumber?: string;
+}

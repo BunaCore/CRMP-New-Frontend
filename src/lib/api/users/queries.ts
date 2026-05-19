@@ -110,3 +110,23 @@ export function useSearchEvaluators(q: string, enabled = true) {
     enabled,
   });
 }
+
+import type { UserProfile } from "@/lib/api/auth/types";
+
+/**
+ * Fetch the current authenticated user's fresh profile.
+ * GET /auth/me — uses JWT, no admin perms needed.
+ * Use this to get up-to-date data when the profile dialog opens.
+ */
+export async function getMyProfile(): Promise<UserProfile> {
+  const response = await apiClient.get<UserProfile>("/auth/me");
+  return response.data;
+}
+
+export function useGetMyProfile(enabled = true) {
+  return useQuery({
+    queryKey: ["users", "me"],
+    queryFn: getMyProfile,
+    enabled,
+  });
+}
