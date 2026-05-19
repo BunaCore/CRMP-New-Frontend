@@ -499,3 +499,9 @@ export function UserProfileDialog({ isOpen, onOpenChange }: UserProfileDialogPro
     </Dialog>
   );
 }
+
+// Helper component for tooltip badge
+function TooltipBadge({ children, title }: { children: React.ReactNode; title: string }) {
+  // Can wrap in Tooltip from shadcn if imported, simplified here for ease
+  return <div title={title}>{children}</div>;
+}
