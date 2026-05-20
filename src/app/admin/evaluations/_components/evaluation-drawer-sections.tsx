@@ -50,8 +50,8 @@ interface EvaluationOverviewTabProps {
   activeProject: ProjectListItem | null;
   canAssignEvaluators: boolean;
   canAssignAdvisors: boolean;
-  evaluatorSummary: string;
-  advisorSummary: string;
+  evaluatorsList: string[];
+  advisorsList: string[];
   onAssignEvaluators: () => void;
   onAssignAdvisor: () => void;
   proposalFile?: FileDetails | null;
@@ -63,8 +63,8 @@ export function EvaluationOverviewTab({
   activeProject,
   canAssignEvaluators,
   canAssignAdvisors,
-  evaluatorSummary,
-  advisorSummary,
+  evaluatorsList,
+  advisorsList,
   onAssignEvaluators,
   onAssignAdvisor,
   proposalFile,
@@ -187,9 +187,21 @@ export function EvaluationOverviewTab({
                 <UserCheck className="h-4 w-4" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-bold text-[13px] leading-tight">Assign Evaluators</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-bold text-[13px] leading-tight">Assign Evaluators</p>
+                  {evaluatorsList.length > 0 && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-blue-100 text-[10px] text-blue-700 hover:bg-blue-200 dark:bg-blue-900/60 dark:text-blue-300"
+                    >
+                      Assigned
+                    </Badge>
+                  )}
+                </div>
                 <p className="mt-0.5 line-clamp-2 font-medium text-[11px] text-blue-700/80 dark:text-blue-400/80">
-                  {evaluatorSummary}
+                  {evaluatorsList.length > 0
+                    ? `${evaluatorsList.length} assigned: ${evaluatorsList.join(", ")}`
+                    : "No evaluators assigned"}
                 </p>
               </div>
               <ChevronRight className="ml-auto h-4 w-4 shrink-0 opacity-40 transition-opacity group-hover:opacity-100" />
@@ -226,9 +238,21 @@ export function EvaluationOverviewTab({
                 <GraduationCap className="h-4 w-4" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-bold text-[13px] leading-tight">Assign Advisor</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-bold text-[13px] leading-tight">Assign Advisor</p>
+                  {advisorsList.length > 0 && (
+                    <Badge
+                      variant="secondary"
+                      className="bg-violet-100 text-[10px] text-violet-700 hover:bg-violet-200 dark:bg-violet-900/60 dark:text-violet-300"
+                    >
+                      Assigned
+                    </Badge>
+                  )}
+                </div>
                 <p className="mt-0.5 line-clamp-2 font-medium text-[11px] text-violet-700/80 dark:text-violet-400/80">
-                  {advisorSummary}
+                  {advisorsList.length > 0
+                    ? `${advisorsList.length} assigned: ${advisorsList.join(", ")}`
+                    : "No advisors assigned"}
                 </p>
               </div>
               <ChevronRight className="ml-auto h-4 w-4 shrink-0 opacity-40 transition-opacity group-hover:opacity-100" />

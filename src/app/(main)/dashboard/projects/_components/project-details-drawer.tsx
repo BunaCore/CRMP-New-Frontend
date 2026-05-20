@@ -248,68 +248,76 @@ export function ProjectDetailsDrawer({ open, onOpenChange, project }: ProjectDet
             ))}
 
           {activeTab === "budget" &&
-            (project.budget ? (
-              <div className="space-y-5">
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                    <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Status</p>
-                    <Badge variant="outline" className="text-[11px]">
-                      {project.budget.currentStatus}
-                    </Badge>
-                  </div>
-                  <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                    <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Total Amount</p>
-                    <p className="font-bold text-[13px] text-slate-800 dark:text-slate-200">
-                      ETB{" "}
-                      {parseFloat(project.budget.totalAmount).toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                    </p>
-                  </div>
-                </div>
-
-                {project.budget.approvedAmount && (
-                  <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
-                    <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
-                      Approved Amount
-                    </p>
-                    <p className="font-bold text-[13px] text-slate-800 dark:text-slate-200">
-                      ETB{" "}
-                      {parseFloat(project.budget.approvedAmount).toLocaleString(undefined, {
-                        maximumFractionDigits: 2,
-                      })}
-                    </p>
-                  </div>
-                )}
-
-                <div>
-                  <h4 className="mb-3 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
-                    <Banknote className="h-3.5 w-3.5" /> Budget Items
-                  </h4>
-                  <div className="space-y-3">
-                    {project.budget.items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0 flex-1">
-                            <p className="font-semibold text-[13px] text-slate-800 dark:text-slate-200">
-                              {item.description}
-                            </p>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400">Line {item.lineIndex}</p>
-                          </div>
-                          <p className="whitespace-nowrap font-bold text-[13px] text-slate-800 dark:text-slate-200">
-                            ETB{" "}
-                            {parseFloat(item.requestedAmount).toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                          </p>
-                        </div>
+            (project.budget && project.budget.length > 0 ? (
+              <div className="space-y-8">
+                {project.budget.map((budgetObj) => (
+                  <div key={budgetObj.id} className="space-y-5">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
+                        <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">Status</p>
+                        <Badge variant="outline" className="text-[11px]">
+                          {budgetObj.currentStatus}
+                        </Badge>
                       </div>
-                    ))}
-                  </div>
-                </div>
+                      <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
+                        <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                          Total Amount
+                        </p>
+                        <p className="font-bold text-[13px] text-slate-800 dark:text-slate-200">
+                          ETB{" "}
+                          {parseFloat(budgetObj.totalAmount).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                        </p>
+                      </div>
+                    </div>
 
-                <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Created on {new Date(project.budget.createdAt).toLocaleDateString()}
-                </div>
+                    {budgetObj.approvedAmount && (
+                      <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50">
+                        <p className="mb-1.5 font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+                          Approved Amount
+                        </p>
+                        <p className="font-bold text-[13px] text-slate-800 dark:text-slate-200">
+                          ETB{" "}
+                          {parseFloat(budgetObj.approvedAmount).toLocaleString(undefined, {
+                            maximumFractionDigits: 2,
+                          })}
+                        </p>
+                      </div>
+                    )}
+
+                    <div>
+                      <h4 className="mb-3 flex items-center gap-2 font-bold text-[11px] text-slate-500 uppercase tracking-wider">
+                        <Banknote className="h-3.5 w-3.5" /> Budget Items
+                      </h4>
+                      <div className="space-y-3">
+                        {budgetObj.items.map((item) => (
+                          <div
+                            key={item.id}
+                            className="rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/50"
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0 flex-1">
+                                <p className="font-semibold text-[13px] text-slate-800 dark:text-slate-200">
+                                  {item.description}
+                                </p>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400">Line {item.lineIndex}</p>
+                              </div>
+                              <p className="whitespace-nowrap font-bold text-[13px] text-slate-800 dark:text-slate-200">
+                                ETB{" "}
+                                {parseFloat(item.requestedAmount).toLocaleString(undefined, {
+                                  maximumFractionDigits: 2,
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Created on {new Date(budgetObj.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="py-12 text-center">

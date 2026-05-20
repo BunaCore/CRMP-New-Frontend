@@ -94,7 +94,8 @@ export interface ProjectDetails {
   publishedAt?: string | null;
   publishedBy?: string | null;
   members?: ProjectMember[] | null;
-  budget?: ProjectBudget | null;
+  budget?: ProjectBudget[] | null;
+  proposalId?: string | null;
 }
 
 export interface ProjectsQueryParams {
