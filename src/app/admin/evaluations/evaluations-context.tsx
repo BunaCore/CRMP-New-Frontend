@@ -10,16 +10,22 @@ import { hasPermission } from "@/access-control/permission-gates";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useGetEvaluationProjects } from "@/lib/api/evaluations/queries";
 import type { EvaluationItem, EvaluationRubric } from "@/lib/api/evaluations/types";
-import { useAllProjectsQuery, useScheduleProjectDefence } from "@/lib/api/projects/queries";
-import type { ProjectListItem } from "@/lib/api/projects/types";
+import { getProjectDetails, useAllProjectsQuery, useScheduleProjectDefence } from "@/lib/api/projects/queries";
+import type { ProjectDetails, ProjectListItem } from "@/lib/api/projects/types";
 import { assignAdvisor, assignEvaluators } from "@/lib/api/proposals/mutations";
 import {
+  getAdminProposalDetails,
   getMyProposals,
   getPendingApprovals,
   useProposalsListQuery,
   useScheduleProposalDefence,
 } from "@/lib/api/proposals/queries";
-import type { PendingApproval, ProposalListItem, ResearcherProposal } from "@/lib/api/proposals/types";
+import type {
+  AdminProposalDetail,
+  PendingApproval,
+  ProposalListItem,
+  ResearcherProposal,
+} from "@/lib/api/proposals/types";
 import { useSearchAdvisors, useSearchEvaluators } from "@/lib/api/users/queries";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -129,6 +135,12 @@ interface EvaluationsContextValue {
   setSelectedEvalRubric: React.Dispatch<React.SetStateAction<EvaluationRubric | null>>;
   apiProjects: EvaluationItem[];
   isSchedulingDefence: boolean;
+
+  // Detailed loading and objects
+  proposalDetails: AdminProposalDetail | null;
+  projectDetails: ProjectDetails | null;
+  isLoadingDetails: boolean;
+  refetchDetails: () => Promise<void>;
 }
 
 const EvaluationsContext = createContext<EvaluationsContextValue | undefined>(undefined);
@@ -185,6 +197,38 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
 
   const queryClient = useQueryClient();
 
+  const [proposalDetails, setProposalDetails] = useState<AdminProposalDetail | null>(null);
+  const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(null);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+
+  const activeId = drawerKind === "proposal" ? activeProposal?.id : activeProject?.projectId;
+
+  const refetchDetails = useCallback(async () => {
+    if (!activeId) {
+      setProposalDetails(null);
+      setProjectDetails(null);
+      return;
+    }
+    setIsLoadingDetails(true);
+    try {
+      if (drawerKind === "proposal") {
+        const details = await getAdminProposalDetails(activeId);
+        setProposalDetails(details);
+      } else {
+        const details = await getProjectDetails(activeId);
+        setProjectDetails(details);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoadingDetails(false);
+    }
+  }, [activeId, drawerKind]);
+
+  useEffect(() => {
+    refetchDetails();
+  }, [refetchDetails]);
+
   const selectionKey =
     drawerKind === "proposal" && activeProposal
       ? `p-${activeProposal.id}`
@@ -227,6 +271,8 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
       year: proposal.submittedDate
         ? new Date(proposal.submittedDate).getFullYear().toString()
         : new Date().getFullYear().toString(),
+      evaluators: proposal.evaluators?.map((e) => e.name) || [],
+      advisors: proposal.advisors?.map((a) => a.name) || [],
     };
   }, []);
 
@@ -245,6 +291,8 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
       year: proposal.createdAt
         ? new Date(proposal.createdAt).getFullYear().toString()
         : new Date().getFullYear().toString(),
+      evaluators: proposal.evaluators?.map((e) => e.name) || [],
+      advisors: proposal.advisors?.map((a) => a.name) || [],
     };
   }, []);
 
@@ -280,6 +328,8 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
             year: p.submittedAt
               ? new Date(p.submittedAt).getFullYear().toString()
               : new Date().getFullYear().toString(),
+            evaluators: p.evaluatorAssigned ? ["Assigned"] : [],
+            advisors: p.advisorAssigned ? ["Assigned"] : [],
           }));
           setApiProposals(mapped);
         })
@@ -311,18 +361,24 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
 
   const filteredProjects = useMemo(
     () =>
-      (allProjectsQuery.data?.items ?? []).filter((project) =>
-        (
-          project.projectTitle +
-          project.projectId +
-          project.projectProgram +
-          project.projectDescription +
-          (project.pi?.fullName ?? "")
+      (allProjectsQuery.data?.items ?? [])
+        .filter((project) =>
+          (
+            project.projectTitle +
+            project.projectId +
+            project.projectProgram +
+            project.projectDescription +
+            (project.pi?.fullName ?? "")
+          )
+            .toLowerCase()
+            .includes(search.toLowerCase()),
         )
-          .toLowerCase()
-          .includes(search.toLowerCase()),
-      ),
-    [allProjectsQuery.data?.items, search],
+        .filter((project) => {
+          if (yearFilter === "all") return true;
+          const projectYear = new Date(project.createdAt).getFullYear().toString();
+          return projectYear === yearFilter;
+        }),
+    [allProjectsQuery.data?.items, search, yearFilter],
   );
 
   useEffect(() => {
@@ -365,11 +421,15 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
   const { mutate: assignEvaluatorsMutate, isPending: isAssigningEvaluators } = useMutation({
     mutationFn: ({ proposalId, userIds }: { proposalId: string; userIds: string[] }) =>
       assignEvaluators(proposalId, userIds),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       toast.success("Evaluators assigned successfully");
       setShowAssign(false);
       setEvalSearch("");
       setPickedEvalIds([]);
+      refetchDetails();
+      queryClient.invalidateQueries({
+        queryKey: ["proposals", "byId", variables.proposalId],
+      });
       queryClient.invalidateQueries({
         queryKey: ["proposals", "pending-approvals"],
       });
@@ -499,6 +559,7 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
       setShowAssignAdvisor(false);
       setAdvisorSearch("");
       setPickedAdvisorIds([]);
+      refetchDetails();
       queryClient.invalidateQueries({
         queryKey: ["proposals", "byId", variables.proposalId],
       });
@@ -506,6 +567,9 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
         queryKey: ["proposals", "pending-approvals"],
       });
       queryClient.invalidateQueries({ queryKey: ["proposals", "list"] });
+      if (drawerKind === "project") {
+        queryClient.invalidateQueries({ queryKey: ["projects"] });
+      }
     },
     onError: () => {
       toast.error("Failed to assign advisor");
@@ -513,9 +577,13 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
   });
 
   const handleAssignAdvisorConfirm = () => {
-    if (!activeProposal?.id || pickedAdvisorIds.length === 0) return;
+    const targetProposalId = drawerKind === "proposal" ? activeProposal?.id : projectDetails?.proposalId;
+    if (!targetProposalId || pickedAdvisorIds.length === 0) {
+      toast.error("No proposal ID found for assigning advisor");
+      return;
+    }
     assignAdvisorMutate({
-      proposalId: activeProposal.id,
+      proposalId: targetProposalId,
       userId: pickedAdvisorIds[0],
     });
   };
@@ -610,6 +678,10 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
         setSelectedEvalRubric,
         apiProjects,
         isSchedulingDefence,
+        proposalDetails,
+        projectDetails,
+        isLoadingDetails,
+        refetchDetails,
       }}
     >
       {children}

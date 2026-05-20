@@ -1,12 +1,10 @@
 import { Suspense } from "react";
 
-import Image from "next/image";
 import Link from "next/link";
 
 import type { Metadata } from "next";
 
 import { SignInForm } from "@/components/auth/SignInForm";
-import { APP_CONFIG } from "@/config/app-config";
 
 export const metadata: Metadata = {
   title: "Sign In | Collaborative Research Management Platform",
@@ -15,59 +13,247 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-[100dvh] w-full bg-slate-50 font-sans dark:bg-slate-950">
-      {/* Left Panel: Graphic / Brand Side */}
-      <div className="relative hidden w-0 w-1/2 flex-1 flex-col justify-center border-slate-200 border-r bg-white px-10 pt-10 lg:flex dark:border-slate-800 dark:bg-slate-900">
-        <div className="absolute inset-0 z-0 bg-[url('/media/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+    <div className="flex h-screen w-full overflow-hidden bg-slate-50 font-sans transition-colors duration-300 dark:bg-slate-950">
+      {/* Left Panel: Centered login card, no scrolling, no footers, increased width & height */}
+      <div className="relative flex h-full flex-1 flex-col justify-between overflow-hidden p-6 sm:p-8 lg:w-1/2 lg:flex-none">
+        {/* Decorative Grid Background on Left Side */}
+        <div className="absolute inset-0 z-0 bg-[url('/media/grid.svg')] bg-center opacity-[0.25] [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] dark:opacity-[0.1]" />
 
-        <div className="relative z-10 mx-auto flex max-w-xl flex-col items-center justify-center text-center">
-          <div className="mb-6 inline-flex items-center justify-center">
-            <Image src="/logo.png" alt="CRMP Logo" width={64} height={64} className="object-contain" priority />
-          </div>
-          <h1 className="font-extrabold font-serif text-slate-900 text-xl tracking-tight sm:text-5xl dark:text-white/40">
-            {APP_CONFIG.meta.title || "CRMP"} Access Portal
-          </h1>
-          <p className="mt-6 text-lg text-slate-600 dark:text-slate-400">
-            A secure gateway for Principal Investigators, Evaluators, and Administration logic. Use role-based
-            assignments to safely manage and evaluate ongoing projects.
-          </p>
-        </div>
-      </div>
-
-      {/* Right Panel: Login Form Side */}
-      <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:w-1/2 lg:flex-none lg:px-20 xl:px-24">
-        <div className="mx-auto w-full max-w-sm lg:w-96">
-          <div className="text-center lg:text-left">
-            <Link
-              href="/"
-              className="mb-10 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white lg:hidden"
-            >
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <title>Back</title>
-                <path d="M12 2L2 7l10 5 10-5-10-5Z" />
-              </svg>
-            </Link>
-
-            <h2 className="mt-2 font-bold text-3xl text-slate-900 tracking-tight dark:text-white">
-              Sign in to your account
-            </h2>
-            <p className="mt-2 text-slate-600 text-sm dark:text-slate-400">
-              Need access?{" "}
-              <a
-                href="mailto:support@crmp.com"
-                className="font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400"
+        {/* Header - Branding */}
+        <div className="relative z-10 flex w-full shrink-0 items-center justify-between">
+          <Link href="/" className="group flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md shadow-primary/10 transition-all group-hover:scale-105">
+              <svg
+                className="h-4.5 w-4.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                Contact your systemic administrator
-              </a>
+                <title>CRMP Logo</title>
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+            </div>
+            <span className="font-bold text-foreground text-lg tracking-tight transition-colors">CRMP</span>
+          </Link>
+
+          <div className="text-muted-foreground text-xs">
+            System Status:{" "}
+            <span className="inline-flex items-center gap-1 font-semibold text-emerald-500 dark:text-emerald-400">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500 dark:bg-emerald-400" />
+              Online
+            </span>
+          </div>
+        </div>
+
+        {/* Center Container: Centered header text + Login Card (Increased to max-w-[450px]) */}
+        <div className="relative z-10 mx-auto my-auto flex w-full max-w-[450px] shrink-0 flex-col justify-center">
+          {/* Header Texts - Centered */}
+          <div className="mb-8 text-center">
+            <h1 className="font-extrabold text-3xl text-foreground tracking-tight sm:text-4xl">Welcome Back</h1>
+            <p className="mt-3 text-muted-foreground text-sm leading-relaxed">
+              Enter your email and password to access your CRMP account.
             </p>
           </div>
 
-          <div className="mt-10">
-            <div className="bg-white px-6 py-8 shadow-sm ring-1 ring-slate-900/5 sm:rounded-xl sm:px-12 dark:bg-slate-900 dark:ring-white/10">
-              {/* Client Component handling state & submission */}
-              <Suspense fallback={null}>
-                <SignInForm />
-              </Suspense>
+          <Suspense
+            fallback={
+              <div className="flex h-48 items-center justify-center">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              </div>
+            }
+          >
+            <SignInForm />
+          </Suspense>
+
+          {/* Signup Link */}
+          <div className="mt-6 text-center text-muted-foreground text-sm">
+            Don&apos;t have an account?{" "}
+            <Link
+              href="/register"
+              className="font-semibold text-primary transition-colors hover:text-primary/80 hover:underline"
+            >
+              Register Now.
+            </Link>
+          </div>
+        </div>
+
+        {/* Spacer to balance layout */}
+        <div className="h-9 shrink-0" />
+      </div>
+
+      {/* Right Panel: Reverted design with dark-indigo system color gradient, showing system features */}
+      <div className="relative hidden h-full w-1/2 flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-[#0e163d] via-[#090e26] to-[#040612] p-8 lg:flex xl:p-12">
+        {/* Floating Glowing Orbs */}
+        <div className="pointer-events-none absolute top-[-100px] right-[-100px] h-[500px] w-[500px] rounded-full bg-primary/10 blur-[120px]" />
+        <div className="pointer-events-none absolute bottom-[-150px] left-[-100px] h-[600px] w-[600px] rounded-full bg-primary/15 blur-[140px]" />
+
+        {/* Grid pattern overlay */}
+        <div className="pointer-events-none absolute inset-0 z-0 bg-[url('/media/grid.svg')] bg-center opacity-[0.07] mix-blend-overlay" />
+
+        {/* Banner Texts */}
+        <div className="relative z-10 mb-12 max-w-lg space-y-4 self-start pl-8 text-center text-white lg:text-left xl:pl-12">
+          <h2 className="font-extrabold text-3xl leading-tight tracking-tight xl:text-4xl">
+            Effortlessly manage your research.
+          </h2>
+          <p className="font-normal text-sm text-white/80 leading-relaxed xl:text-base">
+            Log in to access your CRMP dashboard, submit proposal, track budget and oversee academic evaluations.
+          </p>
+        </div>
+
+        {/* Mockup Presentation Container */}
+        <div className="relative z-10 w-full max-w-md select-none px-6 xl:max-w-lg">
+          {/* Main Dashboard Window Mockup */}
+          <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-slate-950/45 p-1.5 shadow-[0_20px_50px_rgba(0,0,0,0.3)] backdrop-blur-xl transition-all duration-500 hover:scale-[1.01] hover:border-white/15">
+            {/* Window Chrome Header Bar */}
+            <div className="flex items-center justify-between border-white/5 border-b bg-slate-950/30 px-4 py-3">
+              <div className="flex gap-1.5">
+                <div className="h-2.5 w-2.5 rounded-full bg-rose-500/70" />
+                <div className="h-2.5 w-2.5 rounded-full bg-amber-500/70" />
+                <div className="h-2.5 w-2.5 rounded-full bg-emerald-500/70" />
+              </div>
+              <div className="flex items-center justify-center gap-1 rounded-md border border-white/5 bg-slate-950/60 px-3 py-1 font-mono text-[9px] text-white/40 tracking-wider">
+                crmp.university.edu/dashboard
+              </div>
+              <div className="w-10" />
+            </div>
+
+            {/* Window Content - Custom styled CRMP system features */}
+            <div className="space-y-4 p-4 text-left">
+              {/* Stats Card Grid */}
+              <div className="grid grid-cols-2 gap-3.5">
+                <div className="rounded-xl border border-white/5 bg-white/[0.04] p-3 backdrop-blur-md transition-all hover:bg-white/[0.07]">
+                  <div className="font-medium text-[10px] text-white/50">Active Proposals</div>
+                  <div className="mt-0.5 font-bold text-lg text-white">189 Projects</div>
+                  <div className="mt-1 flex items-center gap-0.5 font-semibold text-[9px] text-emerald-400">
+                    <span>↑ 12%</span>
+                    <span className="font-normal text-white/30">from last month</span>
+                  </div>
+                </div>
+                <div className="rounded-xl border border-white/5 bg-white/[0.04] p-3 backdrop-blur-md transition-all hover:bg-white/[0.07]">
+                  <div className="font-medium text-[10px] text-white/50">Funding Active</div>
+                  <div className="mt-0.5 font-bold text-lg text-white">$4.2M Allocated</div>
+                  <div className="mt-1 flex items-center gap-0.5 font-semibold text-[9px] text-blue-400">
+                    <span>88% Approved</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pipeline List Container */}
+              <div className="space-y-3 rounded-xl border border-white/5 bg-white/[0.04] p-3.5 backdrop-blur-md">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[10px] text-white/60 uppercase tracking-widest">
+                    Live Research Feed
+                  </span>
+                  <span className="text-[9px] text-white/30">Updated 2m ago</span>
+                </div>
+
+                <div className="space-y-2.5">
+                  {/* Item 1 */}
+                  <div className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.02] p-2 transition-all hover:border-white/[0.08] hover:bg-white/[0.06]">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-6.5 w-6.5 items-center justify-center rounded-lg border border-primary/25 bg-primary/20 font-bold text-[9px] text-primary-foreground">
+                        ML
+                      </div>
+                      <div>
+                        <div className="font-semibold text-white text-xs">Machine Learning Ethics</div>
+                        <div className="text-[9px] text-white/40">Dr. Emily • Thesis Proposal</div>
+                      </div>
+                    </div>
+                    <span className="rounded-full border border-amber-500/30 bg-amber-500/20 px-2 py-0.5 font-semibold text-[8px] text-amber-300">
+                      Under Review
+                    </span>
+                  </div>
+
+                  {/* Item 2 */}
+                  <div className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.02] p-2 transition-all hover:border-white/[0.08] hover:bg-white/[0.06]">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-6.5 w-6.5 items-center justify-center rounded-lg border border-emerald-500/25 bg-emerald-500/20 font-bold text-[9px] text-emerald-400">
+                        SE
+                      </div>
+                      <div>
+                        <div className="font-semibold text-white text-xs">Sustainable Energy Grids</div>
+                        <div className="text-[9px] text-white/40">Prof. James • Research Grant</div>
+                      </div>
+                    </div>
+                    <span className="rounded-full border border-emerald-500/30 bg-emerald-500/20 px-2 py-0.5 font-semibold text-[8px] text-emerald-300">
+                      Approved
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Floating Donut Chart Card overlapping it - right corner */}
+          <div className="hover:-translate-y-1 absolute right-[-14px] bottom-[-24px] z-20 w-44 rounded-2xl border border-white/10 bg-slate-950/75 p-4 shadow-2xl backdrop-blur-xl transition-all duration-500 hover:scale-105 hover:border-white/15">
+            <div className="mb-2.5 font-medium text-[10px] text-white/50">Category Breakdown</div>
+            <div className="flex items-center gap-3">
+              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
+                <svg className="-rotate-90 h-full w-full transform" viewBox="0 0 36 36">
+                  <title>Category breakdown chart</title>
+                  <path
+                    className="text-white/10"
+                    strokeWidth="3.5"
+                    stroke="currentColor"
+                    fill="none"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <path
+                    className="text-primary"
+                    strokeWidth="3.5"
+                    strokeDasharray="60, 100"
+                    strokeLinecap="round"
+                    stroke="currentColor"
+                    fill="none"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <path
+                    className="text-emerald-400"
+                    strokeWidth="3.5"
+                    strokeDasharray="30, 100"
+                    strokeDashoffset="-60"
+                    strokeLinecap="round"
+                    stroke="currentColor"
+                    fill="none"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                  <span className="font-bold text-[9px]">90%</span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                  <span className="font-semibold text-[8.5px] text-white/70">Research (60%)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                  <span className="font-semibold text-[8.5px] text-white/70">Thesis (30%)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Floating Advisors Stack Card overlapping it - left corner */}
+          <div className="hover:-translate-y-1 absolute top-[140px] left-[-16px] z-20 flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-950/75 p-3 shadow-2xl backdrop-blur-xl transition-all duration-500 hover:scale-105 hover:border-white/15">
+            <div className="-space-x-2 flex shrink-0">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-900 bg-emerald-500 font-bold text-[7px] text-white shadow-md">
+                DE
+              </div>
+              <div className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-900 bg-blue-500 font-bold text-[7px] text-white shadow-md">
+                PJ
+              </div>
+              <div className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-900 bg-amber-500 font-bold text-[7px] text-white shadow-md">
+                MW
+              </div>
+            </div>
+            <div>
+              <div className="font-medium text-[8px] text-white/50">Advisors Online</div>
+              <div className="font-bold text-[9.5px] text-white">5 Active Reviewers</div>
             </div>
           </div>
         </div>

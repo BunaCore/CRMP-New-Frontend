@@ -29,6 +29,8 @@ export interface EvalProposalRow {
   teamCount: number;
   year: string;
   budgetItems?: BudgetItem[];
+  evaluators?: string[];
+  advisors?: string[];
 }
 
 export interface EvalProjectRow {
