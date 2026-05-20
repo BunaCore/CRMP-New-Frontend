@@ -5,7 +5,6 @@
 "use client";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,10 +20,24 @@ import type { Message } from "@/lib/api/chat/types";
 import { useChatStore } from "@/stores/chat-store";
 import { emitGetInitialPresence, emitSendMessage, emitTyping } from "@/lib/socket/emitter";
 import { useMarkAsRead } from "@/lib/socket/hooks/use-mark-as-read";
-import { ArrowDown, Hash, Info, MoreVertical, Paperclip, Send, Smile, Users } from "lucide-react";
+import {
+  ArrowDown,
+  Hash,
+  Info,
+  MoreHorizontal,
+  Paperclip,
+  Send,
+  Smile,
+  Search,
+  Phone,
+  Users,
+  User,
+  X,
+} from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useChatScroll } from "@/lib/hooks/use-chat-scroll";
 import { ChatMessageSkeleton } from "./skeletons/chat-message-skeleton";
+import { Separator } from "@/components/ui/separator";
 
 interface GroupChatPanelProps {
   chatId: string;
@@ -43,7 +56,7 @@ function getInitials(name: string) {
 function formatTime(timestamp: string) {
   const date = new Date(timestamp);
   return date.toLocaleTimeString("en-US", {
-    hour: "2-digit",
+    hour: "numeric",
     minute: "2-digit",
   });
 }
@@ -61,40 +74,17 @@ function formatDateHeader(timestamp: string) {
     return "Yesterday";
   }
   return date.toLocaleDateString("en-US", {
-    month: "short",
+    weekday: "long",
+    month: "long",
     day: "numeric",
-    year: "numeric",
   });
 }
-
-function _getRelativeTime(timestamp: string) {
-  const now = new Date();
-  const date = new Date(timestamp);
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 1) return "Just now";
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  return `${diffDays}d ago`;
-}
-
-const _roleColors: Record<string, string> = {
-  "Principal Investigator": "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
-  "Co-Investigator": "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
-  "Research Assistant": "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
-  "Graduate Student": "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
-  "Postdoctoral Fellow": "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
-};
 
 function TypingIndicator({ chatId, roomMembers }: { chatId: string; roomMembers: { id: string; name?: string }[] }) {
   const typingState = useChatStore((s) => s.typingState[chatId]);
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
-    // Only run interval if there might be typing active
     const hasTypers = Object.keys(typingState || {}).length > 0;
     if (!hasTypers) return;
 
@@ -113,11 +103,11 @@ function TypingIndicator({ chatId, roomMembers }: { chatId: string; roomMembers:
   if (typingMemberNames.length === 0) return null;
 
   return (
-    <div className="flex items-center gap-2 text-muted-foreground text-sm">
-      <div className="flex gap-1">
-        <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50 [animation-delay:-0.3s]" />
-        <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50 [animation-delay:-0.15s]" />
-        <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50" />
+    <div className="flex items-center gap-2 text-muted-foreground text-[13px] font-medium animate-in fade-in duration-300 ml-[52px] mt-1 mb-4">
+      <div className="flex gap-1 items-center px-1.5 py-1 rounded-full">
+        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:-0.3s]" />
+        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:-0.15s]" />
+        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60" />
       </div>
       <span>
         {typingMemberNames.length === 1
@@ -136,7 +126,6 @@ function ChatInput({ chatId, placeholder }: { chatId: string; placeholder: strin
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
-    // Emit typing started (cooldown managed by Zustand/socket emitter)
     emitTyping({ chatId });
   };
 
@@ -145,9 +134,7 @@ function ChatInput({ chatId, placeholder }: { chatId: string; placeholder: strin
     if (!content) return;
 
     const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    // Emit via socket — backend will echo back with real id replacing tempId
     emitSendMessage({ chatId, content, tempId });
-
     setInputValue("");
   };
 
@@ -159,30 +146,67 @@ function ChatInput({ chatId, placeholder }: { chatId: string; placeholder: strin
   };
 
   return (
-    <div className="border-t p-4">
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0">
-          <Paperclip className="h-4 w-4 text-muted-foreground" />
-          <span className="sr-only">Attach file</span>
-        </Button>
-        <div className="relative flex-1">
+    <div className="px-6 pb-6 pt-2 bg-background relative z-10 w-full">
+      <div className="flex flex-col w-full bg-background rounded-xl border border-border shadow-sm focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all overflow-hidden">
+        {/* Input Field */}
+        <div className="flex-1">
           <Input
             ref={inputRef}
             value={inputValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="pr-10"
+            className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-4 py-4 min-h-[50px] text-[15px] resize-none"
+            autoComplete="off"
           />
-          <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2">
-            <Smile className="h-4 w-4 text-muted-foreground" />
-            <span className="sr-only">Add emoji</span>
+        </div>
+
+        {/* Toolbar */}
+        <div className="flex items-center justify-between px-2 pb-2">
+          <div className="flex items-center gap-1">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-md text-muted-foreground hover:text-foreground"
+                  >
+                    <Paperclip className="h-4 w-4" />
+                    <span className="sr-only">Attach file</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Attach file</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-md text-muted-foreground hover:text-foreground"
+                  >
+                    <Smile className="h-4 w-4" />
+                    <span className="sr-only">Add emoji</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Add emoji</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+
+          <Button
+            onClick={handleSend}
+            disabled={!inputValue.trim()}
+            size="sm"
+            className={`h-8 px-3 rounded-md transition-all font-medium ${inputValue.trim() ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground opacity-50"}`}
+          >
+            <Send className="h-4 w-4 mr-1.5" />
+            Send
           </Button>
         </div>
-        <Button onClick={handleSend} size="icon" className="h-9 w-9 shrink-0">
-          <Send className="h-4 w-4" />
-          <span className="sr-only">Send message</span>
-        </Button>
       </div>
     </div>
   );
@@ -205,7 +229,6 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
     messages.length,
   );
 
-  // Intersection Observer for fetching older messages when topRef comes into view
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -220,7 +243,6 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage, snapshotScrollBeforeFetch]);
 
-  // Handles: on chat open, on window focus → emit chat:markAsRead
   useMarkAsRead(chatId);
 
   const presenceMap = useChatStore((s) => s.presenceMap);
@@ -232,11 +254,9 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
   const dmPartner = isDirectMessage ? roomMembers.find((m) => m.id !== currentUserId) : null;
 
   useEffect(() => {
-    // Request initial presence whenever the chat changes
     emitGetInitialPresence();
   }, [chatId]);
 
-  // Group messages by date
   const groupedMessages = useMemo(() => {
     const result: { date: string; messages: Message[] }[] = [];
     let currentDate = "";
@@ -253,295 +273,291 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
   }, [messages]);
 
   if (isLoadingRoom || !room) {
-    return <div className="flex h-full items-center justify-center text-muted-foreground">Loading chat...</div>;
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4 text-muted-foreground animate-pulse">
+          <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+          <p className="text-sm font-medium">Loading conversation...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="flex h-full flex-col bg-card">
-      {/* Chat Header */}
-      <div className="flex items-center justify-between border-b px-4 py-3">
-        <div className="flex items-center gap-3">
-          {isDirectMessage && dmPartner ? (
-            <>
-              <div className="relative">
-                <Avatar className="h-10 w-10">
-                  <AvatarFallback className="bg-primary/10 text-primary">{getInitials(dmPartner.name)}</AvatarFallback>
+    <div className="flex h-full w-full relative overflow-hidden bg-background">
+      {/* Main Chat Area */}
+      <div className="flex h-full flex-col flex-1 relative z-10 w-full min-w-0">
+        {/* Chat Header (Slack/Linear Enterprise Style) */}
+        <div className="flex items-center justify-between bg-background/95 backdrop-blur border-b border-border/60 px-6 py-4 z-20 shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            {isDirectMessage && dmPartner ? (
+              <>
+                <Avatar className="h-10 w-10 border border-border/50 shrink-0">
+                  <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                    {getInitials(dmPartner.name)}
+                  </AvatarFallback>
                 </Avatar>
-                {presenceMap[dmPartner.id] === "online" && (
-                  <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card bg-emerald-500" />
-                )}
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground">{dmPartner?.name || "Direct Message"}</h3>
-                <div className="flex items-center gap-2">
-                  <Badge
-                    variant="secondary"
-                    className="text-[10px] px-1.5 py-0 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-                  >
-                    Team Member
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">
-                    {presenceMap[dmPartner?.id || ""] === "online" ? "Online" : "Offline"}
-                  </span>
+                <div className="flex flex-col justify-center min-w-0">
+                  <h3 className="font-semibold text-foreground text-[16px] leading-tight truncate">
+                    {dmPartner?.name}
+                  </h3>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className={`relative flex h-2 w-2 shrink-0`}>
+                      {presenceMap[dmPartner?.id || ""] === "online" && (
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      )}
+                      <span
+                        className={`relative inline-flex rounded-full h-2 w-2 ${presenceMap[dmPartner?.id || ""] === "online" ? "bg-emerald-500" : "bg-muted-foreground/40"}`}
+                      />
+                    </span>
+                    <span className="text-[12px] font-medium text-muted-foreground truncate">
+                      {presenceMap[dmPartner?.id || ""] === "online" ? "Active now" : "Offline"}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                <Hash className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground">{room.name}</h3>
-                <p className="text-xs text-muted-foreground">
-                  {onlineMembers.length} online of {roomMembers.length} members
-                </p>
-              </div>
-            </>
-          )}
-        </div>
-        <div className="flex items-center gap-1">
-          {/* Online Members Avatars - Only show for group chats */}
-          {!isDirectMessage && (
-            <>
+              </>
+            ) : (
+              <>
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 border border-primary/10">
+                  <Hash className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex flex-col justify-center min-w-0">
+                  <h3 className="font-semibold text-foreground text-[16px] leading-tight truncate">{room.name}</h3>
+                  <div className="flex items-center gap-1.5 mt-0.5 text-[12px] font-medium text-muted-foreground">
+                    <Users className="h-3.5 w-3.5" />
+                    <span>{roomMembers.length} members</span>
+                    <span className="opacity-50">•</span>
+                    <span className="text-emerald-600 dark:text-emerald-500">{onlineMembers.length} online</span>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1 ml-4 shrink-0">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground">
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Search</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            {!isDirectMessage && (
               <TooltipProvider>
-                <div className="mr-2 flex -space-x-2">
-                  {onlineMembers.slice(0, 4).map((member) => (
-                    <Tooltip key={member.id}>
-                      <TooltipTrigger asChild>
-                        <div className="relative">
-                          <Avatar className="h-7 w-7 border-2 border-card">
-                            <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                              {getInitials(member.name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full border border-card bg-emerald-500" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="font-medium">{member.name}</p>
-                        <p className="text-xs text-muted-foreground">Team Member</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  ))}
-                  {onlineMembers.length > 4 && (
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-card bg-muted text-xs font-medium">
-                      +{onlineMembers.length - 4}
-                    </div>
-                  )}
-                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={showMembers ? "secondary" : "ghost"}
+                      size="icon"
+                      className={`h-9 w-9 text-muted-foreground hover:text-foreground ${showMembers ? "bg-muted" : ""}`}
+                      onClick={() => setShowMembers(!showMembers)}
+                    >
+                      <User className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Show Members</TooltipContent>
+                </Tooltip>
               </TooltipProvider>
+            )}
 
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowMembers(!showMembers)}>
-                <Users className="h-4 w-4" />
-                <span className="sr-only">Show members</span>
-              </Button>
-            </>
-          )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <MoreVertical className="h-4 w-4" />
-                <span className="sr-only">More options</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {isDirectMessage && dmPartner ? (
-                <>
-                  <DropdownMenuItem onClick={() => alert("Profile API not connected")}>
-                    <Info className="mr-2 h-4 w-4" />
-                    View Profile
-                  </DropdownMenuItem>
-                </>
-              ) : (
-                <>
-                  <DropdownMenuItem onClick={() => alert("Room API not connected")}>
-                    <Info className="mr-2 h-4 w-4" />
-                    Room Info
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem className="cursor-pointer">
+                  <Info className="mr-2 h-4 w-4" />
+                  <span>View Details</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-      </div>
 
-      <div className="flex flex-1 overflow-hidden relative">
-        <ScrollArea className="flex-1 p-4" viewportRef={scrollRef}>
-          <div ref={topRef} className="h-1 w-full" />
-          {isFetchingNextPage && <ChatMessageSkeleton />}
-          <div className="flex flex-col gap-6">
-            {groupedMessages.map((group) => (
-              <div key={group.date}>
-                <div className="mb-4 flex items-center justify-center">
-                  <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
-                    {formatDateHeader(group.date)}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-4">
-                  {[...group.messages].map((msg, index, arr) => {
-                    const isMe = msg.sender.id === currentUserId;
-                    const showAvatar = index === arr.length - 1 || arr[index + 1].sender.id !== msg.sender.id;
+        <ScrollArea className="flex-1 w-full" viewportRef={scrollRef}>
+          <div className="px-6 py-4">
+            <div ref={topRef} className="h-1 w-full" />
+            {isFetchingNextPage && <ChatMessageSkeleton />}
 
-                    return (
-                      <div key={msg.id} className={`flex gap-3 ${isMe ? "flex-row-reverse" : ""}`}>
-                        {/* Avatar */}
-                        <div className="w-8 shrink-0 flex flex-col justify-end">
-                          {showAvatar && !isMe && (
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <div className="relative">
-                                    <Avatar className="h-8 w-8">
-                                      <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                                        {getInitials(msg.sender.name)}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    {presenceMap[msg.sender.id] === "online" && (
-                                      <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-card bg-emerald-500" />
-                                    )}
-                                  </div>
-                                </TooltipTrigger>
-                                <TooltipContent side="left">
-                                  <p className="font-medium">{msg.sender.name}</p>
-                                  <p className="text-xs text-muted-foreground">Team Member</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          )}
-                        </div>
+            <div className="flex flex-col pb-4">
+              {groupedMessages.map((group) => (
+                <div key={group.date} className="flex flex-col">
+                  {/* Date Separator */}
+                  <div className="flex items-center justify-center my-6">
+                    <Separator className="flex-1" />
+                    <span className="mx-4 text-[11px] font-semibold tracking-widest text-muted-foreground uppercase">
+                      {formatDateHeader(group.date)}
+                    </span>
+                    <Separator className="flex-1" />
+                  </div>
 
-                        {/* Message Content */}
-                        <div className={`max-w-[70%] flex flex-col ${isMe ? "items-end" : "items-start"}`}>
-                          {showAvatar && !isMe && (
-                            <div className="mb-1 flex items-center gap-2">
-                              <span className="text-sm font-medium text-foreground">{msg.sender.name}</span>
-                              <Badge
-                                variant="secondary"
-                                className="text-[10px] px-1.5 py-0 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-                              >
-                                Team Member
-                              </Badge>
+                  <div className="flex flex-col gap-5">
+                    {[...group.messages].map((msg, index, arr) => {
+                      const isMe = msg.sender.id === currentUserId;
+                      const isFirstInGroup = index === 0 || arr[index - 1].sender.id !== msg.sender.id;
+                      const isLastInGroup = index === arr.length - 1 || arr[index + 1].sender.id !== msg.sender.id;
+                      const showAvatar = !isMe && isFirstInGroup;
+
+                      return (
+                        <div
+                          key={msg.id}
+                          className={`flex gap-4 w-full ${isMe ? "justify-end" : "justify-start"} ${!isFirstInGroup && !isMe ? "mt-[-12px]" : ""} ${!isFirstInGroup && isMe ? "mt-[-12px]" : ""}`}
+                        >
+                          {/* Avatar (Left aligned for others) */}
+                          {!isMe && (
+                            <div className="w-10 shrink-0">
+                              {showAvatar ? (
+                                <Avatar className="h-10 w-10 border border-border/50 shadow-sm mt-0.5">
+                                  <AvatarFallback className="bg-primary/5 text-primary text-[14px] font-medium">
+                                    {getInitials(msg.sender.name)}
+                                  </AvatarFallback>
+                                </Avatar>
+                              ) : (
+                                <div className="w-10" />
+                              )}
                             </div>
                           )}
-                          <div
-                            className={`rounded-2xl px-4 py-2 ${
-                              isMe
-                                ? "bg-primary text-primary-foreground rounded-br-md"
-                                : "bg-muted text-foreground rounded-bl-md"
-                            }`}
-                          >
-                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                          </div>
-                          <div
-                            className={`mt-1 flex items-center gap-1 text-[10px] text-muted-foreground ${
-                              isMe ? "justify-end" : ""
-                            }`}
-                          >
-                            <span>{formatTime(msg.createdAt)}</span>
-                            {/* Read receipts simulation conditionally omitted per strict instructions to fallback without data mapping overhead */}
+
+                          <div className={`flex flex-col max-w-[75%] ${isMe ? "items-end" : "items-start"}`}>
+                            {/* Sender Name & Time (Top of bubble) */}
+                            {isFirstInGroup && (
+                              <div className={`flex items-baseline gap-2 mb-1.5 ${isMe ? "flex-row-reverse" : "ml-1"}`}>
+                                {!isMe && !isDirectMessage && (
+                                  <span className="text-[14px] font-semibold text-foreground tracking-tight">
+                                    {msg.sender.name}
+                                  </span>
+                                )}
+                                <span className="text-[11px] font-medium text-muted-foreground">
+                                  {formatTime(msg.createdAt)}
+                                </span>
+                              </div>
+                            )}
+
+                            {/* Message Bubble */}
+                            <div
+                              className={`px-4 py-2.5 text-[15px] leading-relaxed whitespace-pre-wrap break-words shadow-sm
+                                ${isMe ? "bg-primary text-primary-foreground" : "bg-muted/50 border border-border/50 text-foreground"}
+                                ${isMe && isFirstInGroup && isLastInGroup ? "rounded-2xl rounded-tr-sm" : ""}
+                                ${isMe && isFirstInGroup && !isLastInGroup ? "rounded-2xl rounded-tr-sm rounded-br-sm" : ""}
+                                ${isMe && !isFirstInGroup && isLastInGroup ? "rounded-2xl rounded-tr-sm rounded-br-sm" : ""}
+                                ${isMe && !isFirstInGroup && !isLastInGroup ? "rounded-2xl rounded-r-sm" : ""}
+                                
+                                ${!isMe && isFirstInGroup && isLastInGroup ? "rounded-2xl rounded-tl-sm" : ""}
+                                ${!isMe && isFirstInGroup && !isLastInGroup ? "rounded-2xl rounded-tl-sm rounded-bl-sm" : ""}
+                                ${!isMe && !isFirstInGroup && isLastInGroup ? "rounded-2xl rounded-tl-sm rounded-bl-sm" : ""}
+                                ${!isMe && !isFirstInGroup && !isLastInGroup ? "rounded-2xl rounded-l-sm" : ""}
+                              `}
+                            >
+                              {msg.content}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
-            {/* Typing Indicator */}
-            <TypingIndicator chatId={chatId} roomMembers={roomMembers} />
+              <TypingIndicator chatId={chatId} roomMembers={roomMembers} />
+            </div>
           </div>
         </ScrollArea>
 
         {!isAtBottom && (
           <Button
             size="icon"
-            className="absolute bottom-6 right-6 rounded-full shadow-lg z-10 animate-in fade-in zoom-in w-10 h-10 bg-neutral-200/20 hover:bg-neutral-200/30 cursor-pointer"
+            className="absolute bottom-28 right-8 rounded-full shadow-lg z-20 animate-in fade-in zoom-in w-10 h-10 bg-background hover:bg-muted text-foreground border border-border"
             onClick={() => scrollToBottom(true)}
           >
-            <ArrowDown className="h-5 w-5 text-foreground" />
+            <ArrowDown className="h-4 w-4" />
             {hasUnreadDownBelow && (
-              <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-destructive" />
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold shadow-sm">
+                1
               </span>
             )}
           </Button>
         )}
 
-        {/* Members Sidebar */}
-        {showMembers && (
-          <div className="w-56 border-l bg-background">
-            <div className="border-b p-3">
-              <h4 className="text-sm font-medium">Members ({roomMembers.length})</h4>
-            </div>
-            <ScrollArea className="h-[calc(100%-45px)]">
-              <div className="p-2">
-                {/* Online Members */}
-                <div className="mb-3">
-                  <p className="mb-2 px-2 text-xs font-medium text-muted-foreground uppercase">
-                    Online - {onlineMembers.length}
-                  </p>
-                  {onlineMembers.map((member) => (
-                    <div key={member.id} className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-muted">
-                      <div className="relative">
-                        <Avatar className="h-6 w-6">
-                          <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                            {getInitials(member.name)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full border border-card bg-emerald-500" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-xs font-medium">{member.name}</p>
-                        <p className="truncate text-[10px] text-muted-foreground">Team Member</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Offline Members */}
-                {roomMembers.filter((m) => presenceMap[m.id] !== "online").length > 0 && (
-                  <div>
-                    <p className="mb-2 px-2 text-xs font-medium text-muted-foreground uppercase">
-                      Offline - {roomMembers.filter((m) => presenceMap[m.id] !== "online").length}
-                    </p>
-                    {roomMembers
-                      .filter((m) => presenceMap[m.id] !== "online")
-                      .map((member) => (
-                        <div
-                          key={member.id}
-                          className="flex items-center gap-2 rounded-lg px-2 py-1.5 opacity-60 hover:bg-muted"
-                        >
-                          <Avatar className="h-6 w-6">
-                            <AvatarFallback className="bg-muted text-muted-foreground text-xs">
-                              {getInitials(member.name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-xs font-medium">{member.name}</p>
-                            <p className="truncate text-[10px] text-muted-foreground">Offline</p>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-          </div>
-        )}
+        {/* Input Area */}
+        <ChatInput
+          chatId={chatId}
+          placeholder={
+            isDirectMessage && dmPartner ? `Message ${dmPartner.name.split(" ")[0]}` : `Message ${room.name}`
+          }
+        />
       </div>
 
-      {/* Input Area */}
-      <ChatInput
-        chatId={chatId}
-        placeholder={
-          isDirectMessage && dmPartner
-            ? `Message ${dmPartner.name.split(" ")[0]}...`
-            : `Message #${room.name.toLowerCase().replace(/\s+/g, "-")}`
-        }
-      />
+      {/* Slide-over Right Sidebar (Members Info) */}
+      <div
+        className={`absolute top-0 right-0 h-full w-[300px] bg-background border-l border-border/60 shadow-2xl z-30 transition-transform duration-300 ease-in-out flex flex-col ${
+          showMembers ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border/60 bg-background/95 backdrop-blur shrink-0">
+          <h4 className="text-[15px] font-semibold text-foreground">Room Details</h4>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-md hover:bg-muted text-muted-foreground"
+            onClick={() => setShowMembers(false)}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <ScrollArea className="flex-1 w-full">
+          <div className="p-5 flex flex-col items-center border-b border-border/40">
+            <div className="h-20 w-20 rounded-2xl bg-primary/10 border border-primary/10 flex items-center justify-center mb-4">
+              <Hash className="h-10 w-10 text-primary" />
+            </div>
+            <h2 className="text-lg font-semibold text-foreground text-center">{room.name}</h2>
+            <p className="text-[13px] text-muted-foreground mt-1 text-center">
+              Created {formatDateHeader(room.createdAt)}
+            </p>
+          </div>
+
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h5 className="text-[13px] font-semibold text-foreground">Members</h5>
+              <span className="text-[12px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                {roomMembers.length}
+              </span>
+            </div>
+
+            <div className="space-y-1">
+              {roomMembers.map((member) => (
+                <div
+                  key={member.id}
+                  className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-muted/50 cursor-pointer transition-colors group"
+                >
+                  <div className="relative shrink-0">
+                    <Avatar className="h-9 w-9 border border-border/50">
+                      <AvatarFallback className="text-[13px] font-medium bg-primary/5 text-primary">
+                        {getInitials(member.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span
+                      className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-background ${presenceMap[member.id] === "online" ? "bg-emerald-500" : "bg-muted-foreground/30"}`}
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[14px] font-medium text-foreground leading-tight">{member.name}</p>
+                    <p className="truncate text-[12px] text-muted-foreground mt-0.5">
+                      {presenceMap[member.id] === "online" ? "Active" : "Offline"}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 }
