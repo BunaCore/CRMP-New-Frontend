@@ -19,10 +19,9 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { Hash, MessageSquarePlus, Search, UserPlus, Users } from "lucide-react";
 import { useState } from "react";
-import { useGetRecommendations } from "@/lib/api/recommendations/queries";
-import { useCreateChat } from "@/lib/api/chat/mutations";
-import { Loader2, Sparkles } from "lucide-react";
 import { CreateChatModal } from "./create-chat-modal";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Separator } from "@/components/ui/separator";
 
 type ChatRoomsListProps = {
   currentUserId: string;
@@ -50,11 +49,6 @@ export function ChatRoomsList({ currentUserId }: ChatRoomsListProps) {
   const setCreateChatMode = useChatStore((s) => s.setCreateChatMode);
   const setIsCreateChatOpen = useChatStore((s) => s.setIsCreateChatOpen);
 
-  const { data: recommendations = [], isLoading: isLoadingRecommendations } = useGetRecommendations(
-    parseInt(currentUserId, 10),
-  );
-  const { mutate: createChat, isPending: isCreatingChat } = useCreateChat();
-
   const [searchQuery, onSearchChange] = useState("");
   const [filterType, onFilterTypeChange] = useState<string>("all");
 
@@ -69,86 +63,99 @@ export function ChatRoomsList({ currentUserId }: ChatRoomsListProps) {
   };
 
   return (
-    <div className="flex h-full flex-col border-r bg-background">
+    <div className="flex h-full flex-col border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       {/* Header */}
-      <div className="border-b px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="font-semibold text-foreground text-lg">Team Chat</h2>
-            <p className="text-muted-foreground text-xs">
-              {Object.values(presenceMap).filter((v) => v === "online").length} members online
-            </p>
+      <div className="flex items-center justify-between px-4 py-4">
+        <div className="flex flex-col gap-0.5">
+          <h2 className="font-semibold text-lg tracking-tight">Messages</h2>
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
+            {Object.values(presenceMap).filter((v) => v === "online").length} online
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="icon" variant="outline" className="h-8 w-8">
-                <MessageSquarePlus className="h-4 w-4" />
-                <span className="sr-only">Create room</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() => {
-                  setCreateChatMode("dm");
-                  setIsCreateChatOpen(true);
-                }}
-              >
-                <UserPlus className="mr-2 h-4 w-4" />
-                Direct Message
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  setCreateChatMode("group");
-                  setIsCreateChatOpen(true);
-                }}
-              >
-                <Users className="mr-2 h-4 w-4" />
-                Group Chat
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
+        <DropdownMenu>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full hover:bg-muted">
+                    <MessageSquarePlus className="h-5 w-5 text-muted-foreground" />
+                    <span className="sr-only">New message</span>
+                  </Button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent>New message</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem
+              onClick={() => {
+                setCreateChatMode("dm");
+                setIsCreateChatOpen(true);
+              }}
+              className="cursor-pointer"
+            >
+              <UserPlus className="mr-2 h-4 w-4" />
+              <span>Direct Message</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                setCreateChatMode("group");
+                setIsCreateChatOpen(true);
+              }}
+              className="cursor-pointer"
+            >
+              <Users className="mr-2 h-4 w-4" />
+              <span>Group Chat</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <CreateChatModal />
 
       {/* Search & Filter */}
-      <div className="space-y-3 p-3">
-        <div className="relative">
-          <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
+      <div className="px-4 pb-4 space-y-4">
+        <div className="relative group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
           <Input
-            placeholder="Search conversations..."
+            placeholder="Search messages..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-9"
+            className="pl-9 bg-muted/50 border-transparent focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-primary/20 rounded-full h-10 transition-all"
           />
         </div>
         <Tabs value={filterType} onValueChange={onFilterTypeChange}>
-          <TabsList className="w-full">
-            <TabsTrigger value="all" className="flex-1">
+          <TabsList className="w-full grid grid-cols-3 bg-muted/50 h-9 p-1 rounded-full">
+            <TabsTrigger value="all" className="rounded-full text-xs font-medium">
               All
             </TabsTrigger>
-            <TabsTrigger value="group" className="flex-1">
+            <TabsTrigger value="group" className="rounded-full text-xs font-medium">
               Groups
             </TabsTrigger>
-            <TabsTrigger value="dm" className="flex-1">
+            <TabsTrigger value="dm" className="rounded-full text-xs font-medium">
               Direct
             </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
+      <Separator className="opacity-50" />
+
       {/* Room List */}
       <ScrollArea type="hover" className="h-full flex-1">
-        <div className="p-2">
+        <div className="p-3">
           {filteredRooms.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                <Hash className="h-6 w-6 text-muted-foreground" />
+            <div className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in duration-300">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/50 mb-4 shadow-sm border border-border/50">
+                <Hash className="h-7 w-7 text-muted-foreground/70" />
               </div>
-              <p className="mt-3 font-medium text-foreground text-sm">No conversations found</p>
-              <p className="mt-1 text-muted-foreground text-xs">
-                {searchQuery ? "Try a different search" : "Create a new conversation to get started"}
+              <p className="font-semibold text-foreground text-sm">No conversations</p>
+              <p className="mt-1.5 text-muted-foreground text-xs max-w-[200px]">
+                {searchQuery ? "No matches found for your search." : "Start a new conversation to get started."}
               </p>
             </div>
           ) : (
@@ -165,112 +172,84 @@ export function ChatRoomsList({ currentUserId }: ChatRoomsListProps) {
                     type="button"
                     key={room.id}
                     onClick={() => setActiveChatId(room.id)}
-                    className={`flex w-full items-start gap-3 rounded-lg p-3 text-left transition-colors ${
-                      isSelected ? "border border-primary/20 bg-primary/10" : "border border-transparent hover:bg-muted"
+                    className={`group flex w-full items-center gap-3 rounded-xl p-3 text-left transition-all duration-200 ${
+                      isSelected ? "bg-primary/10 shadow-sm" : "hover:bg-muted/80 border border-transparent"
                     }`}
                   >
                     {/* Room Icon or Avatar */}
                     {room.type === "dm" ? (
                       <div className="relative shrink-0">
-                        <Avatar className="h-10 w-10">
-                          <AvatarFallback className={`${isSelected ? "bg-primary/20 text-primary" : "bg-muted"}`}>
+                        <Avatar className="h-11 w-11 border border-border/50 shadow-sm transition-transform group-hover:scale-105">
+                          <AvatarFallback
+                            className={`${isSelected ? "bg-primary text-primary-foreground font-medium" : "bg-muted font-medium text-foreground"}`}
+                          >
                             {getInitials(displayName)}
                           </AvatarFallback>
                         </Avatar>
                         {isPartnerOnline && (
-                          <span className="absolute right-0 bottom-0 h-3 w-3 rounded-full border-2 border-background bg-emerald-500" />
+                          <span className="absolute right-0 bottom-0 h-3.5 w-3.5 rounded-full border-[2.5px] border-background bg-emerald-500 shadow-sm" />
                         )}
                       </div>
                     ) : (
                       <div
-                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-                          isSelected ? "bg-primary/20" : "bg-muted"
+                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border/50 shadow-sm transition-transform group-hover:scale-105 ${
+                          isSelected ? "bg-primary" : "bg-muted"
                         }`}
                       >
-                        <Hash className={`h-5 w-5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                        <Hash
+                          className={`h-5 w-5 ${isSelected ? "text-primary-foreground" : "text-muted-foreground"}`}
+                        />
                       </div>
                     )}
 
                     {/* Room Info */}
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1 flex flex-col justify-center">
+                      <div className="flex items-center justify-between gap-2 mb-1">
                         <span
-                          className={`truncate font-medium text-sm ${isSelected ? "text-primary" : "text-foreground"}`}
+                          className={`truncate font-semibold text-[14px] leading-none ${isSelected ? "text-primary" : "text-foreground"}`}
                         >
                           {displayName}
                         </span>
-                        <span className="shrink-0 text-[10px] text-muted-foreground">
+                        <span
+                          className={`shrink-0 text-[11px] font-medium leading-none ${isSelected ? "text-primary/70" : "text-muted-foreground/70"}`}
+                        >
                           {formatRelativeTime(room.lastMessage?.createdAt)}
                         </span>
                       </div>
-                      <div className="mt-0.5 flex items-center justify-between gap-2">
-                        {room.type === "dm" ? (
-                          <span className="truncate text-muted-foreground text-xs">Team Member</span>
+
+                      <div className="flex items-center justify-between gap-2">
+                        {room.lastMessage ? (
+                          <p
+                            className={`truncate text-[13px] leading-tight ${isSelected ? "text-foreground/80" : "text-muted-foreground"}`}
+                          >
+                            {room.lastMessage.content}
+                          </p>
+                        ) : room.type === "dm" ? (
+                          <span className="truncate text-muted-foreground/70 text-[12px] font-medium">Team Member</span>
                         ) : (
-                          <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
+                          <div className="flex items-center gap-1.5 text-muted-foreground/80 text-[12px] font-medium">
                             <span className="flex items-center gap-1">
                               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                               {onlineCount} online
                             </span>
-                            <span className="text-muted-foreground/50">|</span>
+                            <span className="opacity-50">•</span>
                             <span>{(room.memberIds || []).length} members</span>
                           </div>
                         )}
-                        {room.unreadCount && room.unreadCount > 0 && (
-                          <Badge variant="default" className="h-5 min-w-5 rounded-full px-1.5 font-bold text-[10px]">
+
+                        {room.unreadCount && room.unreadCount > 0 ? (
+                          <Badge
+                            variant="default"
+                            className="h-5 min-w-[20px] rounded-full px-1.5 flex items-center justify-center font-bold text-[10px] shadow-sm ml-auto"
+                          >
                             {room.unreadCount > 99 ? "99+" : room.unreadCount}
                           </Badge>
-                        )}
+                        ) : null}
                       </div>
-                      {room.lastMessage && room.type === "group" && (
-                        <p className="mt-1 truncate text-muted-foreground/70 text-xs">{room.lastMessage.content}</p>
-                      )}
                     </div>
                   </button>
                 );
               })}
-            </div>
-          )}
-        </div>
-
-        {/* Recommended Members Section */}
-        <div className="mt-4 border-t p-4">
-          <div className="mb-3 flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <h3 className="font-semibold text-foreground text-sm">Recommended to Connect</h3>
-          </div>
-          {isLoadingRecommendations ? (
-            <div className="flex justify-center p-4">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            </div>
-          ) : recommendations.length === 0 ? (
-            <p className="text-center text-muted-foreground text-xs">No recommendations available</p>
-          ) : (
-            <div className="space-y-2">
-              {recommendations.map((rec) => (
-                <div key={rec.id} className="flex items-center justify-between rounded-lg border bg-card p-3 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                        {getInitials(rec.name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="font-medium text-foreground text-sm">{rec.name}</span>
-                      <span className="text-muted-foreground text-xs">Match: {Math.round(rec.score * 100)}%</span>
-                    </div>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-8"
-                    disabled={isCreatingChat}
-                    onClick={() => createChat({ type: "dm", memberIds: [rec.id.toString()] })}
-                  >
-                    Message
-                  </Button>
-                </div>
-              ))}
             </div>
           )}
         </div>
