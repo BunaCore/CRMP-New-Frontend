@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { Download, ExternalLink, FileText, Search, Share2, Sparkles, User, Users } from "lucide-react";
 import { toast } from "sonner";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -52,10 +51,10 @@ export function ActivityTab() {
     return (
       project.title.toLowerCase().includes(term) ||
       project.abstract.toLowerCase().includes(term) ||
-      (project.researchArea && project.researchArea.toLowerCase().includes(term)) ||
-      (project.department && project.department.toLowerCase().includes(term)) ||
-      (project.advisor && project.advisor.toLowerCase().includes(term)) ||
-      (project.members && project.members.some((m) => m.toLowerCase().includes(term)))
+      project.researchArea?.toLowerCase().includes(term) ||
+      project.department?.toLowerCase().includes(term) ||
+      project.advisor?.toLowerCase().includes(term) ||
+      project.members?.some((m) => m.toLowerCase().includes(term))
     );
   });
 
@@ -70,9 +69,10 @@ export function ActivityTab() {
             : `/projects/${projectId}/related`;
         const response = await apiClient.get(url);
         setProjects(response.data);
-      } catch (e: any) {
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Failed to contact the backend microservice.";
         toast.error("Failed to load similar projects", {
-          description: e.message || "Failed to contact the backend microservice.",
+          description: message,
         });
       } finally {
         setLoading(false);
@@ -118,9 +118,10 @@ export function ActivityTab() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (e: any) {
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to download the generated PDF.";
       toast.error("Download failed", {
-        description: e.message || "Failed to download the generated PDF.",
+        description: message,
       });
     } finally {
       setDownloadingId(null);
@@ -147,7 +148,7 @@ export function ActivityTab() {
       <div className="shrink-0 space-y-4 p-6 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="rounded-xl bg-primary/10 p-2 text-primary"></div>
+            <div className="rounded-xl bg-primary/10 p-2 text-primary" />
             <div>
               <h3 className="font-bold text-base tracking-tight">Related Research</h3>
               <p className="font-medium text-[11px] text-muted-foreground uppercase tracking-widest">
@@ -176,9 +177,9 @@ export function ActivityTab() {
       <div className="custom-scrollbar flex-1 space-y-5 overflow-y-auto px-6 pb-6">
         {filteredProjects.length === 0 ? (
           <div className="flex h-40 flex-col items-center justify-center text-center text-muted-foreground">
-            <Sparkles className="mb-2 h-8 w-8 opacity-40 text-primary" />
+            <Sparkles className="mb-2 h-8 w-8 text-primary opacity-40" />
             <p className="font-medium text-sm">No related proposals found</p>
-            <p className="text-xs text-muted-foreground/80 mt-1">
+            <p className="mt-1 text-muted-foreground/80 text-xs">
               Try tweaking your search query or index more proposals
             </p>
           </div>
@@ -236,7 +237,7 @@ export function ActivityTab() {
                     </p>
 
                     {/* Team Members & Advisor info */}
-                    <div className="space-y-1 border-t border-border/10 pt-2 text-[11px] text-muted-foreground/80">
+                    <div className="space-y-1 border-border/10 border-t pt-2 text-[11px] text-muted-foreground/80">
                       {project.advisor && (
                         <div className="flex items-center gap-1">
                           <User className="h-3 w-3 text-primary/60" />
