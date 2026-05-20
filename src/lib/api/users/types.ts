@@ -1,3 +1,4 @@
+import type { FileDetails } from "@/lib/api/files/types";
 import type { PaginatedResponse } from "@/lib/api/types/pagination";
 
 export interface UsersQueryParams {
@@ -37,6 +38,8 @@ export interface DepartmentCoordinationDepartment {
 
 export interface UserDetails extends UserListItem {
   university: string | null;
+  supportingDocumentFileId?: string | null;
+  supportingDocument?: FileDetails | null;
   roles: Array<{ id: string; name: string; grantedAt: string }>;
   departmentCoordination: {
     isCoordinator: boolean;

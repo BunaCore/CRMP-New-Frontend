@@ -304,9 +304,9 @@ export default function UserDetailsPage() {
                   </CardContent>
                 </Card>
                 {/* Supporting Document */}
-                {user.departmentCoordination?.supportingDocument &&
+                {user.supportingDocument &&
                   (() => {
-                    const supportingDocument = user.departmentCoordination.supportingDocument;
+                    const supportingDocument = user.supportingDocument;
                     const previewFile = {
                       ...supportingDocument,
                       visibility: supportingDocument.visibility as "private" | "public",
@@ -320,10 +320,10 @@ export default function UserDetailsPage() {
                         <CardContent className="p-6">
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="font-semibold">{user.departmentCoordination?.supportingDocument?.name}</p>
+                              <p className="font-semibold">{user.supportingDocument?.name}</p>
                               <p className="text-muted-foreground text-sm">
-                                {user.departmentCoordination?.supportingDocument?.mimeType} •{" "}
-                                {Math.round((user.departmentCoordination?.supportingDocument?.size ?? 0) / 1024)} KB
+                                {user.supportingDocument?.mimeType} •{" "}
+                                {Math.round((user.supportingDocument?.size ?? 0) / 1024)} KB
                               </p>
                             </div>
                             <div>
