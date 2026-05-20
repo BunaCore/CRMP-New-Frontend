@@ -73,7 +73,7 @@ function normalizeProposal(raw: any): ResearcherProposal {
 
 // ─── Queries ───────────────────────────────────────────────────────────────────
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 function buildProposalQueryString(params: ProposalListQueryParams = {}): string {
   const searchParams = new URLSearchParams();
@@ -236,5 +236,39 @@ export function useGetProposalMembers(proposalId: string | null, enabled = true)
     queryKey: ["proposals", "members", proposalId],
     queryFn: () => getProposalMembers(proposalId as string),
     enabled: enabled && !!proposalId,
+  });
+}
+
+// ─── Defence scheduling ───────────────────────────────────────────────────────
+
+export interface ScheduleProposalDefencePayload {
+  defenceDate: string; // ISO string
+  location: string;
+  note?: string;
+}
+
+/**
+ * POST /proposals/:proposalId/defence
+ * Schedules a proposal-phase defence session.
+ * Also auto-sets proposal status to 'Under_Review' on the backend.
+ */
+export async function scheduleProposalDefence(
+  proposalId: string,
+  payload: ScheduleProposalDefencePayload,
+): Promise<DefenceSchedule> {
+  const { apiClient } = await import("@/lib/api/client");
+  const response = await apiClient.post<{ defence: DefenceSchedule }>(`/proposals/${proposalId}/defence`, payload);
+  return response.data.defence;
+}
+
+export function useScheduleProposalDefence() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ proposalId, payload }: { proposalId: string; payload: ScheduleProposalDefencePayload }) =>
+      scheduleProposalDefence(proposalId, payload),
+    onSuccess: () => {
+      // Refresh dashboard proposals so the new defence alert appears
+      queryClient.invalidateQueries({ queryKey: ["dashboard_proposals"] });
+    },
   });
 }

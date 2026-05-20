@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { format } from "date-fns";
 import {
   Banknote,
@@ -7,6 +9,7 @@ import {
   CheckCircle2,
   ChevronRight,
   Clock,
+  Download,
   FileText,
   GraduationCap,
   Loader2,
@@ -27,6 +30,7 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { exportWorkspace, fetchWorkspaces, triggerDownload } from "@/lib/api/editor/workspace.api";
 import type { FileDetails } from "@/lib/api/files/types";
 import type { ProjectListItem } from "@/lib/api/projects/types";
 import { useGetProposalMembers } from "@/lib/api/proposals/queries";
@@ -65,6 +69,28 @@ export function EvaluationOverviewTab({
   onAssignAdvisor,
   proposalFile,
 }: EvaluationOverviewTabProps) {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportPdf = async () => {
+    if (drawerKind !== "project" || !activeProject?.projectId) return;
+    setIsExporting(true);
+    try {
+      const workspaces = await fetchWorkspaces(activeProject.projectId);
+      if (workspaces && workspaces.length > 0) {
+        const workspaceId = workspaces[0].id;
+        const blob = await exportWorkspace(workspaceId, "pdf");
+        triggerDownload(blob, `${activeProject.projectTitle || "Project"}.pdf`);
+      } else {
+        alert("No workspace found for this project.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to export project PDF.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -151,7 +177,7 @@ export function EvaluationOverviewTab({
       <div>
         <h4 className="mb-3 font-bold text-[11px] text-slate-500 uppercase tracking-wider">Workflow Actions</h4>
         <div className="grid grid-cols-1 gap-2.5 lg:grid-cols-2">
-          {canAssignEvaluators && (
+          {canAssignEvaluators && drawerKind !== "project" && (
             <button
               type="button"
               onClick={onAssignEvaluators}
@@ -164,6 +190,26 @@ export function EvaluationOverviewTab({
                 <p className="font-bold text-[13px] leading-tight">Assign Evaluators</p>
                 <p className="mt-0.5 line-clamp-2 font-medium text-[11px] text-blue-700/80 dark:text-blue-400/80">
                   {evaluatorSummary}
+                </p>
+              </div>
+              <ChevronRight className="ml-auto h-4 w-4 shrink-0 opacity-40 transition-opacity group-hover:opacity-100" />
+            </button>
+          )}
+
+          {drawerKind === "project" && (
+            <button
+              type="button"
+              onClick={handleExportPdf}
+              disabled={isExporting}
+              className="group flex w-full items-center gap-3 rounded-xl border border-teal-200/90 bg-linear-to-br from-teal-50/90 to-white p-4 text-left text-teal-800 shadow-sm transition-all hover:border-teal-300 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-70 dark:border-teal-900/45 dark:from-teal-950/40 dark:to-slate-950 dark:text-teal-300 dark:hover:border-teal-800"
+            >
+              <div className="shrink-0 rounded-xl bg-teal-100 p-2.5 dark:bg-teal-900/50">
+                {isExporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-bold text-[13px] leading-tight">Download Project</p>
+                <p className="mt-0.5 line-clamp-2 font-medium text-[11px] text-teal-700/80 dark:text-teal-400/80">
+                  Export workspace as PDF
                 </p>
               </div>
               <ChevronRight className="ml-auto h-4 w-4 shrink-0 opacity-40 transition-opacity group-hover:opacity-100" />
@@ -269,22 +315,26 @@ export function EvaluationBudgetTab({ drawerKind, activeProposal, activeProject 
 
 interface EvaluationScoresTabProps {
   drawerKind: "proposal" | "project";
+  _activeProposal: EvalProposalRow | null;
+  members: ProposalMemberWithUser[];
   rubric: RubricItem[];
   setRubric: React.Dispatch<React.SetStateAction<RubricItem[]>>;
   apiRubrics: EvaluationRubric[];
   filteredApiRubrics: EvaluationRubric[];
-  draftScores: Record<string, DraftScore>;
-  setDraftScores: React.Dispatch<React.SetStateAction<Record<string, DraftScore>>>;
+  draftScores: Record<string, Record<string, DraftScore>>;
+  setDraftScores: React.Dispatch<React.SetStateAction<Record<string, Record<string, DraftScore>>>>;
   scoresLoading: boolean;
   membersLoading: boolean;
   isSubmitting: boolean;
   totals: { earned: number; max: number; pct: number };
-  apiAggregate: { earned: number; max: number };
+  _apiAggregate: { earned: number; max: number };
   handleSubmitScores: () => void;
 }
 
 export function EvaluationScoresTab({
   drawerKind,
+  _activeProposal,
+  members,
   rubric,
   setRubric,
   // biome-ignore lint/correctness/noUnusedFunctionParameters: reserved for other tabs
@@ -296,7 +346,7 @@ export function EvaluationScoresTab({
   membersLoading,
   isSubmitting,
   totals,
-  apiAggregate,
+  _apiAggregate,
   handleSubmitScores,
 }: EvaluationScoresTabProps) {
   return (
@@ -308,15 +358,45 @@ export function EvaluationScoresTab({
             {drawerKind === "proposal" ? "Proposal phase" : "Project phase"} rubrics · adjust scores and submit.
           </p>
         </div>
-        {!scoresLoading && filteredApiRubrics.length > 0 && (
-          <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 dark:border-indigo-900/50 dark:bg-indigo-950/40">
-            <p className="font-bold text-[10px] text-indigo-800 uppercase tracking-wider dark:text-indigo-300">
-              Aggregate
-            </p>
-            <p className="font-black text-indigo-900 text-lg tabular-nums dark:text-indigo-100">
-              {apiAggregate.earned.toFixed(2)}{" "}
-              <span className="font-semibold text-slate-500 text-sm">/ {apiAggregate.max}</span>
-            </p>
+        {!scoresLoading && filteredApiRubrics.length > 0 && members.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {/* biome-ignore lint/suspicious/noExplicitAny: student object */}
+            {members.map((m: any) => {
+              const sId = m.studentId || m.userId || m.user?.id || m.id;
+              const agg = filteredApiRubrics.reduce(
+                (acc, row) => {
+                  const isIndividual = row.name.toLowerCase().includes("individual");
+                  const groupDraft = draftScores[row.id]?.GROUP ?? { score: 0 };
+                  const displayDraft = isIndividual ? (draftScores[row.id]?.[sId] ?? { score: 0 }) : groupDraft;
+                  acc.earned += displayDraft.score;
+                  acc.max += row.maxPoints;
+                  return acc;
+                },
+                { earned: 0, max: 0 },
+              );
+              const initials = (m.user?.fullName || "ST").slice(0, 2).toUpperCase();
+              return (
+                <div
+                  key={sId}
+                  className="flex items-center gap-3 rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-2 shadow-xs dark:border-indigo-900/50 dark:bg-indigo-950/40"
+                >
+                  <Avatar className="h-7 w-7 border border-indigo-100 dark:border-indigo-800">
+                    <AvatarFallback className="bg-white font-bold text-[10px] text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <p className="max-w-[100px] truncate font-bold text-[10px] text-indigo-800 uppercase tracking-wider dark:text-indigo-300">
+                      {m.user?.fullName || "Student"}
+                    </p>
+                    <p className="mt-0.5 font-black text-indigo-900 text-sm tabular-nums leading-none dark:text-indigo-100">
+                      {agg.earned.toFixed(2)}{" "}
+                      <span className="font-semibold text-[10px] text-slate-500">/ {agg.max}</span>
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
         {!scoresLoading && filteredApiRubrics.length === 0 && (
@@ -341,8 +421,15 @@ export function EvaluationScoresTab({
       {!(scoresLoading || membersLoading) && filteredApiRubrics.length > 0 && (
         <div className="flex flex-col gap-3">
           {filteredApiRubrics.map((row, i) => {
-            const draft = draftScores[row.id] ?? { score: 0, feedback: "" };
-            const pct = row.maxPoints > 0 ? (draft.score / row.maxPoints) * 100 : 0;
+            const isIndividual = row.name.toLowerCase().includes("individual");
+            const groupDraft = draftScores[row.id]?.GROUP ?? { score: 0, feedback: "" };
+
+            // To calculate progress for the whole rubric we'll just take the first student or group
+            const displayDraft = isIndividual
+              ? (draftScores[row.id]?.[members[0]?.userId] ?? { score: 0, feedback: "" })
+              : groupDraft;
+
+            const pct = row.maxPoints > 0 ? (displayDraft.score / row.maxPoints) * 100 : 0;
             return (
               <div
                 key={row.id}
@@ -355,7 +442,12 @@ export function EvaluationScoresTab({
                       {i + 1}
                     </span>
                     <div className="min-w-0">
-                      <p className="font-bold text-slate-900 text-sm dark:text-slate-100">{row.name}</p>
+                      <p className="font-bold text-slate-900 text-sm dark:text-slate-100">
+                        {row.name}{" "}
+                        {isIndividual && (
+                          <span className="ml-1 font-semibold text-indigo-500 text-xs">(Individual)</span>
+                        )}
+                      </p>
                       <div className="mt-1 flex flex-wrap items-center gap-2">
                         <Badge
                           variant="outline"
@@ -371,53 +463,137 @@ export function EvaluationScoresTab({
                     <div className="flex items-baseline justify-between gap-2">
                       <span className="font-bold text-slate-500 text-xs">Result</span>
                       <span className="font-black text-indigo-700 text-lg tabular-nums dark:text-indigo-300">
-                        {draft.score.toFixed(2)}
+                        {displayDraft.score.toFixed(2)}
                         <span className="font-semibold text-slate-400 text-sm"> / {row.maxPoints}</span>
                       </span>
                     </div>
                     <Progress value={pct} className="h-2 bg-slate-100 dark:bg-slate-800" />
                   </div>
                 </div>
-                <div className="mt-3 flex flex-col gap-2 pl-2 sm:pl-12">
-                  <div className="flex items-center gap-2">
-                    <Label className="w-14 shrink-0 font-semibold text-[11px] text-slate-500">Score</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min={0}
-                      max={row.maxPoints}
-                      className="h-8 max-w-30 font-mono text-sm"
-                      value={draft.score}
-                      onChange={(e) => {
-                        const v = Number.parseFloat(e.target.value);
-                        if (Number.isNaN(v)) return;
-                        setDraftScores((prev) => ({
-                          ...prev,
-                          [row.id]: {
-                            ...prev[row.id],
-                            score: Math.min(row.maxPoints, Math.max(0, v)),
-                          },
-                        }));
-                      }}
-                    />
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Label className="mt-1.5 w-14 shrink-0 font-semibold text-[11px] text-slate-500">Note</Label>
-                    <Textarea
-                      className="min-h-15 resize-none rounded-lg text-[12px] dark:bg-slate-900"
-                      placeholder="Optional feedback…"
-                      value={draft.feedback}
-                      onChange={(e) =>
-                        setDraftScores((prev) => ({
-                          ...prev,
-                          [row.id]: {
-                            ...prev[row.id],
-                            feedback: e.target.value,
-                          },
-                        }))
-                      }
-                    />
-                  </div>
+
+                <div className="mt-4 flex flex-col gap-4 pl-2 sm:pl-12">
+                  {isIndividual ? (
+                    <div className="grid gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/30">
+                      {/* biome-ignore lint/suspicious/noExplicitAny: student object */}
+                      {members.map((student: any) => {
+                        const sId = student.studentId || student.userId || student.user?.id || student.id;
+                        const studentDraft = draftScores[row.id]?.[sId] ?? { score: 0, feedback: "" };
+                        return (
+                          <div
+                            key={sId}
+                            className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-950"
+                          >
+                            <div className="font-semibold text-slate-900 text-sm dark:text-slate-100">
+                              {student.user?.fullName || "Student"}{" "}
+                              <span className="font-normal text-slate-400 text-xs">({student.role})</span>
+                            </div>
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-4">
+                              <div className="flex items-center gap-2">
+                                <Label className="w-10 shrink-0 font-semibold text-[11px] text-slate-500">Score</Label>
+                                <Input
+                                  type="number"
+                                  step="0.01"
+                                  min={0}
+                                  max={row.maxPoints}
+                                  className="h-8 w-24 font-mono text-sm"
+                                  value={studentDraft.score}
+                                  onChange={(e) => {
+                                    const v = Number.parseFloat(e.target.value);
+                                    if (Number.isNaN(v)) return;
+                                    setDraftScores((prev) => ({
+                                      ...prev,
+                                      [row.id]: {
+                                        ...prev[row.id],
+                                        [sId]: {
+                                          ...studentDraft,
+                                          score: Math.min(row.maxPoints, Math.max(0, v)),
+                                        },
+                                      },
+                                    }));
+                                  }}
+                                />
+                              </div>
+                              <div className="flex flex-1 items-start gap-2">
+                                <Label className="mt-1.5 w-10 shrink-0 font-semibold text-[11px] text-slate-500">
+                                  Note
+                                </Label>
+                                <Textarea
+                                  className="min-h-12 resize-none rounded-lg text-[12px] dark:bg-slate-900"
+                                  placeholder="Feedback for this student…"
+                                  value={studentDraft.feedback}
+                                  onChange={(e) =>
+                                    setDraftScores((prev) => ({
+                                      ...prev,
+                                      [row.id]: {
+                                        ...prev[row.id],
+                                        [sId]: {
+                                          ...studentDraft,
+                                          feedback: e.target.value,
+                                        },
+                                      },
+                                    }))
+                                  }
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-3 rounded-lg border border-slate-100 bg-slate-50 p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900/30">
+                      <p className="font-semibold text-slate-700 text-xs dark:text-slate-300">
+                        Group Score (Applies to entire team)
+                      </p>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+                        <div className="flex items-center gap-2">
+                          <Label className="w-10 shrink-0 font-semibold text-[11px] text-slate-500">Score</Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min={0}
+                            max={row.maxPoints}
+                            className="h-8 w-24 font-mono text-sm"
+                            value={groupDraft.score}
+                            onChange={(e) => {
+                              const v = Number.parseFloat(e.target.value);
+                              if (Number.isNaN(v)) return;
+                              setDraftScores((prev) => ({
+                                ...prev,
+                                [row.id]: {
+                                  ...prev[row.id],
+                                  GROUP: {
+                                    ...groupDraft,
+                                    score: Math.min(row.maxPoints, Math.max(0, v)),
+                                  },
+                                },
+                              }));
+                            }}
+                          />
+                        </div>
+                        <div className="flex flex-1 items-start gap-2">
+                          <Label className="mt-1.5 w-10 shrink-0 font-semibold text-[11px] text-slate-500">Note</Label>
+                          <Textarea
+                            className="min-h-12 resize-none rounded-lg text-[12px] dark:bg-slate-900"
+                            placeholder="Optional group feedback…"
+                            value={groupDraft.feedback}
+                            onChange={(e) =>
+                              setDraftScores((prev) => ({
+                                ...prev,
+                                [row.id]: {
+                                  ...prev[row.id],
+                                  GROUP: {
+                                    ...groupDraft,
+                                    feedback: e.target.value,
+                                  },
+                                },
+                              }))
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -535,6 +711,7 @@ interface EvaluationDefenceTabProps {
   setDefenceMessage: React.Dispatch<React.SetStateAction<string>>;
   defenceDraftSent: boolean;
   handleSendDefenceInvite: () => void;
+  isSchedulingDefence?: boolean;
 }
 
 export function EvaluationDefenceTab({
@@ -548,6 +725,7 @@ export function EvaluationDefenceTab({
   setDefenceMessage,
   defenceDraftSent,
   handleSendDefenceInvite,
+  isSchedulingDefence,
 }: EvaluationDefenceTabProps) {
   return (
     <div className="flex flex-col gap-6">
@@ -645,10 +823,11 @@ export function EvaluationDefenceTab({
         <Button
           type="button"
           className="h-11 w-full bg-indigo-600 font-bold text-white shadow-md transition-all hover:bg-indigo-700 hover:shadow-lg sm:flex-1"
-          disabled={!defenceDate}
+          disabled={!defenceDate || isSchedulingDefence}
           onClick={handleSendDefenceInvite}
         >
-          <Send className="mr-2 h-4 w-4" /> Send Invite to PI
+          {isSchedulingDefence ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+          {isSchedulingDefence ? "Scheduling..." : "Send Invite to PI"}
         </Button>
 
         {defenceDraftSent && defenceDate && (

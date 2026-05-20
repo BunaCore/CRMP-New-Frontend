@@ -34,23 +34,23 @@ export function AuditDetailsPanel({ selectedEntry }: AuditDetailsPanelProps) {
           <div className="space-y-5 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm dark:border-slate-800/70 dark:bg-slate-950/80">
             <div className="flex flex-wrap items-center gap-2">
               <Badge
-                className={`border text-[10px] font-bold uppercase tracking-wider ${actionStyles[selectedEntry.action].badge}`}
+                className={`border font-bold text-[10px] uppercase tracking-wider ${actionStyles[selectedEntry.action].badge}`}
               >
                 {selectedEntry.action.replace(/_/g, " ")}
               </Badge>
-              <Badge className="border-slate-200 bg-slate-100 text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+              <Badge className="border-slate-200 bg-slate-100 font-bold text-[10px] text-slate-700 uppercase tracking-wider dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
                 {selectedEntry.entityType}
               </Badge>
             </div>
 
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Actor</p>
+              <p className="font-bold text-[11px] text-slate-400 uppercase tracking-wider">Actor</p>
               <p className="mt-1 font-semibold text-slate-900 dark:text-slate-100">{selectedEntry.actorFullName}</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">{selectedEntry.actorEmail}</p>
+              <p className="text-slate-500 text-sm dark:text-slate-400">{selectedEntry.actorEmail}</p>
             </div>
 
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Entity</p>
+              <p className="font-bold text-[11px] text-slate-400 uppercase tracking-wider">Entity</p>
               <div className="mt-1 flex items-center gap-2">
                 <p className="font-semibold text-slate-900 dark:text-slate-100">{selectedEntry.entityType}</p>
                 <Button
@@ -70,7 +70,7 @@ export function AuditDetailsPanel({ selectedEntry }: AuditDetailsPanelProps) {
 
             <div>
               <div className="flex items-center justify-between">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Metadata</p>
+                <p className="font-bold text-[11px] text-slate-400 uppercase tracking-wider">Metadata</p>
                 <button
                   type="button"
                   aria-label="Toggle metadata"
@@ -89,19 +89,19 @@ export function AuditDetailsPanel({ selectedEntry }: AuditDetailsPanelProps) {
             </div>
 
             <div className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-900/50">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Created at</p>
+              <p className="font-bold text-[11px] text-slate-400 uppercase tracking-wider">Created at</p>
               <p className="mt-1 font-semibold text-slate-900 dark:text-slate-100">
                 {new Date(selectedEntry.createdAt).toLocaleString()}
               </p>
             </div>
           </div>
         ) : (
-          <div className="flex min-h-[320px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white/70 p-6 text-center dark:border-slate-700 dark:bg-slate-950/50">
+          <div className="flex min-h-[320px] flex-col items-center justify-center rounded-2xl border border-slate-300 border-dashed bg-white/70 p-6 text-center dark:border-slate-700 dark:bg-slate-950/50">
             <div className="mb-4 rounded-full bg-slate-100 p-4 text-slate-500 dark:bg-slate-800 dark:text-slate-300">
               <ShieldCheck className="h-6 w-6" />
             </div>
             <h3 className="font-bold text-base text-slate-900 dark:text-slate-100">No event selected</h3>
-            <p className="mt-2 max-w-xs text-sm text-slate-500 dark:text-slate-400">
+            <p className="mt-2 max-w-xs text-slate-500 text-sm dark:text-slate-400">
               Choose an entry to inspect its payload and metadata.
             </p>
           </div>

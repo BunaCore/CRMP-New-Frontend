@@ -1,4 +1,4 @@
-export function MetadataViewer({ metadata }: { metadata: Record<string, any> }) {
+export function MetadataViewer({ metadata }: { metadata: Record<string, unknown> }) {
   if (!metadata || typeof metadata !== "object" || Object.keys(metadata).length === 0) {
     return <span className="text-slate-400 italic">No metadata provided</span>;
   }
@@ -14,10 +14,10 @@ export function MetadataViewer({ metadata }: { metadata: Record<string, any> }) 
       {entries.map(([key, value]) => (
         <div
           key={key}
-          className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4 py-1.5 border-b border-slate-100 dark:border-slate-800/50 last:border-0"
+          className="flex flex-col gap-1 border-slate-100 border-b py-1.5 last:border-0 sm:flex-row sm:items-start sm:gap-4 dark:border-slate-800/50"
         >
-          <span className="text-xs font-mono font-semibold text-slate-500 min-w-24 shrink-0">{key}</span>
-          <div className="text-xs text-slate-700 dark:text-slate-300 font-mono break-all bg-slate-50 dark:bg-slate-900 px-2 py-0.5 rounded">
+          <span className="min-w-24 shrink-0 font-mono font-semibold text-slate-500 text-xs">{key}</span>
+          <div className="break-all rounded bg-slate-50 px-2 py-0.5 font-mono text-slate-700 text-xs dark:bg-slate-900 dark:text-slate-300">
             {typeof value === "object" && value !== null ? JSON.stringify(value) : String(value)}
           </div>
         </div>

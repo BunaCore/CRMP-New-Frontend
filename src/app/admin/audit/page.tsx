@@ -93,12 +93,12 @@ export default function AdminAuditPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4 rounded-3xl border border-slate-200/70 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/80 sm:p-6">
+      <div className="flex flex-col gap-4 rounded-3xl border border-slate-200/70 bg-white/80 p-5 shadow-sm backdrop-blur sm:p-6 dark:border-slate-800/70 dark:bg-slate-950/80">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-3">
             <div>
-              <h1 className="font-black text-3xl tracking-tight text-slate-950 dark:text-slate-50">Audit Log</h1>
-              <p className="max-w-2xl text-sm text-slate-500 dark:text-slate-400">
+              <h1 className="font-black text-3xl text-slate-950 tracking-tight dark:text-slate-50">Audit Log</h1>
+              <p className="max-w-2xl text-slate-500 text-sm dark:text-slate-400">
                 A timeline view for tracking sensitive admin actions. Use the tools below to filter and investigate
                 system events.
               </p>
@@ -120,11 +120,11 @@ export default function AdminAuditPage() {
                     <Icon className="h-4 w-4" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    <p className="font-bold text-[10px] text-slate-500 uppercase tracking-wider dark:text-slate-400">
                       {item.label}
                     </p>
-                    <p className="mt-1 text-2xl font-black text-slate-950 dark:text-slate-50">{item.value}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{item.note}</p>
+                    <p className="mt-1 font-black text-2xl text-slate-950 dark:text-slate-50">{item.value}</p>
+                    <p className="text-slate-500 text-xs dark:text-slate-400">{item.note}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -137,7 +137,7 @@ export default function AdminAuditPage() {
         <CardContent className="space-y-5 p-4 sm:p-5">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="relative w-full lg:max-w-xl">
-              <Search className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Search className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-4 h-4 w-4 text-slate-400" />
               <Input
                 value={search}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
@@ -166,7 +166,7 @@ export default function AdminAuditPage() {
               ))}
 
               <Select value={String(limit)} onValueChange={(v) => setLimit(Number(v))}>
-                <SelectTrigger className="w-[110px] h-9 rounded-full ml-auto">
+                <SelectTrigger className="ml-auto h-9 w-[110px] rounded-full">
                   <SelectValue placeholder="Limit" />
                 </SelectTrigger>
                 <SelectContent>
@@ -198,7 +198,7 @@ export default function AdminAuditPage() {
                         <Search className="h-6 w-6" />
                       </div>
                       <h3 className="font-semibold text-slate-900 dark:text-slate-100">No logs found</h3>
-                      <p className="text-sm text-slate-500">Adjust your search or filters to see more results.</p>
+                      <p className="text-slate-500 text-sm">Adjust your search or filters to see more results.</p>
                     </div>
                   ) : (
                     filteredItems.map((entry, index) => {
@@ -220,7 +220,7 @@ export default function AdminAuditPage() {
                           onClick={() => setSelectedId(entry.id)}
                           className="relative w-full text-left"
                         >
-                          <div className="absolute left-[-3rem] top-2 flex w-10 justify-end text-right font-mono text-[13px] text-slate-500 dark:text-slate-400">
+                          <div className="absolute top-2 left-[-3rem] flex w-10 justify-end text-right font-mono text-[13px] text-slate-500 dark:text-slate-400">
                             {new Date(entry.createdAt).toLocaleTimeString([], {
                               hour: "2-digit",
                               minute: "2-digit",
@@ -229,7 +229,7 @@ export default function AdminAuditPage() {
                           </div>
 
                           <div
-                            className={`absolute left-12 top-2 z-[1] h-3.5 w-3.5 -translate-x-1/2 rounded-full border-4 border-white shadow-sm dark:border-slate-950 ${style.dot}`}
+                            className={`-translate-x-1/2 absolute top-2 left-12 z-[1] h-3.5 w-3.5 rounded-full border-4 border-white shadow-sm dark:border-slate-950 ${style.dot}`}
                           />
 
                           <div
@@ -243,17 +243,17 @@ export default function AdminAuditPage() {
                               <div className="space-y-1">
                                 <div className="flex flex-wrap items-center gap-2">
                                   <span className="font-semibold text-sky-500 text-sm">{entry.actorFullName}</span>
-                                  <span className="font-semibold text-sm text-slate-900 dark:text-slate-100">
+                                  <span className="font-semibold text-slate-900 text-sm dark:text-slate-100">
                                     {actionLabel}
                                   </span>
                                   <Badge
-                                    className={`border text-[10px] font-bold uppercase tracking-wider ${style.badge}`}
+                                    className={`border font-bold text-[10px] uppercase tracking-wider ${style.badge}`}
                                   >
                                     {style.label}
                                   </Badge>
                                 </div>
 
-                                <p className="text-sm text-slate-500 dark:text-slate-400">
+                                <p className="text-slate-500 text-sm dark:text-slate-400">
                                   <span className="font-medium text-slate-700 dark:text-slate-300">
                                     {entry.entityType}
                                   </span>{" "}
@@ -264,7 +264,7 @@ export default function AdminAuditPage() {
                                       : `${entry.action.toLowerCase()} ${entry.entityType}`}
                                 </p>
 
-                                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                                <div className="flex flex-wrap items-center gap-2 text-slate-500 text-xs dark:text-slate-400">
                                   <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 dark:bg-slate-900">
                                     <EntityIcon className="h-3.5 w-3.5" />
                                     {entry.entityType}
@@ -281,7 +281,7 @@ export default function AdminAuditPage() {
                                   {entry.actorEmail}
                                 </span>
                                 <div className="inline-flex items-center gap-2">
-                                  <div className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+                                  <div className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 font-semibold text-[11px] text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
                                     <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
                                     ID ••••
                                   </div>

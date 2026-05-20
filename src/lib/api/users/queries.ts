@@ -6,6 +6,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { apiClient } from "@/lib/api/client";
+import type { FileDetails } from "@/lib/api/files/types";
 import type { UserOption } from "@/lib/api/proposals/types";
 
 import type { UserDetails, UsersListResponse, UsersQueryParams } from "./types";
@@ -41,7 +42,27 @@ export async function getUsersList(params: UsersQueryParams): Promise<UsersListR
  */
 export async function getUserById(userId: string): Promise<UserDetails> {
   const response = await apiClient.get<UserDetails>(`/users/${userId}`);
-  return response.data;
+
+  const raw = response.data as UserDetails & {
+    supportingDocument?: (Partial<FileDetails> & { originalName?: string }) | null;
+  };
+
+  if (!raw.supportingDocument) return raw;
+
+  const supportingDocument: FileDetails = {
+    id: raw.supportingDocument.id ?? "",
+    name: raw.supportingDocument.name ?? raw.supportingDocument.originalName ?? "Supporting document",
+    mimeType: raw.supportingDocument.mimeType ?? "application/octet-stream",
+    size: raw.supportingDocument.size ?? 0,
+    url: raw.supportingDocument.url ?? "",
+    visibility: (raw.supportingDocument.visibility as "private" | "public") ?? "private",
+    expiresIn: raw.supportingDocument.expiresIn,
+  };
+
+  return {
+    ...raw,
+    supportingDocument,
+  };
 }
 
 export function useGetUsersList(params: UsersQueryParams, enabled = true) {

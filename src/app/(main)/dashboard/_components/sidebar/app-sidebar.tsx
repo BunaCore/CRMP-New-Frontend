@@ -93,7 +93,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             }
 
             // Sidebar visibility uses OR semantics: show if the user has any required permission.
-            return required.some((p) => hasPermission(user?.permissions ?? [], p));
+            const hasAccess = required.some((p) => hasPermission(user?.permissions ?? [], p));
+            if (!hasAccess) return false;
+
+            // Restrict Budget Requests for UG students
+            if (item.url === "/dashboard/researcher/budget" && user?.userProgram === "UG") {
+              return false;
+            }
+
+            return true;
           }),
         }))
         .filter((group) => group.items.length > 0);
