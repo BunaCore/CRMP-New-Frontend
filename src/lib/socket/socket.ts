@@ -27,12 +27,13 @@ class SocketManager {
     // extraHeaders are sent on the HTTP polling handshake request (before WS upgrade),
     // which is how the backend receives the Authorization header.
     // Forcing websocket-only would skip that HTTP phase and drop the headers.
+    console.log("token", token);
     this.socket = io(SOCKET_URL, {
-      auth: {
-        token: token,
+      extraHeaders: {
+        Authorization: token,
       },
       autoConnect: false,
-      transports: ["websocket", "polling"],
+      transports: ["polling", "websocket"],
       reconnectionAttempts: 5,
       timeout: 10000,
     });
