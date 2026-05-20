@@ -41,7 +41,7 @@ function formatRelativeTime(timestamp: string | undefined) {
   return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
 }
 
-export function ChatRoomsList({ currentUserId }: ChatRoomsListProps) {
+export function ChatRoomsList({ currentUserId: _currentUserId }: ChatRoomsListProps) {
   const { data: rooms = [] } = useGetChats();
   const activeChatId = useChatStore((s) => s.activeChatId);
   const setActiveChatId = useChatStore((s) => s.setActiveChatId);
@@ -68,10 +68,10 @@ export function ChatRoomsList({ currentUserId }: ChatRoomsListProps) {
       <div className="flex items-center justify-between px-4 py-4">
         <div className="flex flex-col gap-0.5">
           <h2 className="font-semibold text-lg tracking-tight">Messages</h2>
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+          <div className="flex items-center gap-1.5 font-medium text-muted-foreground text-xs">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
             </span>
             {Object.values(presenceMap).filter((v) => v === "online").length} online
           </div>
@@ -118,25 +118,25 @@ export function ChatRoomsList({ currentUserId }: ChatRoomsListProps) {
       <CreateChatModal />
 
       {/* Search & Filter */}
-      <div className="px-4 pb-4 space-y-4">
-        <div className="relative group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
+      <div className="space-y-4 px-4 pb-4">
+        <div className="group relative">
+          <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
           <Input
             placeholder="Search messages..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-9 bg-muted/50 border-transparent focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-primary/20 rounded-full h-10 transition-all"
+            className="h-10 rounded-full border-transparent bg-muted/50 pl-9 transition-all focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-primary/20"
           />
         </div>
         <Tabs value={filterType} onValueChange={onFilterTypeChange}>
-          <TabsList className="w-full grid grid-cols-3 bg-muted/50 h-9 p-1 rounded-full">
-            <TabsTrigger value="all" className="rounded-full text-xs font-medium">
+          <TabsList className="grid h-9 w-full grid-cols-3 rounded-full bg-muted/50 p-1">
+            <TabsTrigger value="all" className="rounded-full font-medium text-xs">
               All
             </TabsTrigger>
-            <TabsTrigger value="group" className="rounded-full text-xs font-medium">
+            <TabsTrigger value="group" className="rounded-full font-medium text-xs">
               Groups
             </TabsTrigger>
-            <TabsTrigger value="dm" className="rounded-full text-xs font-medium">
+            <TabsTrigger value="dm" className="rounded-full font-medium text-xs">
               Direct
             </TabsTrigger>
           </TabsList>
@@ -149,12 +149,12 @@ export function ChatRoomsList({ currentUserId }: ChatRoomsListProps) {
       <ScrollArea type="hover" className="h-full flex-1">
         <div className="p-3">
           {filteredRooms.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in duration-300">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/50 mb-4 shadow-sm border border-border/50">
+            <div className="fade-in flex animate-in flex-col items-center justify-center py-12 text-center duration-300">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border/50 bg-muted/50 shadow-sm">
                 <Hash className="h-7 w-7 text-muted-foreground/70" />
               </div>
               <p className="font-semibold text-foreground text-sm">No conversations</p>
-              <p className="mt-1.5 text-muted-foreground text-xs max-w-[200px]">
+              <p className="mt-1.5 max-w-[200px] text-muted-foreground text-xs">
                 {searchQuery ? "No matches found for your search." : "Start a new conversation to get started."}
               </p>
             </div>
@@ -173,7 +173,7 @@ export function ChatRoomsList({ currentUserId }: ChatRoomsListProps) {
                     key={room.id}
                     onClick={() => setActiveChatId(room.id)}
                     className={`group flex w-full items-center gap-3 rounded-xl p-3 text-left transition-all duration-200 ${
-                      isSelected ? "bg-primary/10 shadow-sm" : "hover:bg-muted/80 border border-transparent"
+                      isSelected ? "bg-primary/10 shadow-sm" : "border border-transparent hover:bg-muted/80"
                     }`}
                   >
                     {/* Room Icon or Avatar */}
@@ -181,7 +181,7 @@ export function ChatRoomsList({ currentUserId }: ChatRoomsListProps) {
                       <div className="relative shrink-0">
                         <Avatar className="h-11 w-11 border border-border/50 shadow-sm transition-transform group-hover:scale-105">
                           <AvatarFallback
-                            className={`${isSelected ? "bg-primary text-primary-foreground font-medium" : "bg-muted font-medium text-foreground"}`}
+                            className={`${isSelected ? "bg-primary font-medium text-primary-foreground" : "bg-muted font-medium text-foreground"}`}
                           >
                             {getInitials(displayName)}
                           </AvatarFallback>
@@ -203,15 +203,15 @@ export function ChatRoomsList({ currentUserId }: ChatRoomsListProps) {
                     )}
 
                     {/* Room Info */}
-                    <div className="min-w-0 flex-1 flex flex-col justify-center">
-                      <div className="flex items-center justify-between gap-2 mb-1">
+                    <div className="flex min-w-0 flex-1 flex-col justify-center">
+                      <div className="mb-1 flex items-center justify-between gap-2">
                         <span
                           className={`truncate font-semibold text-[14px] leading-none ${isSelected ? "text-primary" : "text-foreground"}`}
                         >
                           {displayName}
                         </span>
                         <span
-                          className={`shrink-0 text-[11px] font-medium leading-none ${isSelected ? "text-primary/70" : "text-muted-foreground/70"}`}
+                          className={`shrink-0 font-medium text-[11px] leading-none ${isSelected ? "text-primary/70" : "text-muted-foreground/70"}`}
                         >
                           {formatRelativeTime(room.lastMessage?.createdAt)}
                         </span>
@@ -225,9 +225,9 @@ export function ChatRoomsList({ currentUserId }: ChatRoomsListProps) {
                             {room.lastMessage.content}
                           </p>
                         ) : room.type === "dm" ? (
-                          <span className="truncate text-muted-foreground/70 text-[12px] font-medium">Team Member</span>
+                          <span className="truncate font-medium text-[12px] text-muted-foreground/70">Team Member</span>
                         ) : (
-                          <div className="flex items-center gap-1.5 text-muted-foreground/80 text-[12px] font-medium">
+                          <div className="flex items-center gap-1.5 font-medium text-[12px] text-muted-foreground/80">
                             <span className="flex items-center gap-1">
                               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                               {onlineCount} online
@@ -240,7 +240,7 @@ export function ChatRoomsList({ currentUserId }: ChatRoomsListProps) {
                         {room.unreadCount && room.unreadCount > 0 ? (
                           <Badge
                             variant="default"
-                            className="h-5 min-w-[20px] rounded-full px-1.5 flex items-center justify-center font-bold text-[10px] shadow-sm ml-auto"
+                            className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 font-bold text-[10px] shadow-sm"
                           >
                             {room.unreadCount > 99 ? "99+" : room.unreadCount}
                           </Badge>

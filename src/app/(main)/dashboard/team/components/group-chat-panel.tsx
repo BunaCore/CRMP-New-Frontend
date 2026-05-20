@@ -20,20 +20,7 @@ import type { Message } from "@/lib/api/chat/types";
 import { useChatStore } from "@/stores/chat-store";
 import { emitGetInitialPresence, emitSendMessage, emitTyping } from "@/lib/socket/emitter";
 import { useMarkAsRead } from "@/lib/socket/hooks/use-mark-as-read";
-import {
-  ArrowDown,
-  Hash,
-  Info,
-  MoreHorizontal,
-  Paperclip,
-  Send,
-  Smile,
-  Search,
-  Phone,
-  Users,
-  User,
-  X,
-} from "lucide-react";
+import { ArrowDown, Hash, Info, MoreHorizontal, Paperclip, Send, Smile, Search, Users, User, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useChatScroll } from "@/lib/hooks/use-chat-scroll";
 import { ChatMessageSkeleton } from "./skeletons/chat-message-skeleton";
