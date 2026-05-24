@@ -18,12 +18,12 @@ export function TeamManagement() {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Panel - Chat Rooms List */}
-      <div className="w-full shrink-0 sm:w-80 lg:w-96 flex overflow-hidden">
+      <div className="w-full shrink-0 sm:w-[320px] lg:w-[340px] flex flex-col overflow-hidden border-r border-border/60 bg-muted/10">
         <ChatRoomsList currentUserId={CURRENT_USER_ID} />
       </div>
 
       {/* Right Panel - Chat Section (Group or Direct) */}
-      <div className="hidden flex-1 flex-col sm:flex">
+      <div className="hidden flex-1 flex-col sm:flex bg-background relative min-w-0">
         {activeChatId ? (
           <GroupChatPanel chatId={activeChatId} currentUserId={CURRENT_USER_ID} />
         ) : (
