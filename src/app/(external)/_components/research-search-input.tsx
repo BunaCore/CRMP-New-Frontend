@@ -6,9 +6,15 @@ interface ResearchSearchInputProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  onClear?: () => void;
 }
 
-export function ResearchSearchInput({ value, onChange, placeholder = "Search by title..." }: ResearchSearchInputProps) {
+export function ResearchSearchInput({
+  value,
+  onChange,
+  placeholder = "Search by title...",
+  onClear: _onClear,
+}: ResearchSearchInputProps) {
   return (
     <input
       type="text"

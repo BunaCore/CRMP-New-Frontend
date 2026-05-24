@@ -16,7 +16,7 @@ export function TeamManagement() {
   const activeChatId = useChatStore((s) => s.activeChatId);
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-[550px] overflow-hidden">
       {/* Left Panel - Chat Rooms List */}
       <div className="w-full shrink-0 sm:w-[320px] lg:w-[340px] flex flex-col overflow-hidden border-r border-border/60 bg-muted/10">
         <ChatRoomsList currentUserId={CURRENT_USER_ID} />
