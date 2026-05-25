@@ -2,7 +2,7 @@ import { io, type Socket } from "socket.io-client";
 
 // Define the environment variable for your backend URL in production
 // Since we don't know the exact URL, default to empty to enforce relying on relative or env
-const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 class SocketManager {
   private static instance: SocketManager;

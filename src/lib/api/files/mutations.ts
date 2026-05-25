@@ -3,7 +3,7 @@ import axios from "axios";
 import type { InitiateUploadPayload, InitiateUploadResponse } from "./types";
 
 function getApiBaseUrl(): string {
-  return process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+  return process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 }
 
 /**
