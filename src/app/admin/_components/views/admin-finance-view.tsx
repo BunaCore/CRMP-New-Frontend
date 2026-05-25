@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { Clock, DollarSign, TrendingUp, Wallet } from "lucide-react";
 
-import { StatusBadge } from "@/app/admin/_components/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

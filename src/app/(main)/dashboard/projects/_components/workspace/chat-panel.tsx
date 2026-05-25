@@ -123,7 +123,7 @@ export function ChatPanel() {
                   <ChatMessageList messages={messages} isLoading={status === "pending"} />
 
                   {/* Composer - Fixed at Bottom */}
-                  <div className="shrink-0 border-t border-border dark:border-zinc-800">
+                  <div className="shrink-0 border-border border-t dark:border-zinc-800">
                     <ChatComposer onSend={handleSend} onClear={handleClear} isSending={status === "pending"} />
                   </div>
                 </div>
