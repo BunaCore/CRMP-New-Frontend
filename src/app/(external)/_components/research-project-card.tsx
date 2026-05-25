@@ -47,9 +47,7 @@ export function ResearchProjectCard({ project }: ResearchProjectCardProps) {
         <div className="space-y-2 text-sm text-muted-foreground">
           {pi && (
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] text-primary hover:bg-primary/10">
-                PI
-              </Badge>
+              <span className="text-[10px] text-primary">PI</span>
               <span className="font-medium text-foreground">{pi.fullName}</span>
               {pi.email && <span className="text-xs">{pi.email}</span>}
             </div>
@@ -77,14 +75,7 @@ export function ResearchProjectCard({ project }: ResearchProjectCardProps) {
               </Link>
             </Button>
           )}
-          {project.bannerUrl && (
-            <Button asChild size="sm" variant="ghost" className="h-8 rounded-full px-3 text-xs">
-              <Link href={project.bannerUrl} target="_blank" rel="noopener noreferrer">
-                <FileText className="mr-1.5 h-3.5 w-3.5" />
-                Banner
-              </Link>
-            </Button>
-          )}
+          {/* Removed banner download/button per user request */}
         </div>
       </div>
 
