@@ -117,13 +117,15 @@ export function ChatPanel() {
                 </TabsList>
               </div>
 
-              <TabsContent value="chat" className="relative m-0 min-h-0 flex-1 border-none p-0">
-                <div className="absolute inset-0 flex flex-col overflow-hidden">
-                  {/* Middle Content - Message List */}
+              <TabsContent value="chat" className="m-0 min-h-0 flex-1 border-none p-0">
+                <div className="flex h-full flex-col overflow-hidden">
+                  {/* Message List - Scrollable */}
                   <ChatMessageList messages={messages} isLoading={status === "pending"} />
 
-                  {/* Sticky Bottom Composer */}
-                  <ChatComposer onSend={handleSend} onClear={handleClear} isSending={status === "pending"} />
+                  {/* Composer - Fixed at Bottom */}
+                  <div className="shrink-0 border-t border-border dark:border-zinc-800">
+                    <ChatComposer onSend={handleSend} onClear={handleClear} isSending={status === "pending"} />
+                  </div>
                 </div>
               </TabsContent>
 

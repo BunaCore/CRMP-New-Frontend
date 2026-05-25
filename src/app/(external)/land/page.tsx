@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import Image from "next/image";
+
 import { motion } from "framer-motion";
 
 import { Badge } from "@/components/ui/badge";
@@ -279,18 +281,7 @@ export default function LandPage() {
         }`}
       >
         <div className="flex items-center gap-2.5">
-          <svg
-            className={`h-5 w-5 transition-colors duration-300 ${isDark ? "text-white" : "text-slate-900"}`}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <title>CRMP Logo</title>
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-          </svg>
+          <Image src="/logo.png" alt="CRMP Logo" width={32} height={32} className="object-contain" priority />
           <span
             className={`font-bold text-lg tracking-tight transition-colors duration-300 ${isDark ? "text-white" : "text-slate-900"}`}
           >
