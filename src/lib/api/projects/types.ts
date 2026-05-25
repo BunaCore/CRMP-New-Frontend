@@ -37,13 +37,37 @@ export interface PublicProjectListItem {
   projectTitle: string;
   projectDescription: string;
   researchArea: string | null;
-  bannerUrl: string;
-  publicFileUrl: string;
+  bannerUrl: string | null;
+  publicFileUrl: string | null;
   projectProgram: string;
   department: string;
   departmentId: string;
   publishedAt: string;
   durationMonths: number;
+  members: PublicProjectMember[];
+}
+
+export interface PublicProjectMember {
+  userId: string;
+  fullName: string;
+  email: string | null;
+  avatarUrl: string | null;
+  role: "PI" | "ADVISOR" | "MEMBER";
+  addedAt: string;
+}
+
+export interface PublicProjectsMeta {
+  page: number;
+  limit: number;
+  totalItems: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+export interface PublicProjectsResponse {
+  items: PublicProjectListItem[];
+  meta: PublicProjectsMeta;
 }
 
 export interface ProjectMember {

@@ -9,6 +9,8 @@ import type {
   ProjectListItem,
   ProjectsQueryParams,
   PublicProjectListItem,
+  PublicProjectMember,
+  PublicProjectsResponse,
 } from "./types";
 
 function buildProjectsQueryString(params: ProjectsQueryParams = {}): string {
@@ -146,18 +148,100 @@ export function useUploadProjectPublicFile() {
  * Fetch published public projects for the public research discovery page.
  * GET /public/projects/
  */
-export async function getPublicProjects(): Promise<PublicProjectListItem[]> {
-  const response = await apiClient.get<PublicProjectListItem[]>("/public/projects/");
-  return response.data;
+type PublicProjectsApiResponse = PublicProjectListItem[] | PublicProjectsResponse;
+
+type PublicProjectsQueryParams = Pick<ProjectsQueryParams, "search" | "page" | "limit">;
+
+function buildPublicProjectsQueryString(params: PublicProjectsQueryParams = {}): string {
+  const searchParams = new URLSearchParams();
+
+  if (params.search?.trim()) searchParams.set("search", params.search.trim());
+  if (params.page) searchParams.set("page", String(params.page));
+  if (params.limit) searchParams.set("limit", String(params.limit));
+
+  const query = searchParams.toString();
+  return query ? `?${query}` : "";
+}
+
+function normalizePublicProjectMember(member: unknown): PublicProjectMember {
+  const source = typeof member === "object" && member !== null ? (member as Record<string, unknown>) : {};
+
+  return {
+    userId: String(source.userId ?? source.id ?? ""),
+    fullName: String(source.fullName ?? source.name ?? "Unknown member"),
+    email: source.email === undefined || source.email === null ? null : String(source.email),
+    avatarUrl: source.avatarUrl === undefined || source.avatarUrl === null ? null : String(source.avatarUrl),
+    role: source.role === "PI" || source.role === "ADVISOR" ? source.role : "MEMBER",
+    addedAt: String(source.addedAt ?? ""),
+  };
+}
+
+function normalizePublicProject(project: unknown): PublicProjectListItem {
+  const source = typeof project === "object" && project !== null ? (project as Record<string, unknown>) : {};
+
+  return {
+    projectId: String(source.projectId ?? ""),
+    projectTitle: String(source.projectTitle ?? "Untitled project"),
+    projectDescription: String(source.projectDescription ?? ""),
+    researchArea: source.researchArea === undefined ? null : (source.researchArea as string | null),
+    bannerUrl: source.bannerUrl === undefined || source.bannerUrl === null ? null : String(source.bannerUrl),
+    publicFileUrl:
+      source.publicFileUrl === undefined || source.publicFileUrl === null ? null : String(source.publicFileUrl),
+    projectProgram: String(source.projectProgram ?? "GENERAL"),
+    department: String(source.department ?? "Unknown department"),
+    departmentId: String(source.departmentId ?? ""),
+    publishedAt: String(source.publishedAt ?? ""),
+    durationMonths: Number(source.durationMonths ?? 0),
+    members: Array.isArray(source.members) ? source.members.map((member) => normalizePublicProjectMember(member)) : [],
+  };
+}
+
+function normalizePublicProjectsResponse(data: PublicProjectsApiResponse): PublicProjectsResponse {
+  if (Array.isArray(data)) {
+    const items = (data as unknown[]).map(normalizePublicProject);
+    return {
+      items,
+      meta: {
+        page: 1,
+        limit: items.length,
+        totalItems: items.length,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
+    };
+  }
+
+  const items = Array.isArray(data.items) ? (data.items as unknown[]).map(normalizePublicProject) : [];
+  const meta = data.meta ?? {
+    page: 1,
+    limit: items.length,
+    totalItems: items.length,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPrevPage: false,
+  };
+
+  return {
+    items,
+    meta,
+  };
+}
+
+export async function getPublicProjects(params: PublicProjectsQueryParams = {}): Promise<PublicProjectsResponse> {
+  const response = await apiClient.get<PublicProjectsApiResponse>(
+    `/public/projects/${buildPublicProjectsQueryString(params)}`,
+  );
+  return normalizePublicProjectsResponse(response.data);
 }
 
 /**
  * React Query hook for fetching public projects.
  */
-export function usePublicProjectsQuery(enabled = true) {
+export function usePublicProjectsQuery(params: PublicProjectsQueryParams = {}, enabled = true) {
   return useQuery({
-    queryKey: ["projects", "public"],
-    queryFn: () => getPublicProjects(),
+    queryKey: ["projects", "public", params],
+    queryFn: () => getPublicProjects(params),
     enabled,
   });
 }
@@ -218,7 +302,9 @@ export function useScheduleProjectDefence() {
     onSuccess: (_data, variables) => {
       // Invalidate so the project list and detail both refresh
       queryClient.invalidateQueries({ queryKey: ["projects", "mine"] });
-      queryClient.invalidateQueries({ queryKey: ["projects", variables.projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ["projects", variables.projectId],
+      });
     },
   });
 }

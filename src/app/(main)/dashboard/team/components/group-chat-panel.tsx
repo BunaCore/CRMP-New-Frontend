@@ -367,7 +367,7 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
           </div>
         </div>
 
-        <ScrollArea className="flex-1 w-full" viewportRef={scrollRef}>
+        <ScrollArea className="min-h-0 flex-1 w-full" viewportRef={scrollRef}>
           <div className="px-6 py-4">
             <div ref={topRef} className="h-1 w-full" />
             {isFetchingNextPage && <ChatMessageSkeleton />}
@@ -459,7 +459,7 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
         {!isAtBottom && (
           <Button
             size="icon"
-            className="absolute bottom-28 right-8 rounded-full shadow-lg z-20 animate-in fade-in zoom-in w-10 h-10 bg-background hover:bg-muted text-foreground border border-border"
+            className="absolute bottom-56 right-8 rounded-full shadow-lg z-20 animate-in fade-in zoom-in w-10 h-10 bg-background hover:bg-muted text-foreground border border-border"
             onClick={() => scrollToBottom(true)}
           >
             <ArrowDown className="h-4 w-4" />
@@ -471,13 +471,15 @@ export function GroupChatPanel({ chatId, currentUserId }: GroupChatPanelProps) {
           </Button>
         )}
 
-        {/* Input Area */}
-        <ChatInput
-          chatId={chatId}
-          placeholder={
-            isDirectMessage && dmPartner ? `Message ${dmPartner.name.split(" ")[0]}` : `Message ${room.name}`
-          }
-        />
+        {/* Input Area - Fixed at Bottom */}
+        <div className="shrink-0 border-t border-border/60 bg-background">
+          <ChatInput
+            chatId={chatId}
+            placeholder={
+              isDirectMessage && dmPartner ? `Message ${dmPartner.name.split(" ")[0]}` : `Message ${room.name}`
+            }
+          />
+        </div>
       </div>
 
       {/* Slide-over Right Sidebar (Members Info) */}
