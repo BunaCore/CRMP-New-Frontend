@@ -1,3 +1,12 @@
+export interface ProjectDefenceSchedule {
+  id: string;
+  defenceDate: string; // ISO string
+  location: string;
+  note?: string | null;
+  scheduledBy?: string | null;
+  createdAt: string;
+}
+
 export interface ProjectListItem {
   projectId: string;
   projectTitle: string;
@@ -15,6 +24,7 @@ export interface ProjectListItem {
   publishedAt: string | null;
   isPublic: boolean;
   createdAt: string;
+  defenceSchedules: ProjectDefenceSchedule[];
   pi: {
     id: string;
     fullName: string;
@@ -84,7 +94,8 @@ export interface ProjectDetails {
   publishedAt?: string | null;
   publishedBy?: string | null;
   members?: ProjectMember[] | null;
-  budget?: ProjectBudget | null;
+  budget?: ProjectBudget[] | null;
+  proposalId?: string | null;
 }
 
 export interface ProjectsQueryParams {

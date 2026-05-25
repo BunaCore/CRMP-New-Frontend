@@ -16,7 +16,7 @@ export interface BudgetRequestItem {
   amount: number;
 }
 
-export type BudgetRequestStatus = "PENDING" | "RESUBMITTED" | "PAID" | "RETURNED";
+export type BudgetRequestStatus = "PENDING" | "RESUBMITTED" | "PAID" | "RETURNED" | "REJECTED";
 
 export interface BudgetRequest {
   requestId: string;

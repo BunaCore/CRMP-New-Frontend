@@ -32,7 +32,7 @@ export function ReturnModal() {
 
   if (!request) return null;
 
-  const minLength = 20;
+  const minLength = 5;
   const isFeedbackValid = feedback.trim().length >= minLength;
 
   async function handleConfirm() {

@@ -13,9 +13,11 @@ import { BudgetRequestsTable } from "./_components/BudgetRequestsTable";
 import { ControlsRow } from "./_components/ControlsRow";
 import { MetricCards, MetricCardsSkeleton } from "./_components/MetricCards";
 import { ApproveModal } from "./_components/modals/ApproveModal";
+import { RejectModal } from "./_components/modals/RejectModal";
 import { ReturnModal } from "./_components/modals/ReturnModal";
 import { BudgetRequestsProvider } from "./_context/BudgetRequestsContext";
 import { useBudgetMetrics } from "./_hooks/useBudgetMetrics";
+import { useBudgetRequests } from "./_hooks/useBudgetRequests";
 
 // ─── Access Denied fallback ────────────────────────────────────────────────
 function AccessDenied() {
@@ -44,6 +46,7 @@ function AccessDenied() {
 // ─── Page Content ──────────────────────────────────────────────────────────
 function BudgetRequestsPageContent() {
   const { metrics, isLoading: metricsLoading, error: metricsError, refetch: refetchMetrics } = useBudgetMetrics();
+  useBudgetRequests(); // Fetch table data into context
 
   return (
     <div className="space-y-6">
@@ -82,6 +85,7 @@ function BudgetRequestsPageContent() {
       <BudgetRequestDrawer />
       <ApproveModal />
       <ReturnModal />
+      <RejectModal />
     </div>
   );
 }

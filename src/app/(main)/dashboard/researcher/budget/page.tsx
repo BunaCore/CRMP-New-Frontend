@@ -65,7 +65,7 @@ export default function ResearcherBudgetPage() {
   const permissions = user?.permissions ?? [];
 
   // ── Permission gate
-  if (!permissions.includes("BUDGET_VIEW")) {
+  if (!permissions.includes("BUDGET_VIEW") || user?.userProgram === "UG") {
     return <AccessDenied />;
   }
 

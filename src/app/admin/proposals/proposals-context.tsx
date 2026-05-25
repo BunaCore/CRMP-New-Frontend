@@ -4,8 +4,9 @@ import type React from "react";
 import { createContext, useContext, useState } from "react";
 
 import type { PendingApproval, ProposalListItem } from "@/lib/api/proposals/types";
+import { useSearchEvaluators } from "@/lib/api/users/queries";
 
-import { ADVISORS, EVALUATORS } from "./_data/mock-proposals";
+import { ADVISORS } from "./_data/mock-proposals";
 import type { Evaluator } from "./types";
 
 interface ProposalsContextValue {
@@ -77,9 +78,19 @@ export function ProposalsProvider({ children }: { children: React.ReactNode }) {
   const [showTimelineReject, setShowTimelineReject] = useState(false);
   const [timelineRejectComment, setTimelineRejectComment] = useState("");
 
-  const filteredEvals = EVALUATORS.filter((e) =>
-    (e.name + e.specialty).toLowerCase().includes(evalSearch.toLowerCase()),
-  );
+  const isEvalSearchActive = evalSearch.trim().length > 0;
+  const { data: evaluatorOptions = [] } = useSearchEvaluators(evalSearch, isEvalSearchActive);
+
+  const filteredEvals: Evaluator[] = isEvalSearchActive
+    ? evaluatorOptions.map((option) => ({
+        id: option.value,
+        name: option.label,
+        avatar: option.label.slice(0, 2).toUpperCase(),
+        color: "bg-blue-100 text-blue-700",
+        specialty: option.email ? option.email : "Faculty evaluator",
+        assigned: 0,
+      }))
+    : [];
 
   const filteredAdvisors = ADVISORS.filter((a) =>
     (a.name + a.specialty).toLowerCase().includes(advisorSearch.toLowerCase()),

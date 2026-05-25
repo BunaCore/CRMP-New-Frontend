@@ -1,25 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
   ArrowRight,
+  BarChart3,
   BookOpen,
   CheckCircle2,
   Circle,
   Clock,
   FileText,
   MessageSquare,
+  Users,
   Wallet,
 } from "lucide-react";
+import { Label, Pie, PieChart, Sector } from "recharts";
+import type { PieSectorShapeProps } from "recharts/types/polar/Pie";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { type ChartConfig, ChartContainer, ChartStyle, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useSession } from "@/context/SessionContext";
+import { useMyBudgetProjects } from "@/lib/api/budget/queries";
+import { apiClient } from "@/lib/api/client";
+import type { ProjectListItem } from "@/lib/api/projects/types";
+import { getMyProposals } from "@/lib/api/proposals/queries";
+import { shortProposalId } from "@/lib/api/proposals/utils";
+import { useMyTasks } from "@/lib/api/task-management/queries";
+import type { Task } from "@/lib/api/task-management/types";
+import type { WorkspaceInfo } from "@/types/editor";
 
 // ─────────────────────────────────────────────────────────
 // Mock Data — will be replaced with real API calls
@@ -45,91 +62,7 @@ interface Proposal {
   steps: ProposalStep[];
 }
 
-const MY_PROPOSALS: Proposal[] = [
-  {
-    id: "PRO-2024-001",
-    title: "AI-Based Crop Disease Detection",
-    type: "PG",
-    currentStep: 3,
-    totalSteps: 6,
-    currentStepLabel: "DGC Review",
-    holder: "DGC Committee",
-    daysWaiting: 3,
-    steps: [
-      { label: "Submitted", status: "completed", date: "Nov 2" },
-      { label: "Coordinator", status: "completed", date: "Nov 5" },
-      { label: "DGC Review", status: "current", holder: "DGC Committee", daysWaiting: 3 },
-      { label: "ADRPM", status: "pending" },
-      { label: "Budget Approval", status: "pending" },
-      { label: "Project Created", status: "pending" },
-    ],
-  },
-  {
-    id: "PRO-2024-003",
-    title: "Carbon Footprint Analytics Platform",
-    type: "UG",
-    currentStep: 1,
-    totalSteps: 5,
-    currentStepLabel: "Coordinator Assign",
-    holder: "Dept. Coordinator",
-    daysWaiting: 1,
-    steps: [
-      { label: "Submitted", status: "completed", date: "Dec 1" },
-      { label: "Coordinator", status: "current", holder: "Dept. Coordinator", daysWaiting: 1 },
-      { label: "DGC Review", status: "pending" },
-      { label: "Advisor Assign", status: "pending" },
-      { label: "Project Created", status: "pending" },
-    ],
-  },
-  {
-    id: "PRO-2024-005",
-    title: "Rural Water Quality Monitoring System",
-    type: "PG",
-    currentStep: 5,
-    totalSteps: 6,
-    currentStepLabel: "Budget Approval",
-    holder: "Finance Office",
-    daysWaiting: 5,
-    steps: [
-      { label: "Submitted", status: "completed", date: "Oct 10" },
-      { label: "Coordinator", status: "completed", date: "Oct 12" },
-      { label: "DGC Review", status: "completed", date: "Oct 20" },
-      { label: "ADRPM", status: "completed", date: "Nov 1" },
-      { label: "Budget Approval", status: "current", holder: "Finance Office", daysWaiting: 5 },
-      { label: "Project Created", status: "pending" },
-    ],
-  },
-];
-
-const MY_PROJECTS = [
-  {
-    id: "PRJ-001",
-    title: "AI-Based Crop Disease Detection",
-    approved: 48000,
-    spent: 18200,
-    remaining: 29800,
-  },
-  {
-    id: "PRJ-003",
-    title: "Rural Water Quality Monitoring System",
-    approved: 22000,
-    spent: 17500,
-    remaining: 4500,
-  },
-];
-
-const BUDGET_AGGREGATE = {
-  totalApproved: 70000,
-  totalSpent: 35700,
-  totalRemaining: 34300,
-  latestRequest: {
-    project: "AI-Based Crop Disease Detection",
-    item: "Lab Equipment (Spectrophotometer)",
-    amount: 5000,
-    status: "Pending Finance Approval",
-  },
-};
-
+// (Mock data removed; we now use real data from the API)
 const ADVISOR_FEEDBACK = [
   {
     id: 1,
@@ -162,50 +95,6 @@ const ADVISOR_FEEDBACK = [
     time: "2d ago",
   },
 ];
-
-const MY_TASKS = [
-  {
-    id: 1,
-    title: "Upload ethics clearance form",
-    due: "2 days ago",
-    overdue: true,
-    priority: "high" as const,
-    project: "AI-Based Crop Disease",
-  },
-  {
-    id: 2,
-    title: "Submit revised methodology chapter",
-    due: "Tomorrow",
-    overdue: false,
-    priority: "high" as const,
-    project: "AI-Based Crop Disease",
-  },
-  {
-    id: 3,
-    title: "Prepare defence presentation slides",
-    due: "In 5 days",
-    overdue: false,
-    priority: "medium" as const,
-    project: "AI-Based Crop Disease",
-  },
-  {
-    id: 4,
-    title: "Submit water sample test results",
-    due: "In 3 days",
-    overdue: false,
-    priority: "medium" as const,
-    project: "Rural Water Quality",
-  },
-  {
-    id: 5,
-    title: "Review co-researcher's data analysis",
-    due: "In 1 week",
-    overdue: false,
-    priority: "low" as const,
-    project: "Rural Water Quality",
-  },
-];
-
 const MY_PUBLICATIONS = [
   {
     id: 1,
@@ -231,106 +120,572 @@ const PUB_STAGES = ["Draft", "Submitted", "Under Review", "Accepted", "Published
 // Component
 // ─────────────────────────────────────────────────────────
 
+function BudgetPieChart() {
+  const { user } = useSession();
+  const hasBudgetPermission = useMemo(() => {
+    if (!user) return false;
+    const hasKey = user.permissions?.includes("budget:view");
+    const hasRole = user.roles?.some((r) => ["STUDENT", "FACULTY", "RAD", "FINANCE"].includes(r));
+    return !!(hasKey || hasRole);
+  }, [user]);
+
+  const { data: rawProjects, isLoading } = useMyBudgetProjects({
+    enabled: hasBudgetPermission,
+  });
+  const id = "budget-pie-interactive";
+
+  // Filter out UG projects which have no budget
+  const projects = useMemo(() => {
+    return rawProjects?.filter((p) => p.projectType !== "UG") || [];
+  }, [rawProjects]);
+
+  const [activeProject, setActiveProject] = useState<string>("");
+
+  // Auto-select first project
+  useMemo(() => {
+    if (projects.length > 0 && !activeProject) {
+      setActiveProject(projects[0].projectId);
+    }
+  }, [projects, activeProject]);
+
+  const activeIndex = useMemo(() => {
+    const idx = projects.findIndex((item) => item.projectId === activeProject);
+    return idx === -1 ? 0 : idx;
+  }, [activeProject, projects]);
+
+  const chartData = useMemo(
+    () =>
+      projects.map((proj) => ({
+        ...proj,
+        approved: Number(proj.totalApprovedBudget),
+        spent: Number(proj.totalDisbursed),
+        remaining: Number(proj.totalApprovedBudget) - Number(proj.totalDisbursed),
+        fill: `var(--color-${proj.projectId})`,
+      })),
+    [projects],
+  );
+
+  const chartConfig = useMemo(() => {
+    return projects.reduce(
+      (acc, proj, index) => {
+        const alphaValues = ["", "CC", "99", "66", "33"];
+        acc[proj.projectId] = {
+          label: proj.title,
+          color: `#1447E6${alphaValues[index % 5] || "11"}`,
+        };
+        return acc;
+      },
+      {
+        approved: { label: "Approved" },
+        spent: { label: "Spent" },
+        remaining: { label: "Remaining" },
+      } as ChartConfig,
+    );
+  }, [projects]);
+
+  const aggregate = useMemo(() => {
+    let totalApproved = 0;
+    let totalSpent = 0;
+    for (const p of projects) {
+      totalApproved += Number(p.totalApprovedBudget);
+      totalSpent += Number(p.totalDisbursed);
+    }
+    return {
+      totalApproved,
+      totalSpent,
+      totalRemaining: totalApproved - totalSpent,
+    };
+  }, [projects]);
+
+  const renderPieShape = useCallback(
+    ({ index, outerRadius = 0, ...props }: PieSectorShapeProps) => {
+      if (index === activeIndex) {
+        return (
+          <g>
+            <Sector {...props} outerRadius={outerRadius + 6} />
+            <Sector {...props} outerRadius={outerRadius + 14} innerRadius={outerRadius + 8} />
+          </g>
+        );
+      }
+      return <Sector {...props} outerRadius={outerRadius} />;
+    },
+    [activeIndex],
+  );
+
+  const activeProjData = chartData[activeIndex];
+  const pct =
+    activeProjData && activeProjData.approved > 0
+      ? Math.round((activeProjData.spent / activeProjData.approved) * 100)
+      : 0;
+  const isLow = activeProjData && activeProjData.remaining < activeProjData.approved * 0.15;
+
+  if (isLoading) {
+    return <Skeleton className="h-[380px] w-full rounded-xl" />;
+  }
+
+  if (projects.length === 0) {
+    return null; // Don't render budget overview if no projects with budget
+  }
+
+  return (
+    <Card data-chart={id} className="flex flex-col border-border/50 bg-card/50">
+      <ChartStyle id={id} config={chartConfig} />
+      <CardHeader className="pb-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Wallet className="h-4 w-4 text-blue-400" />
+            <CardTitle className="font-semibold text-muted-foreground text-sm uppercase tracking-widest">
+              Budget Overview
+            </CardTitle>
+          </div>
+          <Select value={activeProject} onValueChange={setActiveProject}>
+            <SelectTrigger
+              className="h-6 w-fit min-w-[130px] max-w-[180px] rounded-full border-none bg-muted/50 px-3 text-[10px] shadow-none transition-colors hover:bg-muted/80 focus:ring-0 focus:ring-offset-0"
+              aria-label="Select a project"
+            >
+              <SelectValue placeholder="Select project" />
+            </SelectTrigger>
+            <SelectContent align="end" className="rounded-2xl border-border/50 bg-card/95 backdrop-blur-md">
+              {projects.map((proj) => {
+                const key = proj.projectId;
+                const config = chartConfig[key as keyof typeof chartConfig];
+                if (!config) return null;
+
+                const pData = chartData.find((p) => p.projectId === key);
+                const pLow = pData && pData.remaining < pData.approved * 0.15;
+
+                return (
+                  <SelectItem key={key} value={key} className="rounded-xl focus:bg-muted/80">
+                    <div className="flex items-center gap-2 text-[10px]">
+                      <span
+                        className="flex h-2 w-2 shrink-0 rounded-full"
+                        style={{ backgroundColor: `var(--color-${key})` }}
+                      />
+                      <span className="max-w-[120px] truncate font-medium">{config?.label}</span>
+                      {pLow && <AlertTriangle className="h-2.5 w-2.5 text-red-500" />}
+                    </div>
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+        <CardDescription className="mt-1 text-xs">
+          Total Approved: ETB {aggregate.totalApproved.toLocaleString()}
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent className="flex flex-1 flex-col justify-center pt-2 pb-2">
+        <ChartContainer id={id} config={chartConfig} className="mx-auto aspect-square w-full max-w-[180px]">
+          <PieChart>
+            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+            <Pie
+              data={chartData}
+              dataKey="approved"
+              nameKey="title"
+              innerRadius={45}
+              strokeWidth={5}
+              shape={renderPieShape}
+            >
+              <Label
+                content={({ viewBox }) => {
+                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                    return (
+                      <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
+                        <tspan x={viewBox.cx} y={viewBox.cy} className="fill-foreground font-bold text-2xl">
+                          {pct}%
+                        </tspan>
+                        <tspan x={viewBox.cx} y={(viewBox.cy || 0) + 20} className="fill-muted-foreground text-[10px]">
+                          Spent
+                        </tspan>
+                      </text>
+                    );
+                  }
+                }}
+              />
+            </Pie>
+          </PieChart>
+        </ChartContainer>
+
+        <div className="mt-4 flex flex-col items-center justify-center space-y-1 text-sm">
+          <div className="w-full truncate px-4 text-center font-medium text-foreground">{activeProjData.title}</div>
+          <div className="mt-2 flex gap-4 text-muted-foreground text-xs">
+            <span className="flex items-center gap-1">
+              <div className="h-2 w-2 rounded-full bg-emerald-500" />
+              Spent: {activeProjData.spent.toLocaleString()}
+            </span>
+            <span className={`flex items-center gap-1 ${isLow ? "font-bold text-red-500" : ""}`}>
+              <div className={`h-2 w-2 rounded-full ${isLow ? "bg-red-500" : "bg-amber-500"}`} />
+              Left: {activeProjData.remaining.toLocaleString()}
+              {isLow && " ⚠"}
+            </span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// Live Data Hook — Aggregates stats across user's projects
+// ─────────────────────────────────────────────────────────
+function useResearcherStats(userId: string | undefined) {
+  return useQuery({
+    queryKey: ["researcher-dashboard-stats", userId],
+    queryFn: async () => {
+      // 1. Fetch the current user's projects
+      const projectsRes = await apiClient.get<ProjectListItem[]>("/projects");
+      const projects = Array.isArray(projectsRes.data) ? projectsRes.data : [];
+
+      if (projects.length === 0) {
+        return { projects: 0, tasks: 0, overdueTasks: 0, workspaces: 0 };
+      }
+
+      // 2. Fetch tasks and workspaces for each project in parallel
+      const [tasksResults, workspacesResults] = await Promise.all([
+        Promise.allSettled(
+          projects.map((p) => apiClient.get<{ tasks: Task[] } | Task[]>(`/projects/${p.projectId}/tasks`)),
+        ),
+        Promise.allSettled(projects.map((p) => apiClient.get<WorkspaceInfo[]>(`/workspaces/project/${p.projectId}`))),
+      ]);
+
+      // 3. Aggregate tasks assigned to this user
+      let totalTasks = 0;
+      let overdueTasks = 0;
+      const now = new Date();
+      for (const result of tasksResults) {
+        if (result.status === "fulfilled") {
+          const raw = result.value.data;
+          const tasks: Task[] = Array.isArray(raw) ? raw : ((raw as { tasks: Task[] })?.tasks ?? []);
+          for (const task of tasks) {
+            if (!userId || task.assigneeId === userId) {
+              totalTasks++;
+              if (task.dueDate && new Date(task.dueDate) < now && task.status !== "done") {
+                overdueTasks++;
+              }
+            }
+          }
+        }
+      }
+
+      // 4. Aggregate workspaces
+      let totalWorkspaces = 0;
+      for (const result of workspacesResults) {
+        if (result.status === "fulfilled") {
+          const ws = result.value.data;
+          totalWorkspaces += Array.isArray(ws) ? ws.length : 0;
+        }
+      }
+
+      return {
+        projects: projects.length,
+        tasks: totalTasks,
+        overdueTasks,
+        workspaces: totalWorkspaces,
+      };
+    },
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    refetchOnWindowFocus: false,
+  });
+}
+
+/**
+ * Hook to determine whether the current user has budget data to display.
+ * Mirrors the same permission + data check used inside BudgetPieChart so the
+ * parent layout can adapt its grid when no budget section will be rendered.
+ */
+function useBudgetAvailable() {
+  const { user } = useSession();
+  const hasBudgetPermission = useMemo(() => {
+    if (!user) return false;
+    const hasKey = user.permissions?.includes("budget:view");
+    const hasRole = user.roles?.some((r) => ["STUDENT", "FACULTY", "RAD", "FINANCE"].includes(r));
+    return !!(hasKey || hasRole);
+  }, [user]);
+
+  const { data: rawProjects, isLoading } = useMyBudgetProjects({
+    enabled: hasBudgetPermission,
+  });
+
+  const hasBudgetData = useMemo(() => {
+    if (!hasBudgetPermission) return false;
+    if (isLoading) return true; // Assume true while loading to avoid layout flash
+    const funded = rawProjects?.filter((p) => p.projectType !== "UG") || [];
+    return funded.length > 0;
+  }, [hasBudgetPermission, isLoading, rawProjects]);
+
+  return { hasBudgetData, isLoading };
+}
+
 export function ResearcherView() {
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
-  const budgetPercent = Math.round((BUDGET_AGGREGATE.totalSpent / BUDGET_AGGREGATE.totalApproved) * 100);
+  const { user } = useSession();
+
+  // ── Live data from backend ──────────────────────────────────
+  const { data: stats, isLoading: statsLoading } = useResearcherStats(user?.id);
+
+  // Budget availability – controls whether the grid is 2-col or 1-col
+  const { hasBudgetData } = useBudgetAvailable();
+
+  // Proposals data
+  const { data: apiProposals, isLoading: proposalsLoading } = useQuery({
+    queryKey: ["myProposals"],
+    queryFn: getMyProposals,
+  });
+
+  // Tasks data
+  const { data: apiTasks, isLoading: tasksLoading } = useMyTasks();
+
+  const myTasks = useMemo(() => {
+    if (!apiTasks) return [];
+    const now = new Date();
+
+    // Filter active tasks that have a due date
+    const filteredTasks = apiTasks.filter((t) => t.dueDate && t.status !== "done");
+
+    // Sort by due date ascending
+    const sortedTasks = [...filteredTasks].sort((a, b) => {
+      if (!a.dueDate || !b.dueDate) return 0;
+      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    });
+
+    // Limit to 5 upcoming deadlines
+    const slicedTasks = sortedTasks.slice(0, 5);
+
+    return slicedTasks.map((t) => {
+      let dueStr = "No due date";
+      let overdue = false;
+      if (t.dueDate) {
+        const d = new Date(t.dueDate);
+        overdue = d < now && t.status !== "done";
+        const diffDays = Math.round((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        if (diffDays === 0) dueStr = "Today";
+        else if (diffDays === 1) dueStr = "Tomorrow";
+        else if (diffDays === -1) dueStr = "Yesterday";
+        else if (diffDays < -1) dueStr = `${Math.abs(diffDays)} days ago`;
+        else dueStr = `In ${diffDays} days`;
+      }
+      return {
+        id: t.id,
+        title: t.title,
+        due: dueStr,
+        overdue,
+        priority: t.priority as "high" | "medium" | "low",
+        project: t.projectTitle || "Unassigned",
+      };
+    });
+  }, [apiTasks]);
+
+  const activeProposals = useMemo(() => {
+    if (!apiProposals) return [];
+
+    // Filter to active ones
+    const active = apiProposals.filter((p) =>
+      ["Under_Review", "Revision", "Needs_Revision", "Pending"].includes(p.status),
+    );
+
+    return active.map((p) => {
+      const steps: ProposalStep[] = p.workflow.steps.map((s) => {
+        let status: "completed" | "current" | "pending" = "pending";
+        if (s.stepOrder < p.workflow.currentStepOrder) status = "completed";
+        else if (s.stepOrder === p.workflow.currentStepOrder) status = "current";
+
+        if (s.isActive) status = "current";
+        else if (s.status === "Accepted") status = "completed";
+
+        return {
+          label: s.label,
+          status,
+          holder: s.role,
+          daysWaiting: s.isActive ? 2 : undefined, // Simulated
+          date: undefined,
+        };
+      });
+
+      const currentStepInfo = p.workflow.steps.find((s) => s.isActive) || p.workflow.steps[p.workflow.steps.length - 1];
+
+      return {
+        id: shortProposalId(p.id),
+        rawId: p.id,
+        title: p.title,
+        type: p.type,
+        currentStep: p.workflow.currentStepOrder || 1,
+        totalSteps: p.workflow.steps.length || 1,
+        currentStepLabel: currentStepInfo?.label || "Unknown",
+        holder: currentStepInfo?.role || "Unknown",
+        daysWaiting: 2, // Simulated
+        steps,
+      };
+    });
+  }, [apiProposals]);
 
   return (
     <div className="space-y-6">
-      {/* ═══════════ PROPOSAL STAT CARDS (Clickable → Modal) ═══════════ */}
-      <div>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-semibold text-muted-foreground text-sm uppercase tracking-widest">My Proposals</h2>
-          <Badge variant="secondary" className="font-mono text-[10px]">
-            {MY_PROPOSALS.length} active
-          </Badge>
-        </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {MY_PROPOSALS.map((p, idx) => {
-            const progressPct = Math.round((p.currentStep / p.totalSteps) * 100);
-            const isStuck = p.daysWaiting >= 5;
-            return (
-              <button type="button" key={p.id} onClick={() => setSelectedProposal(p)} className="group text-left">
-                <motion.div
-                  initial={{ y: 40, opacity: 0 }}
-                  whileInView={{ y: 0, opacity: 1 }}
-                  whileHover={{
-                    y: -8,
-                    scale: 1.03,
-                    boxShadow: "0px 20px 40px rgba(0,0,0,0.15)",
-                  }}
-                  transition={{ duration: 0.4, delay: idx * 0.08 }}
-                  viewport={{ once: true }}
-                  className={`relative flex h-full flex-col overflow-hidden rounded-3xl border p-5 shadow-sm ${
-                    isStuck
-                      ? "border-amber-300 bg-amber-50/50 dark:border-amber-800/50 dark:bg-amber-950/30"
-                      : "border-gray-300 bg-card dark:border-slate-800/50 dark:bg-slate-950/50"
-                  }`}
-                >
-                  {/* Gradient top bar */}
-                  <div
-                    className={`absolute top-0 right-0 left-0 h-1 bg-gradient-to-r opacity-0 transition-opacity group-hover:opacity-100 ${
-                      isStuck
-                        ? "from-amber-400/60 via-amber-300/30 to-transparent"
-                        : "from-primary/40 via-primary/20 to-transparent"
-                    }`}
-                  />
-
-                  {/* Icon + Badge row */}
-                  <div className="flex items-start justify-between">
-                    <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all group-hover:scale-105 ${
-                        isStuck
-                          ? "bg-amber-100 text-amber-600 group-hover:bg-amber-500 group-hover:text-white dark:bg-amber-900/40"
-                          : "bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white"
-                      }`}
-                    >
-                      <FileText className="h-5 w-5" />
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Badge variant="outline" className="font-mono text-[10px]">
-                        {p.type}
-                      </Badge>
-                      {isStuck && <span className="text-amber-500 text-sm">⚠</span>}
-                    </div>
+      {/* ═══════════ RESEARCHER STATUS OVERVIEW ═══════════ */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {[
+          {
+            label: "Assigned Tasks",
+            value: stats?.tasks ?? 0,
+            sub: `${stats?.overdueTasks ?? 0} overdue items`,
+            color: "text-amber-500",
+            icon: CheckCircle2,
+          },
+          {
+            label: "Active Workspaces",
+            value: stats?.workspaces ?? 0,
+            sub: "Collaborative projects",
+            color: "text-blue-500",
+            icon: Users,
+          },
+          {
+            label: "Research Output",
+            value: stats?.projects ?? 0,
+            sub: "Projects & Publications",
+            color: "text-emerald-500",
+            icon: BarChart3,
+          },
+        ].map((m, idx) => (
+          <motion.div
+            key={m.label}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: idx * 0.1 }}
+            whileHover={{ y: -4, transition: { duration: 0.2 } }}
+          >
+            <Card className="h-full border-border/50 bg-white transition-shadow hover:shadow-md dark:border-white/5 dark:bg-[#0D0D0D] dark:hover:shadow-primary/5 dark:hover:shadow-xl">
+              <CardContent className="p-6">
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <p className="font-bold text-[11px] text-muted-foreground uppercase tracking-[0.15em]">{m.label}</p>
+                    <m.icon className={`h-5 w-5 ${m.color} opacity-80`} />
                   </div>
-
-                  {/* Title */}
-                  <p className="mt-4 line-clamp-1 font-bold text-lg transition-colors group-hover:text-primary">
-                    {p.title}
-                  </p>
-                  <p className="mt-1 font-mono text-muted-foreground text-xs">{p.id}</p>
-
-                  {/* Progress bar */}
-                  <div className="mt-4 flex items-center gap-2">
-                    <Progress value={progressPct} className="h-1.5 flex-1" />
-                    <span className="font-mono text-[11px] font-semibold text-foreground">
-                      {p.currentStep}/{p.totalSteps}
-                    </span>
+                  <div>
+                    {statsLoading ? (
+                      <Skeleton className="mb-2 h-10 w-16" />
+                    ) : (
+                      <p className="font-bold font-mono text-4xl text-foreground tracking-tight dark:text-white">
+                        {m.value}
+                      </p>
+                    )}
+                    {statsLoading ? (
+                      <Skeleton className="mt-2 h-4 w-24" />
+                    ) : (
+                      <p className={`mt-2 font-semibold text-[11px] ${m.color} dark:brightness-125`}>{m.sub}</p>
+                    )}
                   </div>
-
-                  {/* Footer: Step pill + Arrow */}
-                  <div className="mt-3 flex items-center justify-between">
-                    <span
-                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium ${
-                        isStuck
-                          ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
-                          : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
-                      }`}
-                    >
-                      <Clock className="h-2.5 w-2.5" />
-                      {p.daysWaiting}d — {p.currentStepLabel}
-                    </span>
-                    <div className="flex h-8 w-8 translate-x-2 items-center justify-center rounded-full bg-primary/10 text-primary opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100">
-                      <ArrowRight className="h-4 w-4" />
-                    </div>
-                  </div>
-                </motion.div>
-              </button>
-            );
-          })}
-        </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
       </div>
+
+      {/* ═══════════ PROPOSAL STAT CARDS (Clickable → Modal) ═══════════ */}
+      {(proposalsLoading || activeProposals.length > 0) && (
+        <div>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-semibold text-muted-foreground text-sm uppercase tracking-widest">My Proposals</h2>
+            <Badge variant="secondary" className="font-mono text-[10px]">
+              {activeProposals.length} active
+            </Badge>
+          </div>
+
+          {proposalsLoading ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <Skeleton className="h-[250px] w-full rounded-3xl" />
+              <Skeleton className="h-[250px] w-full rounded-3xl" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {activeProposals.map((p, idx) => {
+                const progressPct = Math.round((p.currentStep / p.totalSteps) * 100);
+                const isStuck = p.daysWaiting >= 5;
+                return (
+                  <button type="button" key={p.id} onClick={() => setSelectedProposal(p)} className="group text-left">
+                    <motion.div
+                      initial={{ y: 40, opacity: 0 }}
+                      whileInView={{ y: 0, opacity: 1 }}
+                      whileHover={{
+                        y: -8,
+                        scale: 1.03,
+                        boxShadow: "0px 20px 40px rgba(0,0,0,0.15)",
+                      }}
+                      transition={{ duration: 0.4, delay: idx * 0.08 }}
+                      viewport={{ once: true }}
+                      className={`relative flex h-full flex-col overflow-hidden rounded-3xl border p-5 shadow-sm ${
+                        isStuck
+                          ? "border-amber-300 bg-amber-50/50 dark:border-amber-800/50 dark:bg-amber-950/30"
+                          : "border-gray-300 bg-card dark:border-slate-800/50 dark:bg-slate-950/50"
+                      }`}
+                    >
+                      {/* Gradient top bar */}
+                      <div
+                        className={`absolute top-0 right-0 left-0 h-1 bg-gradient-to-r opacity-0 transition-opacity group-hover:opacity-100 ${
+                          isStuck
+                            ? "from-amber-400/60 via-amber-300/30 to-transparent"
+                            : "from-primary/40 via-primary/20 to-transparent"
+                        }`}
+                      />
+
+                      {/* Icon + Badge row */}
+                      <div className="flex items-start justify-between">
+                        <div
+                          className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all group-hover:scale-105 ${
+                            isStuck
+                              ? "bg-amber-100 text-amber-600 group-hover:bg-amber-500 group-hover:text-white dark:bg-amber-900/40"
+                              : "bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white"
+                          }`}
+                        >
+                          <FileText className="h-5 w-5" />
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Badge variant="outline" className="font-mono text-[10px]">
+                            {p.type}
+                          </Badge>
+                          {isStuck && <span className="text-amber-500 text-sm">⚠</span>}
+                        </div>
+                      </div>
+
+                      {/* Title */}
+                      <p className="mt-4 line-clamp-1 font-bold text-lg transition-colors group-hover:text-primary">
+                        {p.title}
+                      </p>
+                      <p className="mt-1 font-mono text-muted-foreground text-xs">{p.id}</p>
+
+                      {/* Progress bar */}
+                      <div className="mt-4 flex items-center gap-2">
+                        <Progress value={progressPct} className="h-1.5 flex-1" />
+                        <span className="font-mono font-semibold text-[11px] text-foreground">
+                          {p.currentStep}/{p.totalSteps}
+                        </span>
+                      </div>
+
+                      {/* Footer: Step pill + Arrow */}
+                      <div className="mt-3 flex items-center justify-between">
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-medium text-[10px] ${
+                            isStuck
+                              ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                              : "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+                          }`}
+                        >
+                          <Clock className="h-2.5 w-2.5" />
+                          {p.daysWaiting}d — {p.currentStepLabel}
+                        </span>
+                        <div className="flex h-8 w-8 translate-x-2 items-center justify-center rounded-full bg-primary/10 text-primary opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100">
+                          <ArrowRight className="h-4 w-4" />
+                        </div>
+                      </div>
+                    </motion.div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ═══════════ PROPOSAL STEPPER MODAL ═══════════ */}
       <Dialog open={!!selectedProposal} onOpenChange={() => setSelectedProposal(null)}>
@@ -370,7 +725,7 @@ export function ResearcherView() {
                   </div>
                   {i < (selectedProposal?.steps.length ?? 0) - 1 && (
                     <div
-                      className={`w-0.5 flex-1 min-h-[24px] ${
+                      className={`min-h-[24px] w-0.5 flex-1 ${
                         step.status === "completed" ? "bg-emerald-400" : "bg-border"
                       }`}
                     />
@@ -378,7 +733,7 @@ export function ResearcherView() {
                 </div>
 
                 {/* Step Label */}
-                <div className="pb-4 pt-1">
+                <div className="pt-1 pb-4">
                   <p
                     className={`font-medium text-sm ${
                       step.status === "current"
@@ -394,7 +749,7 @@ export function ResearcherView() {
                     <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">Completed {step.date}</p>
                   )}
                   {step.status === "current" && step.holder && (
-                    <p className="mt-0.5 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-medium text-blue-700 inline-block dark:bg-blue-900/50 dark:text-blue-300">
+                    <p className="mt-0.5 inline-block rounded-full bg-blue-100 px-2 py-0.5 font-medium text-[10px] text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
                       {step.daysWaiting}d with {step.holder}
                     </p>
                   )}
@@ -406,138 +761,143 @@ export function ResearcherView() {
       </Dialog>
 
       {/* ═══════════ BUDGET SUMMARY + MY TASKS ═══════════ */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {/* Budget Overview (Multi-Project) */}
-        <Card className="border-border/50 bg-card/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 font-semibold text-muted-foreground text-sm uppercase tracking-widest">
-              <Wallet className="h-4 w-4 text-blue-400" />
-              Budget Overview
-            </CardTitle>
-            <CardDescription className="text-xs">Across {MY_PROJECTS.length} active projects</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Aggregate Budget Bar */}
-            <div>
-              <div className="mb-2 flex justify-between text-xs">
-                <span className="text-muted-foreground">
-                  ETB {BUDGET_AGGREGATE.totalSpent.toLocaleString()} spent of ETB{" "}
-                  {BUDGET_AGGREGATE.totalApproved.toLocaleString()}
-                </span>
-                <span className="font-mono font-semibold text-foreground">{budgetPercent}%</span>
-              </div>
-              <Progress value={budgetPercent} className="h-2.5" />
-              <p className="mt-1.5 text-[10px] text-emerald-500">
-                Remaining: ETB {BUDGET_AGGREGATE.totalRemaining.toLocaleString()}
-              </p>
-            </div>
-
-            {/* Per-Project Breakdown */}
-            <div className="space-y-2">
-              {MY_PROJECTS.map((proj) => {
-                const pct = Math.round((proj.spent / proj.approved) * 100);
-                const isLow = proj.remaining < proj.approved * 0.15;
-                return (
-                  <div key={proj.id} className="rounded-md border border-border/40 p-2">
-                    <div className="flex items-center justify-between">
-                      <span className="max-w-[180px] truncate text-[11px] font-medium text-foreground">
-                        {proj.title}
-                      </span>
-                      <span
-                        className={`font-mono text-[10px] ${isLow ? "font-bold text-red-500" : "text-muted-foreground"}`}
-                      >
-                        {pct}%{isLow && " ⚠"}
-                      </span>
-                    </div>
-                    <Progress value={pct} className="mt-1 h-1" />
-                    <div className="mt-1 flex justify-between text-[9px] text-muted-foreground">
-                      <span>
-                        ETB {proj.spent.toLocaleString()} / {proj.approved.toLocaleString()}
-                      </span>
-                      <span className={isLow ? "font-semibold text-red-500" : ""}>
-                        Left: ETB {proj.remaining.toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Latest Budget Request */}
-            <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
-              <p className="flex items-center gap-1.5 font-bold text-[10px] text-amber-700 uppercase tracking-wider dark:text-amber-400">
-                <Clock className="h-3 w-3" />
-                Latest Request
-              </p>
-              <p className="mt-1 font-medium text-sm text-foreground">{BUDGET_AGGREGATE.latestRequest.item}</p>
-              <p className="mt-0.5 text-[10px] text-muted-foreground">{BUDGET_AGGREGATE.latestRequest.project}</p>
-              <div className="mt-1.5 flex items-center justify-between">
-                <span className="font-mono font-semibold text-sm text-amber-700 dark:text-amber-300">
-                  ETB {BUDGET_AGGREGATE.latestRequest.amount.toLocaleString()}
-                </span>
-                <Badge variant="outline" className="border-amber-300 text-[10px] text-amber-700 dark:text-amber-400">
-                  {BUDGET_AGGREGATE.latestRequest.status}
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className={`grid grid-cols-1 gap-4 ${hasBudgetData ? "lg:grid-cols-2" : ""}`}>
+        {hasBudgetData && (
+          <div className="flex flex-col gap-4">
+            <BudgetPieChart />
+          </div>
+        )}
 
         {/* My Tasks (Multi-Project) */}
-        <Card className="border-border/50 bg-card/50">
-          <CardHeader className="pb-3">
+        <Card className="group relative self-start overflow-hidden rounded-xl border-violet-500/20 bg-violet-500/5 shadow-sm transition-all hover:shadow-md">
+          <div className="-top-4 -right-4 pointer-events-none absolute p-4 opacity-[0.03] transition-all group-hover:scale-110 group-hover:opacity-[0.05]">
+            <FileText className="h-24 w-24 text-violet-500" />
+          </div>
+          <CardHeader className="relative z-10 pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 font-semibold text-muted-foreground text-sm uppercase tracking-widest">
-                <FileText className="h-4 w-4 text-violet-400" />
+              <CardTitle className="flex items-center gap-2 font-semibold text-foreground text-sm uppercase tracking-widest">
+                <FileText className="h-4 w-4 text-violet-500" />
                 My Tasks
               </CardTitle>
-              <Badge variant={MY_TASKS.some((t) => t.overdue) ? "destructive" : "secondary"} className="text-[10px]">
-                {MY_TASKS.filter((t) => t.overdue).length} overdue
+              <Badge variant={myTasks.some((t) => t.overdue) ? "destructive" : "secondary"} className="text-[10px]">
+                {myTasks.filter((t) => t.overdue).length} overdue
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="space-y-2">
-            {MY_TASKS.map((task) => (
-              <div
-                key={task.id}
-                className={`flex items-center gap-3 rounded-lg border p-2.5 transition-colors ${
-                  task.overdue
-                    ? "border-red-200 bg-red-50/50 dark:border-red-900/50 dark:bg-red-950/20"
-                    : "border-border/50 hover:bg-muted/30"
-                }`}
-              >
-                {/* Priority Indicator */}
-                <div
-                  className={`h-2 w-2 flex-shrink-0 rounded-full ${
-                    task.priority === "high"
-                      ? "bg-red-500"
-                      : task.priority === "medium"
-                        ? "bg-amber-500"
-                        : "bg-blue-400"
-                  }`}
-                />
-                {/* Task Content */}
-                <div className="min-w-0 flex-1">
-                  <p
-                    className={`text-sm ${task.overdue ? "font-semibold text-red-700 dark:text-red-300" : "text-foreground"}`}
-                  >
-                    {task.title}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground">{task.project}</p>
-                </div>
-                {/* Due Date */}
-                <span
-                  className={`flex-shrink-0 text-[11px] ${
-                    task.overdue
-                      ? "flex items-center gap-1 font-bold text-red-600 dark:text-red-400"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  {task.overdue && <AlertTriangle className="h-3 w-3" />}
-                  {task.due}
-                </span>
+          <CardContent className="relative z-10 flex h-[280px] flex-col px-4 pt-0 pb-4">
+            <div className="custom-scrollbar flex-1 overflow-y-auto px-1">
+              <div className="relative flex flex-col pt-2 pb-4">
+                {tasksLoading ? (
+                  <div className="flex flex-col gap-2 p-2">
+                    <Skeleton className="h-12 w-full rounded-xl" />
+                    <Skeleton className="h-12 w-full rounded-xl" />
+                    <Skeleton className="h-12 w-full rounded-xl" />
+                  </div>
+                ) : myTasks.length === 0 ? (
+                  <div className="flex h-[200px] flex-col items-center justify-center text-center">
+                    <CheckCircle2 className="mb-2 h-8 w-8 text-muted-foreground opacity-50" />
+                    <p className="text-muted-foreground text-xs">All caught up! No tasks assigned.</p>
+                  </div>
+                ) : (
+                  myTasks.map((task, index) => {
+                    const isTop = index === 0;
+
+                    return (
+                      <motion.div
+                        key={task.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className={`hover:-translate-y-1 relative rounded-xl bg-card p-2.5 shadow-sm transition-transform hover:shadow-md ${
+                          task.overdue ? "border border-red-500 dark:border-red-500" : "border border-border/60"
+                        } ${index > 0 ? "-mt-4 pt-7" : ""}`}
+                        style={{ zIndex: 50 - index }}
+                      >
+                        <div className="flex items-start justify-between">
+                          {/* Top left short bar */}
+                          <div className="flex flex-col gap-1.5">
+                            {isTop && <div className="h-[3px] w-5 rounded-full bg-amber-400" />}
+                          </div>
+                          {/* Options Menu (Three dots) */}
+                          <div className="mt-0.5 flex space-x-[2px]">
+                            <div className="h-0.5 w-0.5 rounded-full bg-muted-foreground/50" />
+                            <div className="h-0.5 w-0.5 rounded-full bg-muted-foreground/50" />
+                            <div className="h-0.5 w-0.5 rounded-full bg-muted-foreground/50" />
+                          </div>
+                        </div>
+
+                        <div className={`mt-1.5 ${isTop ? "mb-2" : "mb-0.5"}`}>
+                          <h3
+                            className={`font-semibold ${
+                              task.overdue ? "text-red-600 dark:text-red-400" : "text-foreground"
+                            } ${isTop ? "text-xs leading-tight" : "line-clamp-1 text-[10px] opacity-80"}`}
+                          >
+                            {task.title}
+                          </h3>
+
+                          {/* Project Name and Priority Dot */}
+                          <div className="mt-1 flex items-center gap-1.5">
+                            <div
+                              className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${
+                                task.priority === "high"
+                                  ? "bg-red-500"
+                                  : task.priority === "medium"
+                                    ? "bg-amber-500"
+                                    : "bg-blue-400"
+                              }`}
+                            />
+                            <span className="truncate font-medium text-[9px] text-muted-foreground">
+                              {task.project}
+                            </span>
+                          </div>
+
+                          {isTop && (
+                            <div className="mt-1.5 flex items-center gap-1.5">
+                              <Badge
+                                variant={task.overdue ? "destructive" : "secondary"}
+                                className={`border-none px-1 py-0 text-[8px] ${
+                                  task.overdue ? "" : "bg-muted text-muted-foreground"
+                                }`}
+                              >
+                                {task.overdue && <AlertTriangle className="mr-1 inline h-2 w-2" />}
+                                {task.due}
+                              </Badge>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Bottom Avatars & Comments */}
+                        <div className="mt-auto flex items-center justify-between">
+                          {isTop ? (
+                            <span className="font-medium text-[8px] text-muted-foreground">6 comments</span>
+                          ) : (
+                            <span /> // Spacer
+                          )}
+
+                          <div className="-space-x-1 flex">
+                            <Avatar className="h-4 w-4 border border-background">
+                              <AvatarImage src={`https://i.pravatar.cc/150?u=${task.id}`} />
+                              <AvatarFallback>A</AvatarFallback>
+                            </Avatar>
+                            {isTop && (
+                              <>
+                                <Avatar className="h-4 w-4 border border-background">
+                                  <AvatarImage src={`https://i.pravatar.cc/150?u=${task.id + 10}`} />
+                                  <AvatarFallback>B</AvatarFallback>
+                                </Avatar>
+                                <div className="flex h-4 w-4 items-center justify-center rounded-full border border-background bg-slate-500 font-medium text-[6px] text-white">
+                                  3+
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })
+                )}
               </div>
-            ))}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -565,7 +925,7 @@ export function ResearcherView() {
                 </Avatar>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="truncate font-semibold text-xs text-foreground">{fb.name}</span>
+                    <span className="truncate font-semibold text-foreground text-xs">{fb.name}</span>
                     <span className="flex-shrink-0 text-[10px] text-muted-foreground">{fb.time}</span>
                   </div>
                   <p className="mt-0.5 text-muted-foreground text-xs leading-relaxed">{fb.comment}</p>
@@ -599,7 +959,7 @@ export function ResearcherView() {
               return (
                 <div key={pub.id} className="rounded-lg border border-border/50 p-3">
                   {/* Paper Info */}
-                  <p className="font-semibold text-sm text-foreground leading-snug">{pub.title}</p>
+                  <p className="font-semibold text-foreground text-sm leading-snug">{pub.title}</p>
                   <p className="mt-0.5 text-[10px] text-muted-foreground">{pub.journal}</p>
                   <p className="mt-0.5 text-[9px] text-muted-foreground/70">{pub.project}</p>
 

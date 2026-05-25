@@ -7,32 +7,43 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 import { ProposalViewToggle } from "../../_components/proposal-view-toggle";
 import { useEvaluations } from "../evaluations-context";
-import type { ProjectEvalStatus } from "../types";
 
-export const STATUS_STYLES: Record<ProjectEvalStatus, { className: string; description: string }> = {
-  "On evaluation": {
-    className: "bg-amber-100 text-amber-900 dark:bg-amber-950/50 dark:text-amber-200",
-    description: "Scores still being recorded or verified.",
-  },
-  "Awaiting approval": {
+export function getProjectStatusBadge(stage: string | undefined) {
+  const normalized = (stage ?? "").toLowerCase();
+
+  if (normalized.includes("finish")) {
+    return {
+      className: "bg-emerald-100 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200",
+      description: "Project marked as finished.",
+    };
+  }
+
+  if (normalized.includes("schedule")) {
+    return {
+      className: "bg-sky-100 text-sky-900 dark:bg-sky-950/50 dark:text-sky-200",
+      description: "Project has a scheduled milestone.",
+    };
+  }
+
+  if (normalized.includes("review") || normalized.includes("evaluat")) {
+    return {
+      className: "bg-amber-100 text-amber-900 dark:bg-amber-950/50 dark:text-amber-200",
+      description: "Project is currently under review.",
+    };
+  }
+
+  return {
     className: "bg-violet-100 text-violet-900 dark:bg-violet-950/50 dark:text-violet-200",
-    description: "Admin must confirm the evaluation packet.",
-  },
-  Scheduled: {
-    className: "bg-sky-100 text-sky-900 dark:bg-sky-950/50 dark:text-sky-200",
-    description: "Defence slot shared with the PI.",
-  },
-  Finished: {
-    className: "bg-emerald-100 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200",
-    description: "Evaluation approved and archived.",
-  },
-};
+    description: "Awaiting approval or classification.",
+  };
+}
 
 export function EvaluationsTabs() {
   const {
@@ -42,6 +53,8 @@ export function EvaluationsTabs() {
     setProposalScope,
     search,
     setSearch,
+    yearFilter,
+    setYearFilter,
     filteredProposals,
     filteredProjects,
     openDrawerProposal,
@@ -76,14 +89,28 @@ export function EvaluationsTabs() {
             </TabsTrigger>
           </TabsList>
 
-          <div className="relative w-full sm:w-72">
-            <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-3.5 w-3.5 text-slate-400" />
-            <Input
-              placeholder="Search title, ID, person, dept…"
-              className="h-9 rounded-lg pl-9 dark:bg-slate-950"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+          <div className="flex w-full items-center gap-2 sm:w-auto">
+            <Select value={yearFilter} onValueChange={setYearFilter}>
+              <SelectTrigger className="h-9 w-[120px] rounded-lg bg-white dark:bg-slate-950">
+                <SelectValue placeholder="Year" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Years</SelectItem>
+                <SelectItem value="2026">2026</SelectItem>
+                <SelectItem value="2025">2025</SelectItem>
+                <SelectItem value="2024">2024</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="relative w-full sm:w-64">
+              <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-3.5 w-3.5 text-slate-400" />
+              <Input
+                placeholder="Search title, ID, person, dept…"
+                className="h-9 rounded-lg pl-9 dark:bg-slate-950"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
@@ -202,34 +229,40 @@ export function EvaluationsTabs() {
               </TableHeader>
               <TableBody>
                 {filteredProjects.map((p) => {
-                  const st = STATUS_STYLES[p.evalStatus];
-                  const scoreLabel = p.maxTotal > 0 ? `${p.totalScore.toFixed(1)} / ${p.maxTotal}` : "—";
+                  const st = getProjectStatusBadge(p.projectStage);
                   return (
-                    <TableRow key={p.id} className="border-slate-100 dark:border-slate-800">
+                    <TableRow key={p.projectId} className="border-slate-100 dark:border-slate-800">
                       <TableCell className="py-4 pl-5">
                         <div className="flex flex-col gap-0.5">
                           <span className="line-clamp-1 font-semibold text-[13px] text-slate-900 dark:text-slate-100">
-                            {p.title}
+                            {p.projectTitle}
                           </span>
                           <span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
-                            {p.id} · {p.dept}
+                            {p.projectId} · {p.projectProgram}
                           </span>
                         </div>
                       </TableCell>
                       <TableCell className="py-4">
                         <div className="flex items-center gap-2">
                           <Avatar className="h-7 w-7">
-                            <AvatarFallback className={cn("font-bold text-[10px]", p.leadColor)}>
-                              {p.leadAvatar}
+                            <AvatarFallback className="bg-slate-200 font-bold text-[10px] text-slate-700">
+                              {p.pi?.fullName
+                                ?.split(" ")
+                                .map((part) => part[0])
+                                .slice(0, 2)
+                                .join("")
+                                .toUpperCase() || "—"}
                             </AvatarFallback>
                           </Avatar>
-                          <span className="font-medium text-[13px] text-slate-700 dark:text-slate-300">{p.lead}</span>
+                          <span className="font-medium text-[13px] text-slate-700 dark:text-slate-300">
+                            {p.pi?.fullName || "No PI"}
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell className="py-4">
                         <div className="flex flex-col gap-1">
                           <Badge className={cn("w-fit border-0 font-bold text-[10px]", st.className)}>
-                            {p.evalStatus}
+                            {p.projectStage}
                           </Badge>
                           <span className="max-w-50 text-[10px] text-slate-500 leading-snug dark:text-slate-400">
                             {st.description}
@@ -237,13 +270,13 @@ export function EvaluationsTabs() {
                         </div>
                       </TableCell>
                       <TableCell className="py-4">
-                        <span className="font-bold text-indigo-700 text-sm tabular-nums dark:text-indigo-300">
-                          {scoreLabel}
+                        <span className="font-semibold text-[12px] text-slate-700 dark:text-slate-300">
+                          {p.researchArea || "—"}
                         </span>
                       </TableCell>
                       <Can permission="BUDGET_VIEW">
                         <TableCell className="py-4 font-semibold text-[13px] text-slate-700 dark:text-slate-300">
-                          {p.budget}
+                          {p.isFunded ? "Funded" : "Not funded"}
                         </TableCell>
                       </Can>
                       <TableCell className="py-4 pr-5 text-right">

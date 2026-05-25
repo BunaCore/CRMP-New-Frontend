@@ -25,6 +25,8 @@ const staggerContainer = {
   viewport: { once: true },
 };
 
+const MotionLink = motion(Link);
+
 export default function LandingG() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -208,17 +210,17 @@ export default function LandingG() {
               ASTU to lead the global research frontier.
             </motion.p>
             <motion.div variants={fadeInUp} className="flex flex-wrap gap-4">
-              <motion.button
+              <MotionLink
                 whileHover={{
                   scale: 1.05,
                   boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
                 }}
                 whileTap={{ scale: 0.95 }}
-                type="button"
+                href="/public/projects"
                 className="rounded-lg bg-[#00113a] px-6 py-2.5 font-semibold text-sm text-white shadow-md transition-all hover:bg-[#002244]"
               >
-                Start Your Project
-              </motion.button>
+                Published projects
+              </MotionLink>
               <motion.button
                 whileHover={{ scale: 1.05, backgroundColor: "#f8fafc" }}
                 whileTap={{ scale: 0.95 }}
@@ -238,7 +240,11 @@ export default function LandingG() {
             <div className="relative aspect-square w-full max-w-sm">
               <motion.div
                 animate={{ rotate: [3, 5, 3] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
                 className="absolute inset-0 translate-x-2 translate-y-2 rotate-3 transform rounded-2xl bg-blue-100/30 dark:bg-blue-900/10"
               />
               <motion.div
@@ -370,7 +376,11 @@ export default function LandingG() {
                 <div className="relative aspect-video">
                   <motion.div
                     animate={{ scale: [1, 1.05, 1], rotate: [0, -1, 0] }}
-                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                    transition={{
+                      duration: 5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
                     className="-inset-1.5 -rotate-1 absolute rounded-lg bg-[#00daf3]/5"
                   />
                   <Image
@@ -423,7 +433,11 @@ export default function LandingG() {
                 <div className="relative aspect-video">
                   <motion.div
                     animate={{ scale: [1, 1.05, 1], rotate: [0, 1, 0] }}
-                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                    transition={{
+                      duration: 6,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
                     className="-inset-1.5 absolute rotate-1 rounded-lg bg-blue-100/20 dark:bg-blue-900/10"
                   />
                   <Image
@@ -476,7 +490,11 @@ export default function LandingG() {
                 <div className="relative aspect-video">
                   <motion.div
                     animate={{ scale: [1, 1.05, 1], rotate: [0, -1, 0] }}
-                    transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+                    transition={{
+                      duration: 4.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
                     className="-inset-1.5 -rotate-1 absolute rounded-lg bg-[#00daf3]/5"
                   />
                   <Image

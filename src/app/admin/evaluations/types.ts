@@ -27,7 +27,10 @@ export interface EvalProposalRow {
   budget: string;
   program: string;
   teamCount: number;
+  year: string;
   budgetItems?: BudgetItem[];
+  evaluators?: string[];
+  advisors?: string[];
 }
 
 export interface EvalProjectRow {
@@ -42,4 +45,5 @@ export interface EvalProjectRow {
   evalStatus: ProjectEvalStatus;
   totalScore: number;
   maxTotal: number;
+  year: string;
 }

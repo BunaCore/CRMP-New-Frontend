@@ -28,6 +28,13 @@ export interface SessionUser {
   avatarUrl?: string;
   department?: string | null;
   permissions?: string[];
+  phoneNumber?: string;
+  university?: string;
+  universityId?: string;
+  userProgram?: "UG" | "PG" | null;
+  isExternal?: boolean;
+  accountStatus?: string;
+  createdAt?: string | Date;
 }
 
 interface SessionContextType {
@@ -53,6 +60,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         avatarUrl: authUser.avatarUrl,
         department: authUser.department,
         permissions: authUser.permissions,
+        phoneNumber: authUser.phoneNumber,
+        university: authUser.university,
+        universityId: authUser.universityId,
+        userProgram: authUser.userProgram,
+        isExternal: authUser.isExternal,
+        accountStatus: authUser.accountStatus,
+        createdAt: authUser.createdAt,
       }
     : null;
 

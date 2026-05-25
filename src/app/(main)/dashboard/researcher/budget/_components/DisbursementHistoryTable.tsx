@@ -56,6 +56,12 @@ const statusConfig: Record<StatusKey, { label: string; className: string; icon: 
     icon: XCircle,
     className: "border-red-300 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300",
   },
+  REJECTED: {
+    label: "Rejected",
+    icon: XCircle,
+    className:
+      "border-destructive bg-destructive/10 text-destructive dark:border-destructive dark:bg-destructive/20 dark:text-destructive",
+  },
 };
 
 interface DisbursementHistoryTableProps {

@@ -37,14 +37,13 @@ export interface UserProfile {
    * User program: "UG" (Undergraduate), "PG" (Postgraduate), or null (no restriction)
    */
   userProgram?: "UG" | "PG" | null;
-  /**
-   * Account status (e.g., "active", "inactive", "suspended").
-   */
   accountStatus?: string;
-  /**
-   * Boolean flag sent from the backend to determine if user can access admin dashboard
-   */
   canAccessAdmin?: boolean;
+  phoneNumber?: string;
+  university?: string;
+  universityId?: string;
+  isExternal?: boolean;
+  createdAt?: string | Date;
 }
 
 // ─── Request Shapes ─────────────────────────────────────────
@@ -59,7 +58,10 @@ export interface RegisterPayload {
   fullName?: string;
   departmentId: string;
   phoneNumber?: string;
+  universityId?: string;
   userProgram: "UG" | "PG";
+  isExternal?: boolean;
+  supportingDocumentFileId?: string;
 }
 
 // ─── Response Shapes ────────────────────────────────────────

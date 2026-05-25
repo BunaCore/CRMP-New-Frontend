@@ -153,7 +153,18 @@ export function AdminEvaluatorView() {
                       })}
                     </TableCell>
                     <TableCell>
-                      <StatusBadge status={e.status} />
+                      <Badge
+                        variant={
+                          e.status === "Completed"
+                            ? "secondary"
+                            : e.status === "In Progress"
+                              ? "outline"
+                              : "destructive"
+                        }
+                        className="text-xs"
+                      >
+                        {e.status}
+                      </Badge>
                     </TableCell>
                     <TableCell className="pr-6 text-right">
                       <Button

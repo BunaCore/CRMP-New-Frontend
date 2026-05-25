@@ -2,6 +2,10 @@ import axios from "axios";
 
 import type { InitiateUploadPayload, InitiateUploadResponse } from "./types";
 
+function getApiBaseUrl(): string {
+  return process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+}
+
 /**
  * Initiate a file upload.
  * POST /files/upload
@@ -9,6 +13,17 @@ import type { InitiateUploadPayload, InitiateUploadResponse } from "./types";
 export async function initiateUpload(payload: InitiateUploadPayload): Promise<InitiateUploadResponse> {
   const { apiClient } = await import("@/lib/api/client");
   const response = await apiClient.post<InitiateUploadResponse>("/files/upload", payload);
+  return response.data;
+}
+
+/**
+ * Initiate a guest file upload without requiring auth.
+ * POST /files/guest-presign
+ */
+export async function initiateGuestUpload(payload: InitiateUploadPayload): Promise<InitiateUploadResponse> {
+  const response = await axios.post<InitiateUploadResponse>(`${getApiBaseUrl()}/files/guest-presign`, payload, {
+    headers: { "Content-Type": "application/json" },
+  });
   return response.data;
 }
 
@@ -33,6 +48,22 @@ export async function uploadFileToUrl(uploadUrl: string, file: File): Promise<vo
  */
 export async function performFullUpload(file: File, resourceType?: string): Promise<string> {
   const { fileId, uploadUrl } = await initiateUpload({
+    originalName: file.name,
+    mimeType: file.type,
+    size: file.size,
+    resourceType,
+  });
+
+  await uploadFileToUrl(uploadUrl, file);
+
+  return fileId;
+}
+
+/**
+ * Full guest upload flow for public registration.
+ */
+export async function performGuestFullUpload(file: File, resourceType?: string): Promise<string> {
+  const { fileId, uploadUrl } = await initiateGuestUpload({
     originalName: file.name,
     mimeType: file.type,
     size: file.size,

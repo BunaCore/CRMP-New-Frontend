@@ -38,6 +38,8 @@ export interface AdminUsersListResponse {
 export interface AdminUserDetails extends Omit<AdminUserListItem, "roles"> {
   roles: Array<UserRoleRef & { grantedAt: string }>;
   university: string | null;
+  supportingDocumentFileId?: string | null;
+  supportingDocument?: import("@/lib/api/files/types").FileDetails | null;
   departmentCoordination: {
     isCoordinator: boolean;
     departments: Array<{

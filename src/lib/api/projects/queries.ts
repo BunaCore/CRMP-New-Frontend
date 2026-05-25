@@ -3,7 +3,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api/client";
 import type { PaginatedResponse } from "@/lib/api/types/pagination";
 
-import type { ProjectDetails, ProjectListItem, ProjectsQueryParams, PublicProjectListItem } from "./types";
+import type {
+  ProjectDefenceSchedule,
+  ProjectDetails,
+  ProjectListItem,
+  ProjectsQueryParams,
+  PublicProjectListItem,
+} from "./types";
 
 function buildProjectsQueryString(params: ProjectsQueryParams = {}): string {
   const searchParams = new URLSearchParams();
@@ -152,6 +158,92 @@ export function usePublicProjectsQuery(enabled = true) {
   return useQuery({
     queryKey: ["projects", "public"],
     queryFn: () => getPublicProjects(),
+    enabled,
+  });
+}
+
+// ─── User's own projects (for dashboard) ────────────────────────────────────
+
+/**
+ * Fetch projects the current user is a member of.
+ * GET /projects  (the backend resolves the user from the JWT token)
+ * Returns ProjectListItem[] including defenceSchedules[].
+ */
+export async function getMyProjects(): Promise<ProjectListItem[]> {
+  const response = await apiClient.get<ProjectListItem[]>("/projects");
+  const raw = Array.isArray(response.data) ? response.data : [];
+  return raw.map((p) => ({
+    ...p,
+    defenceSchedules: Array.isArray(p.defenceSchedules) ? p.defenceSchedules : [],
+  }));
+}
+
+/**
+ * React Query hook for the current user's own projects (dashboard use).
+ */
+export function useMyProjectsQuery(enabled = true) {
+  return useQuery({
+    queryKey: ["projects", "mine"],
+    queryFn: getMyProjects,
+    enabled,
+  });
+}
+
+// ─── Defence scheduling mutations ────────────────────────────────────────────
+
+export interface ScheduleDefencePayload {
+  defenceDate: string; // ISO string
+  location: string;
+  note?: string;
+}
+
+/**
+ * POST /projects/:projectId/defence
+ * Schedules a project-phase defence.
+ * Also auto-sets project stage to 'Under Review' on the backend.
+ */
+export async function scheduleProjectDefence(
+  projectId: string,
+  payload: ScheduleDefencePayload,
+): Promise<ProjectDefenceSchedule> {
+  const response = await apiClient.post<{ defence: ProjectDefenceSchedule }>(`/projects/${projectId}/defence`, payload);
+  return response.data.defence;
+}
+
+export function useScheduleProjectDefence() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ projectId, payload }: { projectId: string; payload: ScheduleDefencePayload }) =>
+      scheduleProjectDefence(projectId, payload),
+    onSuccess: (_data, variables) => {
+      // Invalidate so the project list and detail both refresh
+      queryClient.invalidateQueries({ queryKey: ["projects", "mine"] });
+      queryClient.invalidateQueries({ queryKey: ["projects", variables.projectId] });
+    },
+  });
+}
+
+/**
+ * Fetch projects for admin context.
+ * GET /projects
+ * Returns the same structure as /projects/all for use in admin evaluations view.
+ */
+export async function getAdminProjects(
+  params: ProjectsQueryParams = {},
+): Promise<PaginatedResponse<ProjectListItem> | ProjectListItem[]> {
+  const response = await apiClient.get<PaginatedResponse<ProjectListItem> | ProjectListItem[]>(
+    `/projects${buildProjectsQueryString(params)}`,
+  );
+  return response.data;
+}
+
+/**
+ * React Query hook for fetching admin projects.
+ */
+export function useAdminProjectsQuery(params: ProjectsQueryParams = {}, enabled = true) {
+  return useQuery({
+    queryKey: ["projects", "admin", params],
+    queryFn: () => getAdminProjects(params),
     enabled,
   });
 }

@@ -32,6 +32,7 @@ export const EVAL_PROPOSALS: EvalProposalRow[] = [
     budget: "Br 118,000",
     program: "Agricultural Innovation Program",
     teamCount: 4,
+    year: "2025",
     budgetItems: [
       { description: "Soil Moisture IoT Sensors", amount: 60000 },
       { description: "Data Logging Equipment", amount: 30000 },
@@ -50,6 +51,7 @@ export const EVAL_PROPOSALS: EvalProposalRow[] = [
     budget: "Br 203,500",
     program: "Health Technologies Initiative",
     teamCount: 5,
+    year: "2025",
     budgetItems: [
       { description: "Socket Material Resins", amount: 80000 },
       { description: "3D Printing Filaments", amount: 60000 },
@@ -68,6 +70,7 @@ export const EVAL_PROPOSALS: EvalProposalRow[] = [
     budget: "Br 86,400",
     program: "Climate & Sustainability Research",
     teamCount: 3,
+    year: "2025",
     budgetItems: [
       { description: "High-Res Satellite Imagery", amount: 45000 },
       { description: "GIS Software Licenses", amount: 20000 },
@@ -86,6 +89,7 @@ export const EVAL_PROJECTS: EvalProjectRow[] = [
     leadColor: "bg-amber-100 text-amber-700",
     dept: "Energy Institute",
     budget: "Br 450,000",
+    year: "2025",
     budgetItems: [
       { description: "Solar Panels & Batteries", amount: 250000 },
       { description: "Kiosk Construction Materials", amount: 120000 },
@@ -104,6 +108,7 @@ export const EVAL_PROJECTS: EvalProjectRow[] = [
     leadColor: "bg-rose-100 text-rose-700",
     dept: "Public Health",
     budget: "Br 320,000",
+    year: "2025",
     budgetItems: [
       { description: "Server Infrastructure", amount: 150000 },
       { description: "Developer Contracts", amount: 100000 },
@@ -122,6 +127,7 @@ export const EVAL_PROJECTS: EvalProjectRow[] = [
     leadColor: "bg-cyan-100 text-cyan-700",
     dept: "Architecture",
     budget: "Br 95,000",
+    year: "2025",
     budgetItems: [
       { description: "VR Headsets & Gear", amount: 45000 },
       { description: "3D Scanning Equipment Rent", amount: 30000 },
@@ -140,6 +146,7 @@ export const EVAL_PROJECTS: EvalProjectRow[] = [
     leadColor: "bg-violet-100 text-violet-700",
     dept: "Chemical Engineering",
     budget: "Br 1,200,000",
+    year: "2025",
     budgetItems: [
       { description: "Industrial Bioreactors", amount: 700000 },
       { description: "Raw Chemical Feedstocks", amount: 300000 },

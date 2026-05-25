@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, CheckCircle2, Info, Landmark, Mail, Phone, Undo2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Info, Landmark, Mail, Phone, Undo2, XCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ const statusConfig: Record<string, { label: string; className: string }> = {
   RESUBMITTED: { label: "Resubmitted", className: "border-blue-300 bg-blue-50 text-blue-700" },
   PAID: { label: "Paid", className: "border-emerald-300 bg-emerald-50 text-emerald-700" },
   RETURNED: { label: "Returned", className: "border-red-300 bg-red-50 text-red-700" },
+  REJECTED: { label: "Rejected", className: "border-destructive bg-destructive/10 text-destructive" },
 };
 
 export function BudgetRequestDrawer() {
@@ -213,7 +214,16 @@ export function BudgetRequestDrawer() {
                   onClick={() => dispatch({ type: "SET_RETURN_MODAL", payload: true })}
                 >
                   <Undo2 className="mr-2 h-4 w-4" />
-                  Return for Correction
+                  Return
+                </Button>
+
+                <Button
+                  variant="outline"
+                  className="flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-900 dark:hover:bg-red-950/40"
+                  onClick={() => dispatch({ type: "SET_REJECT_MODAL", payload: true })}
+                >
+                  <XCircle className="mr-2 h-4 w-4" />
+                  Reject
                 </Button>
 
                 <TooltipProvider>

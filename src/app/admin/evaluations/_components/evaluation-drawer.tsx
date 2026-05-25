@@ -14,7 +14,6 @@ import type { EvaluationRubric } from "@/lib/api/proposals/types";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 
-import { formatPeopleList } from "../../proposals/_components/proposals-table";
 import { useEvaluations } from "../evaluations-context";
 import {
   type DraftScore,
@@ -25,7 +24,7 @@ import {
   EvaluationScoresTab,
   TeamTabContent,
 } from "./evaluation-drawer-sections";
-import { STATUS_STYLES } from "./evaluations-tabs";
+import { getProjectStatusBadge } from "./evaluations-tabs";
 
 export function EvaluationDrawer() {
   const {
@@ -55,6 +54,9 @@ export function EvaluationDrawer() {
     filteredAdvisors,
     setPickedAdvisorIds,
     setShowAssignAdvisor,
+    isSchedulingDefence,
+    proposalDetails,
+    projectDetails,
   } = useEvaluations();
 
   const { user } = useAuthStore();
@@ -64,29 +66,50 @@ export function EvaluationDrawer() {
   const canAssignEvaluators = hasPermission(userPerms, "EVALUATOR_ASSIGN");
   const canAssignAdvisors = hasPermission(userPerms, "ADVISOR_ASSIGN");
 
-  const [apiRubrics, setApiRubrics] = useState<EvaluationRubric[]>([]);
-  const [draftScores, setDraftScores] = useState<Record<string, DraftScore>>({});
+  const [draftScores, setDraftScores] = useState<Record<string, Record<string, DraftScore>>>({});
   const [scoresLoading, setScoresLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiRubrics, setApiRubrics] = useState<EvaluationRubric[]>([]);
 
-  const activeId = drawerKind === "proposal" ? activeProposal?.id : activeProject?.id;
+  const activeId = drawerKind === "proposal" ? activeProposal?.id : activeProject?.projectId;
+  const proposalIdForEval = drawerKind === "proposal" ? activeProposal?.id : projectDetails?.proposalId;
 
-  const { data: members = [], isLoading: membersLoading } = useGetProposalMembers(activeId ?? null);
+  const { data: proposalMembers = [], isLoading: proposalMembersLoading } = useGetProposalMembers(
+    proposalIdForEval ?? null,
+  );
+
+  const members = proposalMembers;
+  const membersLoading = proposalMembersLoading;
 
   useEffect(() => {
-    if (drawerTab !== "scores" || !activeId) return;
+    const fetchId = proposalIdForEval || activeId;
+    if (drawerTab !== "scores" || !fetchId) return;
 
     setScoresLoading(true);
-    fetchProposalEvaluations(activeId)
+    fetchProposalEvaluations(fetchId)
       .then((data) => {
         setApiRubrics(data.rubrics);
-        const prefilled: Record<string, DraftScore> = {};
+        const prefilled: Record<string, Record<string, DraftScore>> = {};
         for (const rubricItem of data.rubrics) {
-          const existing = rubricItem.awardedScores[0];
-          prefilled[rubricItem.id] = {
-            score: existing?.score ?? 0,
-            feedback: existing?.feedback ?? "",
-          };
+          prefilled[rubricItem.id] = {};
+
+          const isIndividual = rubricItem.name.toLowerCase().includes("individual");
+          if (!isIndividual && rubricItem.awardedScores && rubricItem.awardedScores.length > 0) {
+            const firstExisting = rubricItem.awardedScores[0];
+            prefilled[rubricItem.id].GROUP = {
+              score: firstExisting?.score ?? 0,
+              feedback: firstExisting?.feedback ?? "",
+            };
+          }
+
+          if (rubricItem.awardedScores) {
+            for (const existing of rubricItem.awardedScores) {
+              prefilled[rubricItem.id][existing.studentId] = {
+                score: existing?.score ?? 0,
+                feedback: existing?.feedback ?? "",
+              };
+            }
+          }
         }
         setDraftScores(prefilled);
       })
@@ -94,14 +117,20 @@ export function EvaluationDrawer() {
         toast.error("Failed to load evaluation rubrics.");
       })
       .finally(() => setScoresLoading(false));
-  }, [drawerTab, activeId]);
+  }, [drawerTab, proposalIdForEval, activeId]);
 
   const phaseFilter = drawerKind === "proposal" ? "PROPOSAL" : "PROJECT";
   const filteredApiRubrics = apiRubrics.filter((rubricItem) => rubricItem.phase === phaseFilter);
 
+  // For display aggregate, we'll average student scores or just sum the first student's score
+  const targetStudentId =
+    members.find((m) => m.role === "PI")?.userId ??
+    members.find((m) => m.role === "MEMBER")?.userId ??
+    members[0]?.userId;
+
   const apiAggregate = filteredApiRubrics.reduce(
     (acc, rubricItem) => {
-      acc.earned += draftScores[rubricItem.id]?.score ?? 0;
+      acc.earned += targetStudentId ? (draftScores[rubricItem.id]?.[targetStudentId]?.score ?? 0) : 0;
       acc.max += rubricItem.maxPoints;
       return acc;
     },
@@ -109,33 +138,63 @@ export function EvaluationDrawer() {
   );
 
   async function handleSubmitScores() {
-    if (!activeId) return;
+    const fetchId = proposalIdForEval || activeId;
+    if (!fetchId) return;
 
     if (filteredApiRubrics.length === 0) {
       toast.error("No rubrics found for this proposal. Cannot submit scores.");
       return;
     }
 
-    // Find the PI first, fall back to any MEMBER, then any member at all
-    const targetStudent =
-      members.find((m) => m.role === "PI") ?? members.find((m) => m.role === "MEMBER") ?? members[0];
-
-    if (!targetStudent) {
-      toast.error("Could not find a valid student to evaluate. Make sure team members are loaded.");
+    if (members.length === 0) {
+      toast.error("Could not find any students to evaluate. Make sure team members are loaded.");
       return;
     }
 
-    const scores = filteredApiRubrics.map((rubricItem) => ({
-      rubricId: rubricItem.id,
-      studentId: targetStudent.userId,
-      score: draftScores[rubricItem.id]?.score ?? 0,
-      feedback: draftScores[rubricItem.id]?.feedback ?? "",
-      projectId: drawerKind === "project" ? activeId : null,
-    }));
+    const scores = filteredApiRubrics.flatMap((rubricItem) => {
+      const isIndividual = rubricItem.name.toLowerCase().includes("individual");
+      if (isIndividual) {
+        // biome-ignore lint/suspicious/noExplicitAny: student object
+        return members.map((student: any) => {
+          const sId = student.studentId || student.userId || student.user?.id || student.id;
+          if (!sId) {
+            console.error("Missing studentId for member:", student);
+          }
+          return {
+            rubricId: rubricItem.id,
+            studentId: sId,
+            score: draftScores[rubricItem.id]?.[sId]?.score ?? 0,
+            feedback: draftScores[rubricItem.id]?.[sId]?.feedback ?? "",
+            projectId: drawerKind === "project" ? (activeId ?? null) : null,
+          };
+        });
+      }
+      // Apply group score to all members
+      const groupScoreDraft = draftScores[rubricItem.id]?.GROUP ?? { score: 0, feedback: "" };
+      // biome-ignore lint/suspicious/noExplicitAny: student object
+      return members.map((student: any) => {
+        const sId = student.studentId || student.userId || student.user?.id || student.id;
+        if (!sId) {
+          console.error("Missing studentId for member:", student);
+        }
+        return {
+          rubricId: rubricItem.id,
+          studentId: sId,
+          score: groupScoreDraft.score,
+          feedback: groupScoreDraft.feedback,
+          projectId: drawerKind === "project" ? (activeId ?? null) : null,
+        };
+      });
+    });
+
+    if (scores.some((s) => !s.studentId)) {
+      toast.error("Invalid team member data. Missing student ID. Check console for details.");
+      return;
+    }
 
     setIsSubmitting(true);
     try {
-      await submitEvaluationScores(activeId, { scores });
+      await submitEvaluationScores(fetchId, { scores });
       toast.success("Evaluation scores submitted successfully!");
     } catch {
       toast.error("Failed to submit scores. Please try again.");
@@ -144,23 +203,25 @@ export function EvaluationDrawer() {
     }
   }
 
-  const drawerTitle = drawerKind === "proposal" ? activeProposal?.title : activeProject?.title;
+  const drawerTitle = drawerKind === "proposal" ? activeProposal?.title : activeProject?.projectTitle;
   const drawerSubtitle =
     drawerKind === "proposal"
       ? activeProposal
         ? `${activeProposal.id} · ${activeProposal.dept} · ${activeProposal.pi}`
         : ""
       : activeProject
-        ? `${activeProject.id} · ${activeProject.dept} · ${activeProject.lead}`
+        ? `${activeProject.projectId} · ${activeProject.projectProgram} · ${activeProject.pi?.fullName ?? "No PI"}`
         : "";
 
-  const evaluatorSummary = (activeProposal as { evaluators?: string[] } | null)?.evaluators?.length
-    ? `${(activeProposal as { evaluators?: string[] } | null)?.evaluators?.length} assigned: ${formatPeopleList((activeProposal as { evaluators?: string[] } | null)?.evaluators || [], 3)}`
-    : "No evaluators assigned";
+  const evaluatorsList =
+    drawerKind === "proposal"
+      ? proposalDetails?.evaluators?.map((e) => e.name) || activeProposal?.evaluators || []
+      : [];
 
-  const advisorSummary = (activeProposal as { advisors?: string[] } | null)?.advisors?.length
-    ? `${(activeProposal as { advisors?: string[] } | null)?.advisors?.length} assigned: ${formatPeopleList((activeProposal as { advisors?: string[] } | null)?.advisors || [], 3)}`
-    : "No advisors assigned";
+  const advisorsList =
+    drawerKind === "proposal"
+      ? proposalDetails?.advisors?.map((a) => a.name) || activeProposal?.advisors || []
+      : projectDetails?.members?.filter((m) => m.role === "ADVISOR").map((m) => m.fullName) || [];
 
   const handleAssignEvaluatorsClick = () => {
     setPickedEvalIds([]);
@@ -191,9 +252,12 @@ export function EvaluationDrawer() {
                 </Badge>
                 {drawerKind === "project" && activeProject && (
                   <Badge
-                    className={cn("border-0 font-bold text-[10px]", STATUS_STYLES[activeProject.evalStatus].className)}
+                    className={cn(
+                      "border-0 font-bold text-[10px]",
+                      getProjectStatusBadge(activeProject.projectStage).className,
+                    )}
                   >
-                    {activeProject.evalStatus}
+                    {activeProject.projectStage}
                   </Badge>
                 )}
                 {isEvalApproved && (
@@ -244,7 +308,7 @@ export function EvaluationDrawer() {
                   <button
                     key={tab.id}
                     type="button"
-                    onClick={() => setDrawerTab(tab.id)}
+                    onClick={() => setDrawerTab(tab.id as Parameters<typeof setDrawerTab>[0])}
                     className={cn(
                       "flex shrink-0 items-center justify-center gap-2 rounded-lg px-3 py-2 font-semibold text-xs transition-all",
                       drawerTab === tab.id
@@ -267,16 +331,22 @@ export function EvaluationDrawer() {
                   activeProject={activeProject}
                   canAssignEvaluators={canAssignEvaluators}
                   canAssignAdvisors={canAssignAdvisors}
-                  evaluatorSummary={evaluatorSummary}
-                  advisorSummary={advisorSummary}
+                  evaluatorsList={evaluatorsList}
+                  advisorsList={advisorsList}
                   onAssignEvaluators={handleAssignEvaluatorsClick}
                   onAssignAdvisor={handleAssignAdvisorClick}
+                  proposalFile={
+                    proposalDetails?.file
+                      ? {
+                          ...proposalDetails.file,
+                          visibility: proposalDetails.file.visibility as "private" | "public",
+                        }
+                      : undefined
+                  }
                 />
               )}
 
-              {drawerTab === "team" && (
-                <TeamTabContent proposalId={drawerKind === "proposal" ? activeProposal?.id : undefined} />
-              )}
+              {drawerTab === "team" && <TeamTabContent proposalId={proposalIdForEval ?? undefined} />}
 
               {drawerTab === "budget" && canViewBudget && (
                 <EvaluationBudgetTab
@@ -289,6 +359,8 @@ export function EvaluationDrawer() {
               {drawerTab === "scores" && (
                 <EvaluationScoresTab
                   drawerKind={drawerKind}
+                  _activeProposal={activeProposal}
+                  members={members}
                   rubric={rubric}
                   setRubric={setRubric}
                   apiRubrics={apiRubrics}
@@ -299,7 +371,7 @@ export function EvaluationDrawer() {
                   membersLoading={membersLoading}
                   isSubmitting={isSubmitting}
                   totals={totals}
-                  apiAggregate={apiAggregate}
+                  _apiAggregate={apiAggregate}
                   handleSubmitScores={handleSubmitScores}
                 />
               )}
@@ -316,6 +388,7 @@ export function EvaluationDrawer() {
                   setDefenceMessage={setDefenceMessage}
                   defenceDraftSent={defenceDraftSent}
                   handleSendDefenceInvite={handleSendDefenceInvite}
+                  isSchedulingDefence={isSchedulingDefence}
                 />
               )}
 

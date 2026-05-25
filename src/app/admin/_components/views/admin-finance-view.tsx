@@ -159,7 +159,14 @@ export function AdminFinanceView() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <StatusBadge status={r.status} />
+                      <Badge
+                        variant={
+                          r.status === "Ready" ? "secondary" : r.status === "Returned" ? "destructive" : "outline"
+                        }
+                        className="text-xs"
+                      >
+                        {r.status}
+                      </Badge>
                     </TableCell>
                     <TableCell className="pr-6 text-right">
                       <Button
