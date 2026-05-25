@@ -9,7 +9,6 @@ declare module "@tiptap/core" {
     };
   }
 }
-// biome-ignore lint/correctness/noUnusedVariables: TODO
 export const LineHeight = Extension.create({
   name: "lineHeight",
 

@@ -29,8 +29,8 @@ export function ResearchProjectCard({ project }: ResearchProjectCardProps) {
   const pi = project.members.find((member) => member.role === "PI") ?? project.members[0] ?? null;
   const visibleMembers = project.members.slice(0, 4);
   const hiddenMembersCount = Math.max(0, project.members.length - visibleMembers.length);
-  const advisorCount = project.members.filter((member) => member.role === "ADVISOR").length;
-  const memberCount = project.members.filter((member) => member.role === "MEMBER").length;
+  const _advisorCount = project.members.filter((member) => member.role === "ADVISOR").length;
+  const _memberCount = project.members.filter((member) => member.role === "MEMBER").length;
 
   return (
     <article className="group flex flex-col gap-4 border-border/50 border-b px-6 py-5 transition-all duration-150 hover:bg-muted/30 md:flex-row md:items-start md:gap-6">
@@ -41,10 +41,10 @@ export function ResearchProjectCard({ project }: ResearchProjectCardProps) {
           </Badge>
         </div>
 
-        <h3 className="mb-2 line-clamp-2 font-bold text-lg leading-tight text-foreground">{project.projectTitle}</h3>
-        <p className="mb-4 line-clamp-3 text-sm leading-6 text-muted-foreground">{project.projectDescription}</p>
+        <h3 className="mb-2 line-clamp-2 font-bold text-foreground text-lg leading-tight">{project.projectTitle}</h3>
+        <p className="mb-4 line-clamp-3 text-muted-foreground text-sm leading-6">{project.projectDescription}</p>
 
-        <div className="space-y-2 text-sm text-muted-foreground">
+        <div className="space-y-2 text-muted-foreground text-sm">
           {pi && (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] text-primary">PI</span>
