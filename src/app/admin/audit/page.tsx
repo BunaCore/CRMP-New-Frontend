@@ -202,13 +202,19 @@ export default function AdminAuditPage() {
                     </div>
                   ) : (
                     filteredItems.map((entry, index) => {
-                      const style = actionStyles[entry.action];
-                      const EntityIcon = entityIcons[entry.entityType];
+                      const actionLabel =
+                        entry.action
+                          ?.replace(/_/g, " ")
+                          .toLowerCase()
+                          .replace(/^[a-z]/, (character: string) => character.toUpperCase()) || "Unknown";
+                      const style = actionStyles[entry.action] || {
+                        dot: "bg-slate-400",
+                        badge:
+                          "border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300",
+                        label: actionLabel,
+                      };
+                      const EntityIcon = entityIcons[entry.entityType] || Activity;
                       const isSelected = selectedEntry?.id === entry.id;
-                      const actionLabel = entry.action
-                        .replace(/_/g, " ")
-                        .toLowerCase()
-                        .replace(/^[a-z]/, (character: string) => character.toUpperCase());
 
                       return (
                         <motion.button
