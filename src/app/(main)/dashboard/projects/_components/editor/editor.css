@@ -98,3 +98,68 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Collaboration Carets & Selections — Google Docs / Notion premium style
+   ───────────────────────────────────────────────────────────── */
+
+/* ── Reset ALL y-prosemirror / Tiptap CollaborationCaret defaults ────────────
+   Aggressively hide the default unstyled fallback divs (which contain the name)
+   that y-prosemirror attempts to inject when rendering peer cursors. ────────── */
+
+.ProseMirror .ProseMirror-yjs-cursor > div {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+}
+
+/* ── The actual Google Docs–style vertical caret line ──────────────────────
+   By styling the base class (.ProseMirror-yjs-cursor) directly, we guarantee
+   that ALL peer cursors are visible and styled correctly, avoiding class mismatches. */
+.ProseMirror .ProseMirror-yjs-cursor {
+  position: relative !important;
+  display: inline-block !important;
+  width: 0 !important; /* Zero width to occupy absolutely zero text space */
+  height: 1.25em !important;
+  vertical-align: text-bottom !important;
+  margin-left: -1px !important;
+  margin-right: -1px !important;
+  
+  /* Guarantee visibility using the CSS custom property injected by JS */
+  border-left: 2.5px solid var(--cc, #6366f1) !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  
+  pointer-events: none !important;
+  user-select: none !important;
+  z-index: 20 !important;
+  overflow: visible !important;
+}
+
+/* ── Tiny colored round dot at the top of the caret line ─────────────────── */
+.ProseMirror .collaboration-carets__handle {
+  all: unset;
+  position: absolute;
+  top: -4px;
+  left: -4px; /* Center perfectly over the 2.5px caret line */
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--cc, #6366f1);
+  box-shadow: 0 0 0 1px #ffffff; /* White contrast border ring */
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  z-index: 25;
+}
+
+
+/* ── Collaborative text selection highlight ───────────────────────────────── */
+.ProseMirror .collab-selection {
+  border-radius: 2px;
+}
+

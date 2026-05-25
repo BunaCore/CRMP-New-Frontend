@@ -23,12 +23,11 @@ export function ChatPanel() {
 
   const { messages, status, sendMessage, sendToolbarAction, clearMessages } = useAiChat(aiMode, {
     projectId,
-    workspaceId: "", // TODO: Get from editorStore or workspace active tab
+    workspaceId: "",
     workspaceName,
     userRole: user?.roles?.[0] ?? "Member",
   });
 
-  // Automatically handle sending when triggered from the editor toolbar
   useEffect(() => {
     if (autoSendTrigger) {
       sendToolbarAction(
@@ -42,27 +41,27 @@ export function ChatPanel() {
     }
   }, [autoSendTrigger, setAutoSendTrigger, sendToolbarAction]);
 
-  const handleSend = (content: string) => {
-    sendMessage(content);
-  };
-
-  const handleClear = () => {
-    clearMessages();
-  };
+  const handleSend = (content: string) => sendMessage(content);
+  const handleClear = () => clearMessages();
 
   return (
     <AnimatePresence>
       {isChatOpen && (
         <motion.aside
           initial={{ width: 0, opacity: 0 }}
-          animate={{ width: 350, opacity: 1 }}
+          animate={{ width: 360, opacity: 1 }}
           exit={{ width: 0, opacity: 0 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="relative z-30 flex h-full shrink-0 flex-col overflow-hidden border-border border-l bg-background shadow-2xl dark:border-zinc-800 dark:bg-zinc-950/95"
+          // overflow-hidden clips the inner 360px content while the panel slides in/out
+          className="relative z-30 flex h-full max-h-full shrink-0 flex-col overflow-hidden border-border border-l bg-background shadow-2xl dark:border-zinc-800 dark:bg-zinc-950/95"
         >
-          <div className="flex h-full w-[350px] flex-col">
-            {/* Top Bar */}
-            <div className="flex items-center justify-between border-border border-b bg-card/40 px-4 py-3 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/60">
+          {/*
+           * Fixed-width inner shell — always 360px so children never measure
+           * an animated partial width. overflow-hidden on the aside clips this.
+           */}
+          <div className="flex h-full max-h-full w-[360px] min-w-0 flex-col overflow-hidden">
+            {/* ── Top Bar ─────────────────────────────────── */}
+            <div className="flex shrink-0 items-center justify-between border-border border-b bg-card/40 px-4 py-3 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-900/60">
               <Button
                 variant="ghost"
                 size="sm"
@@ -82,9 +81,15 @@ export function ChatPanel() {
               </Button>
             </div>
 
-            {/* Tabs */}
+            {/* ── Tabs ────────────────────────────────────── */}
+            {/*
+             * KEY FIX: min-h-0 + flex-1 + overflow-hidden allows the tab
+             * container to shrink to fit the panel without overflowing.
+             * Each TabsContent is a plain flex column child — NO absolute positioning.
+             */}
             <Tabs defaultValue="chat" className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              <div className="px-4 pt-4">
+              {/* Tab strip */}
+              <div className="shrink-0 px-4 pt-3 pb-2">
                 <TabsList className="h-10 w-full rounded-xl border border-border/50 bg-muted/30 p-1 dark:border-zinc-800/50 dark:bg-zinc-900/50">
                   <TabsTrigger
                     value="chat"
@@ -117,32 +122,29 @@ export function ChatPanel() {
                 </TabsList>
               </div>
 
-              <TabsContent value="chat" className="relative m-0 min-h-0 flex-1 border-none p-0">
-                <div className="absolute inset-0 flex flex-col overflow-hidden">
-                  {/* Middle Content - Message List */}
-                  <ChatMessageList messages={messages} isLoading={status === "pending"} />
-
-                  {/* Sticky Bottom Composer */}
-                  <ChatComposer onSend={handleSend} onClear={handleClear} isSending={status === "pending"} />
-                </div>
+              {/*
+               * TabsContent: m-0 border-none p-0 removes shadcn defaults.
+               * flex flex-col flex-1 min-h-0 overflow-hidden replaces the
+               * old "relative + absolute inset-0" hack — no absolute children.
+               */}
+              <TabsContent value="chat" className="m-0 flex h-0 flex-1 flex-col overflow-hidden border-none p-0">
+                <ChatMessageList messages={messages} isLoading={status === "pending"} />
+                <ChatComposer onSend={handleSend} onClear={handleClear} isSending={status === "pending"} />
               </TabsContent>
 
-              <TabsContent value="rag" className="relative m-0 min-h-0 flex-1 border-none p-0">
-                <div className="absolute inset-0 flex flex-col overflow-hidden">
-                  <RagTab />
-                </div>
+              <TabsContent value="rag" className="m-0 flex h-0 flex-1 flex-col overflow-hidden border-none p-0">
+                <RagTab />
               </TabsContent>
 
-              <TabsContent value="details" className="relative m-0 min-h-0 flex-1 border-none p-0">
-                <div className="absolute inset-0 flex flex-col overflow-hidden">
-                  <WorkspaceDetailsTab />
-                </div>
+              <TabsContent value="details" className="m-0 flex h-0 flex-1 flex-col overflow-hidden border-none p-0">
+                <WorkspaceDetailsTab />
               </TabsContent>
 
-              <TabsContent value="notifications" className="relative m-0 min-h-0 flex-1 border-none p-0">
-                <div className="absolute inset-0 flex flex-col overflow-hidden">
-                  <ActivityTab />
-                </div>
+              <TabsContent
+                value="notifications"
+                className="m-0 flex h-0 flex-1 flex-col overflow-hidden border-none p-0"
+              >
+                <ActivityTab />
               </TabsContent>
             </Tabs>
           </div>

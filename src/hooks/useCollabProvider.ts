@@ -282,16 +282,23 @@ export function useCollabProvider(workspaceId: string): CollabProviderResult {
     };
   }, [workspaceId, user?.id, token, isSoloProject, workspaceLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const userId = user?.id;
+  const userFullName = user?.fullName;
+
   // ── Stable extension array ───────────────────────────────────
   //
   // Computed once when isActive stabilises. After that it never
   // changes identity, so TipTap does not recreate the editor.
   const extensions = useMemo<AnyExtension[]>(() => {
-    if (isActive && ydocRef.current) {
-      return buildCollabExtensions(ydocRef.current);
+    if (isActive && ydocRef.current && providerRef.current && userId && userFullName) {
+      return buildCollabExtensions(ydocRef.current, providerRef.current, {
+        name: userFullName,
+        color: generateUserColor(userId),
+        userId: userId,
+      });
     }
     return EDITOR_EXTENSIONS;
-  }, [isActive]);
+  }, [isActive, userId, userFullName]);
 
   return { isReady, isActive, ydoc: ydocRef.current, extensions };
 }
