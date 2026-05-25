@@ -265,7 +265,7 @@ export function EvaluationsProvider({ children }: { children: React.ReactNode })
       piColor: "bg-indigo-100 text-indigo-700",
       dept: proposal.department?.name || "N/A",
       stage: proposal.status.replace(/_/g, " "),
-      budget: `$${proposal.budget?.toLocaleString() || 0}`,
+      budget: `ETB ${proposal.budget?.toLocaleString() || 0}`,
       program: proposal.program || "—",
       teamCount: proposal.teamCount || 0,
       year: proposal.submittedDate
