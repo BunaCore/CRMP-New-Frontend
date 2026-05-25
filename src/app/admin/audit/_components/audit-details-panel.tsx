@@ -34,9 +34,9 @@ export function AuditDetailsPanel({ selectedEntry }: AuditDetailsPanelProps) {
           <div className="space-y-5 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm dark:border-slate-800/70 dark:bg-slate-950/80">
             <div className="flex flex-wrap items-center gap-2">
               <Badge
-                className={`border font-bold text-[10px] uppercase tracking-wider ${actionStyles[selectedEntry.action].badge}`}
+                className={`border font-bold text-[10px] uppercase tracking-wider ${actionStyles[selectedEntry.action]?.badge || "border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"}`}
               >
-                {selectedEntry.action.replace(/_/g, " ")}
+                {selectedEntry.action?.replace(/_/g, " ") || "UNKNOWN"}
               </Badge>
               <Badge className="border-slate-200 bg-slate-100 font-bold text-[10px] text-slate-700 uppercase tracking-wider dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
                 {selectedEntry.entityType}
