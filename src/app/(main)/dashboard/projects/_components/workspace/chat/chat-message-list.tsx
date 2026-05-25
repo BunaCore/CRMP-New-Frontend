@@ -180,7 +180,10 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-foreground text-xs">{isUser ? "You" : "CRMP"}</span>
                   <span className="font-medium text-[10px] text-muted-foreground/60 opacity-0 transition-opacity group-hover:opacity-100">
-                    {m.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    {m.timestamp.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </span>
                 </div>
                 {m.requestType && m.requestType !== "CHAT_QUESTION" && !isUser ? (

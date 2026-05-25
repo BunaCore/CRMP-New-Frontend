@@ -55,6 +55,10 @@ const DASHBOARD_MODULE_RULES: SidebarModuleRule[] = [
     url: "/dashboard/publications",
     permissions: ["FUNDED_VIEW", "FUNDED_DECIDE"],
   },
+  {
+    url: "/public/projects",
+    permissions: ["PROJECT_VIEW"],
+  },
   { url: "/dashboard/settings", permissions: ["PROJECT_VIEW"] },
 ];
 

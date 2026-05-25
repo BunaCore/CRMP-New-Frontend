@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 
+import Image from "next/image";
 import Link from "next/link";
 
 import type { Metadata } from "next";
@@ -22,19 +23,8 @@ export default function SignUpPage() {
         {/* Header - Branding */}
         <div className="relative z-10 flex w-full shrink-0 items-center justify-between">
           <Link href="/" className="group flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md shadow-primary/10 transition-all group-hover:scale-105">
-              <svg
-                className="h-4.5 w-4.5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <title>CRMP Logo</title>
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-              </svg>
+            <div className="flex h-9 w-9 items-center justify-center transition-all group-hover:scale-105">
+              <Image src="/logo.png" alt="CRMP Logo" width={36} height={36} className="object-contain" priority />
             </div>
             <span className="font-bold text-foreground text-lg tracking-tight transition-colors">CRMP</span>
           </Link>

@@ -5,6 +5,7 @@ import {
   Coins,
   FileText,
   Folder,
+  Globe,
   LayoutDashboard,
   type LucideIcon,
   Settings,
@@ -50,6 +51,12 @@ export const sidebarItems: NavGroup[] = [
         title: "Projects",
         url: "/dashboard/projects",
         icon: Folder,
+      },
+      {
+        title: "Public Projects",
+        url: "/public/projects",
+        icon: Globe,
+        newTab: false,
       },
       {
         title: "Proposals",
