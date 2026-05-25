@@ -34,30 +34,31 @@ interface RagMessageListProps {
 // Inline token parser for bold, inline code, citations, and links
 function parseInline(text: string, sources?: RagSource[], onCitationClick?: (sourceId: string) => void) {
   const regex = /(\*\*.*?\*\*|`.*?`|\[\d+\]|\[.*?\]\(.*?\))/g;
-  const parts = text.split(regex);
-  if (parts.length === 1) return text;
+  const rawParts = text.split(regex);
+  if (rawParts.length === 1) return text;
 
-  return parts.map((part, index) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
+  const parts = rawParts.map((part, i) => ({
+    id: `${part}-${i}`,
+    content: part,
+  }));
+
+  return parts.map((part) => {
+    const { content, id } = part;
+    if (content.startsWith("**") && content.endsWith("**")) {
       return (
-        // biome-ignore lint/suspicious/noArrayIndexKey: parts are static
-        <strong key={index} className="font-semibold text-foreground dark:text-zinc-50">
-          {part.slice(2, -2)}
+        <strong key={id} className="font-semibold text-foreground dark:text-zinc-50">
+          {content.slice(2, -2)}
         </strong>
       );
     }
-    if (part.startsWith("`") && part.endsWith("`")) {
+    if (content.startsWith("`") && content.endsWith("`")) {
       return (
-        // biome-ignore lint/suspicious/noArrayIndexKey: parts are static
-        <code
-          key={index}
-          className="rounded bg-muted px-1.5 py-0.5 font-mono text-[11px] text-primary dark:bg-zinc-800"
-        >
-          {part.slice(1, -1)}
+        <code key={id} className="rounded bg-muted px-1.5 py-0.5 font-mono text-[11px] text-primary dark:bg-zinc-800">
+          {content.slice(1, -1)}
         </code>
       );
     }
-    const citationMatch = part.match(/^\[(\d+)\]$/);
+    const citationMatch = content.match(/^\[(\d+)\]$/);
     if (citationMatch) {
       const sourceNum = citationMatch[1];
       const sourceIndex = Number.parseInt(sourceNum, 10) - 1;
@@ -65,8 +66,7 @@ function parseInline(text: string, sources?: RagSource[], onCitationClick?: (sou
       return (
         <button
           type="button"
-          // biome-ignore lint/suspicious/noArrayIndexKey: parts are static
-          key={index}
+          key={id}
           onClick={(e) => {
             if (associatedSource && onCitationClick) {
               e.preventDefault();
@@ -80,14 +80,13 @@ function parseInline(text: string, sources?: RagSource[], onCitationClick?: (sou
         </button>
       );
     }
-    const linkMatch = part.match(/^\[(.*?)\]\((.*?)\)$/);
+    const linkMatch = content.match(/^\[(.*?)\]\((.*?)\)$/);
     if (linkMatch) {
       const linkText = linkMatch[1];
       const linkUrl = linkMatch[2];
       return (
         <a
-          // biome-ignore lint/suspicious/noArrayIndexKey: parts are static
-          key={index}
+          key={id}
           href={linkUrl}
           target="_blank"
           rel="noopener noreferrer"
@@ -97,8 +96,7 @@ function parseInline(text: string, sources?: RagSource[], onCitationClick?: (sou
         </a>
       );
     }
-    // biome-ignore lint/suspicious/noArrayIndexKey: parts are static
-    return <span key={index}>{part}</span>;
+    return <span key={id}>{content}</span>;
   });
 }
 
