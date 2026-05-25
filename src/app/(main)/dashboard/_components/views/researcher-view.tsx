@@ -390,12 +390,43 @@ function useResearcherStats(userId: string | undefined) {
   });
 }
 
+/**
+ * Hook to determine whether the current user has budget data to display.
+ * Mirrors the same permission + data check used inside BudgetPieChart so the
+ * parent layout can adapt its grid when no budget section will be rendered.
+ */
+function useBudgetAvailable() {
+  const { user } = useSession();
+  const hasBudgetPermission = useMemo(() => {
+    if (!user) return false;
+    const hasKey = user.permissions?.includes("budget:view");
+    const hasRole = user.roles?.some((r) => ["STUDENT", "FACULTY", "RAD", "FINANCE"].includes(r));
+    return !!(hasKey || hasRole);
+  }, [user]);
+
+  const { data: rawProjects, isLoading } = useMyBudgetProjects({
+    enabled: hasBudgetPermission,
+  });
+
+  const hasBudgetData = useMemo(() => {
+    if (!hasBudgetPermission) return false;
+    if (isLoading) return true; // Assume true while loading to avoid layout flash
+    const funded = rawProjects?.filter((p) => p.projectType !== "UG") || [];
+    return funded.length > 0;
+  }, [hasBudgetPermission, isLoading, rawProjects]);
+
+  return { hasBudgetData, isLoading };
+}
+
 export function ResearcherView() {
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
   const { user } = useSession();
 
   // ── Live data from backend ──────────────────────────────────
   const { data: stats, isLoading: statsLoading } = useResearcherStats(user?.id);
+
+  // Budget availability – controls whether the grid is 2-col or 1-col
+  const { hasBudgetData } = useBudgetAvailable();
 
   // Proposals data
   const { data: apiProposals, isLoading: proposalsLoading } = useQuery({
@@ -730,10 +761,12 @@ export function ResearcherView() {
       </Dialog>
 
       {/* ═══════════ BUDGET SUMMARY + MY TASKS ═══════════ */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="flex flex-col gap-4">
-          <BudgetPieChart />
-        </div>
+      <div className={`grid grid-cols-1 gap-4 ${hasBudgetData ? "lg:grid-cols-2" : ""}`}>
+        {hasBudgetData && (
+          <div className="flex flex-col gap-4">
+            <BudgetPieChart />
+          </div>
+        )}
 
         {/* My Tasks (Multi-Project) */}
         <Card className="group relative self-start overflow-hidden rounded-xl border-violet-500/20 bg-violet-500/5 shadow-sm transition-all hover:shadow-md">
