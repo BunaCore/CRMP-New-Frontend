@@ -1,5 +1,7 @@
 import { io, type Socket } from "socket.io-client";
 
+import { diagnoseSocketConnection, logDiagnosticResults } from "./socket-diagnostics";
+
 // Define the environment variable for your backend URL in production
 // Since we don't know the exact URL, default to empty to enforce relying on relative or env
 const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -8,6 +10,7 @@ class SocketManager {
   private static instance: SocketManager;
   private socket: Socket | null = null;
   private isConnecting = false;
+  private diagnosticsShown = false;
 
   private constructor() {}
 
@@ -23,19 +26,24 @@ class SocketManager {
 
     this.isConnecting = true;
 
-    // Setup Socket connection
-    // extraHeaders are sent on the HTTP polling handshake request (before WS upgrade),
-    // which is how the backend receives the Authorization header.
-    // Forcing websocket-only would skip that HTTP phase and drop the headers.
-    console.log("token", token);
+    console.log("[SocketManager] Attempting connection to:", SOCKET_URL);
+    console.log("[SocketManager] Token provided:", token ? "Yes" : "No");
+
+    // Setup Socket connection with improved configuration
     this.socket = io(SOCKET_URL, {
-      extraHeaders: {
-        Authorization: token,
+      auth: {
+        token: token,
       },
+      // Ensure cookies/credentials are sent if needed
+      withCredentials: true,
+      // Prefer WebSocket, fallback to polling
+      transports: ["websocket", "polling"],
       autoConnect: false,
-      transports: ["polling", "websocket"],
-      reconnectionAttempts: 5,
-      timeout: 10000,
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 10,
+      timeout: 20000,
     });
 
     this.setupInternalListeners();
@@ -47,16 +55,41 @@ class SocketManager {
 
     this.socket.on("connect", () => {
       this.isConnecting = false;
-      console.log("[SocketManager] Connected to server");
+      this.diagnosticsShown = false; // Reset for future disconnections
+      console.log("[SocketManager] ✓ Connected to server successfully");
     });
 
     this.socket.on("disconnect", (reason) => {
-      console.log(`[SocketManager] Disconnected: ${reason}`);
+      console.warn(`[SocketManager] ✗ Disconnected: ${reason}`);
+      this.isConnecting = false;
     });
 
-    this.socket.on("connect_error", (error) => {
+    this.socket.on("connect_error", async (error) => {
       this.isConnecting = false;
-      console.error("[SocketManager] Connection Error:", error.message);
+      console.error("[SocketManager] Connection Error:", error.message || error, "\nDetails:", error);
+
+      // Show diagnostics only once per connection attempt
+      if (!this.diagnosticsShown) {
+        this.diagnosticsShown = true;
+        console.log("[SocketManager] Running diagnostics... (check console for details)");
+
+        try {
+          const diagnostics = await diagnoseSocketConnection(SOCKET_URL);
+          logDiagnosticResults(diagnostics);
+        } catch (diagErr) {
+          console.error("[SocketManager] Diagnostics failed:", diagErr);
+        }
+      }
+
+      // Log more diagnostic info
+      if (error instanceof Error && (error as unknown as { type?: string }).type === "TransportError") {
+        console.error("[SocketManager] Transport Error - Server may not be running or unreachable");
+        console.error(`[SocketManager] Trying to reach: ${SOCKET_URL}`);
+      }
+    });
+
+    this.socket.on("error", (error) => {
+      console.error("[SocketManager] Socket Error:", error);
     });
   }
 
@@ -64,11 +97,16 @@ class SocketManager {
     if (this.socket) {
       this.socket.disconnect();
       this.socket = null;
+      this.isConnecting = false;
     }
   }
 
   public getSocket(): Socket | null {
     return this.socket;
+  }
+
+  public isConnected(): boolean {
+    return this.socket?.connected ?? false;
   }
 }
 

@@ -288,9 +288,9 @@ export function useCollabProvider(workspaceId: string): CollabProviderResult {
   // changes identity, so TipTap does not recreate the editor.
   const extensions = useMemo<AnyExtension[]>(() => {
     if (isActive && ydocRef.current) {
-      return buildCollabExtensions(ydocRef.current);
+      return buildCollabExtensions(ydocRef.current) as AnyExtension[];
     }
-    return EDITOR_EXTENSIONS;
+    return EDITOR_EXTENSIONS as AnyExtension[];
   }, [isActive]);
 
   return { isReady, isActive, ydoc: ydocRef.current, extensions };

@@ -239,6 +239,9 @@ export function SignUpForm() {
               value={field.value || ""}
               onValueChange={(val) => {
                 field.onChange(val);
+                // Update the search input to display the selected department label
+                const selected = departments.find((d) => d.value === val);
+                setDeptSearch(selected?.label ?? "");
               }}
             >
               <ComboboxInput

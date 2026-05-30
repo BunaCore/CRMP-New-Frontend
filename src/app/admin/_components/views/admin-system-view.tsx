@@ -172,9 +172,8 @@ export function AdminSystemView() {
             {AUDIT_ENTRIES.map((l) => (
               <div key={`${l.action}-${l.time}`} className="flex items-center gap-3 py-1 text-sm">
                 <CircleDot
-                  className={`h-3 w-3 flex-shrink-0 ${
-                    l.type === "create" ? "text-emerald-400" : l.type === "warn" ? "text-amber-400" : "text-blue-400"
-                  }`}
+                  className={`h-3 w-3 flex-shrink-0 ${l.type === "create" ? "text-emerald-400" : l.type === "warn" ? "text-amber-400" : "text-blue-400"
+                    }`}
                 />
                 <span className="font-medium">{l.action}</span>
                 <span className="text-muted-foreground text-xs">{l.detail}</span>

@@ -97,7 +97,6 @@ export const NON_STARTER_EXTENSIONS = [
 
   // ── Media ────────────────────────────────────────────────────
   ImageResize.configure({
-    // @ts-expect-error - allowBase64 exists but is missing from the extension types
     allowBase64: true,
     HTMLAttributes: {
       class: "rounded-xl border border-border shadow-md mx-auto max-w-full my-4",
