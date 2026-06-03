@@ -180,7 +180,6 @@ export default function DocumentEditor({ workspaceId, projectId }: DocumentEdito
       const reader = new FileReader();
       reader.onload = (e) => {
         const base64Str = e.target?.result as string;
-        // @ts-expect-error - tiptap-extension-resize-image adds setImage but may not merge types into ChainedCommands
         editor.chain().focus().setImage({ src: base64Str }).run();
       };
       reader.readAsDataURL(file);
