@@ -1,29 +1,12 @@
 // ============================================================
 // COLLAB EXTENSION BUILDER
-//
 // Returns the TipTap extension array for collab mode.
-// Called from useCollabProvider after ydoc + provider are ready.
-//
-// Key differences from EDITOR_EXTENSIONS (solo):
-//   • StarterKit.history is DISABLED — Y.js Collaboration
-//     provides its own undo/redo via y-protocols. Running both
-//     causes a double-undo bug where Ctrl+Z undoes twice.
-//   • Collaboration extension is added — binds TipTap to a
-//     Y.Doc fragment so the CRDT becomes the content source.
-//
-// NOTE — CollaborationCursor (remote cursor rendering):
-//   @tiptap/extension-collaboration-cursor has not yet published a
-//   TipTap v3-compatible release (still at v2). The extension is
-//   intentionally omitted until TipTap publishes a v3 version.
-//   Peer presence (who is in the room) is surfaced via Y.js
-//   awareness in useCollabProvider + CollabAwarenessBar.
-//   To add cursor rendering once the package is available:
-//     import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
-//     Add after Collaboration: CollaborationCursor.configure({ provider, user: { name, color } })
 // ============================================================
 
 import Collaboration from "@tiptap/extension-collaboration";
+import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 import StarterKit from "@tiptap/starter-kit";
+import type { WebsocketProvider } from "y-websocket";
 import type * as Y from "yjs";
 
 import {
@@ -31,36 +14,80 @@ import {
   STARTER_KIT_BASE_CONFIG,
 } from "@/app/(main)/dashboard/projects/_components/editor/extensions";
 
+export interface CollabUser {
+  name?: string;
+  color?: string;
+  userId?: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Renders a premium, Google Docs-style collaboration caret.
+ *
+ * We intentionally add BOTH classes to the root element:
+ *   - "ProseMirror-yjs-cursor" → tells y-prosemirror this IS the cursor
+ *     widget so it does NOT render a second default element alongside ours.
+ *   - "collaboration-carets__caret" → our own class for the CSS styling.
+ *
+ * DOM structure:
+ *   <span class="ProseMirror-yjs-cursor collaboration-carets__caret" style="--cc:#hex">
+ *     <span class="collaboration-carets__handle"></span>   ← Tiny colored dot at top
+ *     <div  class="collaboration-carets__label">Name</div> ← Hover-only pill tooltip
+ *   </span>
+ */
+function buildCaretElement(user: CollabUser | null | undefined): HTMLElement {
+  const color: string = user?.color || "#6366f1";
+
+  // Root — the vertical caret line.
+  // Adding ProseMirror-yjs-cursor prevents the library from injecting its own fallback.
+  const caret = document.createElement("span");
+  caret.className = "ProseMirror-yjs-cursor collaboration-carets__caret";
+  caret.style.setProperty("--cc", color);
+  caret.style.borderLeftColor = color;
+
+  // The tiny colored dot sitting at the very top of the caret line
+  const handle = document.createElement("span");
+  handle.className = "collaboration-carets__handle";
+  handle.style.backgroundColor = color;
+  handle.setAttribute("aria-hidden", "true");
+
+  caret.appendChild(handle);
+
+  return caret;
+}
+
 /**
  * Builds the collab-mode extension array.
- *
- * Composes:
- *   1. StarterKit with history:false (Y.js owns undo/redo)
- *   2. All NON_STARTER_EXTENSIONS unchanged (same as solo mode)
- *   3. Collaboration — binds TipTap to the Y.Doc field "document"
- *
- * Called once per workspace collab session — not on every render.
+ * Collab includes: StarterKit + all shared extensions + Collaboration + CollaborationCaret.
+ * Called once per workspace session — not on every render.
  */
-export function buildCollabExtensions(ydoc: Y.Doc) {
+export function buildCollabExtensions(
+  ydoc: Y.Doc,
+  provider: WebsocketProvider,
+  user: { name: string; color: string; userId: string },
+) {
   return [
-    // StarterKit base configuration (heading levels etc.).
-    // NOTE: In TipTap v3, `history: false` is NOT a valid StarterKitOption.
-    // The @tiptap/extension-collaboration v3 extension automatically overrides
-    // the undo/redo commands to use Y.js's UndoManager, so the native History
-    // plugin is effectively disabled for collaborative sessions without any
-    // explicit StarterKit configuration needed.
-    StarterKit.configure({
-      ...STARTER_KIT_BASE_CONFIG,
-    }),
+    StarterKit.configure({ ...STARTER_KIT_BASE_CONFIG, undoRedo: false }),
 
-    // All other base extensions — identical to solo mode
     ...NON_STARTER_EXTENSIONS,
 
-    // Y.js document binding — makes Y.Doc the content source of truth.
-    // field "document" must match the backend Y.Doc fragment name.
-    Collaboration.configure({
-      document: ydoc,
-      field: "document",
+    // Y.js CRDT binding
+    Collaboration.configure({ document: ydoc, field: "document" }),
+
+    // Collaborative carets with custom render
+    CollaborationCaret.configure({
+      provider,
+      user,
+      render: buildCaretElement,
+      // Translucent selection fill — append hex alpha for 22% opacity
+      selectionRender: (u: CollabUser | null | undefined) => {
+        const hex = (u?.color || "#6366f1") as string;
+        return {
+          nodeName: "span",
+          class: "collab-selection",
+          style: `background-color: ${hex}38`,
+        };
+      },
     }),
   ];
 }
