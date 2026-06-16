@@ -78,7 +78,9 @@ export function EvaluationDrawer() {
     proposalIdForEval ?? null,
   );
 
-  const members = proposalMembers;
+  // Only PI and MEMBER roles should appear in the scoring table.
+  // Advisors and evaluators are assessors, not the subjects of evaluation.
+  const members = proposalMembers.filter((m) => m.role === "PI" || m.role === "MEMBER");
   const membersLoading = proposalMembersLoading;
 
   useEffect(() => {
@@ -119,8 +121,11 @@ export function EvaluationDrawer() {
       .finally(() => setScoresLoading(false));
   }, [drawerTab, proposalIdForEval, activeId]);
 
-  const phaseFilter = drawerKind === "proposal" ? "PROPOSAL" : "PROJECT";
-  const filteredApiRubrics = apiRubrics.filter((rubricItem) => rubricItem.phase === phaseFilter);
+  // Proposals: show only PROPOSAL-phase rubrics (Advisor 20pts + Proposal Defence 15pts = 35pts total)
+  // Projects:  show ALL rubrics across both phases (all 5 rubrics = 100pts total), because the full
+  //            scoring matrix spans both phases — PROPOSAL scores carry over from the proposal stage.
+  const filteredApiRubrics =
+    drawerKind === "proposal" ? apiRubrics.filter((rubricItem) => rubricItem.phase === "PROPOSAL") : apiRubrics; // all 5 rubrics: PROPOSAL (2) + PROJECT (3) = 100pts
 
   // For display aggregate, we'll average student scores or just sum the first student's score
   const targetStudentId =

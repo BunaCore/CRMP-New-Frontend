@@ -73,7 +73,7 @@ export default function PublicProjectsPage() {
         </header>
 
         <section
-          className={`border-b transition-colors duration-300 px-4 py-16 md:py-24 ${isDark ? "border-white/5 bg-slate-900/10" : "border-slate-200/50 bg-slate-50/50"}`}
+          className={`border-b px-4 py-16 transition-colors duration-300 md:py-24 ${isDark ? "border-white/5 bg-slate-900/10" : "border-slate-200/50 bg-slate-50/50"}`}
         >
           <div className="mx-auto max-w-3xl text-center">
             <div
@@ -110,7 +110,7 @@ export default function PublicProjectsPage() {
         <main className="mx-auto w-full max-w-4xl px-4 py-10">
           <div className="mb-6 flex items-end justify-between gap-3">
             <div>
-              <h2 className="font-semibold text-xl text-foreground md:text-2xl">Published projects</h2>
+              <h2 className="font-semibold text-foreground text-xl md:text-2xl">Published projects</h2>
               <p className="text-muted-foreground text-sm">
                 {meta?.totalItems ?? projects.length} total public projects available
               </p>

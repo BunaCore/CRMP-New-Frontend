@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 
 import { Bot, Check, CheckCircle2, Copy, FileText, MessageSquare, User } from "lucide-react";
 
-import { ScrollArea } from "@/components/ui/scroll-area";
 import type { AiChatMessage } from "@/lib/ai/types";
 import { cn } from "@/lib/utils";
 
@@ -50,11 +49,11 @@ function PremiumTextRenderer({ content }: { content: string }) {
       elements.push(
         <ol
           key={`list-${elements.length}`}
-          className="list-decimal space-y-1.5 pl-5 marker:font-medium marker:text-muted-foreground/80"
+          className="min-w-0 list-decimal space-y-1.5 overflow-hidden pl-5 marker:font-medium marker:text-muted-foreground/80"
         >
           {currentList.map((item, i) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: List items are static
-            <li key={`item-${i}`} className="pl-1">
+            <li key={`item-${i}`} className="min-w-0 break-words pl-1">
               <FormattedText text={item} />
             </li>
           ))}
@@ -100,7 +99,7 @@ function PremiumTextRenderer({ content }: { content: string }) {
   flushParagraph();
   flushList();
 
-  return <div className="flex flex-col gap-2.5 text-sm">{elements}</div>;
+  return <div className="flex min-w-0 flex-col gap-2.5 overflow-hidden text-sm">{elements}</div>;
 }
 
 interface ChatMessageListProps {
@@ -138,8 +137,8 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
 
   if (messages.length === 0) {
     return (
-      <ScrollArea className="min-h-0 flex-1 p-6">
-        <div className="flex h-full flex-col items-center justify-center space-y-4 pt-24 opacity-40">
+      <div className="h-0 flex-1 overflow-y-auto">
+        <div className="flex h-full flex-col items-center justify-center space-y-4 px-6 py-6 opacity-40">
           <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-muted/60">
             <MessageSquare className="h-8 w-8 text-muted-foreground" />
           </div>
@@ -148,19 +147,19 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
             <p className="mt-1 text-muted-foreground text-xs">Start a conversation or select text to begin</p>
           </div>
         </div>
-      </ScrollArea>
+      </div>
     );
   }
 
   return (
-    <ScrollArea className="min-h-0 flex-1 p-4">
-      <div className="flex flex-col gap-6 pb-4">
+    <div className="h-0 flex-1 overflow-y-auto">
+      <div className="flex flex-col gap-6 px-4 pt-4 pb-6">
         {messages.map((m) => {
           const isUser = m.role === "user";
           return (
             <div
               key={m.id}
-              className={cn("group flex w-full gap-3 transition-colors", isUser ? "flex-row-reverse" : "flex-row")}
+              className={cn("group flex w-full gap-3 transition-colors", isUser ? "flex-row-reverse" : "flex-row pr-2")}
             >
               <div
                 className={cn(
@@ -172,7 +171,12 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
               >
                 {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
               </div>
-              <div className={cn("flex min-w-0 max-w-[85%] flex-col gap-1.5", isUser ? "items-end" : "items-start")}>
+              <div
+                className={cn(
+                  "flex w-full min-w-0 max-w-[85%] flex-col gap-1.5 overflow-hidden",
+                  isUser ? "items-end" : "items-start",
+                )}
+              >
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-foreground text-xs">{isUser ? "You" : "CRMP"}</span>
                   <span className="font-medium text-[10px] text-muted-foreground/60 opacity-0 transition-opacity group-hover:opacity-100">
@@ -183,34 +187,36 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
                   </span>
                 </div>
                 {m.requestType && m.requestType !== "CHAT_QUESTION" && !isUser ? (
-                  <div className="flex flex-col gap-2 rounded-2xl rounded-tl-sm border border-border bg-card p-4 text-sm shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-                    <div className="flex items-center gap-2 border-border/50 border-b pb-2 font-medium text-foreground">
+                  <div className="flex w-full min-w-0 flex-col gap-2 overflow-hidden rounded-2xl rounded-tl-sm border border-border bg-card p-4 text-sm shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                    <div className="flex min-w-0 items-center gap-2 overflow-hidden border-border/50 border-b pb-2 font-medium text-foreground">
                       <FileText className="h-4 w-4 text-primary" />
                       {m.requestType.replace(/_/g, " ")} RESULT
                     </div>
-                    {/* Render diff-like view if it is a grammar/replacement action */}
-                    {m.pendingAction && m.pendingAction.action.type === "replace" && m.originalContext ? (
-                      <div className="mt-1 flex flex-col gap-2 rounded-md border border-border bg-muted/30 p-3">
-                        <div className="flex flex-col gap-1">
-                          <span className="font-semibold text-[10px] text-red-500/70 uppercase tracking-wider">
-                            Original
-                          </span>
-                          <div className="text-muted-foreground line-through decoration-red-500/30">
-                            {m.originalContext}
+                    {/* Scrollable content area — prevents long responses from pushing the UI */}
+                    <div className="max-h-56 overflow-y-auto">
+                      {m.pendingAction && m.pendingAction.action.type === "replace" && m.originalContext ? (
+                        <div className="mt-1 flex flex-col gap-2 rounded-md border border-border bg-muted/30 p-3">
+                          <div className="flex flex-col gap-1">
+                            <span className="font-semibold text-[10px] text-red-500/70 uppercase tracking-wider">
+                              Original
+                            </span>
+                            <div className="text-muted-foreground line-through decoration-red-500/30">
+                              {m.originalContext}
+                            </div>
+                          </div>
+                          <div className="mt-1 flex flex-col gap-1">
+                            <span className="font-semibold text-[10px] text-green-600/70 uppercase tracking-wider dark:text-green-500/70">
+                              Corrected
+                            </span>
+                            <div className="text-foreground">
+                              <PremiumTextRenderer content={m.content} />
+                            </div>
                           </div>
                         </div>
-                        <div className="mt-1 flex flex-col gap-1">
-                          <span className="font-semibold text-[10px] text-green-600/70 uppercase tracking-wider dark:text-green-500/70">
-                            Corrected
-                          </span>
-                          <div className="text-foreground">
-                            <PremiumTextRenderer content={m.content} />
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <PremiumTextRenderer content={m.content} />
-                    )}
+                      ) : (
+                        <PremiumTextRenderer content={m.content} />
+                      )}
+                    </div>
 
                     {/* Render action buttons if there is a pending action to apply */}
                     {m.pendingAction && m.pendingAction.action.type !== "none" ? (
@@ -263,7 +269,7 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
                     )}
                   </div>
                 ) : isUser && m.requestType && m.requestType !== "CHAT_QUESTION" ? (
-                  <div className="flex flex-col gap-1.5 rounded-2xl rounded-tr-sm bg-muted px-4 py-3 text-sm shadow-sm dark:bg-zinc-800/50">
+                  <div className="flex w-full min-w-0 flex-col gap-1.5 overflow-hidden rounded-2xl rounded-tr-sm bg-muted px-4 py-3 text-sm shadow-sm dark:bg-zinc-800/50">
                     <div className="border-border/40 border-b pb-1 font-medium text-foreground">
                       {m.content.split(":")[0]}
                     </div>
@@ -274,7 +280,7 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
                 ) : (
                   <div
                     className={cn(
-                      "relative break-words rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm",
+                      "relative w-full min-w-0 overflow-hidden break-words rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm",
                       isUser
                         ? "rounded-tr-sm bg-primary text-primary-foreground dark:bg-primary dark:text-primary-foreground"
                         : "rounded-tl-sm border border-border bg-card text-card-foreground dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100",
@@ -283,7 +289,9 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
                     {isUser ? (
                       <div className="whitespace-pre-wrap">{m.content}</div>
                     ) : (
-                      <PremiumTextRenderer content={m.content} />
+                      <div className="max-h-64 overflow-y-auto">
+                        <PremiumTextRenderer content={m.content} />
+                      </div>
                     )}
                   </div>
                 )}
@@ -292,11 +300,11 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
           );
         })}
         {isLoading && (
-          <div className="flex w-full flex-row gap-3 transition-colors">
+          <div className="flex w-full flex-row gap-3 pr-2 transition-colors">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-foreground shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
               <Bot className="h-4 w-4" />
             </div>
-            <div className="flex min-w-0 max-w-[85%] flex-col items-start gap-1.5">
+            <div className="flex w-full min-w-0 max-w-[85%] flex-col items-start gap-1.5 overflow-hidden">
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-foreground text-xs">CRMP</span>
               </div>
@@ -321,6 +329,6 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
         )}
         <div ref={endRef} />
       </div>
-    </ScrollArea>
+    </div>
   );
 }

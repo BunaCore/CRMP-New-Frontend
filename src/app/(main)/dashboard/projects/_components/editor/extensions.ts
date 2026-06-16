@@ -40,6 +40,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Typography from "@tiptap/extension-typography";
 import Underline from "@tiptap/extension-underline";
+import type { AnyExtension } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import ImageResize from "tiptap-extension-resize-image";
 
@@ -59,7 +60,7 @@ export const STARTER_KIT_BASE_CONFIG = {
 // Everything except StarterKit — shared between solo and collab.
 // Collab mode adds this array after its own StarterKit + Collaboration.
 
-export const NON_STARTER_EXTENSIONS = [
+export const NON_STARTER_EXTENSIONS: AnyExtension[] = [
   // ── Inline formatting ────────────────────────────────────────
   Underline,
   TextStyle, // Required by Color extension and FontFamily
@@ -97,7 +98,6 @@ export const NON_STARTER_EXTENSIONS = [
 
   // ── Media ────────────────────────────────────────────────────
   ImageResize.configure({
-    // @ts-expect-error - allowBase64 exists but is missing from the extension types
     allowBase64: true,
     HTMLAttributes: {
       class: "rounded-xl border border-border shadow-md mx-auto max-w-full my-4",
@@ -138,4 +138,7 @@ export const NON_STARTER_EXTENSIONS = [
 // This is the default extension array used when there is only
 // one project member (no realtime collaboration needed).
 
-export const EDITOR_EXTENSIONS = [StarterKit.configure(STARTER_KIT_BASE_CONFIG), ...NON_STARTER_EXTENSIONS];
+export const EDITOR_EXTENSIONS: AnyExtension[] = [
+  StarterKit.configure(STARTER_KIT_BASE_CONFIG),
+  ...NON_STARTER_EXTENSIONS,
+];

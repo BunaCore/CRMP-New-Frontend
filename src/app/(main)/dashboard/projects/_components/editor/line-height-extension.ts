@@ -1,4 +1,5 @@
-import { Extension } from "@tiptap/core";
+import { Extension } from "@tiptap/react";
+import "@tiptap/core";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -8,7 +9,6 @@ declare module "@tiptap/core" {
     };
   }
 }
-
 export const LineHeight = Extension.create({
   name: "lineHeight",
 
